@@ -21,12 +21,10 @@ class ModelSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False)
     model_path = serializers.CharField(required=False)
     def validate(self, data:dict):
-        model_path = data.get('model_path')
-        if not model_path and not data:
-            raise serializers.ValidationError(
-                "You must provide either 'model_content' or 'model_path'."
-            )
-        return data
+        """
+        Ensure at least one of 'model' or 'model_path' is provided.
+        """
+        return validate(data, 'model_name', 'model_path')
 
 
 class FitModelSerializer(serializers.Serializer):
@@ -38,23 +36,28 @@ class FitModelSerializer(serializers.Serializer):
         """
         Ensure at least one of 'model' or 'model_path' is provided.
         """
-        model = data.get('model')
-        model_path = data.get('model_path')
-
-        if not model and not model_path:
-            raise serializers.ValidationError(
-                "You must provide either 'model' or 'model_path'."
-            )
-        return data
+        return validate(data, 'model', 'model_path')
 
 class PredictSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
-    model = serializers.JSONField()
-
+    model = serializers.JSONField(required=False)
+    model_path = serializers.CharField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'model' or 'model_path' is provided.
+        """
+        return validate(data, 'model', 'model_path')
+    
 class PreprocessorSerializer(serializers.Serializer):
-    preprocessor_name = serializers.CharField(required=True)  # Add all supported scalers
-    preprocessor_type = serializers.ChoiceField(choices=['scaler', 'encoding', 'imputation', 'binarization'])
+    preprocessor_name = serializers.CharField(required=False)  # Add all supported scalers
+    preprocessor_type = serializers.ChoiceField(choices=['scaler', 'encoding', 'imputation', 'binarization'], required=False)
     params = serializers.JSONField(required=False)
+    preprocessor_path = serializers.CharField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
+        """
+        return validate(data, 'preprocessor_name', 'preprocessor_path')
 
 class FitPreprocessorSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
@@ -79,3 +82,11 @@ class DataLoaderSerializer(serializers.Serializer):
     data_type = serializers.CharField(required=False)
     filepath = serializers.CharField(required=False)
 
+def validate(data, *args:str):
+    for arg in args:
+        val = data.get(arg)
+        if val:
+            return data
+    raise serializers.ValidationError(
+        f"You must provide either {', '.join(args)}."
+    )

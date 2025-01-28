@@ -107,12 +107,13 @@ class PredictAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = PredictSerializer(data=request.data)
         if serializer.is_valid():
-            X = serializer.validated_data['X']
-            model = serializer.validated_data['model']
+            X = serializer.validated_data.get('X')
+            model = serializer.validated_data.get('model')
+            model_path = serializer.validated_data.get('model_path')
 
             try:
                 # Perform prediction
-                predictor = Predict(X, model=model)
+                predictor = Predict(X, model=model, model_path=model_path)
                 output_channel = request.query_params.get('output', None)
                 response_data = predictor(output_channel)
                 return Response(response_data, status=status.HTTP_200_OK)
@@ -129,13 +130,13 @@ class PreprocessorAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = PreprocessorSerializer(data=request.data)
         if serializer.is_valid():
-            preprocessor_name = serializer.validated_data['preprocessor_name']
-            preprocessor_type = serializer.validated_data['preprocessor_type']
+            preprocessor_name = serializer.validated_data.get('preprocessor_name')
+            preprocessor_type = serializer.validated_data.get('preprocessor_type')
             params = serializer.validated_data.get('params')
-
+            preprocessor_path = serializer.validated_data.get('preprocessor_path')
             try:
                 # Create the Preprocessor
-                preprocessor = Preprocessor(preprocessor_name, preprocessor_type, params=params)
+                preprocessor = Preprocessor(preprocessor_name, preprocessor_type, params=params, preprocessor_path=preprocessor_path)
                 output_channel = request.query_params.get('output', None)
                 response_data = preprocessor(output_channel)
                 return Response(response_data, status=status.HTTP_200_OK)

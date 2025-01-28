@@ -50,7 +50,7 @@ class Fit:
 
     def _fit_from_path(self):
         try:
-            model = NodeLoader.load(path=self.model)
+            model = NodeLoader.load(path=self.model_path)
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by path: {e}")
@@ -61,7 +61,7 @@ class Fit:
             fitter = ModelFitter(model, self.X, self.y)
             fitted_model = fitter.fit_model()
 
-            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "fit")
+            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "fitter")
             NodeSaver.save(payload, "core/nodes/saved/models")
             del payload['node_data']
             return payload

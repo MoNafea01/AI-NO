@@ -1,10 +1,6 @@
-# Model training nodes
-# core/nodes/models.py
-
 from .models import MODELS as models
 from .utils import PayloadBuilder
 from ..utils import NodeSaver, NodeLoader, NodeNameHandler
-
 
 class Model:
     """Handles model creation and parameter management."""
@@ -32,17 +28,14 @@ class Model:
         try:
             if self.model_type not in models:
                 raise ValueError(f"Unsupported model type: {self.model_type}. Available types are: {list(models.keys())}.")
-            
             if self.task not in models[self.model_type]:
                 raise ValueError(f"Unsupported task type: {self.task} for model type: {self.model_type}.")
-            
             if self.model_name not in models[self.model_type][self.task]:
                 raise ValueError(f"Unsupported model name: {self.model_name} for task: {self.task}.")
 
             model_node = models[self.model_type][self.task][self.model_name]['node']
             model = model_node(**self.params)
             return self._create_handler(model, self.model_name, self.model_type, self.task)
-        
         except Exception as e:
             raise ValueError(f"Error creating model from json: {e}")
         
@@ -50,7 +43,7 @@ class Model:
         try:
             model = NodeLoader.load(path=self.model_path)
             model_name, _ = NodeNameHandler.handle_name(self.model_path)
-            model_type, task = self.find_model_type_and_task(model_name,models)
+            model_type, task = self.find_model_type_and_task(model_name, models)
             return self._create_handler(model, model_name, model_type, task)
         except Exception as e:
             raise ValueError(f"Error loading model from path: {e}")

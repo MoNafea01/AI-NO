@@ -6,7 +6,7 @@ router = DefaultRouter()
 router.register(r'workflows', WorkflowViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('ai_operations/', include(router.urls)),
     path('create_model/', CreateModelView.as_view(), name='create_model'),
     path('fit_model/', FitModelAPIView.as_view(), name='fit_model'),
     path('predict/', PredictAPIView.as_view(), name='predict_model'),

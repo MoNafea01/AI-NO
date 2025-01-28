@@ -1,10 +1,8 @@
 # Data loading nodes
 # backend/core/nodes/dataLoader.py
 import pandas as pd
-from sklearn.datasets import load_iris, load_diabetes
 import os
-from .utils import NodeSaver
-
+from .utils import NodeSaver, DATASETS as datasets
 
 class BaseDataLoader:
     """Abstract base class for all data loaders."""
@@ -17,12 +15,8 @@ class PredefinedDataLoader(BaseDataLoader):
         self.data_type = data_type
 
     def load(self):
-        datasets = {
-            'iris': load_iris,
-            'diabetes': load_diabetes
-        }
         try:
-            if self.data_type not in datasets:
+            if self.data_type not in datasets.keys():
                 raise ValueError(f"Unsupported data type: {self.data_type}")
             data = datasets[self.data_type](return_X_y=True)
             payload = {

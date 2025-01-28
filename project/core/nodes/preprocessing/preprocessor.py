@@ -1,13 +1,14 @@
-
 from .preprocessors import PREPROCESSORS as preprocessors
-from ..utils import NodeSaver
+from .utils import PayloadBuilder
+from ..utils import NodeSaver, NodeLoader, NodeNameHandler
 
 class Preprocessor:
     """Handles preprocessors creation and parameter management."""
-    def __init__(self, preprocessor_name, preprocessor_type, params=None):
+    def __init__(self, preprocessor_name, preprocessor_type, params=None, preprocessor_path=None):
         self.preprocessor_name = preprocessor_name
         self.preprocessor_type = preprocessor_type
         self.task = "preprocessing"
+        self.preprocessor_path = preprocessor_path
         self.params = params if params else self._get_default_params()
         self.payload = self.create_preprocessor()
 
@@ -18,30 +19,55 @@ class Preprocessor:
             raise ValueError(f"Invalid configuration for preprocessor type: {self.preprocessor_type}, task: {self.task}, preprocessor name: {self.preprocessor_name}.")
 
     def create_preprocessor(self):
-
-        if self.preprocessor_type not in preprocessors:
-            raise ValueError(f"Unsupported preprocessor type: {self.preprocessor_type}. Available types are: {list(preprocessors.keys())}.")
-
-        if self.preprocessor_name not in preprocessors[self.preprocessor_type]:
-            raise ValueError(f"Unsupported preprocessor name: {self.preprocessor_name} for task: {self.task}.")
-
-        model_node = preprocessors[self.preprocessor_type][self.preprocessor_name]['node']
-        model = model_node(**self.params)
-
-        payload = {
-            "message": f"Preprocessor created: {self.preprocessor_name}",
-            "params": self.params,
-            "node_name": self.preprocessor_name,
-            "node_type": self.preprocessor_type,
-            "task": self.task,
-            "node_id": id(model),
-            "node_data": model
-        }
-
-        NodeSaver.save(payload, path=f"core\\nodes\\saved\\preprocessors")
-        del payload['node_data']  # Remove the actual node object from the payload
-        return payload
-
+        if self.preprocessor_path:
+            return self._create_from_path()
+        else:
+            return self._create_from_dict()
+        
+    def _create_from_dict(self):
+        try:
+            if self.preprocessor_type not in preprocessors:
+                raise ValueError(f"Unsupported preprocessor type: {self.preprocessor_type}. Available types are: {list(preprocessors.keys())}.")
+            
+            if self.preprocessor_name not in preprocessors[self.preprocessor_type]:
+                raise ValueError(f"Unsupported preprocessor name: {self.preprocessor_name} for task: {self.task}.")
+            
+            preprocessor_node = preprocessors[self.preprocessor_type][self.preprocessor_name]['node']
+            preprocessor = preprocessor_node(**self.params)
+            return self._create_handler(preprocessor, self.preprocessor_name, self.preprocessor_type, self.task)
+        
+        except Exception as e:
+            raise ValueError(f"Error creating preprocessor from json: {e}")
+        
+    def _create_from_path(self):
+        try:
+            preprocessor = NodeLoader.load(path=self.preprocessor_path)
+            preprocessor_name, _ = NodeNameHandler.handle_name(self.preprocessor_path)
+            preprocessor_type = self.find_preprocessor_type(preprocessor_name, preprocessors)
+            return self._create_handler(preprocessor, preprocessor_name, preprocessor_type, "preprocessing")
+        except Exception as e:
+            raise ValueError(f"Error loading preprocessor from path: {e}")
+    
+    def _create_handler(self, preprocessor, preprocessor_name=None, preprocessor_type=None, task=None):
+        try:
+            payload = PayloadBuilder.build_payload(f"Preprocessor created: {preprocessor_name}", 
+                                                    preprocessor=preprocessor,
+                                                    node_name=preprocessor_name,
+                                                    node_type=preprocessor_type,
+                                                    task=task)
+            NodeSaver.save(payload, path=f"core\\nodes\\saved\\preprocessors")
+            del payload['node_data']
+            return payload
+        except Exception as e:
+            raise ValueError(f"Error creating preprocessor: {e}")
+    
+    def find_preprocessor_type(self, preprocessor_name, preprocessors):
+        
+        for preprocessor_type in preprocessors:
+                if preprocessor_name in preprocessors.get(preprocessor_type):
+                    return preprocessor_type
+        return "general"
+    
     def update_params(self, params):
         self.params = params
         self.payload = self.create_preprocessor()

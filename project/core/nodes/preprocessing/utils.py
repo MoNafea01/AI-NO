@@ -1,7 +1,3 @@
-
-
-
-
 class PreprocessorAttributeExtractor:
     """Extracts attributes from a preprocessors."""
     @staticmethod
@@ -22,3 +18,17 @@ class PreprocessorAttributeExtractor:
                 if hasattr(atr, "tolist"):
                     attributes[attr] = atr.tolist()
         return attributes
+
+class PayloadBuilder:
+    """Constructs payloads for saving and response."""
+    @staticmethod
+    def build_payload(message, preprocessor, node_name, **kwargs):
+        payload = {
+            "message": message,
+            "params": PreprocessorAttributeExtractor.get_attributes(preprocessor),
+            "node_id": id(preprocessor),
+            "node_name": node_name,
+            "node_data": preprocessor,
+        }
+        payload.update(kwargs)
+        return payload

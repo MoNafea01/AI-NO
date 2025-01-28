@@ -1,6 +1,6 @@
 from .model import Model
 from .fit import Fit
-from .utils import ModelAttributeExtractor
+from .utils import PayloadBuilder
 from ..utils import NodeLoader, NodeSaver, DataHandler
 
 
@@ -18,23 +18,12 @@ class ModelPredictor:
             raise ValueError(f"Error fitting model: {e}")
         return predictions
 
-class PayloadBuilder:
-    """Constructs payloads for saving and response."""
-    @staticmethod
-    def build_payload(message, node, data):
-        print()
-        return {
-            "message": message,
-            "params": ModelAttributeExtractor.get_attributes(node.__dict__.get("model")),
-            "node_id": id(node),
-            "node_name": "predict",
-            "node_data": data,
-        }
 
 class Predict:
     """Orchestrates the predicting process."""
-    def __init__(self, X, model=None):
+    def __init__(self, X, model=None, model_path=None):
         self.model = model
+        self.model_path = model_path
         self.X = DataHandler.extract_data(X)
         self.payload = self._predict()
 
@@ -55,7 +44,7 @@ class Predict:
 
     def _predict_from_path(self):
         try:
-            model = NodeLoader.load(path=self.model)
+            model = NodeLoader.load(path=self.model_path)
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by path: {e}")
@@ -65,7 +54,7 @@ class Predict:
         try:
             predictor = ModelPredictor(model, self.X)
             predictions = predictor.predict_model()
-            payload = PayloadBuilder.build_payload("Model Predictions", predictor, predictions)
+            payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor")
             NodeSaver.save(payload, "core/nodes/saved/data")
             return payload
         except Exception as e:

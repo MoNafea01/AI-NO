@@ -4,6 +4,7 @@ import joblib
 from io import BytesIO
 from ai_operations.models import NodeStorage
 from django.core.exceptions import ObjectDoesNotExist
+from sklearn.datasets import load_iris, load_diabetes, load_digits, make_regression, make_classification
 
 class DataHandler:
     """Handles preprocessing and data extraction."""
@@ -109,3 +110,11 @@ class NodeNameHandler:
         _id = _id if _id else 0
         _name = _name.rsplit("_", 1)[0]
         return _name, int(_id)
+
+DATASETS = {
+    "iris" : load_iris,
+    "diabetes" : load_diabetes,
+    "digits" : load_digits,
+    "make_regression" : make_regression,
+    "make_classification" : make_classification
+}
