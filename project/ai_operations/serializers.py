@@ -15,15 +15,37 @@ class WorkflowSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'nodes']
 
 class ModelSerializer(serializers.Serializer):
-    model_name = serializers.CharField(max_length=100)
-    model_type = serializers.CharField(max_length=100)
-    task = serializers.CharField(max_length=100)
+    model_name = serializers.CharField(max_length=100, required=False)
+    model_type = serializers.CharField(max_length=100, required=False)
+    task = serializers.CharField(max_length=100, required=False)
     params = serializers.JSONField(required=False)
+    model_path = serializers.CharField(required=False)
+    def validate(self, data:dict):
+        model_path = data.get('model_path')
+        if not model_path and not data:
+            raise serializers.ValidationError(
+                "You must provide either 'model_content' or 'model_path'."
+            )
+        return data
+
 
 class FitModelSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
     y = serializers.JSONField(required=True)
-    model = serializers.JSONField(required=True)
+    model_path = serializers.CharField(required=False)
+    model = serializers.JSONField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'model' or 'model_path' is provided.
+        """
+        model = data.get('model')
+        model_path = data.get('model_path')
+
+        if not model and not model_path:
+            raise serializers.ValidationError(
+                "You must provide either 'model' or 'model_path'."
+            )
+        return data
 
 class PredictSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
@@ -54,7 +76,6 @@ class TrainTestSplitSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False)
 
 class DataLoaderSerializer(serializers.Serializer):
-    data_type = serializers.CharField(required=True)
+    data_type = serializers.CharField(required=False)
     filepath = serializers.CharField(required=False)
-
 

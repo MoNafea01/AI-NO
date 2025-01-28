@@ -1,9 +1,7 @@
 # api/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import WorkflowViewSet, CreateModelView, FitModelAPIView, PredictAPIView, PreprocessorAPIView, FitPreprocessorAPIView
-from .views import TransformAPIView, FitTransformAPIView, TrainTestSplitAPIView, SplitterAPIView
-from .views import DataLoaderAPIView
+from .views import *
 router = DefaultRouter()
 router.register(r'workflows', WorkflowViewSet)
 

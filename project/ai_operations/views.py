@@ -1,11 +1,8 @@
-from django.shortcuts import render
-
-# Create your views here.
 # api/views.py
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Workflow
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from core.nodes import DataLoader
@@ -19,10 +16,7 @@ from core.nodes.preprocessing.splitter import Splitter
 from core.nodes.preprocessing.fit_transform import FitTransform
 from core.nodes.preprocessing.fit import Fit as FitPreprocessor
 from core.nodes.metrics import Evaluator
-from .serializers import WorkflowSerializer, ModelSerializer, FitModelSerializer, PredictSerializer, PreprocessorSerializer
-from .serializers import FitPreprocessorSerializer, TransformSerializer, FitTransformSerializer, TrainTestSplitSerializer
-from .serializers import SplitterSerializer, DataLoaderSerializer
-
+from .serializers import *
 
 class WorkflowViewSet(viewsets.ModelViewSet):
     queryset = Workflow.objects.all()
@@ -77,7 +71,8 @@ class CreateModelView(APIView):
                 model_name=data.get('model_name'),
                 model_type=data.get('model_type'),
                 task=data.get('task'),
-                params=data.get('params')
+                params=data.get('params'),
+                model_path= data.get('model_path')
             )
             output_channel = request.query_params.get('output', None)
             response_data = model_instance(output_channel)
@@ -93,9 +88,10 @@ class FitModelAPIView(APIView):
                 X = serializer.validated_data.get('X')
                 y = serializer.validated_data.get('y')
                 model = serializer.validated_data.get('model')
+                model_path = serializer.validated_data.get('model_path')
 
                 # Instantiate Fit and perform the fitting
-                fitter = FitModel(X=X, y=y, model=model)
+                fitter = FitModel(X=X, y=y, model=model, model_path=model_path)
                 payload = fitter.payload
 
                 return Response(payload, status=status.HTTP_200_OK)
@@ -156,15 +152,14 @@ class FitPreprocessorAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = FitPreprocessorSerializer(data=request.data)
         if serializer.is_valid():
-            data = serializer.validated_data['data']
+            data = serializer.validated_data.get('data')
             preprocessor = serializer.validated_data.get('preprocessor')
-
+            preprocessor_path = serializer.validated_data.get('preprocessor_path')
             try:
                 # Create a Fit instance
-                fit_instance = FitPreprocessor(data=data, preprocessor=preprocessor)
-                output_channel = request.query_params.get('output', None)
-                response_data = fit_instance(output_channel)
-                return Response(response_data, status=status.HTTP_200_OK)
+                fit_instance = FitPreprocessor(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
+                payload = fit_instance.payload
+                return Response(payload, status=status.HTTP_200_OK)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -236,7 +231,7 @@ class TrainTestSplitAPIView(APIView):
             try:
                 # Extract validated data
                 data = serializer.validated_data.get('data')
-                params = data.get('params')
+                params = serializer.validated_data.get('params')
 
                 # Instantiate TrainTestSplit and perform the split
                 splitter = TrainTestSplit(data=data,params=params)
@@ -260,3 +255,4 @@ class DataLoaderAPIView(APIView):
             
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
