@@ -1,5 +1,5 @@
 from .preprocessor import Preprocessor
-from .utils import PreprocessorAttributeExtractor
+from .utils import PayloadBuilder
 from ..utils import NodeSaver, NodeLoader, DataHandler
 
 
@@ -17,17 +17,6 @@ class PreprocessorFitter:
             raise ValueError(f"Error fitting preprocessor: {e}")
         return self.preprocessor
 
-class PayloadBuilder:
-    """Constructs payloads for saving and response."""
-    @staticmethod
-    def build_payload(message, preprocessor):
-        return {
-            "message": message,
-            "params": PreprocessorAttributeExtractor.get_attributes(preprocessor),
-            "node_id": id(preprocessor),
-            "node_name": "fit",
-            "node_data": preprocessor,
-        }
 
 class Fit:
     """Orchestrates the fitting process."""
@@ -54,7 +43,7 @@ class Fit:
 
     def _fit_from_path(self):
         try:
-            preprocessor = NodeLoader.load(path=self.preprocessor)
+            preprocessor = NodeLoader.load(path=self.preprocessor_path)
             return self._fit_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor by path: {e}")
@@ -65,7 +54,7 @@ class Fit:
             fitter = PreprocessorFitter(preprocessor, self.data)
             fitted_preprocessor = fitter.fit_preprocessor()
 
-            payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor)
+            payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter")
             NodeSaver.save(payload, "core/nodes/saved/preprocessors")
             del payload['node_data']
             return payload

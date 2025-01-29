@@ -61,7 +61,7 @@ class Fit:
             fitter = ModelFitter(model, self.X, self.y)
             fitted_model = fitter.fit_model()
 
-            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "fitter")
+            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter")
             NodeSaver.save(payload, "core/nodes/saved/models")
             del payload['node_data']
             return payload

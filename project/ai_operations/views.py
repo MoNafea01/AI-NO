@@ -1,10 +1,10 @@
 # api/views.py
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .models import Workflow
 from rest_framework.decorators import action
 from rest_framework.views import APIView, Response
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser
 from core.nodes import DataLoader
 from core.nodes.model.model import Model
 from core.nodes.model.fit import Fit as FitModel
@@ -17,48 +17,9 @@ from core.nodes.preprocessing.fit_transform import FitTransform
 from core.nodes.preprocessing.fit import Fit as FitPreprocessor
 from core.nodes.metrics import Evaluator
 from .serializers import *
-
-class WorkflowViewSet(viewsets.ModelViewSet):
-    queryset = Workflow.objects.all()
-    serializer_class = WorkflowSerializer
-
-    @action(detail=True, methods=['post'])
-    def execute(self, request, pk=None):
-        workflow = self.get_object()
-        nodes = workflow.nodes.order_by('order')
-
-        # Here, execute the nodes sequentially
-        result = self.execute_workflow(nodes)
-        return Response({"result": result}, status=status.HTTP_200_OK)
-
-    def execute_workflow(self,nodes):
-        # Load data
-        for node in nodes:
-            if node.node_type == "dataLoader":
-                loader = DataLoader(**node.config)
-                X, y = loader.load()
-
-            elif node.node_type == "splitter":
-                splitter = TrainTestSplit(**node.config).payload.values()
-                (X_train, X_test), (y_train, y_test) = splitter
-
-            elif node.node_type == "preprocessor":
-                preprocessor = Preprocessor(**node.config)
-            
-            elif node.node_type == "fit_transform":
-                X_train = FitTransform(X_train, preprocessor).payload['transformed_data']
-            elif node.node_type == "transform":
-                X_test = Transform(X_test, preprocessor).payload['transformed_data']
-            elif node.node_type == "model":
-                model = Model(**node.config)
-            elif node.node_type == "fit":
-                FitModel(X_train, y_train, model)
-            elif node.node_type == "predict":
-                y_pred = Predict(X_test, model).payload['predictions']
-            elif node.node_type == "evaluator":
-                evaluator = Evaluator(**node.config)
-                score = evaluator.evaluate(y_test, y_pred)
-        return score
+import ast
+import pandas as pd
+import json
 
 class CreateModelView(APIView):
     def post(self, request):
@@ -248,12 +209,84 @@ class DataLoaderAPIView(APIView):
     def post(self, request):
         serializer = DataLoaderSerializer(data=request.data)
         if serializer.is_valid():
-            data_type = serializer.validated_data.get('data_type')
-            filepath = serializer.validated_data.get('filepath')
-            loader = DataLoader(data_type=data_type, filepath=filepath)
+            dataset_name = serializer.validated_data.get('dataset_name')
+            dataset_path = serializer.validated_data.get('dataset_path')
+            loader = DataLoader(dataset_name=dataset_name, dataset_path=dataset_path)
             output_channel = request.query_params.get('output', None)
             response_data = loader(output_channel)
             
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ComponentViewSet(viewsets.ModelViewSet):
+    queryset = Component.objects.all()
+    serializer_class = ComponentSerializer
+
+
+
+class ExcelUploadView(APIView):
+    parser_classes = [MultiPartParser]
+    
+    def post(self, request, format=None):
+        if 'file' not in request.FILES:
+            return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        file = request.FILES['file']
+        try:
+            df = pd.read_excel(file, engine='openpyxl')
+            df = df.replace({r'\bTRUE\b': 'true', r'\bFALSE\b': 'false'}, regex=True)
+            
+            created_count = 0
+            skipped_count = 0
+            errors = []
+
+            def parse_json_like(value):
+                try:
+                    return json.loads(value.replace("'", '"'))  # Handle single quotes
+                except:
+                    return None
+            # Convert string representations to actual Python objects
+            for col in ['params', 'input_dots', 'output_dots']:
+                df[col] = df[col].apply(lambda x: 
+                                        parse_json_like(x) if pd.notnull(x) else None
+                                        )
+            
+            # Create components in database
+            for index, row in df.iterrows():
+                try:
+                    # Clean up parameter names
+                    node_name = str(row['node_name']).strip()
+                    if Component.objects.filter(node_name=node_name).exists():
+                        skipped_count += 1
+                        continue
+                    row_data = row.to_dict()
+                    if row_data.get('params'):
+                        for param in row_data['params']:
+                            param['name'] = param['name'].strip()
+                    
+                    serializer = ComponentSerializer(data=row_data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        created_count += 1
+                    else:
+                        errors.append({
+                            'row': index + 2,  # +2 for 0-index and header row
+                            'errors': serializer.errors,
+                            'data': row_data
+                        })
+                except Exception as e:
+                        errors.append({
+                            'row': index + 2,
+                            'error': str(e),
+                            'data': row.to_dict()
+                        })
+            response = {
+            'created': created_count,
+            'skipped': skipped_count,
+            'errors': errors
+            }    
+            return Response(response, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            

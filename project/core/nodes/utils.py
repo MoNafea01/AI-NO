@@ -2,7 +2,7 @@ import os
 import re
 import joblib
 from io import BytesIO
-from ai_operations.models import NodeStorage
+from ai_operations.models import Node
 from django.core.exceptions import ObjectDoesNotExist
 from sklearn.datasets import load_iris, load_diabetes, load_digits, make_regression, make_classification
 
@@ -51,7 +51,7 @@ class NodeSaver:
         buffer.seek(0)
         node_bytes = buffer.read()
 
-        NodeStorage.objects.update_or_create(
+        Node.objects.update_or_create(
             node_id=node_id,
             defaults={
                 'node_name': node_name,
@@ -77,7 +77,7 @@ class NodeLoader:
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
 
-            node_entry = NodeStorage.objects.get(node_id=node_id)
+            node_entry = Node.objects.get(node_id=node_id)
             buffer = BytesIO(node_entry.node_data)
             return joblib.load(buffer)
         except ObjectDoesNotExist:

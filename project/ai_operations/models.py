@@ -1,22 +1,7 @@
 from django.db import models
-
-
-class Workflow(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
+from django.utils import timezone
 
 class Node(models.Model):
-    workflow = models.ForeignKey(Workflow, related_name='nodes', on_delete=models.CASCADE)
-    node_type = models.CharField(max_length=255)  # e.g., 'dataLoader', 'preprocessor', 'modelTrainer', etc.
-    config = models.JSONField()  # Store the configuration as a JSON
-    order = models.IntegerField()  # Order of execution
-
-class NodeStorage(models.Model):
     node_id = models.IntegerField(primary_key=True)
     node_name = models.CharField(max_length=255)
     message = models.CharField(max_length=255, default="Done")
@@ -26,6 +11,14 @@ class NodeStorage(models.Model):
     node_type = models.CharField(max_length=255, default="general")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
     def __str__(self):
         return f"{self.node_name} ({self.node_id})"
+
+class Component(models.Model):
+    node_name = models.CharField(max_length=255)
+    node_type = models.CharField(max_length=255, default="general")
+    task = models.CharField(max_length=255,default='general')
+    params = models.JSONField(null=True, blank=True)  # Changed to core JSONField
+    input_dots = models.JSONField(null=True, blank=True)
+    output_dots = models.JSONField(null=True, blank=True)
+    api_call = models.CharField(max_length=100)
