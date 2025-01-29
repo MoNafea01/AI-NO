@@ -1,18 +1,6 @@
 # api/serializers.py
 from rest_framework import serializers
-from .models import Workflow, Node
-
-class NodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Node
-        fields = '__all__'
-
-class WorkflowSerializer(serializers.ModelSerializer):
-    nodes = NodeSerializer(many=True)
-
-    class Meta:
-        model = Workflow
-        fields = ['id', 'name', 'description', 'nodes']
+from .models import Component
 
 class ModelSerializer(serializers.Serializer):
     model_name = serializers.CharField(max_length=100, required=False)
@@ -61,7 +49,13 @@ class PreprocessorSerializer(serializers.Serializer):
 
 class FitPreprocessorSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=True)
+    preprocessor = serializers.JSONField(required=False)
+    preprocessor_path = serializers.CharField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
+        """
+        return validate(data, 'preprocessor', 'preprocessor_path')
 
 class TransformSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
@@ -79,8 +73,8 @@ class TrainTestSplitSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False)
 
 class DataLoaderSerializer(serializers.Serializer):
-    data_type = serializers.CharField(required=False)
-    filepath = serializers.CharField(required=False)
+    dataset_name = serializers.CharField(required=False)
+    dataset_path = serializers.CharField(required=False)
 
 def validate(data, *args:str):
     for arg in args:
@@ -90,3 +84,12 @@ def validate(data, *args:str):
     raise serializers.ValidationError(
         f"You must provide either {', '.join(args)}."
     )
+class ComponentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Component
+        fields = '__all__'
+        extra_kwargs = {
+            'params': {'allow_null': True},
+            'input_dots': {'allow_null': True},
+            'output_dots': {'allow_null': True}
+        }

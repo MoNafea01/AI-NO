@@ -54,7 +54,7 @@ class Predict:
         try:
             predictor = ModelPredictor(model, self.X)
             predictions = predictor.predict_model()
-            payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor")
+            payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", task='predict')
             NodeSaver.save(payload, "core/nodes/saved/data")
             return payload
         except Exception as e:

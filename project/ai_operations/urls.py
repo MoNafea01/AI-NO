@@ -3,10 +3,10 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import *
 router = DefaultRouter()
-router.register(r'workflows', WorkflowViewSet)
+router.register(r'components', ComponentViewSet)
 
 urlpatterns = [
-    path('ai_operations/', include(router.urls)),
+    path('api/', include(router.urls)),
     path('create_model/', CreateModelView.as_view(), name='create_model'),
     path('fit_model/', FitModelAPIView.as_view(), name='fit_model'),
     path('predict/', PredictAPIView.as_view(), name='predict_model'),
@@ -17,4 +17,5 @@ urlpatterns = [
     path('train_test_split/', TrainTestSplitAPIView.as_view(), name='train_test_split'),
     path('splitter/', SplitterAPIView.as_view(), name='splitter'),
     path('data_loader/', DataLoaderAPIView.as_view(), name='data_loader'),
+    path('upload_excel/', ExcelUploadView.as_view(), name='upload-excel')
 ]
