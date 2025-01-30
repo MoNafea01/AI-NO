@@ -233,7 +233,7 @@ class NodeLoaderAPIView(APIView):
 
 class NodeSaveAPIView(APIView):
     def post(self, request):
-        payload = request.data.get("payload")
+        payload = request.data.get("node")
 
         path = request.data.get("path")  # Optional path parameter
         
