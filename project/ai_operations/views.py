@@ -221,7 +221,6 @@ class DataLoaderAPIView(APIView):
 
 class NodeLoaderAPIView(APIView):
     def post(self, request):
-        print(request.data)
         node_id = request.data.get("node_id")
         path = request.data.get("path")
         loader = NodeLoader()
