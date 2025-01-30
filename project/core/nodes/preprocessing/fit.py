@@ -36,14 +36,14 @@ class Fit:
 
     def _fit_from_id(self):
         try:
-            preprocessor = NodeLoader.load(self.preprocessor.get("node_id"))  # Load preprocessor using ID from database
+            preprocessor, _ = NodeLoader()(self.preprocessor.get("node_id"))  # Load preprocessor using ID from database
             return self._fit_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor by ID: {e}")
 
     def _fit_from_path(self):
         try:
-            preprocessor = NodeLoader.load(path=self.preprocessor_path)
+            preprocessor, _ = NodeLoader()(path=self.preprocessor_path)
             return self._fit_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor by path: {e}")
@@ -55,7 +55,7 @@ class Fit:
             fitted_preprocessor = fitter.fit_preprocessor()
 
             payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter")
-            NodeSaver.save(payload, "core/nodes/saved/preprocessors")
+            NodeSaver()(payload, "core/nodes/saved/preprocessors")
             del payload['node_data']
             return payload
         except Exception as e:

@@ -1,13 +1,14 @@
 # Data loading nodes
 # backend/core/nodes/dataLoader.py
-import pandas as pd
 import os
-from .utils import NodeSaver, NodeLoader, NodeNameHandler, DATASETS as datasets
+from .utils import NodeSaver, NodeNameHandler, NodeLoader, DATASETS as datasets
+
 
 class BaseDataLoader:
     """Abstract base class for all data loaders."""
     def load(self):
         raise NotImplementedError("Subclasses must implement the load method.")
+
 
 class PredefinedDataLoader(BaseDataLoader):
     """Loads predefined datasets like iris or diabetes."""
@@ -26,29 +27,32 @@ class PredefinedDataLoader(BaseDataLoader):
                 "node_name": "data_loader",
                 "node_id": id(self),
             }
-            NodeSaver.save(payload, path="core/nodes/saved/data")
             return payload
         except Exception as e:
             raise ValueError(f"Error loading data: {e}")
 
-class CustomDataLoader(BaseDataLoader):
-    """Loads custom datasets from a file."""
+
+class CustomDataLoader:
     def __init__(self, dataset_path):
         self.dataset_path = dataset_path
-
     def load(self):
         try:
             if not os.path.exists(self.dataset_path):
                 raise FileNotFoundError(f"dataset not found: {self.dataset_path}")
             
             if self.dataset_path.endswith('.pkl'):
-                data = NodeLoader.load(path=self.dataset_path)
-                X,y = data
+                data, _ = NodeLoader()(path=self.dataset_path)
+                X,y = data 
 
             elif self.dataset_path.endswith('.csv'):
+                import pandas as pd
                 data = pd.read_csv(self.dataset_path)
-                X = data.iloc[:, :-1].values
-                y = data.iloc[:, -1].values
+                if data.shape[1] == 1:
+                    X = data.iloc[:, :-1].values
+                    y = None
+                else:
+                    X = data.iloc[:, :-1].values
+                    y = data.iloc[:, -1].values
 
             dataset_name, _ = NodeNameHandler.handle_name(self.dataset_path)
             payload = {
@@ -58,7 +62,6 @@ class CustomDataLoader(BaseDataLoader):
                 "node_id": id(self),
                 "params": {},
             }
-            NodeSaver.save(payload, path="core/nodes/saved/data")
             return payload
         except Exception as e:
             raise ValueError(f"Error loading data: {e}")
@@ -75,9 +78,10 @@ class DataLoaderFactory:
         else:
             raise ValueError("Either dataset_name or dataset_path must be provided.")
 
+
 class DataLoader:
     """Facade for loading data using different strategies."""
-    def __init__(self, dataset_name: BaseDataLoader = None, dataset_path: str = None):
+    def __init__(self, dataset_name: str = None, dataset_path: str = None):
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
         self.payload = self.loader.load()
         self.X = self.payload['node_data'][0]
@@ -93,6 +97,7 @@ class DataLoader:
                 payload['node_data'] = self.X
             elif arg == '2':
                 payload['node_data'] = self.y
+        NodeSaver()(payload, path="core/nodes/saved/data")
         return payload
                 
 

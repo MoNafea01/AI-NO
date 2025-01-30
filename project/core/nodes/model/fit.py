@@ -1,10 +1,7 @@
-# ai_operations/utils/model/model_fit.py
-
 import numpy as np
 from .model import Model
 from .utils import PayloadBuilder
 from ..utils import NodeSaver, NodeLoader, DataHandler
-
 
 
 class ModelFitter:
@@ -43,14 +40,14 @@ class Fit:
 
     def _fit_from_dict(self):
         try:
-            model = NodeLoader.load(self.model.get("node_id"))  # Load model using ID from database
+            model, _ = NodeLoader()(self.model.get("node_id"))  # Load model using ID from database
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by ID: {e}")
 
     def _fit_from_path(self):
         try:
-            model = NodeLoader.load(path=self.model_path)
+            model, _ = NodeLoader()(path=self.model_path)
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by path: {e}")
@@ -62,7 +59,7 @@ class Fit:
             fitted_model = fitter.fit_model()
 
             payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter")
-            NodeSaver.save(payload, "core/nodes/saved/models")
+            NodeSaver()(payload, "core/nodes/saved/models")
             del payload['node_data']
             return payload
         except Exception as e:
@@ -73,7 +70,6 @@ class Fit:
 
     def __call__(self, *args):
         return self.payload
-
 
 
 if __name__ == '__main__':

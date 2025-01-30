@@ -12,7 +12,7 @@ class ModelSerializer(serializers.Serializer):
         """
         Ensure at least one of 'model' or 'model_path' is provided.
         """
-        return validate(data, 'model_name', 'model_path')
+        return validate(data, ('model_name', 'model_path'))
 
 
 class FitModelSerializer(serializers.Serializer):
@@ -24,7 +24,7 @@ class FitModelSerializer(serializers.Serializer):
         """
         Ensure at least one of 'model' or 'model_path' is provided.
         """
-        return validate(data, 'model', 'model_path')
+        return validate(data, ('model', 'model_path'))
 
 class PredictSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
@@ -34,7 +34,7 @@ class PredictSerializer(serializers.Serializer):
         """
         Ensure at least one of 'model' or 'model_path' is provided.
         """
-        return validate(data, 'model', 'model_path')
+        return validate(data, ('model', 'model_path'))
     
 class PreprocessorSerializer(serializers.Serializer):
     preprocessor_name = serializers.CharField(required=False)  # Add all supported scalers
@@ -45,7 +45,7 @@ class PreprocessorSerializer(serializers.Serializer):
         """
         Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
         """
-        return validate(data, 'preprocessor_name', 'preprocessor_path')
+        return validate(data, ('preprocessor_name', 'preprocessor_path'))
 
 class FitPreprocessorSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
@@ -55,7 +55,7 @@ class FitPreprocessorSerializer(serializers.Serializer):
         """
         Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
         """
-        return validate(data, 'preprocessor', 'preprocessor_path')
+        return validate(data, ('preprocessor', 'preprocessor_path'))
 
 class TransformSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
@@ -76,14 +76,18 @@ class DataLoaderSerializer(serializers.Serializer):
     dataset_name = serializers.CharField(required=False)
     dataset_path = serializers.CharField(required=False)
 
-def validate(data, *args:str):
-    for arg in args:
-        val = data.get(arg)
-        if val:
-            return data
-    raise serializers.ValidationError(
-        f"You must provide either {', '.join(args)}."
-    )
+def validate(data, *args:tuple):
+    missing = []
+    for group in args:
+        if not isinstance(group, tuple):
+            raise ValueError("Arguments must be tuples.")
+        if not any(key in data for key in group):
+            missing.append(f"either {', '.join(group)}")
+    if missing:
+        raise serializers.ValidationError(
+            f"You must provide {' and '.join(missing)}."
+        )
+    return data
 class ComponentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Component

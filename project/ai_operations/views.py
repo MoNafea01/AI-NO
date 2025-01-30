@@ -15,6 +15,7 @@ from core.nodes.preprocessing.train_test_split import TrainTestSplit
 from core.nodes.preprocessing.splitter import Splitter
 from core.nodes.preprocessing.fit_transform import FitTransform
 from core.nodes.preprocessing.fit import Fit as FitPreprocessor
+from core.nodes.utils import NodeLoader, NodeSaver
 from core.nodes.metrics import Evaluator
 from .serializers import *
 import ast
@@ -218,13 +219,40 @@ class DataLoaderAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ComponentViewSet(viewsets.ModelViewSet):
+class NodeLoaderAPIView(APIView):
+    def post(self, request):
+        node_id = request.data.get("node_id")
+        path = request.data.get("path")
+        loader = NodeLoader()
+        try:
+            _, payload = loader(node_id=node_id, path=path)
+            return Response(payload, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class NodeSaveAPIView(APIView):
+    def post(self, request):
+        payload = request.data.get("payload")
+
+        path = request.data.get("path")  # Optional path parameter
+        
+        saver = NodeSaver()
+        try:
+            response = saver(payload, path=path)
+            return Response(response, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Internal error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ComponentAPIViewSet(viewsets.ModelViewSet):
     queryset = Component.objects.all()
     serializer_class = ComponentSerializer
 
 
 
-class ExcelUploadView(APIView):
+class ExcelUploadAPIView(APIView):
     parser_classes = [MultiPartParser]
     
     def post(self, request, format=None):

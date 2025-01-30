@@ -41,7 +41,7 @@ class Preprocessor:
         
     def _create_from_path(self):
         try:
-            preprocessor = NodeLoader.load(path=self.preprocessor_path)
+            preprocessor, _ = NodeLoader()(path=self.preprocessor_path)
             preprocessor_name, _ = NodeNameHandler.handle_name(self.preprocessor_path)
             preprocessor_type = self.find_preprocessor_type(preprocessor_name, preprocessors)
             return self._create_handler(preprocessor, preprocessor_name, preprocessor_type, "preprocessing")
@@ -55,7 +55,7 @@ class Preprocessor:
                                                     node_name=preprocessor_name,
                                                     node_type=preprocessor_type,
                                                     task=task)
-            NodeSaver.save(payload, path=f"core\\nodes\\saved\\preprocessors")
+            NodeSaver()(payload, path=f"core\\nodes\\saved\\preprocessors")
             del payload['node_data']
             return payload
         except Exception as e:
