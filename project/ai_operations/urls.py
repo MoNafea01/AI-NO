@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import *
 router = DefaultRouter()
-router.register(r'components', ComponentViewSet)
+router.register(r'components', ComponentAPIViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -17,5 +17,7 @@ urlpatterns = [
     path('train_test_split/', TrainTestSplitAPIView.as_view(), name='train_test_split'),
     path('splitter/', SplitterAPIView.as_view(), name='splitter'),
     path('data_loader/', DataLoaderAPIView.as_view(), name='data_loader'),
-    path('upload_excel/', ExcelUploadView.as_view(), name='upload-excel')
+    path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
+    path('save_node/', NodeSaveAPIView.as_view(), name='save_node'),
+    path('load_node/', NodeLoaderAPIView.as_view(), name='load_node'),
 ]

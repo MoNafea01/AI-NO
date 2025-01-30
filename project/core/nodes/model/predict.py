@@ -37,14 +37,14 @@ class Predict:
 
     def _predict_from_id(self):
         try:
-            model = NodeLoader.load(self.model.get("node_id"))  # Load model using ID from database
+            model, _ = NodeLoader()(self.model.get("node_id"))  # Load model using ID from database
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by ID: {e}")
 
     def _predict_from_path(self):
         try:
-            model = NodeLoader.load(path=self.model_path)
+            model, _ = NodeLoader()(path=self.model_path)
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by path: {e}")
@@ -55,7 +55,7 @@ class Predict:
             predictor = ModelPredictor(model, self.X)
             predictions = predictor.predict_model()
             payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", task='predict')
-            NodeSaver.save(payload, "core/nodes/saved/data")
+            NodeSaver()(payload, "core/nodes/saved/data")
             return payload
         except Exception as e:
             raise ValueError(f"Error Predicting model: {e}")

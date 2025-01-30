@@ -105,14 +105,14 @@ class Transform:
 
     def _transform_from_id(self):
         try:
-            prepocessor = NodeLoader.load(self.preprocessor.get("node_id"))  # Load model using ID from database
+            prepocessor, _ = NodeLoader()(self.preprocessor.get("node_id"))  # Load model using ID from database
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by ID: {e}")
 
     def _transform_from_path(self):
         try:
-            model = NodeLoader.load(path=self.preprocessor)
+            model, _ = NodeLoader()(path=self.preprocessor)
             return self._transform_handler(model)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by path: {e}")
@@ -123,7 +123,7 @@ class Transform:
             transformer = PreprocessorTransformer(preprocessor, self.data)
             output = transformer.transform_data()
             payload = PayloadBuilder.build_payload("Preprocessor transformed data", transformer, output)
-            NodeSaver.save(payload, "core/nodes/saved/data")
+            NodeSaver()(payload, "core/nodes/saved/data")
             return payload
         except Exception as e:
             raise ValueError(f"Error transformation of data: {e}")

@@ -1,10 +1,12 @@
 import os
 import re
 import joblib
+import numpy as np
 from io import BytesIO
 from ai_operations.models import Node
 from django.core.exceptions import ObjectDoesNotExist
 from sklearn.datasets import load_iris, load_diabetes, load_digits, make_regression, make_classification
+
 
 class DataHandler:
     """Handles preprocessing and data extraction."""
@@ -22,13 +24,13 @@ class DirectoryManager:
         except Exception as e:
             print(f"Error creating directory: {e}")
 
+
 class NodeSaver:
     """Handles saving nodes."""
-    @staticmethod
-    def save(payload, path: str = None):
+    
+    def __call__(self, payload, path: str = None):
         if not isinstance(payload, dict):
             raise ValueError("Payload must be a dictionary.")
-
         message = payload.get('message', "Done")
         node_id = payload.get('node_id')
         node_name = payload.get('node_name')
@@ -36,7 +38,7 @@ class NodeSaver:
         node = payload.get('node_data')
         task = payload.get('task', "general")
         node_type = payload.get('node_type', "general")
-
+        
         # save to path
         if path:
             path = f"{path}\\{node_name}_{node_id}.pkl"
@@ -62,28 +64,46 @@ class NodeSaver:
                 'node_type': node_type,
             }
         )
+        return {"message": f"Node: {node_name} saved.",
+                "node_id": id(self),
+                "node_name": "node_saver",
+                "params": {},
+                "task": "save",
+                "node_type": "general"
+                }
+
+
 
 class NodeLoader:
-    """Handles loading nodes."""
-    @staticmethod
-    def load(node_id: str = None, path: str = None):
+    """Handles loading nodes."""   
+    def __call__(self, node_id=None, path=None):
         if not (node_id or path):
             raise ValueError("Either node_id or path must be provided.")
-
+        
         try:
             if isinstance(path, str):
                 try:
-                    return joblib.load(path)
+                    node_data = joblib.load(path)
+                    return self.build_payload(node_data)
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
-
             node_entry = Node.objects.get(node_id=node_id)
             buffer = BytesIO(node_entry.node_data)
-            return joblib.load(buffer)
+            return self.build_payload(joblib.load(buffer))
         except ObjectDoesNotExist:
             raise ValueError(f"Node with node_id {node_id} does not exist.")
         except Exception as e:
             raise ValueError(f"Error loading node: {e}")
+    
+    def build_payload(self, node_data):
+        return node_data,{
+            "message": "Node loaded.",
+            "node_name": "node_loader",
+            "node_id": id(self),
+            "params": {},
+            "task": "load",
+            "node_type": "general"
+        }
 
 
 class NodeDirectoryManager:
@@ -98,6 +118,7 @@ class NodeDirectoryManager:
         nodes_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         return os.path.join(nodes_path, folder)
 
+
 class NodeNameHandler:
     """Handles naming and ID extraction from paths."""
     @staticmethod
@@ -110,6 +131,7 @@ class NodeNameHandler:
         _id = _id if _id else 0
         _name = _name.rsplit("_", 1)[0]
         return _name, int(_id)
+
 
 DATASETS = {
     "iris" : load_iris,
