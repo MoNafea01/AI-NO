@@ -16,6 +16,7 @@ from core.nodes.preprocessing.splitter import Splitter
 from core.nodes.preprocessing.fit_transform import FitTransform
 from core.nodes.preprocessing.fit import Fit as FitPreprocessor
 from core.nodes.utils import NodeLoader, NodeSaver
+from core.nodes.custom import Joiner
 from core.nodes.metrics import Evaluator
 from .serializers import *
 import ast
@@ -41,6 +42,7 @@ class CreateModelView(APIView):
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class FitModelAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = FitModelSerializer(data=request.data)
@@ -54,12 +56,14 @@ class FitModelAPIView(APIView):
 
                 # Instantiate Fit and perform the fitting
                 fitter = FitModel(X=X, y=y, model=model, model_path=model_path)
-                payload = fitter.payload
+                output_channel = request.query_params.get('output', None)
+                response_data = fitter(output_channel)
 
-                return Response(payload, status=status.HTTP_200_OK)
+                return Response(response_data, status=status.HTTP_200_OK)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PredictAPIView(APIView):
     """
@@ -84,6 +88,7 @@ class PredictAPIView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class PreprocessorAPIView(APIView):
     """
     API view to create a Preprocessor instance.
@@ -106,7 +111,8 @@ class PreprocessorAPIView(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+
 class FitPreprocessorAPIView(APIView):
     """
     API view for fitting a preprocessor on the given data.
@@ -121,12 +127,14 @@ class FitPreprocessorAPIView(APIView):
             try:
                 # Create a Fit instance
                 fit_instance = FitPreprocessor(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
-                payload = fit_instance.payload
-                return Response(payload, status=status.HTTP_200_OK)
+                output_channel = request.query_params.get('output', None)
+                response_data = fit_instance(output_channel)
+                return Response(response_data, status=status.HTTP_200_OK)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TransformAPIView(APIView):
     """
@@ -137,12 +145,12 @@ class TransformAPIView(APIView):
         # Deserialize input data using the serializer
         serializer = TransformSerializer(data=request.data)
         if serializer.is_valid():
-            data = serializer.validated_data['data']
+            data = serializer.validated_data.get('data')
             preprocessor = serializer.validated_data.get('preprocessor')  # Extract preprocessor (as JSON object)
-
+            preprocessor_path = serializer.validated_data.get('preprocessor_path')  # Extract preprocessor path
             try:
                 # Create a Transform instance and get the result
-                transform_instance = Transform(data=data, preprocessor=preprocessor)
+                transform_instance = Transform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
                 output_channel = request.query_params.get('output', None)
                 response_data = transform_instance(output_channel)
                 return Response(response_data, status=status.HTTP_200_OK)
@@ -160,12 +168,12 @@ class FitTransformAPIView(APIView):
         # Deserialize input data using the serializer
         serializer = FitTransformSerializer(data=request.data)
         if serializer.is_valid():
-            data = serializer.validated_data['data']
+            data = serializer.validated_data.get('data')
             preprocessor = serializer.validated_data.get('preprocessor')  # Extract preprocessor (as JSON object or path)
-
+            preprocessor_path = serializer.validated_data.get('preprocessor_path')  # Extract preprocessor path
             try:
                 # Create a FitTransform instance and get the result
-                fit_transform_instance = FitTransform(data=data, preprocessor=preprocessor)
+                fit_transform_instance = FitTransform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
                 output_channel = request.query_params.get('output', None)
                 response_data = fit_transform_instance(output_channel)
                 return Response(response_data, status=status.HTTP_200_OK)
@@ -178,12 +186,25 @@ class SplitterAPIView(APIView):
     def post(self, request):
         serializer = SplitterSerializer(data=request.data)
         if serializer.is_valid():
-            data = serializer.validated_data['data']
+            data = serializer.validated_data.get('data')
             # Initialize and use the Splitter class
             splitter_instance = Splitter(data)
             output_channel = request.query_params.get('output', None)
             response_data = splitter_instance(output_channel)
             
+            return Response(response_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class JoinerAPIView(APIView):
+    def post(self, request):
+        serializer = JoinerSerializer(data=request.data)
+        if serializer.is_valid():
+            X = serializer.validated_data.get('X')
+            y = serializer.validated_data.get('y')
+            joiner = Joiner(X, y)
+            output_channel = request.query_params.get('output', None)
+            response_data = joiner(output_channel)
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -206,6 +227,7 @@ class TrainTestSplitAPIView(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class DataLoaderAPIView(APIView):
     def post(self, request):
         serializer = DataLoaderSerializer(data=request.data)
@@ -219,6 +241,7 @@ class DataLoaderAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class NodeLoaderAPIView(APIView):
     def post(self, request):
         node_id = request.data.get("node_id")
@@ -226,6 +249,7 @@ class NodeLoaderAPIView(APIView):
         loader = NodeLoader()
         try:
             _, payload = loader(node_id=node_id, path=path)
+            NodeSaver()(payload)
             return Response(payload, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -246,10 +270,10 @@ class NodeSaveAPIView(APIView):
         except Exception as e:
             return Response({"error": f"Internal error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 class ComponentAPIViewSet(viewsets.ModelViewSet):
     queryset = Component.objects.all()
     serializer_class = ComponentSerializer
-
 
 
 class ExcelUploadAPIView(APIView):

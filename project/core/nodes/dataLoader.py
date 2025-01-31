@@ -1,7 +1,8 @@
 # Data loading nodes
 # backend/core/nodes/dataLoader.py
 import os
-from .utils import NodeSaver, NodeNameHandler, NodeLoader, DATASETS as datasets
+import pandas as pd
+from .utils import NodeSaver, NodeNameHandler, PayloadBuilder, NodeLoader, DATASETS as datasets
 
 
 class BaseDataLoader:
@@ -20,14 +21,8 @@ class PredefinedDataLoader(BaseDataLoader):
             if self.dataset_name not in datasets.keys():
                 raise ValueError(f"Unsupported dataset name: {self.dataset_name}")
             data = datasets[self.dataset_name](return_X_y=True)
-            payload = {
-                "message": f"Pre-defined Data loaded: {self.dataset_name}",
-                "params":{},
-                "node_data": data,
-                "node_name": "data_loader",
-                "node_id": id(self),
-            }
-            return payload
+            X, y = data
+            return X, y
         except Exception as e:
             raise ValueError(f"Error loading data: {e}")
 
@@ -42,27 +37,18 @@ class CustomDataLoader:
             
             if self.dataset_path.endswith('.pkl'):
                 data, _ = NodeLoader()(path=self.dataset_path)
-                X,y = data 
-
+                X, y = data
+                
             elif self.dataset_path.endswith('.csv'):
-                import pandas as pd
+                
                 data = pd.read_csv(self.dataset_path)
+                X = data.iloc[:, :-1].values
                 if data.shape[1] == 1:
-                    X = data.iloc[:, :-1].values
                     y = None
                 else:
-                    X = data.iloc[:, :-1].values
                     y = data.iloc[:, -1].values
 
-            dataset_name, _ = NodeNameHandler.handle_name(self.dataset_path)
-            payload = {
-                "message": f"Custom data loaded: {dataset_name}",
-                "node_data": (X, y),
-                "node_name": "data_loader",
-                "node_id": id(self),
-                "params": {},
-            }
-            return payload
+            return X, y
         except Exception as e:
             raise ValueError(f"Error loading data: {e}")
 
@@ -83,34 +69,33 @@ class DataLoader:
     """Facade for loading data using different strategies."""
     def __init__(self, dataset_name: str = None, dataset_path: str = None):
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
-        self.payload = self.loader.load()
-        self.X = self.payload['node_data'][0]
-        self.y = self.payload['node_data'][1]
+        X, y = self.loader.load()
+        if not dataset_name:
+            dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
+        payloadX = PayloadBuilder.build_payload(f"Predefined data loaded: {dataset_name}: X", X, "data_loader", node_type="general")
+        payloady = PayloadBuilder.build_payload(f"Predefined data loaded: {dataset_name}: y", y, "data_loader", node_type="general")
+        NodeSaver()(payloadX, path="core/nodes/saved/data")
+        NodeSaver()(payloady, path="core/nodes/saved/data")
+        self.payload = payloadX, payloady
 
     def __str__(self):
         return str(self.payload)
 
     def __call__(self, *args):
-        payload = self.payload.copy()
+        payload = self.payload
         for arg in args:
             if arg == '1':
-                payload['node_data'] = self.X
+                payload = self.payload[0]
             elif arg == '2':
-                payload['node_data'] = self.y
-        NodeSaver()(payload, path="core/nodes/saved/data")
+                payload = self.payload[1]
         return payload
                 
 
 if __name__ == "__main__":
-    # Example usage
-    # loader = DataLoader(dataset_name='iris')
-    # X, y = loader.load()
-
-    # loader = DataLoader(dataset_name='diabetes')
-    # X, y = loader('X'),loader('y')
-
-    loader = DataLoader(dataset_name='custom', dataset_path=r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\project\core\data.csv")
-    X, y = loader('X'),loader('y')
-    print(f"Loaded data: {X}, {y}")
+    dl_args = {
+        "dataset_name": "iris",
+    }
+    dl = DataLoader(**dl_args)
+    print(dl)
     
 
