@@ -1,20 +1,34 @@
-# Evaluation metric nodes
-# core/nodes/metrics.py
 from sklearn.metrics import accuracy_score, precision_score, recall_score
+from .utils import DataHandler, NodeSaver, PayloadBuilder, METRICS as metrics
 
 class Evaluator:
-    def __init__(self, metric='accuracy'):
+    def __init__(self, metric='accuracy', y_true=None, y_pred=None, params=None):
+        self.y_true = DataHandler.extract_data(y_true)
+        self.y_pred = DataHandler.extract_data(y_pred)
+        self.params = params if params else {}
         self.metric = metric
+        self.payload = self.evaluate(self.y_true, self.y_pred)
 
     def evaluate(self, y_true, y_pred):
-        if self.metric == 'accuracy':
-            return accuracy_score(y_true, y_pred)
-        elif self.metric == 'precision':
-            return precision_score(y_true, y_pred)
-        elif self.metric == 'recall':
-            return recall_score(y_true, y_pred)
-        else:
-            raise ValueError(f"Unsupported evaluation metric: {self.metric}")
+        try:
+            if self.metric not in metrics.keys():
+                raise ValueError(f"Unsupported metric: {self.metric}")
+            
+            output = metrics[self.metric](y_true, y_pred)
+            output = round(output,2)
+            payload = PayloadBuilder.build_payload(f"{self.metric} score", output, 
+                                                   "evaluator", node_type="metric", task="evaluate")
+            NodeSaver()(payload, "core/nodes/saved/data")
+            # del payload['node_data']
+            return payload
+        except Exception as e:
+            raise ValueError(f"Error evaluating model: {e}")
+    
+    def __str__(self):
+        return f"metric: {self.payload}"
+    
+    def __call__(self, *args):
+        return self.payload
 
 if __name__ == "__main__":
     # Example usage

@@ -5,7 +5,7 @@ from io import BytesIO
 from ai_operations.models import Node
 from django.core.exceptions import ObjectDoesNotExist
 from sklearn.datasets import load_iris, load_diabetes, load_digits, make_regression, make_classification
-
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 class DataHandler:
     """Handles preprocessing and data extraction."""
@@ -171,4 +171,10 @@ DATASETS = {
     "digits" : load_digits,
     "make_regression" : make_regression,
     "make_classification" : make_classification
+}
+
+METRICS = {
+    "accuracy" : accuracy_score,
+    "precision" : precision_score,
+    "recall" : recall_score,
 }

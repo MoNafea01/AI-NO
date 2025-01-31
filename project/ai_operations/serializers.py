@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from .models import Component
 
+
 class ModelSerializer(serializers.Serializer):
     model_name = serializers.CharField(max_length=100, required=False)
     model_type = serializers.CharField(max_length=100, required=False)
@@ -91,6 +92,7 @@ class JoinerSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
     y = serializers.JSONField(required=True)
 
+
 class TrainTestSplitSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
     params = serializers.JSONField(required=False)
@@ -105,6 +107,12 @@ class DataLoaderSerializer(serializers.Serializer):
         """
         return validate(data, ('dataset_name', 'dataset_path'))
 
+class EvaluatorSerializer(serializers.Serializer):
+    metric = serializers.CharField(required=True)
+    y_true = serializers.JSONField(required=True)
+    y_pred = serializers.JSONField(required=True)
+    params = serializers.JSONField(required=False)
+
 
 class ComponentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -115,6 +123,7 @@ class ComponentSerializer(serializers.ModelSerializer):
             'input_dots': {'allow_null': True},
             'output_dots': {'allow_null': True}
         }
+
 
 def validate(data, *args:tuple):
     missing = []

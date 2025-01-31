@@ -159,6 +159,7 @@ class TransformAPIView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class FitTransformAPIView(APIView):
     """
     API view for fitting and transforming data using the given preprocessor.
@@ -181,6 +182,7 @@ class FitTransformAPIView(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SplitterAPIView(APIView):
     def post(self, request):
@@ -207,6 +209,7 @@ class JoinerAPIView(APIView):
             response_data = joiner(output_channel)
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TrainTestSplitAPIView(APIView):
     def post(self, request, *args, **kwargs):
@@ -241,6 +244,20 @@ class DataLoaderAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class EvaluatorAPIView(APIView):
+    def post(self, request):
+        serializer = EvaluatorSerializer(data=request.data)
+        if serializer.is_valid():
+            metric = serializer.validated_data.get('metric')
+            y_true = serializer.validated_data.get('y_true')
+            y_pred = serializer.validated_data.get('y_pred')
+            params = serializer.validated_data.get('params')
+
+            evaluator = Evaluator(metric=metric, y_true=y_true, y_pred=y_pred, params=params)
+            output_channel = request.query_params.get('output', None)
+            response_data = evaluator(output_channel)
+            return Response(response_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class NodeLoaderAPIView(APIView):
     def post(self, request):
