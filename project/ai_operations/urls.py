@@ -21,4 +21,5 @@ urlpatterns = [
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
     path('save_node/', NodeSaveAPIView.as_view(), name='save_node'),
     path('load_node/', NodeLoaderAPIView.as_view(), name='load_node'),
+    path('evaluate/', EvaluatorAPIView.as_view(), name='evaluate'),
 ]
