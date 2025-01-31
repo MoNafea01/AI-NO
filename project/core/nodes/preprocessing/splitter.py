@@ -1,3 +1,6 @@
+from .utils import PayloadBuilder
+from ..utils import DataHandler, NodeSaver
+
 class Splitter:
     """
     This Class is responsible for splitting the data into two parts.\n
@@ -8,20 +11,19 @@ class Splitter:
     """
 
     def __init__(self, data):
-        self.data = data.get('data') if isinstance(data, dict) else data
+        self.data = DataHandler.extract_data(data)
         self.payload = self.split()
-        self.out1 = self.payload['data'][0]
-        self.out2 = self.payload['data'][1]
-    
+
     def split(self):
         try:
-            payload = {"message": "Data split successful", 
-                       "data":self.data,
-                       "node_name": "Splitter", 
-                       "node_type": "preprocessing", 
-                       "node_id": id(self), 
-                       }
-            return payload
+            out1, out2 = self.data
+            payload1 = PayloadBuilder.build_payload("data_1", out1, "splitter", node_type="split")
+            payload2 = PayloadBuilder.build_payload("data_2", out2, "splitter", node_type="split")
+            NodeSaver()(payload1, "core/nodes/saved/data")
+            NodeSaver()(payload2, "core/nodes/saved/data")
+            # del payload1['node_data']
+            # del payload2['node_data']
+            return payload1, payload2
         except Exception as e:
             raise ValueError(f"Error splitting data: {e}")
     
@@ -29,12 +31,12 @@ class Splitter:
         return f"data: {self.payload}"
     
     def __call__(self, *args):
-        payload = self.payload.copy()
+        payload = self.payload
         for arg in args:
             if arg == '1':
-                payload['data'] = self.out1
+                payload = self.payload[0]
             elif arg == '2':
-                payload['data'] = self.out2
+                payload = self.payload[1]
         return payload
     
 if __name__ == "__main__":

@@ -26,6 +26,7 @@ class FitModelSerializer(serializers.Serializer):
         """
         return validate(data, ('model', 'model_path'))
 
+
 class PredictSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
     model = serializers.JSONField(required=False)
@@ -35,7 +36,8 @@ class PredictSerializer(serializers.Serializer):
         Ensure at least one of 'model' or 'model_path' is provided.
         """
         return validate(data, ('model', 'model_path'))
-    
+
+
 class PreprocessorSerializer(serializers.Serializer):
     preprocessor_name = serializers.CharField(required=False)  # Add all supported scalers
     preprocessor_type = serializers.ChoiceField(choices=['scaler', 'encoding', 'imputation', 'binarization'], required=False)
@@ -47,6 +49,7 @@ class PreprocessorSerializer(serializers.Serializer):
         """
         return validate(data, ('preprocessor_name', 'preprocessor_path'))
 
+
 class FitPreprocessorSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
     preprocessor = serializers.JSONField(required=False)
@@ -57,24 +60,61 @@ class FitPreprocessorSerializer(serializers.Serializer):
         """
         return validate(data, ('preprocessor', 'preprocessor_path'))
 
+
 class TransformSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=True)
+    preprocessor = serializers.JSONField(required=False)
+    preprocessor_path = serializers.CharField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
+        """
+        return validate(data, ('preprocessor', 'preprocessor_path'))
+
 
 class FitTransformSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=True)
-    
+    preprocessor = serializers.JSONField(required=False)
+    preprocessor_path = serializers.CharField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
+        """
+        return validate(data, ('preprocessor', 'preprocessor_path'))
+
+
 class SplitterSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
+
+
+class JoinerSerializer(serializers.Serializer):
+    X = serializers.JSONField(required=True)
+    y = serializers.JSONField(required=True)
 
 class TrainTestSplitSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
     params = serializers.JSONField(required=False)
 
+
 class DataLoaderSerializer(serializers.Serializer):
     dataset_name = serializers.CharField(required=False)
     dataset_path = serializers.CharField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'dataset_name' or 'dataset_path' is provided.
+        """
+        return validate(data, ('dataset_name', 'dataset_path'))
+
+
+class ComponentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Component
+        fields = '__all__'
+        extra_kwargs = {
+            'params': {'allow_null': True},
+            'input_dots': {'allow_null': True},
+            'output_dots': {'allow_null': True}
+        }
 
 def validate(data, *args:tuple):
     missing = []
@@ -88,12 +128,3 @@ def validate(data, *args:tuple):
             f"You must provide {' and '.join(missing)}."
         )
     return data
-class ComponentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Component
-        fields = '__all__'
-        extra_kwargs = {
-            'params': {'allow_null': True},
-            'input_dots': {'allow_null': True},
-            'output_dots': {'allow_null': True}
-        }
