@@ -54,9 +54,9 @@ class Transform:
         try:
             transformer = PreprocessorTransformer(preprocessor, self.data)
             output = transformer.transform_data()
-            payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='preprocessing', node_type='transformer')
+            payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', node_type='transformer')
             NodeSaver()(payload, "core/nodes/saved/data")
-            # del payload['node_data']
+            del payload['node_data']
             return payload
         except Exception as e:
             raise ValueError(f"Error transformation of data: {e}")

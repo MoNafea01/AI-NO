@@ -54,11 +54,11 @@ class FitTransform:
             fitter_transformer = PreprocessorFitterTransformer(preprocessor, self.data)
             fitted_preprocessor, output = fitter_transformer.fit_transform_preprocessor()
 
-            payload_data = PayloadBuilder.build_payload("Preprocessor transformed", output, "preprocessor_fitter_transformer", node_type="fitter_transformer")
-            payload_fitted = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter")
+            payload_data = PayloadBuilder.build_payload("Preprocessor transformed", output, "preprocessor_fitter_transformer", node_type="fitter_transformer", task="fit_transform")
+            payload_fitted = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter_transformer", task="fit_transform")
             NodeSaver()(payload_data, "core/nodes/saved/data")
             NodeSaver()(payload_fitted, "core/nodes/saved/preprocessors")
-            # del payload_data['node_data']
+            del payload_data['node_data']
             del payload_fitted['node_data']
             return payload_fitted, payload_data
         except Exception as e:

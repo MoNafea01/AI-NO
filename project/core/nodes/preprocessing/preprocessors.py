@@ -11,22 +11,17 @@ PREPROCESSORS = {
         'robust_scaler':{'node': RobustScaler, 'params': {'quantile_range': (25.0, 75.0)}},
         'normalizer':{'node': Normalizer, 'params': {'norm': 'l2'}},
     },
-    'encoding':{
+    'encoder':{
         'label_encoder':{'node': LabelEncoder, 'params':{}},
         'onehot_encoder':{'node': OneHotEncoder, 'params':{}},
         'ordinal_encoder':{'node': OrdinalEncoder, 'params':{}},
         'label_binarizer':{'node': LabelBinarizer, 'params':{}},
     },
-    'imputation':{
+    'imputer':{
         'simple_imputer':{'node': SimpleImputer, 'params':{}},
         'knn_imputer':{'node': KNNImputer, 'params':{}},
     },
-    # 'feature_engineering':{
-    #     'polynomial_features':{},
-    #     'feature_selection':{},
-    #     'dimensionality_reduction':{},
-    # },
-    'binarization':{
+    'binarizer':{
         'binarizer':{'node': Binarizer, 'params':{}},
     }
 }

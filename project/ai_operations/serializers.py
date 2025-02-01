@@ -89,8 +89,8 @@ class SplitterSerializer(serializers.Serializer):
 
 
 class JoinerSerializer(serializers.Serializer):
-    X = serializers.JSONField(required=True)
-    y = serializers.JSONField(required=True)
+    data_1 = serializers.JSONField(required=True)
+    data_2 = serializers.JSONField(required=True)
 
 
 class TrainTestSplitSerializer(serializers.Serializer):
