@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from sklearn.datasets import load_iris, load_diabetes, load_digits, make_regression, make_classification
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
+
 class DataHandler:
     """Handles preprocessing and data extraction."""
     @staticmethod
@@ -69,14 +70,13 @@ class NodeSaver:
                 "node_name": "node_saver",
                 "params": {},
                 "task": "save",
-                "node_type": "general"
+                "node_type": "saver"
                 }
-
 
 
 class NodeLoader:
     """Handles loading nodes."""   
-    def __call__(self, node_id=None, path=None):
+    def __call__(self, node_id=None, path=None) -> tuple[bytearray, dict]:
         if not (node_id or path):
             raise ValueError("Either node_id or path must be provided.")
         
@@ -103,8 +103,8 @@ class NodeLoader:
             "node_name": "node_loader",
             "node_id": id(self),
             "params": {},
-            "task": "load",
-            "node_type": "general"
+            "task": "load_node",
+            "node_type": "loader"
         }
 
 
@@ -163,7 +163,7 @@ class NodeAttributeExtractor:
                 if hasattr(atr, "tolist"):
                     attributes[attr] = atr.tolist()
         return attributes
-    
+
 
 DATASETS = {
     "iris" : load_iris,

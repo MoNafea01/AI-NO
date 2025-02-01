@@ -54,7 +54,7 @@ class Fit:
             fitter = PreprocessorFitter(preprocessor, self.data)
             fitted_preprocessor = fitter.fit_preprocessor()
 
-            payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter")
+            payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter", task="fit")
             NodeSaver()(payload, "core/nodes/saved/preprocessors")
             del payload['node_data']
             return payload

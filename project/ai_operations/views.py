@@ -5,23 +5,22 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser
-from core.nodes import DataLoader
+from core.nodes.other.dataLoader import DataLoader
 from core.nodes.model.model import Model
 from core.nodes.model.fit import Fit as FitModel
 from core.nodes.model.predict import Predict
 from core.nodes.preprocessing.preprocessor import Preprocessor
 from core.nodes.preprocessing.transform import Transform
-from core.nodes.preprocessing.train_test_split import TrainTestSplit
-from core.nodes.preprocessing.splitter import Splitter
+from core.nodes.other.train_test_split import TrainTestSplit
 from core.nodes.preprocessing.fit_transform import FitTransform
 from core.nodes.preprocessing.fit import Fit as FitPreprocessor
 from core.nodes.utils import NodeLoader, NodeSaver
-from core.nodes.custom import Joiner
-from core.nodes.metrics import Evaluator
+from core.nodes.other.custom import Joiner, Splitter
+from core.nodes.other.metrics import Evaluator
 from .serializers import *
-import ast
 import pandas as pd
 import json
+
 
 class CreateModelView(APIView):
     def post(self, request):
@@ -202,9 +201,9 @@ class JoinerAPIView(APIView):
     def post(self, request):
         serializer = JoinerSerializer(data=request.data)
         if serializer.is_valid():
-            X = serializer.validated_data.get('X')
-            y = serializer.validated_data.get('y')
-            joiner = Joiner(X, y)
+            data_1 = serializer.validated_data.get('data_1')
+            data_2 = serializer.validated_data.get('data_2')
+            joiner = Joiner(data_1, data_2)
             output_channel = request.query_params.get('output', None)
             response_data = joiner(output_channel)
             return Response(response_data, status=status.HTTP_200_OK)
@@ -244,6 +243,7 @@ class DataLoaderAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class EvaluatorAPIView(APIView):
     def post(self, request):
         serializer = EvaluatorSerializer(data=request.data)
@@ -259,14 +259,17 @@ class EvaluatorAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class NodeLoaderAPIView(APIView):
     def post(self, request):
         node_id = request.data.get("node_id")
         path = request.data.get("path")
         loader = NodeLoader()
         try:
-            _, payload = loader(node_id=node_id, path=path)
+            node_data, payload = loader(node_id=node_id, path=path)
+            payload.update({"node_data": node_data})
             NodeSaver()(payload)
+            del payload["node_data"]
             return Response(payload, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -358,4 +361,4 @@ class ExcelUploadAPIView(APIView):
             
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            
+  

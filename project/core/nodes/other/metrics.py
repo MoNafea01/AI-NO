@@ -1,5 +1,5 @@
 from sklearn.metrics import accuracy_score, precision_score, recall_score
-from .utils import DataHandler, NodeSaver, PayloadBuilder, METRICS as metrics
+from ..utils import DataHandler, NodeSaver, PayloadBuilder, METRICS as metrics
 
 class Evaluator:
     def __init__(self, metric='accuracy', y_true=None, y_pred=None, params=None):
@@ -19,7 +19,7 @@ class Evaluator:
             payload = PayloadBuilder.build_payload(f"{self.metric} score", output, 
                                                    "evaluator", node_type="metric", task="evaluate")
             NodeSaver()(payload, "core/nodes/saved/data")
-            # del payload['node_data']
+            del payload['node_data']
             return payload
         except Exception as e:
             raise ValueError(f"Error evaluating model: {e}")
