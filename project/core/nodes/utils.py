@@ -1,17 +1,18 @@
 import os
 import re
 import joblib
-import numpy as np
 from io import BytesIO
 from ai_operations.models import Node
 from django.core.exceptions import ObjectDoesNotExist
 from sklearn.datasets import load_iris, load_diabetes, load_digits, make_regression, make_classification
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 
 class DataHandler:
     """Handles preprocessing and data extraction."""
     @staticmethod
     def extract_data(data):
+        '''Extracts node_data from a dictionary.'''
         return data.get('node_data') if isinstance(data, dict) else data
 
 
@@ -64,19 +65,18 @@ class NodeSaver:
                 'node_type': node_type,
             }
         )
-        return {"message": f"Node: {node_name} saved.",
-                "node_id": id(self),
+        return {"message": f"Node {node_name} saved.",
+                "node_id": node_id,
                 "node_name": "node_saver",
                 "params": {},
                 "task": "save",
-                "node_type": "general"
+                "node_type": "saver"
                 }
-
 
 
 class NodeLoader:
     """Handles loading nodes."""   
-    def __call__(self, node_id=None, path=None):
+    def __call__(self, node_id=None, path=None) -> tuple[bytearray, dict]:
         if not (node_id or path):
             raise ValueError("Either node_id or path must be provided.")
         
@@ -84,25 +84,27 @@ class NodeLoader:
             if isinstance(path, str):
                 try:
                     node_data = joblib.load(path)
-                    return self.build_payload(node_data)
+                    node_name, node_id = NodeNameHandler.handle_name(path)
+                    return self.build_payload(node_data, node_name)
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
             node_entry = Node.objects.get(node_id=node_id)
             buffer = BytesIO(node_entry.node_data)
-            return self.build_payload(joblib.load(buffer))
+            node_name = node_entry.node_name
+            return self.build_payload(joblib.load(buffer), node_name)
         except ObjectDoesNotExist:
             raise ValueError(f"Node with node_id {node_id} does not exist.")
         except Exception as e:
             raise ValueError(f"Error loading node: {e}")
     
-    def build_payload(self, node_data):
-        return node_data,{
-            "message": "Node loaded.",
+    def build_payload(self, node_data, name):
+        return node_data, {
+            "message": f"Node {name} Loaded.",
             "node_name": "node_loader",
             "node_id": id(self),
             "params": {},
-            "task": "load",
-            "node_type": "general"
+            "task": "load_node",
+            "node_type": "loader"
         }
 
 
@@ -133,10 +135,46 @@ class NodeNameHandler:
         return _name, int(_id)
 
 
+class PayloadBuilder:
+    """Constructs payloads for saving and response."""
+    @staticmethod
+    def build_payload(message, node, node_name, **kwargs):
+        payload = {
+            "message": message,
+            "params": NodeAttributeExtractor.get_attributes(node),
+            "node_id": id(node),
+            "node_name": node_name,
+            "node_data": node,
+            "task": "custom"
+        }
+        payload.update(kwargs)
+        return payload
+
+
+class NodeAttributeExtractor:
+    """Extracts attributes from a node."""
+    @staticmethod
+    def get_attributes(node):
+        
+        attributes = {}
+        for attr in dir(node):
+            if attr.endswith("_") and not attr.startswith("_"):
+                atr = getattr(node, attr)
+                if hasattr(atr, "tolist"):
+                    attributes[attr] = atr.tolist()
+        return attributes
+
+
 DATASETS = {
     "iris" : load_iris,
     "diabetes" : load_diabetes,
     "digits" : load_digits,
     "make_regression" : make_regression,
     "make_classification" : make_classification
+}
+
+METRICS = {
+    "accuracy" : accuracy_score,
+    "precision" : precision_score,
+    "recall" : recall_score,
 }

@@ -1,6 +1,6 @@
 # Core workflow execution logic
 # core/workflow_executor.py
-from dataLoader import DataLoader
+from project.core.nodes.other.dataLoader import DataLoader
 
 from backend.core.nodes.preprocessing.preprocessor import Scaler
 from preprocessing.transform import Transform
@@ -10,7 +10,7 @@ from preprocessing.fit_transform import FitTransform
 from model.model import Model
 from model.fit import Fit
 from model.predict import Predict
-from metrics import Evaluator
+from project.core.nodes.other.metrics import Evaluator
 
 class WorkflowExecutor:
     def __init__(self, workflow):
