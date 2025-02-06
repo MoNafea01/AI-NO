@@ -1,10 +1,10 @@
 from sklearn.metrics import accuracy_score, precision_score, recall_score
-from ..utils import DataHandler, NodeSaver, PayloadBuilder, METRICS as metrics
+from ..utils import NodeSaver, NodeLoader, PayloadBuilder, METRICS as metrics
 
 class Evaluator:
     def __init__(self, metric='accuracy', y_true=None, y_pred=None, params=None):
-        self.y_true = DataHandler.extract_data(y_true)
-        self.y_pred = DataHandler.extract_data(y_pred)
+        self.y_true = NodeLoader()(y_true.get("node_id"))[0] if isinstance(y_true, dict) else y_true
+        self.y_pred = NodeLoader()(y_pred.get("node_id"))[0] if isinstance(y_pred, dict) else y_pred
         self.params = params if params else {}
         self.metric = metric
         self.payload = self.evaluate(self.y_true, self.y_pred)

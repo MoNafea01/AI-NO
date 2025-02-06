@@ -107,6 +107,21 @@ class DataLoaderSerializer(serializers.Serializer):
         """
         return validate(data, ('dataset_name', 'dataset_path'))
 
+
+class NodeLoaderSerializer(serializers.Serializer):
+    node_id = serializers.IntegerField(required=False)
+    path = serializers.CharField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'node_name' or 'node_path' is provided.
+        """
+        return validate(data, ('node_id', 'path'))
+    
+class NodeSaverSerializer(serializers.Serializer):
+    node = serializers.JSONField(required=True)
+    path = serializers.CharField(required=True)
+    
+
 class EvaluatorSerializer(serializers.Serializer):
     metric = serializers.CharField(required=True)
     y_true = serializers.JSONField(required=True)

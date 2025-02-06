@@ -1,7 +1,7 @@
 from .model import Model
 from .fit import Fit
 from .utils import PayloadBuilder
-from ..utils import NodeLoader, NodeSaver, DataHandler
+from ..utils import NodeLoader, NodeSaver
 
 
 class ModelPredictor:
@@ -24,7 +24,7 @@ class Predict:
     def __init__(self, X, model=None, model_path=None):
         self.model = model
         self.model_path = model_path
-        self.X = DataHandler.extract_data(X)
+        self.X = NodeLoader()(X.get("node_id"))[0] if isinstance(X, dict) else X
         self.payload = self._predict()
 
     def _predict(self):

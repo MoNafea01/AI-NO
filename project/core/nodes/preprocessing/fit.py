@@ -1,6 +1,6 @@
 from .preprocessor import Preprocessor
 from .utils import PayloadBuilder
-from ..utils import NodeSaver, NodeLoader, DataHandler
+from ..utils import NodeSaver, NodeLoader
 
 
 class PreprocessorFitter:
@@ -23,7 +23,7 @@ class Fit:
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = DataHandler.extract_data(data)
+        self.data = NodeLoader()(data.get("node_id"))[0] if isinstance(data, dict) else data
         self.payload = self._fit()
 
     def _fit(self):
@@ -54,7 +54,7 @@ class Fit:
             fitter = PreprocessorFitter(preprocessor, self.data)
             fitted_preprocessor = fitter.fit_preprocessor()
 
-            payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter", task="fit")
+            payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter", task="fit_preprocessor")
             NodeSaver()(payload, "core/nodes/saved/preprocessors")
             del payload['node_data']
             return payload
