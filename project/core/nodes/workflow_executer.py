@@ -2,9 +2,9 @@
 # core/workflow_executor.py
 from project.core.nodes.other.dataLoader import DataLoader
 
-from backend.core.nodes.preprocessing.preprocessor import Scaler
+from core.nodes.preprocessing.preprocessor import Preprocessor
 from preprocessing.transform import Transform
-from backend.core.nodes.preprocessing.train_test_split import TrainTestSplit
+from core.nodes.other.train_test_split import TrainTestSplit
 from preprocessing.fit_transform import FitTransform
 
 from model.model import Model
@@ -27,7 +27,7 @@ class WorkflowExecutor:
         splitter_params = workflow['splitter_params']
         (X_train, y_train), (X_test, y_test) = TrainTestSplit(X,y,**splitter_params).payload.values()
         trans_params = workflow['transformer_params']
-        scaler = Scaler(**trans_params)
+        scaler = Preprocessor(**trans_params)
         X_train = FitTransform(X_train, scaler).payload['transformed_data']
         X_test = Transform(X_test, scaler).payload['transformed_data']
 

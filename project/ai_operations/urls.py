@@ -22,4 +22,5 @@ urlpatterns = [
     path('save_node/', NodeSaveAPIView.as_view(), name='save_node'),
     path('load_node/', NodeLoaderAPIView.as_view(), name='load_node'),
     path('evaluate/', EvaluatorAPIView.as_view(), name='evaluate'),
+    path('clear_nodes/', ClearNodesAPIView.as_view(), name='clear_nodes'),
 ]

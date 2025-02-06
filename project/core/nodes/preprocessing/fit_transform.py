@@ -1,6 +1,6 @@
 from .preprocessor import Preprocessor
 from .utils import PayloadBuilder
-from ..utils import NodeLoader, NodeSaver, DataHandler
+from ..utils import NodeLoader, NodeSaver
 
 class PreprocessorFitterTransformer:
     """Handles the fitting and transformation of preprocessors."""
@@ -23,7 +23,7 @@ class FitTransform:
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = DataHandler.extract_data(data)
+        self.data = NodeLoader()(data.get("node_id"))[0] if isinstance(data, dict) else data
         self.payload = self._fit_transform()
 
     def _fit_transform(self):
@@ -53,14 +53,17 @@ class FitTransform:
         try:
             fitter_transformer = PreprocessorFitterTransformer(preprocessor, self.data)
             fitted_preprocessor, output = fitter_transformer.fit_transform_preprocessor()
-
-            payload_data = PayloadBuilder.build_payload("Preprocessor transformed", output, "preprocessor_fitter_transformer", node_type="fitter_transformer", task="fit_transform")
-            payload_fitted = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", node_type="fitter_transformer", task="fit_transform")
+            payload = PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output), "fitter_transformer", node_type="fitter_transformer", task="fit_transform")
+            n_id = payload['node_id']
+            payload_fitted = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "fitter_transformer", node_type="fitter_transformer", task="fit_preprocessor", node_id=n_id+1)
+            payload_data = PayloadBuilder.build_payload("Preprocessor transformed", output, "fitter_transformer", node_type="fitter_transformer", task="transform", node_id=n_id+2)
+            NodeSaver()(payload, "core/nodes/saved/preprocessors")
             NodeSaver()(payload_data, "core/nodes/saved/data")
             NodeSaver()(payload_fitted, "core/nodes/saved/preprocessors")
             del payload_data['node_data']
             del payload_fitted['node_data']
-            return payload_fitted, payload_data
+            del payload['node_data']
+            return payload, payload_fitted, payload_data
         except Exception as e:
             raise ValueError(f"Error fitting and transforming preprocessor: {e}")
 
@@ -69,7 +72,7 @@ class FitTransform:
         return str(self.payload)
     
     def __call__(self, *args):
-        payload = self.payload
+        payload = self.payload[0]
         for arg in args:
             if arg == 'model':
                 payload = self.payload[0]

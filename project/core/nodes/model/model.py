@@ -89,18 +89,12 @@ class Model:
                 if model_name in models.get(model_type).get(task):
                     return model_type, task
         return "general", "general"
-    
-    def update_params(self, params: dict):
-        self.params = params
-        self.payload = self._create_model()
 
     def __str__(self):
         return str(self.payload)
 
     def __call__(self, *args):
         return self.payload
-
-
 
 
 

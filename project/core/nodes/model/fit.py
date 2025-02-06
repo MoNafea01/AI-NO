@@ -1,7 +1,7 @@
 import numpy as np
 from .model import Model
 from .utils import PayloadBuilder
-from ..utils import NodeSaver, NodeLoader, DataHandler
+from ..utils import NodeSaver, NodeLoader
 
 
 class ModelFitter:
@@ -26,8 +26,8 @@ class Fit:
     def __init__(self, X, y, model=None, model_path=None):
         self.model = model
         self.model_path = model_path
-        self.X = DataHandler.extract_data(X)
-        self.y = DataHandler.extract_data(y)
+        self.X = NodeLoader()(X.get("node_id"))[0] if isinstance(X, dict) else X
+        self.y = NodeLoader()(y.get("node_id"))[0] if isinstance(y, dict) else y
         self.payload = self._fit()
 
     def _fit(self):
@@ -58,7 +58,7 @@ class Fit:
             fitter = ModelFitter(model, self.X, self.y)
             fitted_model = fitter.fit_model()
 
-            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit")
+            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model")
             NodeSaver()(payload, "core/nodes/saved/models")
             del payload['node_data']
             return payload

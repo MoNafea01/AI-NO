@@ -30,12 +30,14 @@ MODELS = {
     {
     'regression':
         {
-        'svr':{'node': SVR,'params': {'C': 1.0, 'kernel': 'rbf',}},
+        'rbf_svr':{'node': SVR,'params': {'C': 1.0, 'kernel': 'rbf',}},
         'linear_svr':{'node': LinearSVR,'params': {'C': 1.0,}},
+        'poly_svr':{'node': SVR,'params': {'C': 1.0, 'kernel': 'poly',}},
+        'sigmoid_svr':{'node': SVR,'params': {'C': 1.0, 'kernel': 'sigmoid',}},
         },
     'classification':
         {
-        'linear_svm':{'node': LinearSVC,'params': {'C': 1.0,}},
+        'linear_svc':{'node': LinearSVC,'params': {'C': 1.0,}},
         'rbf_svc':{'node': SVC,'params': {'C': 1.0, 'kernel': 'rbf',}},
         'poly_svc':{'node': SVC,'params': {'C': 1.0, 'kernel': 'poly',}},
         'sigmoid_svc':{'node': SVC,'params': {'C': 1.0, 'kernel': 'sigmoid',}},

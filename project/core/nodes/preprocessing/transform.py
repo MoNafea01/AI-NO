@@ -1,7 +1,7 @@
 from .preprocessor import Preprocessor
 from .fit import Fit
 from .utils import PayloadBuilder
-from ..utils import NodeLoader, NodeSaver, DataHandler
+from ..utils import NodeLoader, NodeSaver
 
 
 class PreprocessorTransformer:
@@ -24,7 +24,7 @@ class Transform:
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = DataHandler.extract_data(data)
+        self.data = NodeLoader()(data.get("node_id"))[0] if isinstance(data, dict) else data
         self.payload = self._transform()
 
     def _transform(self):
