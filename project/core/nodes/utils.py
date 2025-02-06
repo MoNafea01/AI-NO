@@ -196,6 +196,7 @@ class ClearAllNodes:
             for arg in args:
                 if arg == 'components':
                     Component.objects.all().delete()
+                    return True, "All components cleared."
             # deletes all objects in the Node model
             Node.objects.all().delete()
             nodes_dir = NodeDirectoryManager.get_nodes_dir()
