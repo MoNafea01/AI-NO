@@ -405,7 +405,7 @@ class FitTransformAPIView(APIView):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id)
+            success, message = NodeDeleter()(node_id, is_special_case=True, from_view=True)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -446,7 +446,7 @@ class SplitterAPIView(APIView):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id)
+            success, message = NodeDeleter()(node_id, is_multi_channel=True, from_view=True)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -536,7 +536,7 @@ class TrainTestSplitAPIView(APIView):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id)
+            success, message = NodeDeleter()(node_id, is_multi_channel=True, from_view=True)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -579,7 +579,7 @@ class DataLoaderAPIView(APIView):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id)
+            success, message = NodeDeleter()(node_id, is_multi_channel=True, from_view=True)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -733,6 +733,7 @@ class NodeSaveAPIView(APIView):
         except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ClearNodesAPIView(APIView):
     def post(self, request):
         try:
@@ -741,7 +742,7 @@ class ClearNodesAPIView(APIView):
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+   
 
 class ComponentAPIViewSet(viewsets.ModelViewSet):
     queryset = Component.objects.all()

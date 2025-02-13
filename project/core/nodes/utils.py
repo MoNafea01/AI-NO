@@ -24,6 +24,7 @@ class NodeSaver:
     def __call__(self, payload, path: str = None):
         if not isinstance(payload, dict):
             raise ValueError("Payload must be a dictionary.")
+        
         message = payload.get('message', "Done")
         node_id = payload.get('node_id')
         node_name = payload.get('node_name')
@@ -79,10 +80,12 @@ class NodeLoader:
                     return self.build_payload(node_data, node_name)
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
+                
             node_entry = Node.objects.get(node_id=node_id)
             buffer = BytesIO(node_entry.node_data)
             node_name = node_entry.node_name
             return self.build_payload(joblib.load(buffer), node_name)
+        
         except ObjectDoesNotExist:
             raise ValueError(f"Node with node_id {node_id} does not exist.")
         except Exception as e:
@@ -98,31 +101,47 @@ class NodeLoader:
             "node_type": "loader"
         }
 
+
 class NodeDeleter:
-    def __call__(self, node_id: str) :
+    def __call__(self, node_id: str, is_special_case=False, is_multi_channel=False, from_view=False):
         """Delete a node by its ID from the database and filesystem."""
         if not node_id:
             raise ValueError("Node ID must be provided.")
+        node_id = int(node_id) if node_id else None
         try:
+            
             # Fetch node from database
             node = Node.objects.get(node_id=node_id)
             node_name = node.node_name
-            special_case_nodes = ["fitter_transformer"]
             # Delete the associated file from disk
-            folder = "models" if node.task in ["regression", "classification", "fit_model"] else ("preprocessors" if node.task in ["preprocessing", "fit_preprocessor"] else "data")
+            folder = "models" if node.task in ["regression", "classification", "fit_model"] else (
+                "preprocessors" if node.task in ["preprocessing", "fit_preprocessor", "fit_transform"] else "data")
             node_path = os.path.join(NodeDirectoryManager.get_nodes_dir(folder), f"{node_name}_{node_id}.pkl")
             if os.path.exists(node_path):
                 os.remove(node_path)
-            if node_name in special_case_nodes:
-                folder = 'preprocessors'
-                id_ = node.node_id
-                node_path = os.path.join(NodeDirectoryManager.get_nodes_dir(folder), f"{node_name}_{id_}.pkl")
-                if os.path.exists(node_path):
-                    os.remove(node_path)
+            
+            folders = None
+            if is_multi_channel:
+                folders = ['data', 'data']
+            elif is_special_case:
+                folders = ['preprocessors', 'data']
+
+            if folders:
+                for folder in folders:
+                    for i in range(1,3):
+                        node_path = os.path.join(NodeDirectoryManager.get_nodes_dir(folder), f"{node_name}_{node_id + i}.pkl")
+                        if os.path.exists(node_path):
+                            os.remove(node_path)
             # Delete the database entry
             node.delete()
+
+            if from_view:
+                for i in range(1,3):
+                    node = Node.objects.filter(node_id=node_id + i)
+                    if node.exists():
+                        node.delete()
+
             return True, f"Node {node_id} deleted."
-            
         except ObjectDoesNotExist:
             return False, f"Node {node_id} does not exist."
         except Exception as e:
@@ -134,54 +153,54 @@ class NodeUpdater:
     def __call__(self, node_id, payload):
         if not node_id:
             raise ValueError("Node ID must be provided.")
+        node_id = int(node_id) if node_id else None
         if not isinstance(payload, dict):
             raise ValueError("Payload must be a dictionary.")
+        
         try:
+            is_multi_channel = False
+            is_special_case = False
             node = Node.objects.get(node_id=node_id)
             multi_channel_nodes = ["data_loader", "train_test_split", "splitter"]
             special_case_nodes = ["fitter_transformer"]
-            folder = "models" if node.task in ["regression", "classification", "fit_model"] else ("preprocessors" if node.task in ["preprocessing", "fit_preprocessor"] else "data")
-            node_path = os.path.join(NodeDirectoryManager.get_nodes_dir(folder), f"{node.node_name}_{node_id}.pkl")
-            folder_path = os.path.dirname(node_path)
-            data, _ = NodeLoader()(node_id=payload.get("node_id"))
-            payload["node_data"] = data
-            old_id = payload.get("node_id")
+
+            new_task = payload.get('task', node.task)
+            folder = "models" if new_task in ["regression", "classification", "fit_model"] else (
+                "preprocessors" if new_task in ["preprocessing", "fit_preprocessor", "fit_transform"] else "data")
+            
+            folder_path = NodeDirectoryManager.get_nodes_dir(folder)
+            original_id = payload.get("node_id")
+            payload['node_data'] = []
+
+            folders = None
             if node.node_name in multi_channel_nodes:
-                id_ =node.node_id
-                id_1, id_2 = id_+1, id_+2
-                old_id_1, old_id_2 = old_id+1, old_id+2
-                data1, _ = NodeLoader()(old_id_1)
-                data2, _ = NodeLoader()(old_id_2)
-                payload_1, payload_2 = payload.copy(), payload.copy()
-                payload_1['node_id'] = id_1
-                payload_2['node_id'] = id_2
-                payload_1['node_data'] = data1
-                payload_2['node_data'] = data2
-                NodeSaver()(payload_1, path=folder_path)
-                NodeSaver()(payload_2, path=folder_path)
-                NodeDeleter()(old_id_1)
-                NodeDeleter()(old_id_2)
+                is_multi_channel = True
+                folders = ['data', 'data']
             elif node.node_name in special_case_nodes:
+                is_special_case = True
                 folders = ['preprocessors', 'data']
-                payload_ = payload.copy()
-                for idx, folder in enumerate(folders,1):
-                    id_ = node.node_id
-                    folder_path_ = NodeDirectoryManager.get_nodes_dir(folder)
-                    old_id_new = old_id+idx
-                    data, _ = NodeLoader()(old_id_new)
-                    payload_['node_id'] = id_+idx
-                    payload_['node_data'] = data
-                    NodeSaver()(payload_, path=folder_path_)
-                    NodeDeleter()(old_id_new)
+            
+            if folders:
+                for i, f in enumerate(folders, 1):
+                    f_path = NodeDirectoryManager.get_nodes_dir(f)
+                    tmp_id = original_id + i
+                    new_id = node_id + i
+                    data, _ = NodeLoader()(tmp_id)
+                    new_payload = payload.copy()
+                    new_payload['node_id'] = new_id
+                    new_payload['node_data'] = data
+                    payload['node_data'].append(data)
+                    NodeSaver()(new_payload, path=f_path)
+                    NodeDeleter()(tmp_id)
 
             payload['node_id'] = node_id
             NodeSaver()(payload, path=folder_path)
-            NodeDeleter()(old_id)
+            NodeDeleter()(original_id, is_special_case, is_multi_channel)
             if node.node_name != payload.get("node_name"):
+
                 node_path = os.path.join(folder_path, f"{node.node_name}_{node_id}.pkl")
                 if os.path.exists(node_path):
                     os.remove(node_path)
-            
             
             return True, f"Node {node_id} updated."
         except ObjectDoesNotExist:
@@ -191,21 +210,24 @@ class NodeUpdater:
 
 class ClearAllNodes:
     """Clears all nodes from the database and filesystem."""
-    def __call__(self,*args):
+    def __call__(self, *args):
         try:
             for arg in args:
                 if arg == 'components':
                     Component.objects.all().delete()
                     return True, "All components cleared."
+                
             # deletes all objects in the Node model
             Node.objects.all().delete()
             nodes_dir = NodeDirectoryManager.get_nodes_dir()
+
             for folder in os.listdir(nodes_dir):
                 folder_path = os.path.join(nodes_dir, folder)
                 for file in os.listdir(folder_path):
                     file_path = os.path.join(folder_path, file)
                     if os.path.isfile(file_path):
                         os.remove(file_path)
+
             return True, "All nodes cleared."
         except Exception as e:
             return False, f"Error clearing nodes: {e}"
@@ -215,6 +237,7 @@ class NodeDirectoryManager:
     """Handles node directory paths."""
     def __init__(self, folder_name):
         self.folder_name = folder_name
+
     @staticmethod
     def get_nodes_dir(folder_name=None):
         folder = "nodes\\saved"
@@ -258,7 +281,6 @@ class NodeAttributeExtractor:
     """Extracts attributes from a node."""
     @staticmethod
     def get_attributes(node):
-        
         attributes = {}
         for attr in dir(node):
             if attr.endswith("_") and not attr.startswith("_"):
