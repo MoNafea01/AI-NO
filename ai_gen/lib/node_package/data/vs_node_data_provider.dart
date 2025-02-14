@@ -20,7 +20,7 @@ class VSNodeDataProvider extends ChangeNotifier {
   VSNodeDataProvider({
     required this.nodeManager,
 
-    ///Set this to false if you dont want undo functionality
+    ///Set this to false if you don't want undo functionality
     this.historyManager,
   }) {
     if (historyManager != null) {
