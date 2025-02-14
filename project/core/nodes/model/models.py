@@ -30,12 +30,14 @@ MODELS = {
     {
     'regression':
         {
-        'svr':{'node': SVR,'params': {'C': 1.0, 'kernel': 'rbf',}},
+        'rbf_svr':{'node': SVR,'params': {'C': 1.0, 'kernel': 'rbf',}},
         'linear_svr':{'node': LinearSVR,'params': {'C': 1.0,}},
+        'poly_svr':{'node': SVR,'params': {'C': 1.0, 'kernel': 'poly',}},
+        'sigmoid_svr':{'node': SVR,'params': {'C': 1.0, 'kernel': 'sigmoid',}},
         },
     'classification':
         {
-        'linear_svm':{'node': LinearSVC,'params': {'C': 1.0,}},
+        'linear_svc':{'node': LinearSVC,'params': {'C': 1.0,}},
         'rbf_svc':{'node': SVC,'params': {'C': 1.0, 'kernel': 'rbf',}},
         'poly_svc':{'node': SVC,'params': {'C': 1.0, 'kernel': 'poly',}},
         'sigmoid_svc':{'node': SVC,'params': {'C': 1.0, 'kernel': 'sigmoid',}},
@@ -45,19 +47,19 @@ MODELS = {
     {
     'classification':
         {
-        'decision_tree':{'node': DecisionTreeClassifier,'params': {'max_depth': None,}},
-        'random_forest':{'node': RandomForestClassifier,'params': {'n_estimators': 100,'max_depth': None,}},
-        'gradient_boosting':{'node': GradientBoostingClassifier,'params': {}},
-        'adaboost':{'node': AdaBoostClassifier,'params': {}},
-        'bagging':{'node': BaggingClassifier,'params': {}},
+        'dtc':{'node': DecisionTreeClassifier,'params': {'max_depth': None,}},
+        'rfc':{'node': RandomForestClassifier,'params': {'n_estimators': 100,'max_depth': None,}},
+        'gbc':{'node': GradientBoostingClassifier,'params': {}},
+        'adc':{'node': AdaBoostClassifier,'params': {}},
+        'bc':{'node': BaggingClassifier,'params': {}},
         },
     'regression':
         {
-        'decision_tree':{'node': DecisionTreeRegressor,'params': {'max_depth': None,}},
-        'random_forest':{'node': RandomForestRegressor,'params': {'n_estimators': 100,'max_depth': None,}},
-        'gradient_boosting':{'node': GradientBoostingRegressor,'params': {}},
-        'adaboost':{'node': AdaBoostRegressor,'params': {}},
-        'bagging':{'node': BaggingRegressor,'params': {}},
+        'dtr':{'node': DecisionTreeRegressor,'params': {'max_depth': None,}},
+        'rfr':{'node': RandomForestRegressor,'params': {'n_estimators': 100,'max_depth': None,}},
+        'gbr':{'node': GradientBoostingRegressor,'params': {}},
+        'adr':{'node': AdaBoostRegressor,'params': {}},
+        'br':{'node': BaggingRegressor,'params': {}},
         },
     },
     'naive_bayes':

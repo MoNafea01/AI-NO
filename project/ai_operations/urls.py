@@ -1,11 +1,9 @@
 # api/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import WorkflowViewSet, CreateModelView, FitModelAPIView, PredictAPIView, PreprocessorAPIView, FitPreprocessorAPIView
-from .views import TransformAPIView, FitTransformAPIView, TrainTestSplitAPIView, SplitterAPIView
-from .views import DataLoaderAPIView
+from .views import *
 router = DefaultRouter()
-router.register(r'workflows', WorkflowViewSet)
+router.register(r'components', ComponentAPIViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -18,5 +16,11 @@ urlpatterns = [
     path('fit_transform/', FitTransformAPIView.as_view(), name='fit_transform'),
     path('train_test_split/', TrainTestSplitAPIView.as_view(), name='train_test_split'),
     path('splitter/', SplitterAPIView.as_view(), name='splitter'),
+    path('joiner/', JoinerAPIView.as_view(), name='joiner'),
     path('data_loader/', DataLoaderAPIView.as_view(), name='data_loader'),
+    path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
+    path('save_node/', NodeSaveAPIView.as_view(), name='save_node'),
+    path('load_node/', NodeLoaderAPIView.as_view(), name='load_node'),
+    path('evaluate/', EvaluatorAPIView.as_view(), name='evaluate'),
+    path('clear_nodes/', ClearNodesAPIView.as_view(), name='clear_nodes'),
 ]

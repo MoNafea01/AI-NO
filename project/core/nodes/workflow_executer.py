@@ -1,16 +1,16 @@
 # Core workflow execution logic
 # core/workflow_executor.py
-from dataLoader import DataLoader
+from project.core.nodes.other.dataLoader import DataLoader
 
-from backend.core.nodes.preprocessing.preprocessor import Scaler
+from core.nodes.preprocessing.preprocessor import Preprocessor
 from preprocessing.transform import Transform
-from backend.core.nodes.preprocessing.train_test_split import TrainTestSplit
+from core.nodes.other.train_test_split import TrainTestSplit
 from preprocessing.fit_transform import FitTransform
 
 from model.model import Model
 from model.fit import Fit
 from model.predict import Predict
-from metrics import Evaluator
+from project.core.nodes.other.metrics import Evaluator
 
 class WorkflowExecutor:
     def __init__(self, workflow):
@@ -27,7 +27,7 @@ class WorkflowExecutor:
         splitter_params = workflow['splitter_params']
         (X_train, y_train), (X_test, y_test) = TrainTestSplit(X,y,**splitter_params).payload.values()
         trans_params = workflow['transformer_params']
-        scaler = Scaler(**trans_params)
+        scaler = Preprocessor(**trans_params)
         X_train = FitTransform(X_train, scaler).payload['transformed_data']
         X_test = Transform(X_test, scaler).payload['transformed_data']
 

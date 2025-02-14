@@ -1,9 +1,9 @@
 # Core workflow execution logic
 # core/workflow_executor.py
-from nodes.dataLoader import DataLoader
-from backend.core.nodes.preprocessing.preprocessing import Preprocessor
-from backend.core.nodes.model.model import ModelTrainer
-from nodes.metrics import Evaluator
+from core.nodes.other.dataLoader import DataLoader
+from core.nodes.preprocessing.preprocessor import Preprocessor
+from core.nodes.model.model import Model
+from project.core.nodes.other.metrics import Evaluator
 
 class WorkflowExecutor:
     def __init__(self, workflow):
@@ -22,7 +22,7 @@ class WorkflowExecutor:
 
         # Train model
         model_params = workflow['model_params']
-        model_trainer = ModelTrainer(**model_params)
+        model_trainer = Model(**model_params)
         model = model_trainer.train(X_train, y_train)
 
         # Evaluate model

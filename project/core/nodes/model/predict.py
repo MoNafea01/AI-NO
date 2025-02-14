@@ -1,58 +1,92 @@
 from .model import Model
 from .fit import Fit
-from .utils import load_node, handle_name, get_attributes, _get_nodes_dir
+from .utils import PayloadBuilder
+from ..utils import NodeLoader, NodeSaver
+
+
+class ModelPredictor:
+    """Handles the prediction of models."""
+    def __init__(self, model, X):
+        self.model = model
+        self.X = X
+
+    def predict_model(self):
+        """predict the output with the provided data."""
+        try:
+            predictions = self.model.predict(self.X)
+        except Exception as e:
+            raise ValueError(f"Error fitting model: {e}")
+        return predictions
 
 
 class Predict:
-    def __init__(self, X, model: dict|str = None):
-        self.model_path = model
-        self.model = model() if isinstance(model, Fit) else (model() if isinstance(model,Model) 
-                                else(model if isinstance(model, dict)
-                                else(load_node(model))))
-        self.X = X.get('data') if isinstance(X, dict) else X
-        self.payload = self.predict_model()
-    
-    def predict_model(self):
+    """Orchestrates the predicting process."""
+    def __init__(self, X, model=None, model_path=None):
+        self.model = model
+        self.model_path = model_path
+        self.X = NodeLoader()(X.get("node_id"))[0] if isinstance(X, dict) else X
+        self.payload = self._predict()
+
+    def _predict(self):
         if isinstance(self.model, dict):
-            try:
-                import joblib
-                nodes_dir = _get_nodes_dir()
-                model = joblib.load(f'{nodes_dir}\\{self.model.get('node_name')}_{self.model.get('node_id')}.pkl')
-                predictions = model.predict(self.X)
-                attributes = get_attributes(model)
-                payload = {"message": "Model predicted",
-                           'data': predictions,
-                            "node_id": self.model.get('node_id'),
-                            "attributes": attributes,
-                            "node_name": self.model.get('node_name')
-                            }
-                return payload
-            except Exception as e:
-                raise ValueError(f"Error loading model: {e}")
+            return self._predict_from_id()
+        elif isinstance(rf"{self.model}", str):
+            return self._predict_from_path()
+        else:
+            raise ValueError("Invalid model or path provided.")
+
+    def _predict_from_id(self):
         try:
-            node_name, node_id = handle_name(self.model_path)
-            model = self.model
-            predictions = model.predict(self.X)
-            attributes = get_attributes(model)
-            payload = {"message": "Model predicted", 
-                       'data': predictions,
-                       "node_id": node_id, 
-                       "attributes": attributes,
-                       "node_name": node_name
-                        }
+            model, _ = NodeLoader()(self.model.get("node_id"))  # Load model using ID from database
+            return self._predict_handler(model)
+        except Exception as e:
+            raise ValueError(f"Error predicting using model by ID: {e}")
+
+    def _predict_from_path(self):
+        try:
+            model, _ = NodeLoader()(path=self.model_path)
+            return self._predict_handler(model)
+        except Exception as e:
+            raise ValueError(f"Error predicting using model by path: {e}")
+    
+
+    def _predict_handler(self, model):
+        try:
+            predictor = ModelPredictor(model, self.X)
+            predictions = predictor.predict_model()
+            payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict')
+            NodeSaver()(payload, "core/nodes/saved/data")
+            del payload['node_data']
             return payload
         except Exception as e:
-            raise ValueError(f"Error loading model: {e}")
-    
+            raise ValueError(f"Error Predicting model: {e}")
+        
     def __str__(self):
-        return f'{self.payload}'
-    
+        return str(self.payload)
+
     def __call__(self, *args):
         return self.payload
 
+
 if __name__ == '__main__':
-    model = Model('logistic_regression', 'linear_models', 'classification', {'penalty': 'l2','C': 0.5,})
-    fit = Fit([[1, 2], [2, 3]], [3, 4], model)
-    # model = r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\backend\core\nodes\saved\models\logistic_regression_2782831042800.pkl"
-    pred = Predict([[3, 4], [4, 5]], model)
+    
+    model_args = {
+        "name": "logistic_regression",
+        "type": "linear_models",
+        "task": "classification",
+        "params": {
+            "penalty": "l2",
+            "C": 0.5,
+        }
+    }
+    fit_args = {
+        "data": [[1, 2], [2, 3]],
+    }
+    pred_args = {
+        "X": [[3, 4], [4, 5]],
+    }
+
+    model = Model(**model_args)
+    fit = Fit(**fit_args, model=model)
+    pred = Predict(**pred_args, model=fit)
     print(pred)
