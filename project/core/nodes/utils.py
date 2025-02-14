@@ -20,7 +20,6 @@ class DirectoryManager:
 
 class NodeSaver:
     """Handles saving nodes."""
-    
     def __call__(self, payload, path: str = None):
         if not isinstance(payload, dict):
             raise ValueError("Payload must be a dictionary.")
