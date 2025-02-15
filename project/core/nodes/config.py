@@ -1,6 +1,6 @@
 from . import get_ds_name
-def setup_config(node_name, idx):
-    ds_name = get_ds_name()
+def setup_config(node_name, idx, node_id):
+    ds_name = get_ds_name(node_id)
     CONFIG = {
         'data_loader': {
             '1':{"message":f"data loaded: {ds_name}: X"},
