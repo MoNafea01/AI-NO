@@ -37,7 +37,7 @@ class NodeSaver:
             path = f"{path}\\{node_name}_{node_id}.pkl"
             nodes_dir = os.path.dirname(path)
             DirectoryManager.make_dirs(nodes_dir)
-            print(f"Node saved to: {path}")
+            # print(f"Node saved to: {path}")
             joblib.dump(node, path)
 
         # save to database
@@ -135,10 +135,14 @@ class NodeDeleter:
             node.delete()
 
             if from_view:
+                from . import clear_ds_name
+                clear_ds_name(node_id)
                 for i in range(1,3):
                     node = Node.objects.filter(node_id=node_id + i)
                     if node.exists():
                         node.delete()
+                
+                
 
             return True, f"Node {node_id} deleted."
         except ObjectDoesNotExist:
@@ -151,6 +155,7 @@ class NodeUpdater:
     """Updates a node in the database."""
     def __call__(self, node_id, payload):
         from .config import setup_config
+        from . import clear_ds_name, get_ds_name
         if not node_id:
             raise ValueError("Node ID must be provided.")
         node_id = int(node_id) if node_id else None
@@ -182,7 +187,7 @@ class NodeUpdater:
             
             if folders:
                 for i, f in enumerate(folders, 1):
-                    config = setup_config(node.node_name, str(i))
+                    config = setup_config(node.node_name, str(i), original_id)
                     f_path = NodeDirectoryManager.get_nodes_dir(f)
                     tmp_id = original_id + i
                     new_id = node_id + i
@@ -194,6 +199,7 @@ class NodeUpdater:
                     payload['node_data'].append(data)
                     NodeSaver()(new_payload, path=f_path)
                     NodeDeleter()(tmp_id)
+            clear_ds_name(original_id)
 
             payload['node_id'] = node_id
             NodeSaver()(payload, path=folder_path)

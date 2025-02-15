@@ -72,9 +72,9 @@ class DataLoader:
         X, y = self.loader.load()
         if not dataset_name:
             dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
-        set_ds_name(dataset_name)
         payload = PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data")
         n_id = payload['node_id']
+        set_ds_name(dataset_name, n_id)
         payloadX = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: X", X, "data_loader", node_type="loader", task="load_data", node_id=n_id+1)
         payloady = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: y", y, "data_loader", node_type="loader", task="load_data", node_id =n_id+2)
         NodeSaver()(payloadX, path="core/nodes/saved/data")
