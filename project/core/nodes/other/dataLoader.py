@@ -3,7 +3,7 @@
 import os
 import pandas as pd
 from ..utils import NodeSaver, NodeNameHandler, PayloadBuilder, NodeLoader, DATASETS as datasets
-
+from .. import set_ds_name
 
 class BaseDataLoader:
     """Abstract base class for all data loaders."""
@@ -68,15 +68,16 @@ class DataLoaderFactory:
 class DataLoader:
     """Facade for loading data using different strategies."""
     def __init__(self, dataset_name: str = None, dataset_path: str = None):
+        global ds_name
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
         X, y = self.loader.load()
         if not dataset_name:
             dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
-        
-        payload = PayloadBuilder.build_payload(f"Predefined data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data")
+        set_ds_name(dataset_name)
+        payload = PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data")
         n_id = payload['node_id']
-        payloadX = PayloadBuilder.build_payload(f"Predefined data loaded: {dataset_name}: X", X, "data_loader", node_type="loader", task="load_data", node_id=n_id+1)
-        payloady = PayloadBuilder.build_payload(f"Predefined data loaded: {dataset_name}: y", y, "data_loader", node_type="loader", task="load_data", node_id =n_id+2)
+        payloadX = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: X", X, "data_loader", node_type="loader", task="load_data", node_id=n_id+1)
+        payloady = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: y", y, "data_loader", node_type="loader", task="load_data", node_id =n_id+2)
         NodeSaver()(payloadX, path="core/nodes/saved/data")
         NodeSaver()(payloady, path="core/nodes/saved/data")
         NodeSaver()(payload, path="core/nodes/saved/data")
