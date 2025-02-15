@@ -68,7 +68,6 @@ class DataLoaderFactory:
 class DataLoader:
     """Facade for loading data using different strategies."""
     def __init__(self, dataset_name: str = None, dataset_path: str = None):
-        global ds_name
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
         X, y = self.loader.load()
         if not dataset_name:
