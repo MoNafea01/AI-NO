@@ -17,8 +17,7 @@ void main() async {
     await serverManager.startServer();
   }
 
-  // print(await ApiCall()
-  //     .trainTestSplit([1, 2, 3, 4], testSize: 0.2, randomState: 1));
+  // print(await ApiCall().trainTestSplit([1, 2, 3, 4], testSize: 0.2, randomState: 1));
   runApp(const MyApp());
 }
 
