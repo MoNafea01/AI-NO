@@ -8,7 +8,7 @@ class BlockSerializer {
 
   final Dio dio = Dio();
 
-  Future<List<BlockModel>> serializeBlocks() async {
+  Future<List<BlockModel>> _serializeBlocks() async {
     try {
       final Response response = await dio.get("$_baseURL/$_allComponentsApi");
       List<BlockModel> blocks = [];
@@ -29,6 +29,30 @@ class BlockSerializer {
       }
     } catch (e) {
       throw Exception("Server Error: $e");
+    }
+  }
+
+  Future<Map<String, Map<String, List<BlockModel>>>> getBlocks() async {
+    try {
+      List<BlockModel> blocks = await _serializeBlocks();
+      Map<String, Map<String, List<BlockModel>>> categorizedBlocks = {};
+
+      for (BlockModel block in blocks) {
+        if (categorizedBlocks.containsKey(block.nodeType)) {
+          if (categorizedBlocks[block.nodeType]!.containsKey(block.task)) {
+            categorizedBlocks[block.nodeType]![block.task!]!.add(block);
+          } else {
+            categorizedBlocks[block.nodeType]![block.task!] != [block];
+          }
+        } else {
+          categorizedBlocks[block.nodeType!] = {
+            block.task!: [block],
+          };
+        }
+      }
+      return categorizedBlocks;
+    } catch (e) {
+      throw Exception(e);
     }
   }
 }

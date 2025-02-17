@@ -6,30 +6,9 @@ import 'package:flutter/material.dart';
 class NodeBuilder {
   Future<List<VSSubgroup>> buildBlocks() async {
     final Map<String, Map<String, List<BlockModel>>> categorizedBlocks =
-        await _getCategorizedBlocks();
+        await BlockSerializer().getBlocks();
 
     return _buildBlocks(categorizedBlocks);
-  }
-
-  Future<Map<String, Map<String, List<BlockModel>>>>
-      _getCategorizedBlocks() async {
-    List<BlockModel> blocks = await BlockSerializer().serializeBlocks();
-    Map<String, Map<String, List<BlockModel>>> categorizedBlocks = {};
-
-    for (BlockModel block in blocks) {
-      if (categorizedBlocks.containsKey(block.nodeType)) {
-        if (categorizedBlocks[block.nodeType]!.containsKey(block.task)) {
-          categorizedBlocks[block.nodeType]![block.task!]!.add(block);
-        } else {
-          categorizedBlocks[block.nodeType]![block.task!] != [block];
-        }
-      } else {
-        categorizedBlocks[block.nodeType!] = {
-          block.task!: [block],
-        };
-      }
-    }
-    return categorizedBlocks;
   }
 
   List<VSSubgroup> _buildBlocks(
