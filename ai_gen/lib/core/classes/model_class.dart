@@ -1,8 +1,8 @@
 class AIModel {
   String? message;
-  String modelName;
-  String modelType;
-  String task;
+  String? modelName;
+  String? modelType;
+  String? task;
   Map<String, dynamic>? params;
   int? modelId;
 

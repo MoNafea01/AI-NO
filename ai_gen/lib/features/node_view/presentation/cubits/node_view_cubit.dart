@@ -1,5 +1,4 @@
 import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
-import 'package:ai_gen/node_package/data/vs_subgroup.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
@@ -14,7 +13,7 @@ class BlockLoaderCubit extends Cubit<BlockLoaderState> {
     try {
       emit(NodeViewLoading());
 
-      final List<VSSubgroup> nodeBuilder = await NodeBuilder().buildBlocks();
+      final List<Object> nodeBuilder = await NodeBuilder().buildBlocks();
 
       emit(NodeViewSuccess(nodeBuilder));
     } catch (e) {

@@ -5,7 +5,7 @@ class BlockModel {
   String? nodeType;
   String? task;
   String? nodeName;
-  List<Params?>? params;
+  List<Params>? params;
   List<String>? inputDots;
   List<String>? outputDots;
   String? apiCall;

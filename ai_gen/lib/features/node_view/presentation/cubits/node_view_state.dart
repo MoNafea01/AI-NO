@@ -8,7 +8,7 @@ final class NodeViewInitial extends BlockLoaderState {}
 final class NodeViewLoading extends BlockLoaderState {}
 
 final class NodeViewSuccess extends BlockLoaderState {
-  final List<VSSubgroup> nodeBuilder;
+  final List<Object> nodeBuilder;
   NodeViewSuccess(this.nodeBuilder);
 }
 

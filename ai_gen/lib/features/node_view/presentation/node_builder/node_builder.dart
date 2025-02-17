@@ -1,14 +1,25 @@
+import 'package:ai_gen/core/classes/model_class.dart';
 import 'package:ai_gen/core/models/block_model/BlockModel.dart';
+import 'package:ai_gen/features/node_view/data/functions/create_model.dart';
 import 'package:ai_gen/features/node_view/data/serialization/block_serializer.dart';
+import 'package:ai_gen/node_package/custom_widgets/vs_text_input_data.dart';
+import 'package:ai_gen/node_package/data/standard_interfaces/vs_model_interface.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
 class NodeBuilder {
-  Future<List<VSSubgroup>> buildBlocks() async {
+  Future<List<Object>> buildBlocks() async {
     final Map<String, Map<String, List<BlockModel>>> categorizedBlocks =
         await BlockSerializer().getBlocks();
 
-    return _buildBlocks(categorizedBlocks);
+    return [
+      (Offset offset, VSOutputData? ref) => VSOutputNode(
+            type: "Output",
+            widgetOffset: offset,
+            ref: ref,
+          ),
+      ..._buildBlocks(categorizedBlocks),
+    ];
   }
 
   List<VSSubgroup> _buildBlocks(
@@ -39,28 +50,48 @@ class NodeBuilder {
       return (Offset offset, VSOutputData? ref) => VSNodeData(
             type: block.nodeName!,
             widgetOffset: offset,
-            inputData: _buildInputData(block.inputDots, ref),
-            outputData: _buildOutputData(block.outputDots),
+            inputData: _buildInputData(block, ref),
+            outputData: _buildOutputData(block),
           );
     }).toList();
   }
 
-  List<VSNumInputData> _buildInputData(
-      List<String>? inputDots, VSOutputData? ref) {
-    return inputDots?.map((inputDot) {
-          return VSNumInputData(type: inputDot, initialConnection: ref);
-        }).toList() ??
-        [];
+  List<VSInputData> _buildInputData(BlockModel block, VSOutputData? ref) {
+    return [
+      ...block.params?.map(_paramInput) ?? [],
+      ...block.inputDots?.map((inputDot) => _inputDots(inputDot, ref)) ?? [],
+    ];
   }
 
-  List<VSBoolOutputData> _buildOutputData(List<String>? outputDots) {
-    return outputDots?.map((outputDot) {
-          return VSBoolOutputData(
-            type: outputDot,
-            outputFunction: (data) => data["First"] > data["Second"],
+  VSInputData _inputDots(String inputDot, VSOutputData<dynamic>? ref) {
+    return VSModelInputData(type: inputDot, initialConnection: ref);
+  }
+
+  VSInputData _paramInput(param) {
+    return VsTextInputData(
+      type: param.name ?? "type",
+      controller: TextEditingController(),
+    );
+  }
+
+  List<VSOutputData> _buildOutputData(BlockModel block) {
+    return block.outputDots?.map((outputDot) {
+          return VSModelOutputData(
+            type: "${outputDot}Output",
+            outputFunction: (data) async {
+              print("outputFunction: ${data.entries}");
+
+              final aiModel = AIModel(
+                modelName: block.nodeName,
+                modelType: block.nodeType,
+                task: block.task,
+                params: {},
+              );
+
+              return await createModel(aiModel.createModelToJson());
+            },
           );
         }).toList() ??
         [];
   }
 }
-//{id: 166, node_name: linear_regression, node_type: linear_models, task: regression, params: null, input_dots: [], output_dots: [model], api_call: create_model/}
