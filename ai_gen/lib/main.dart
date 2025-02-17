@@ -1,8 +1,8 @@
-import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'core/network/server_manager/server_manager.dart';
+import 'features/node_view/presentation/grid_loader.dart';
 
 void main() async {
   // Create ServerManager
@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 46, 46, 46),
       ),
-      home: const Scaffold(body: NodeView()),
+      home: const Scaffold(body: GridLoader()),
     );
   }
 }

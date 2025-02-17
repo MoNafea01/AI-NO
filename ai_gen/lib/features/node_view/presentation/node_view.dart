@@ -1,23 +1,30 @@
-import 'package:ai_gen/features/node_view/presentation/node_builder/block_builder/block_builder.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:ai_gen/node_package/widgets/GridCubit/grid_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class NodeView extends StatefulWidget {
-  const NodeView({super.key});
+import 'node_builder/node_builder.dart';
 
+class NodeView extends StatefulWidget {
+  const NodeView({required this.nodeBuilder, super.key});
+
+  final List<dynamic> nodeBuilder;
   @override
   State<NodeView> createState() => _NodeViewState();
 }
 
 class _NodeViewState extends State<NodeView> {
   Iterable<String>? results;
+  late final VSNodeDataProvider nodeDataProvider;
 
-  final VSNodeDataProvider nodeDataProvider = VSNodeDataProvider(
-    nodeManager: VSNodeManager(nodeBuilders: NodeBuilder.nodeBuilders),
-  );
+  @override
+  void initState() {
+    // TODO: implement initState
+    nodeDataProvider = VSNodeDataProvider(
+      nodeManager: VSNodeManager(nodeBuilders: widget.nodeBuilder),
+    );
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +72,7 @@ class _NodeViewState extends State<NodeView> {
       bottom: 50,
       left: 10,
       child: ElevatedButton(
-        onPressed: () => BlockBuilder().buildBlocks(),
+        onPressed: () => NodeBuilder().buildBlocks(),
         child: const Text("Test"),
       ),
     );
