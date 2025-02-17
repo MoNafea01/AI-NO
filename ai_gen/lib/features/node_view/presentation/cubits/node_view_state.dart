@@ -1,18 +1,18 @@
 part of 'node_view_cubit.dart';
 
 @immutable
-sealed class NodeLoaderState {}
+sealed class BlockLoaderState {}
 
-final class NodeViewInitial extends NodeLoaderState {}
+final class NodeViewInitial extends BlockLoaderState {}
 
-final class NodeViewLoading extends NodeLoaderState {}
+final class NodeViewLoading extends BlockLoaderState {}
 
-final class NodeViewSuccess extends NodeLoaderState {
+final class NodeViewSuccess extends BlockLoaderState {
   final List<VSSubgroup> nodeBuilder;
   NodeViewSuccess(this.nodeBuilder);
 }
 
-final class NodeViewFailure extends NodeLoaderState {
+final class NodeViewFailure extends BlockLoaderState {
   final String errMessage;
 
   NodeViewFailure(this.errMessage);

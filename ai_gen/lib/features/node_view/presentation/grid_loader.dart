@@ -10,8 +10,8 @@ class GridLoader extends StatelessWidget {
   @override
   Widget build(BuildContext _) {
     return BlocProvider(
-      create: (context) => NodeLoaderCubit(),
-      child: BlocBuilder<NodeLoaderCubit, NodeLoaderState>(
+      create: (context) => BlockLoaderCubit(),
+      child: BlocBuilder<BlockLoaderCubit, BlockLoaderState>(
         builder: (context, state) {
           if (state is NodeViewLoading || state is NodeViewInitial) {
             return const Center(child: CircularProgressIndicator());

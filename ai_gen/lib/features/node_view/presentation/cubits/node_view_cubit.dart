@@ -5,8 +5,8 @@ import 'package:meta/meta.dart';
 
 part 'node_view_state.dart';
 
-class NodeLoaderCubit extends Cubit<NodeLoaderState> {
-  NodeLoaderCubit() : super(NodeViewInitial()) {
+class BlockLoaderCubit extends Cubit<BlockLoaderState> {
+  BlockLoaderCubit() : super(NodeViewInitial()) {
     buildBlocks();
   }
 
