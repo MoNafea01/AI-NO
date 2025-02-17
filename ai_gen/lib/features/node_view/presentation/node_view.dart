@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/network/serialization/block_serializer.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:ai_gen/node_package/widgets/GridCubit/grid_cubit.dart';
@@ -53,7 +54,19 @@ class _NodeViewState extends State<NodeView> {
               ],
             ),
           ),
+          _testButton(),
         ],
+      ),
+    );
+  }
+
+  Positioned _testButton() {
+    return Positioned(
+      bottom: 50,
+      left: 10,
+      child: ElevatedButton(
+        onPressed: () => BlockSerializer().serializeBlocks(),
+        child: const Text("Test"),
       ),
     );
   }
