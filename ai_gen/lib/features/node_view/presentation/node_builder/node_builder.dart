@@ -7,6 +7,7 @@ import 'models_subgroup/models_subgroup.dart';
 class NodeBuilder {
   static List<Object> nodeBuilders = [
     // numbersSubGroup(),
+    // BlockBuilder().buildBlocks(),
     ModelsSubGroup(),
     FunctionsSubgroup(),
     (Offset offset, VSOutputData? ref) => VSOutputNode(

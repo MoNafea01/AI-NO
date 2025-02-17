@@ -2,9 +2,9 @@ import 'Params.dart';
 
 class BlockModel {
   num? id;
-  String? nodeName;
   String? nodeType;
   String? task;
+  String? nodeName;
   List<Params?>? params;
   List<String>? inputDots;
   List<String>? outputDots;
@@ -22,10 +22,10 @@ class BlockModel {
   });
 
   BlockModel.fromJson(dynamic json) {
-    id = json['id'];
-    nodeName = json['node_name'];
+    id = num.parse(json['id'].toString());
     nodeType = json['node_type'];
     task = json['task'];
+    nodeName = json['node_name'];
 
     if (json['params'] != null) {
       params = (json['params'] as List)
@@ -33,11 +33,8 @@ class BlockModel {
           .toList();
     }
 
-    // params = (json['params']?.map((e) => Params.fromJson(e)).toList())
-    //     as List<Params>?;
-
     inputDots =
-        json['output_dots'] != null ? json['output_dots'].cast<String>() : [];
+        json['input_dots'] != null ? json['input_dots'].cast<String>() : [];
     outputDots =
         json['output_dots'] != null ? json['output_dots'].cast<String>() : [];
     apiCall = json['api_call'];
@@ -46,9 +43,9 @@ class BlockModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = <String, dynamic>{};
     json['id'] = id;
-    json['node_name'] = nodeName;
     json['node_type'] = nodeType;
     json['task'] = task;
+    json['node_name'] = nodeName;
     json['params'] = params?.map((e) => e?.toJson()).toList();
     json['input_dots'] = inputDots;
     json['output_dots'] = outputDots;

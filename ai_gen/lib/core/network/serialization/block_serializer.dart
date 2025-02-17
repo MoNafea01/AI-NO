@@ -7,6 +7,7 @@ class BlockSerializer {
   final String _allComponentsApi = NetworkConstants.allComponentsApi;
 
   final Dio dio = Dio();
+
   Future<List<BlockModel>> serializeBlocks() async {
     try {
       final Response response = await dio.get("$_baseURL/$_allComponentsApi");
@@ -19,9 +20,6 @@ class BlockSerializer {
             blocks.add(blockModel);
           });
 
-          for (var block in blocks) {
-            print(block.toJson());
-          }
           return blocks;
         } else {
           throw Exception('Failed to load blocks');
