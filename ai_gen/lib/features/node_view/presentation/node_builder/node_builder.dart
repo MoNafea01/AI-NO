@@ -1,9 +1,16 @@
 import 'package:ai_gen/core/models/block_model/BlockModel.dart';
-import 'package:ai_gen/core/network/serialization/block_serializer.dart';
+import 'package:ai_gen/features/node_view/data/serialization/block_serializer.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
 class NodeBuilder {
+  Future<List<VSSubgroup>> buildBlocks() async {
+    final Map<String, Map<String, List<BlockModel>>> categorizedBlocks =
+        await _getCategorizedBlocks();
+
+    return _buildBlocks(categorizedBlocks);
+  }
+
   Future<Map<String, Map<String, List<BlockModel>>>>
       _getCategorizedBlocks() async {
     List<BlockModel> blocks = await BlockSerializer().serializeBlocks();
@@ -22,15 +29,7 @@ class NodeBuilder {
         };
       }
     }
-    print(categorizedBlocks);
     return categorizedBlocks;
-  }
-
-  Future<List<VSSubgroup>> buildBlocks() async {
-    final Map<String, Map<String, List<BlockModel>>> categorizedBlocks =
-        await _getCategorizedBlocks();
-
-    return _buildBlocks(categorizedBlocks);
   }
 
   List<VSSubgroup> _buildBlocks(
