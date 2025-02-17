@@ -2,7 +2,7 @@ import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import 'core/server_manager.dart';
+import 'core/network/server_manager/server_manager.dart';
 
 void main() async {
   // Create ServerManager
