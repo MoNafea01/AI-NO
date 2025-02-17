@@ -23,6 +23,7 @@ class Node(models.Model):
 
 
 class Component(models.Model):
+    displayed_name = models.CharField(max_length=255, default="")
     node_name = models.CharField(max_length=255)
     node_type = models.CharField(max_length=255, default="general")
     task = models.CharField(max_length=255,default='general')
