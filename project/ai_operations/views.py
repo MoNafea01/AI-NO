@@ -771,7 +771,7 @@ class ExcelUploadAPIView(APIView):
                 except:
                     return None
             # Convert string representations to actual Python objects
-            for col in ['params', 'input_dots', 'output_dots']:
+            for col in ['params', 'input_channels', 'output_channels']:
                 df[col] = df[col].apply(lambda x: 
                                         parse_json_like(x) if pd.notnull(x) else None
                                         )
