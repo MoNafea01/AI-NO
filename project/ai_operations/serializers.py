@@ -135,8 +135,8 @@ class ComponentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'params': {'allow_null': True},
-            'input_dots': {'allow_null': True},
-            'output_dots': {'allow_null': True}
+            'input_channels': {'allow_null': True},
+            'output_channels': {'allow_null': True}
         }
 
 

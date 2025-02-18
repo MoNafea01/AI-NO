@@ -32,9 +32,9 @@ class TrainTestSplit:
         payload = self.payload[0]
         for arg in args:
             if arg == '1':
-                payload = self.payload[0]
-            elif arg == '2':
                 payload = self.payload[1]
+            elif arg == '2':
+                payload = self.payload[2]
         return payload
 
 

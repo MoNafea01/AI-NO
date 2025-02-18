@@ -7,7 +7,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from sklearn.datasets import load_iris, load_diabetes, load_digits, make_regression, make_classification
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, mean_squared_error, mean_absolute_error, r2_score
 
-
 class DirectoryManager:
     """Handles directory operations."""
     @staticmethod
@@ -38,7 +37,7 @@ class NodeSaver:
             path = f"{path}\\{node_name}_{node_id}.pkl"
             nodes_dir = os.path.dirname(path)
             DirectoryManager.make_dirs(nodes_dir)
-            print(f"Node saved to: {path}")
+            # print(f"Node saved to: {path}")
             joblib.dump(node, path)
 
         # save to database
@@ -136,6 +135,8 @@ class NodeDeleter:
             node.delete()
 
             if from_view:
+                from . import clear_ds_name
+                clear_ds_name(node_id)
                 for i in range(1,3):
                     node = Node.objects.filter(node_id=node_id + i)
                     if node.exists():
@@ -151,6 +152,8 @@ class NodeDeleter:
 class NodeUpdater:
     """Updates a node in the database."""
     def __call__(self, node_id, payload):
+        from .config import setup_config
+        from . import clear_ds_name, get_ds_name
         if not node_id:
             raise ValueError("Node ID must be provided.")
         node_id = int(node_id) if node_id else None
@@ -182,6 +185,7 @@ class NodeUpdater:
             
             if folders:
                 for i, f in enumerate(folders, 1):
+                    config = setup_config(node.node_name, str(i), original_id)
                     f_path = NodeDirectoryManager.get_nodes_dir(f)
                     tmp_id = original_id + i
                     new_id = node_id + i
@@ -189,9 +193,11 @@ class NodeUpdater:
                     new_payload = payload.copy()
                     new_payload['node_id'] = new_id
                     new_payload['node_data'] = data
+                    new_payload.update(**config)
                     payload['node_data'].append(data)
                     NodeSaver()(new_payload, path=f_path)
                     NodeDeleter()(tmp_id)
+            clear_ds_name(original_id)
 
             payload['node_id'] = node_id
             NodeSaver()(payload, path=folder_path)
@@ -207,6 +213,7 @@ class NodeUpdater:
             return False, f"Node {node_id} does not exist."
         except Exception as e:
             return False, f"Error updating node: {e}"
+
 
 class ClearAllNodes:
     """Clears all nodes from the database and filesystem."""
@@ -288,7 +295,6 @@ class NodeAttributeExtractor:
                 if hasattr(atr, "tolist"):
                     attributes[attr] = atr.tolist()
         return attributes
-
 
 
 
