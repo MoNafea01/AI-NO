@@ -3,8 +3,6 @@ import 'package:ai_gen/node_package/widgets/GridCubit/grid_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'node_builder/node_builder.dart';
-
 class NodeView extends StatefulWidget {
   const NodeView({required this.nodeBuilder, super.key});
 
@@ -72,7 +70,7 @@ class _NodeViewState extends State<NodeView> {
       bottom: 50,
       left: 10,
       child: ElevatedButton(
-        onPressed: () => NodeBuilder().buildBlocks(),
+        onPressed: () {},
         child: const Text("Test"),
       ),
     );

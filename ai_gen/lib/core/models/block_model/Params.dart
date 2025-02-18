@@ -22,4 +22,9 @@ class Params {
     map['default'] = defaultValue;
     return map;
   }
+
+  @override
+  String toString() {
+    return 'Params{name: $name, type: $type, defaultValue: $defaultValue}';
+  }
 }

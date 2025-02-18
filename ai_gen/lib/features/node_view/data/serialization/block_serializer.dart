@@ -42,11 +42,11 @@ class BlockSerializer {
           if (categorizedBlocks[block.nodeType]!.containsKey(block.task)) {
             categorizedBlocks[block.nodeType]![block.task!]!.add(block);
           } else {
-            categorizedBlocks[block.nodeType]![block.task!] != [block];
+            categorizedBlocks[block.nodeType]![block.task!] = [block];
           }
         } else {
           categorizedBlocks[block.nodeType!] = {
-            block.task!: [block],
+            block.task!: [block]
           };
         }
       }
@@ -56,3 +56,17 @@ class BlockSerializer {
     }
   }
 }
+
+// Example of the returned map:
+Map<String, Map<String, List<BlockModel>>> mapScheme = {
+  "linear_models": {
+    "regression": [BlockModel(), BlockModel()],
+    "classification": [BlockModel()],
+    "clustering": [BlockModel()],
+  },
+  "svm": {
+    "regression": [BlockModel(), BlockModel()],
+    "classification": [BlockModel()],
+    "clustering": [BlockModel()],
+  }
+};

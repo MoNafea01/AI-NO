@@ -1,5 +1,6 @@
 import 'package:ai_gen/core/classes/model_class.dart';
 import 'package:ai_gen/core/models/block_model/BlockModel.dart';
+import 'package:ai_gen/core/models/block_model/Params.dart';
 import 'package:ai_gen/features/node_view/data/functions/create_model.dart';
 import 'package:ai_gen/features/node_view/data/serialization/block_serializer.dart';
 import 'package:ai_gen/node_package/custom_widgets/vs_text_input_data.dart';
@@ -13,16 +14,29 @@ class NodeBuilder {
         await BlockSerializer().getBlocks();
 
     return [
+      // output node
       (Offset offset, VSOutputData? ref) => VSOutputNode(
             type: "Output",
             widgetOffset: offset,
             ref: ref,
           ),
-      ..._buildBlocks(categorizedBlocks),
+      ..._buildTypes(categorizedBlocks),
     ];
   }
 
-  List<VSSubgroup> _buildBlocks(
+  Map<String, Map<String, List<BlockModel>>> mapScheme = {
+    "linear_models": {
+      "regression": [BlockModel(), BlockModel()],
+      "classification": [BlockModel()],
+      "clustering": [BlockModel()],
+    },
+    "svm": {
+      "regression": [BlockModel(), BlockModel()],
+      "classification": [BlockModel()],
+      "clustering": [BlockModel()],
+    }
+  };
+  List<VSSubgroup> _buildTypes(
       Map<String, Map<String, List<BlockModel>>> categorizedBlocks) {
     return categorizedBlocks.entries.map(
       (blockType) {
@@ -46,7 +60,7 @@ class NodeBuilder {
 
   List<Function(Offset, VSOutputData?)> _buildBlockNodes(
       List<BlockModel> blocksList) {
-    return blocksList.map((block) {
+    return blocksList.map((BlockModel block) {
       return (Offset offset, VSOutputData? ref) => VSNodeData(
             type: block.nodeName!,
             widgetOffset: offset,
@@ -67,10 +81,10 @@ class NodeBuilder {
     return VSModelInputData(type: inputDot, initialConnection: ref);
   }
 
-  VSInputData _paramInput(param) {
+  VSInputData _paramInput(Params param) {
     return VsTextInputData(
       type: param.name ?? "type",
-      controller: TextEditingController(),
+      controller: TextEditingController(text: param.defaultValue.toString()),
     );
   }
 
@@ -79,8 +93,8 @@ class NodeBuilder {
           return VSModelOutputData(
             type: "${outputDot}Output",
             outputFunction: (data) async {
-              print("outputFunction: ${data.entries}");
-
+              print(data.entries);
+              // print("outputFunction: ${data.entries}");
               final aiModel = AIModel(
                 modelName: block.nodeName,
                 modelType: block.nodeType,
@@ -88,7 +102,7 @@ class NodeBuilder {
                 params: {},
               );
 
-              return await createModel(aiModel.createModelToJson());
+              return await apiCall(aiModel.createModelToJson());
             },
           );
         }).toList() ??

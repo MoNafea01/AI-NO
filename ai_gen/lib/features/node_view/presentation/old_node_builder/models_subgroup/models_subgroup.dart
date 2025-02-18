@@ -33,7 +33,7 @@ class ModelsSubGroup extends VSSubgroup {
             outputData: [
               VSModelOutputData(
                 type: "Output",
-                outputFunction: (data) => createModel(
+                outputFunction: (data) => apiCall(
                   {
                     "model_name": "knn",
                     "model_type": "knnr",
@@ -60,7 +60,7 @@ class ModelsSubGroup extends VSSubgroup {
             outputData: [
               VSModelOutputData(
                 type: "Output",
-                outputFunction: (data) => createModel(
+                outputFunction: (data) => apiCall(
                   {
                     "model_name": "gaussian_nb",
                     "model_type": "naive_bayes",
@@ -87,7 +87,7 @@ class ModelsSubGroup extends VSSubgroup {
             outputData: [
               VSModelOutputData(
                 type: "Output",
-                outputFunction: (data) => createModel(
+                outputFunction: (data) => apiCall(
                   {
                     "model_name": "gaussian_nb",
                     "model_type": "naive_bayes",
@@ -107,7 +107,7 @@ class ModelsSubGroup extends VSSubgroup {
             outputData: [
               VSModelOutputData(
                 type: "Output",
-                outputFunction: (data) => createModel(
+                outputFunction: (data) => apiCall(
                   {
                     "model_name": "gaussian_nb",
                     "model_type": "naive_bayes",
@@ -127,7 +127,7 @@ class ModelsSubGroup extends VSSubgroup {
             outputData: [
               VSModelOutputData(
                 type: "Output",
-                outputFunction: (data) => createModel(
+                outputFunction: (data) => apiCall(
                   {
                     "model_name": "gaussian_nb",
                     "model_type": "naive_bayes",
@@ -159,7 +159,7 @@ class ModelsSubGroup extends VSSubgroup {
             outputData: [
               VSModelOutputData(
                 type: "Output",
-                outputFunction: (data) => createModel(
+                outputFunction: (data) => apiCall(
                   {
                     "model_name": "svm",
                     "model_type": "rbf_svc",
@@ -183,7 +183,7 @@ class ModelsSubGroup extends VSSubgroup {
             outputData: [
               VSModelOutputData(
                 type: "Output",
-                outputFunction: (data) => createModel(
+                outputFunction: (data) => apiCall(
                   {
                     "model_name": "svm",
                     "model_type": "rbf_svc",
@@ -208,7 +208,7 @@ class ModelsSubGroup extends VSSubgroup {
             outputData: [
               VSModelOutputData(
                 type: "Output",
-                outputFunction: (data) => createModel(
+                outputFunction: (data) => apiCall(
                   {
                     "model_name": "svm",
                     "model_type": "rbf_svc",
@@ -239,7 +239,7 @@ class ModelsSubGroup extends VSSubgroup {
                 outputData: [
                   VSModelOutputData(
                     type: "Output",
-                    outputFunction: (data) => createModel(
+                    outputFunction: (data) => apiCall(
                       AIModel(
                         modelName: "linear_regression",
                         modelType: "linear_models",
@@ -263,7 +263,7 @@ class ModelsSubGroup extends VSSubgroup {
                 outputData: [
                   VSModelOutputData(
                     type: "Output",
-                    outputFunction: (data) => createModel(
+                    outputFunction: (data) => apiCall(
                       AIModel(
                         modelName: "ridge",
                         modelType: "linear_models",
@@ -288,7 +288,7 @@ class ModelsSubGroup extends VSSubgroup {
                 outputData: [
                   VSModelOutputData(
                     type: "Output",
-                    outputFunction: (data) => createModel(
+                    outputFunction: (data) => apiCall(
                       {
                         "model_name": "lasso",
                         "model_type": "linear_models",
@@ -313,7 +313,7 @@ class ModelsSubGroup extends VSSubgroup {
                 outputData: [
                   VSModelOutputData(
                     type: "Output",
-                    outputFunction: (data) => createModel(
+                    outputFunction: (data) => apiCall(
                       {
                         "model_name": "sgd_regression",
                         "model_type": "linear_models",
@@ -351,7 +351,7 @@ class ModelsSubGroup extends VSSubgroup {
               outputData: [
                 VSModelOutputData(
                   type: "Output",
-                  outputFunction: (data) => createModel(
+                  outputFunction: (data) => apiCall(
                     {
                       "model_name": "logistic_regression",
                       "model_type": "linear_models",
@@ -380,7 +380,7 @@ class ModelsSubGroup extends VSSubgroup {
               outputData: [
                 VSModelOutputData(
                   type: "Output",
-                  outputFunction: (data) => createModel(
+                  outputFunction: (data) => apiCall(
                     {
                       "model_name": "LinearRegression",
                       "model_type": "linear_models",
@@ -407,7 +407,7 @@ class ModelsSubGroup extends VSSubgroup {
               outputData: [
                 VSModelOutputData(
                   type: "Output",
-                  outputFunction: (data) => createModel(
+                  outputFunction: (data) => apiCall(
                     {
                       "model_name": "LinearRegression",
                       "model_type": "linear_models",
