@@ -141,8 +141,6 @@ class NodeDeleter:
                     node = Node.objects.filter(node_id=node_id + i)
                     if node.exists():
                         node.delete()
-                
-                
 
             return True, f"Node {node_id} deleted."
         except ObjectDoesNotExist:
@@ -215,6 +213,7 @@ class NodeUpdater:
             return False, f"Node {node_id} does not exist."
         except Exception as e:
             return False, f"Error updating node: {e}"
+
 
 class ClearAllNodes:
     """Clears all nodes from the database and filesystem."""
@@ -296,7 +295,6 @@ class NodeAttributeExtractor:
                 if hasattr(atr, "tolist"):
                     attributes[attr] = atr.tolist()
         return attributes
-
 
 
 
