@@ -75,9 +75,9 @@ class FitTransform:
         payload = self.payload[0]
         for arg in args:
             if arg == 'model':
-                payload = self.payload[0]
-            elif arg == 'data':
                 payload = self.payload[1]
+            elif arg == 'data':
+                payload = self.payload[2]
         return payload
     
 
