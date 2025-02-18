@@ -24,11 +24,13 @@ class Node(models.Model):
 
 class Component(models.Model):
     displayed_name = models.CharField(max_length=255, default="")
+    idx = models.IntegerField(default=0)
+    category = models.CharField(max_length=255, default="")
     node_name = models.CharField(max_length=255)
     node_type = models.CharField(max_length=255, default="general")
     task = models.CharField(max_length=255,default='general')
     params = models.JSONField(null=True, blank=True)
-    input_dots = models.JSONField(null=True, blank=True)
-    output_dots = models.JSONField(null=True, blank=True)
+    input_channels = models.JSONField(null=True, blank=True)
+    output_channels = models.JSONField(null=True, blank=True)
     api_call = models.CharField(max_length=100)
 
