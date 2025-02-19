@@ -8,6 +8,16 @@ class BlockSerializer {
 
   final Dio dio = Dio();
 
+  Future<Map<String, Map<String, Map<String, List<BlockModel>>>>>
+      getBlocks() async {
+    try {
+      List<BlockModel> blocks = await _serializeBlocks();
+      return _categorizeBlocks(blocks);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<BlockModel>> _serializeBlocks() async {
     try {
       final Response response = await dio.get("$_baseURL/$_allComponentsApi");
@@ -32,47 +42,13 @@ class BlockSerializer {
     }
   }
 
-  Future<Map<String, Map<String, List<BlockModel>>>> getBlocks1() async {
-    try {
-      List<BlockModel> blocks = await _serializeBlocks();
-      Map<String, Map<String, List<BlockModel>>> categorizedBlocks = {};
-
-      for (BlockModel block in blocks) {
-        if (categorizedBlocks.containsKey(block.nodeType)) {
-          if (categorizedBlocks[block.nodeType]!.containsKey(block.task)) {
-            categorizedBlocks[block.nodeType]![block.task!]!.add(block);
-          } else {
-            categorizedBlocks[block.nodeType]![block.task!] = [block];
-          }
-        } else {
-          categorizedBlocks[block.nodeType!] = {
-            block.task!: [block]
-          };
-        }
-      }
-      return categorizedBlocks;
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
-
-  Future<Map<String, Map<String, Map<String, List<BlockModel>>>>>
-      getBlocks() async {
-    try {
-      List<BlockModel> blocks = await _serializeBlocks();
-      return _categorizeBlocks(blocks);
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
-
   Map<String, Map<String, Map<String, List<BlockModel>>>> _categorizeBlocks(
       List<BlockModel> blocks) {
     Map<String, Map<String, Map<String, List<BlockModel>>>> categorizedBlocks =
         {};
 
     for (BlockModel block in blocks) {
-      _checkIfCategoriesExists(categorizedBlocks, block);
+      _createKeysIfNotExists(categorizedBlocks, block);
 
       categorizedBlocks[block.category]![block.nodeType]![block.task]!
           .add(block);
@@ -81,21 +57,15 @@ class BlockSerializer {
     return categorizedBlocks;
   }
 
-  void _checkIfCategoriesExists(
+  void _createKeysIfNotExists(
       Map<String, Map<String, Map<String, List<BlockModel>>>> categorizedBlocks,
       BlockModel block) {
-    if (!categorizedBlocks.containsKey(block.category)) {
-      categorizedBlocks[block.category!] = {};
-    }
+    categorizedBlocks.putIfAbsent(block.category, () => {});
 
-    if (!categorizedBlocks[block.category]!.containsKey(block.nodeType)) {
-      categorizedBlocks[block.category]![block.nodeType!] = {};
-    }
+    categorizedBlocks[block.category]!.putIfAbsent(block.nodeType, () => {});
 
-    if (!categorizedBlocks[block.category]![block.nodeType]!
-        .containsKey(block.task)) {
-      categorizedBlocks[block.category]![block.nodeType]![block.task!] = [];
-    }
+    categorizedBlocks[block.category]![block.nodeType]!
+        .putIfAbsent(block.task, () => []);
   }
 }
 

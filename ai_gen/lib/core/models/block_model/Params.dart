@@ -1,30 +1,30 @@
 class Params {
   String? name;
   String? type;
-  dynamic defaultValue;
+  dynamic value;
 
   Params({
     this.name,
     this.type,
-    this.defaultValue,
+    this.value,
   });
 
   Params.fromJson(dynamic json) {
     name = json['name'];
     type = json['type'];
-    defaultValue = json['default'];
+    value = json['default'];
   }
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['name'] = name;
     map['type'] = type;
-    map['default'] = defaultValue;
+    map['default'] = value;
     return map;
   }
 
   @override
   String toString() {
-    return 'Params{name: $name, type: $type, defaultValue: $defaultValue}';
+    return 'Params{name: $name, type: $type, defaultValue: $value}';
   }
 }

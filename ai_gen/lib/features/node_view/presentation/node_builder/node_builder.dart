@@ -103,7 +103,7 @@ class NodeBuilder {
   VSInputData _paramInput(Params param) {
     return VsTextInputData(
       type: param.name ?? "type",
-      controller: TextEditingController(text: param.defaultValue.toString()),
+      controller: TextEditingController(text: param.value.toString()),
     );
   }
 

@@ -5,9 +5,9 @@ class BlockModel {
   int? index;
   String? nodeName;
   String? displayName;
-  String? category;
-  String? nodeType;
-  String? task;
+  String category;
+  String nodeType;
+  String task;
   List<Params>? params;
   List<String>? inputDots;
   List<String>? outputDots;
@@ -17,23 +17,24 @@ class BlockModel {
     this.id,
     this.nodeName,
     this.displayName,
-    this.category,
-    this.nodeType,
-    this.task,
+    this.category = "others",
+    this.nodeType = "others",
+    this.task = "others",
     this.params,
     this.inputDots,
     this.outputDots,
     this.apiCall,
   });
 
-  BlockModel.fromJson(dynamic json) {
+  BlockModel.fromJson(dynamic json)
+      : category = json['category'] ?? "cat ${json['id']}",
+        nodeType = json['node_type'] ?? "type ${json['id']}",
+        task = json['task'] ?? "task ${json['id']}" {
     if (json['id'] != null) id = num.parse(json['id'].toString());
     if (json['idx'] != null) index = int.parse(json['idx'].toString());
-    nodeName = json['node_name'];
+    nodeName = json['node_name'] ?? "Node";
     displayName = json['display_name'] ?? nodeName;
-    category = json['category'] ?? "others";
-    nodeType = json['node_type'] ?? "others";
-    task = json['task'] ?? "others";
+
     if (json['params'] != null) {
       params = (json['params'] as List)
           .map((e) => Params.fromJson(e as Map<String, dynamic>))
