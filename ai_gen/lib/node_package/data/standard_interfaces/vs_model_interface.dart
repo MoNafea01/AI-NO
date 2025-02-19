@@ -27,7 +27,7 @@ class VSModelOutputData extends VSOutputData<AIModel> {
   ///Basic List output interface
   VSModelOutputData({
     required super.type,
-    FutureOr<AIModel> Function(Map<String, dynamic>)? super.outputFunction,
+    FutureOr<AIModel> Function(Map<String, dynamic> data)? super.outputFunction,
   });
 
   @override
