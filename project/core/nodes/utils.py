@@ -153,7 +153,7 @@ class NodeUpdater:
     """Updates a node in the database."""
     def __call__(self, node_id, payload):
         from .config import setup_config
-        from . import clear_ds_name, get_ds_name
+        from . import clear_ds_name
         if not node_id:
             raise ValueError("Node ID must be provided.")
         node_id = int(node_id) if node_id else None
