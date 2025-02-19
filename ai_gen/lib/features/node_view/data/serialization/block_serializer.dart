@@ -22,10 +22,10 @@ class BlockSerializer {
 
           return blocks;
         } else {
-          throw Exception('Failed to load blocks');
+          throw Exception('server error: response data is null');
         }
       } else {
-        throw Exception('Failed to load blocks');
+        throw Exception("server error: error code ${response.statusCode}");
       }
     } catch (e) {
       throw Exception("Server Error: $e");

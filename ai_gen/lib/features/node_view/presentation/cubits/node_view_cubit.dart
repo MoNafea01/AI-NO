@@ -17,7 +17,7 @@ class BlockLoaderCubit extends Cubit<BlockLoaderState> {
 
       emit(NodeViewSuccess(nodeBuilder));
     } catch (e) {
-      emit(NodeViewFailure("Failed to load blocks"));
+      emit(NodeViewFailure(e.toString()));
     }
   }
 }

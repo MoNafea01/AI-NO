@@ -24,18 +24,19 @@ class NodeBuilder {
     ];
   }
 
-  Map<String, Map<String, List<BlockModel>>> mapScheme = {
-    "linear_models": {
-      "regression": [BlockModel(), BlockModel()],
-      "classification": [BlockModel()],
-      "clustering": [BlockModel()],
-    },
-    "svm": {
-      "regression": [BlockModel(), BlockModel()],
-      "classification": [BlockModel()],
-      "clustering": [BlockModel()],
-    }
-  };
+  // Blocks Scheme
+  // Map<String, Map<String, List<BlockModel>>> mapScheme = {
+  //   "linear_models": {
+  //     "regression": [BlockModel(), BlockModel()],
+  //     "classification": [BlockModel()],
+  //     "clustering": [BlockModel()],
+  //   },
+  //   "svm": {
+  //     "regression": [BlockModel(), BlockModel()],
+  //     "classification": [BlockModel()],
+  //     "clustering": [BlockModel()],
+  //   }
+  // };
   List<VSSubgroup> _buildTypes(
       Map<String, Map<String, List<BlockModel>>> categorizedBlocks) {
     return categorizedBlocks.entries.map(
