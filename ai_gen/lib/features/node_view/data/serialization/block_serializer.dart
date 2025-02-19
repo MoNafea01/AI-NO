@@ -1,44 +1,17 @@
 import 'package:ai_gen/core/models/block_model/BlockModel.dart';
-import 'package:ai_gen/core/network/network_constants.dart';
-import 'package:dio/dio.dart';
+import 'package:ai_gen/core/network/server_calls.dart';
 
 class BlockSerializer {
-  final String _baseURL = NetworkConstants.baseURL;
-  final String _allComponentsApi = NetworkConstants.allComponentsApi;
-
-  final Dio dio = Dio();
-
   Future<Map<String, Map<String, Map<String, List<BlockModel>>>>>
-      getBlocks() async {
+      categorizeBlocks() async {
     try {
-      List<BlockModel> blocks = await _serializeBlocks();
+      // read the blocks from the server
+      List<BlockModel> blocks = await ServerCalls().getBlocks();
+
+      // categorize blocks by category, type, and task and return them in a 3 level map
       return _categorizeBlocks(blocks);
     } catch (e) {
       throw Exception(e);
-    }
-  }
-
-  Future<List<BlockModel>> _serializeBlocks() async {
-    try {
-      final Response response = await dio.get("$_baseURL/$_allComponentsApi");
-      List<BlockModel> blocks = [];
-
-      if (response.statusCode == 200) {
-        if (response.data != null) {
-          response.data.forEach((blockData) {
-            BlockModel blockModel = BlockModel.fromJson(blockData);
-            blocks.add(blockModel);
-          });
-
-          return blocks;
-        } else {
-          throw Exception('server error: response data is null');
-        }
-      } else {
-        throw Exception("server error: error code ${response.statusCode}");
-      }
-    } catch (e) {
-      throw Exception("Server Error: $e");
     }
   }
 
@@ -48,23 +21,27 @@ class BlockSerializer {
         {};
 
     for (BlockModel block in blocks) {
-      _createKeysIfNotExists(categorizedBlocks, block);
+      // check if the block category, type, and task keys exist and if not, create them
+      _createKeysIfNotExist(categorizedBlocks, block);
 
-      categorizedBlocks[block.category]![block.nodeType]![block.task]!
-          .add(block);
+      // Add the block to the list of blocks in the corresponding category, type, and task
+      categorizedBlocks[block.category]![block.type]![block.task]!.add(block);
     }
 
     return categorizedBlocks;
   }
 
-  void _createKeysIfNotExists(
+  void _createKeysIfNotExist(
       Map<String, Map<String, Map<String, List<BlockModel>>>> categorizedBlocks,
       BlockModel block) {
+    // If the category key does not exist, create it and assign an empty map, else do nothing
     categorizedBlocks.putIfAbsent(block.category, () => {});
 
-    categorizedBlocks[block.category]!.putIfAbsent(block.nodeType, () => {});
+    // If the type key does not exist, create it
+    categorizedBlocks[block.category]!.putIfAbsent(block.type, () => {});
 
-    categorizedBlocks[block.category]![block.nodeType]!
+    // If the task key does not exist, create it
+    categorizedBlocks[block.category]![block.type]!
         .putIfAbsent(block.task, () => []);
   }
 }

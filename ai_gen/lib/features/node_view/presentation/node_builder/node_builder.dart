@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 class NodeBuilder {
   Future<List<Object>> buildBlocks() async {
     final Map<String, Map<String, Map<String, List<BlockModel>>>>
-        categorizedBlocks = await BlockSerializer().getBlocks();
+        categorizedBlocks = await BlockSerializer().categorizeBlocks();
 
     return [
       // output node
@@ -116,7 +116,7 @@ class NodeBuilder {
               // print("outputFunction: ${data.entries}");
               final aiModel = AIModel(
                 modelName: block.nodeName,
-                modelType: block.nodeType,
+                modelType: block.type,
                 task: block.task,
                 params: {},
               );

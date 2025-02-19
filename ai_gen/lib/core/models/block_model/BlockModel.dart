@@ -6,7 +6,7 @@ class BlockModel {
   String? nodeName;
   String? displayName;
   String category;
-  String nodeType;
+  String type;
   String task;
   List<Params>? params;
   List<String>? inputDots;
@@ -18,7 +18,7 @@ class BlockModel {
     this.nodeName,
     this.displayName,
     this.category = "others",
-    this.nodeType = "others",
+    this.type = "others",
     this.task = "others",
     this.params,
     this.inputDots,
@@ -28,7 +28,7 @@ class BlockModel {
 
   BlockModel.fromJson(dynamic json)
       : category = json['category'] ?? "cat ${json['id']}",
-        nodeType = json['node_type'] ?? "type ${json['id']}",
+        type = json['node_type'] ?? "type ${json['id']}",
         task = json['task'] ?? "task ${json['id']}" {
     if (json['id'] != null) id = num.parse(json['id'].toString());
     if (json['idx'] != null) index = int.parse(json['idx'].toString());
@@ -57,7 +57,7 @@ class BlockModel {
     json['node_name'] = nodeName;
     json['display_name'] = displayName;
     json['category'] = category;
-    json['node_type'] = nodeType;
+    json['node_type'] = type;
     json['task'] = task;
     json['params'] = params?.map((e) => e.toJson()).toList();
     json['input_channels'] = inputDots;
