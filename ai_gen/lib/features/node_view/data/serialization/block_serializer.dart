@@ -32,7 +32,7 @@ class BlockSerializer {
     }
   }
 
-  Future<Map<String, Map<String, List<BlockModel>>>> getBlocks() async {
+  Future<Map<String, Map<String, List<BlockModel>>>> getBlocks1() async {
     try {
       List<BlockModel> blocks = await _serializeBlocks();
       Map<String, Map<String, List<BlockModel>>> categorizedBlocks = {};
@@ -55,18 +55,62 @@ class BlockSerializer {
       throw Exception(e);
     }
   }
+
+  Future<Map<String, Map<String, Map<String, List<BlockModel>>>>>
+      getBlocks() async {
+    try {
+      List<BlockModel> blocks = await _serializeBlocks();
+      return _categorizeBlocks(blocks);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Map<String, Map<String, Map<String, List<BlockModel>>>> _categorizeBlocks(
+      List<BlockModel> blocks) {
+    Map<String, Map<String, Map<String, List<BlockModel>>>> categorizedBlocks =
+        {};
+
+    for (BlockModel block in blocks) {
+      _checkIfCategoriesExists(categorizedBlocks, block);
+
+      categorizedBlocks[block.category]![block.nodeType]![block.task]!
+          .add(block);
+    }
+
+    return categorizedBlocks;
+  }
+
+  void _checkIfCategoriesExists(
+      Map<String, Map<String, Map<String, List<BlockModel>>>> categorizedBlocks,
+      BlockModel block) {
+    if (!categorizedBlocks.containsKey(block.category)) {
+      categorizedBlocks[block.category!] = {};
+    }
+
+    if (!categorizedBlocks[block.category]!.containsKey(block.nodeType)) {
+      categorizedBlocks[block.category]![block.nodeType!] = {};
+    }
+
+    if (!categorizedBlocks[block.category]![block.nodeType]!
+        .containsKey(block.task)) {
+      categorizedBlocks[block.category]![block.nodeType]![block.task!] = [];
+    }
+  }
 }
 
 // Example of the returned map:
-Map<String, Map<String, List<BlockModel>>> mapScheme = {
-  "linear_models": {
-    "regression": [BlockModel(), BlockModel()],
-    "classification": [BlockModel()],
-    "clustering": [BlockModel()],
+Map<String, Map<String, Map<String, List<BlockModel>>>> mapScheme = {
+  "Models": {
+    "linear_models": {
+      "regression": [BlockModel(), BlockModel()],
+      "classification": [BlockModel()],
+      "clustering": [BlockModel()],
+    },
+    "svm": {
+      "regression": [BlockModel(), BlockModel()],
+      "classification": [BlockModel()],
+      "clustering": [BlockModel()],
+    }
   },
-  "svm": {
-    "regression": [BlockModel(), BlockModel()],
-    "classification": [BlockModel()],
-    "clustering": [BlockModel()],
-  }
 };

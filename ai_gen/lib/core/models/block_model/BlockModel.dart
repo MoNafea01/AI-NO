@@ -30,10 +30,10 @@ class BlockModel {
     if (json['id'] != null) id = num.parse(json['id'].toString());
     if (json['idx'] != null) index = int.parse(json['idx'].toString());
     nodeName = json['node_name'];
-    displayName = json['display_name'];
-    category = json['category'];
-    nodeType = json['node_type'];
-    task = json['task'];
+    displayName = json['display_name'] ?? nodeName;
+    category = json['category'] ?? "others";
+    nodeType = json['node_type'] ?? "others";
+    task = json['task'] ?? "others";
     if (json['params'] != null) {
       params = (json['params'] as List)
           .map((e) => Params.fromJson(e as Map<String, dynamic>))

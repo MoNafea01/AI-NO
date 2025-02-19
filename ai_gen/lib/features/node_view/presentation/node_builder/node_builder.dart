@@ -10,40 +10,58 @@ import 'package:flutter/material.dart';
 
 class NodeBuilder {
   Future<List<Object>> buildBlocks() async {
-    final Map<String, Map<String, List<BlockModel>>> categorizedBlocks =
-        await BlockSerializer().getBlocks();
+    final Map<String, Map<String, Map<String, List<BlockModel>>>>
+        categorizedBlocks = await BlockSerializer().getBlocks();
 
     return [
       // output node
       (Offset offset, VSOutputData? ref) => VSOutputNode(
-            type: "Output",
+            type: "Evaluate",
             widgetOffset: offset,
             ref: ref,
           ),
-      ..._buildTypes(categorizedBlocks),
+      ..._buildCategories(categorizedBlocks),
     ];
   }
 
   // Blocks Scheme
-  // Map<String, Map<String, List<BlockModel>>> mapScheme = {
-  //   "linear_models": {
-  //     "regression": [BlockModel(), BlockModel()],
-  //     "classification": [BlockModel()],
-  //     "clustering": [BlockModel()],
+  // Map<String, Map<String, Map<String, List<BlockModel>>>> mapScheme = {
+  //   "Models": {
+  //     "linear_models": {
+  //       "regression": [BlockModel(), BlockModel()],
+  //       "classification": [BlockModel()],
+  //       "clustering": [BlockModel()],
+  //     },
+  //     "svm": {
+  //       "regression": [BlockModel(), BlockModel()],
+  //       "classification": [BlockModel()],
+  //       "clustering": [BlockModel()],
+  //     }
   //   },
-  //   "svm": {
-  //     "regression": [BlockModel(), BlockModel()],
-  //     "classification": [BlockModel()],
-  //     "clustering": [BlockModel()],
-  //   }
   // };
+  List<VSSubgroup> _buildCategories(
+      Map<String, Map<String, Map<String, List<BlockModel>>>>
+          categorizedBlocks) {
+    return categorizedBlocks.entries.map(
+      (blockCategory) {
+        final String categoryName = blockCategory.key;
+        final Map<String, Map<String, List<BlockModel>>> categoryTypes =
+            blockCategory.value;
+
+        final List<VSSubgroup> typeTasks = _buildTypes(categoryTypes);
+        return VSSubgroup(name: categoryName, subgroup: typeTasks);
+      },
+    ).toList();
+  }
+
   List<VSSubgroup> _buildTypes(
       Map<String, Map<String, List<BlockModel>>> categorizedBlocks) {
     return categorizedBlocks.entries.map(
       (blockType) {
         final String typeName = blockType.key;
-        final List<VSSubgroup> typeTasks = _buildTasks(blockType.value);
+        final Map<String, List<BlockModel>> tasksList = blockType.value;
 
+        final List<VSSubgroup> typeTasks = _buildTasks(tasksList);
         return VSSubgroup(name: typeName, subgroup: typeTasks);
       },
     ).toList();
