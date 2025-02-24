@@ -75,7 +75,7 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
             startPoint: getWidgetCenter(renderBox),
             endPoint: dragPos,
             startColor: widget.data.interfaceColor,
-            endColor: widget.data.interfaceColor,
+            endColor: widget.data.interfaceColor,  //widget.data.interfaceColor  
           ),
           child: Draggable<VSOutputData>(
             data: widget.data,
@@ -90,10 +90,12 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
                 outputData: widget.data,
               );
             },
-            feedback: Icon(
-              Icons.circle,
-              color: widget.data.interfaceColor,
+
+            feedback:  Icon(
+              Icons.square, //-----------------  Icons.circle  مقدمه الخط بتاع التوصيل 
+              color: widget.data.interfaceColor, // widget.data.interfaceColor  لون راس الايقون
               size: 15,
+              
             ),
             child: wrapWithToolTip(
               toolTip: widget.data.toolTip,

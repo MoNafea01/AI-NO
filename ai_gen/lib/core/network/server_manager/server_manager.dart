@@ -10,9 +10,10 @@ class ServerManager {
   Future<void> startServer() async {
     if (_isServerRunning) return;
 
-    String pathEldemy = "D:\\College\\4th\\Graduation Project\\simple_task";
+    //String pathEldemy = "D:\\College\\4th\\Graduation Project\\simple_task";
+      String pathShaltoot = "D:\\GraduationProject\\backend\\run_server.bat";
     try {
-      String batchFilePath = "$pathEldemy\\backend\\run_server.bat";
+      String batchFilePath = pathShaltoot;
 
       await _killExistingServers();
 

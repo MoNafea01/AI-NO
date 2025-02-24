@@ -138,7 +138,7 @@ abstract class VSOutputData<T> extends VSInterfaceData {
     }
 
     return Icon(
-      Icons.circle,
+      Icons.square,  //-----------------
       key: anchor,
       color: interfaceColor,
       size: 15,

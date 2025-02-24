@@ -39,10 +39,12 @@ class VSNodeManager {
   Map<String, dynamic> get nodeBuildersMap =>
       serializationManager.contextNodeBuilders;
 
+      
+
   ///This function gets called whenever the nodes get updated
   ///
   ///Use it to run code synchronously
-  final void Function(
+  late final void Function(
     Map<String, VSNodeData> oldData,
     Map<String, VSNodeData> newData,
   )? onNodesUpdate;
@@ -98,3 +100,5 @@ class VSNodeManager {
     nodes = {};
   }
 }
+
+

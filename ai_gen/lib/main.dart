@@ -67,12 +67,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
       debugShowCheckedModeBanner: false,
       title: 'AI Gen',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 46, 46, 46),
       ),
-      home: const Scaffold(body: GridLoader()),
+      home: const Scaffold(
+        backgroundColor: Colors.white,
+        
+        body: GridLoader()),
     );
   }
 }
