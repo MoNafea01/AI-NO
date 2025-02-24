@@ -83,8 +83,8 @@ class _NodeViewState extends State<NodeView> {
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             side: const BorderSide(
-                color: Colors.black, width: 2), // Set border color to black
-            borderRadius: BorderRadius.circular(20), // Optional: border radius
+                color: Colors.black, width: 1), // Set border color to black
+            borderRadius: BorderRadius.circular(16), // Optional: border radius
           ),
         ),
       ),

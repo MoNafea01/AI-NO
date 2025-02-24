@@ -51,6 +51,7 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
                   controller: titleController,
                   focusNode: focusNode,
                   textAlign: TextAlign.center,
+
                   style: const TextStyle(fontSize: 15),
                   decoration: InputDecoration(
                     border: InputBorder.none,
@@ -61,6 +62,8 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
                       vertical: 5,
                     ),
                   ),
+                  maxLines: 1, // ✅ Prevents overflow
+                  // overflow: TextOverflow.ellipsis, // ✅ Adds "..." for long text
                   onTapOutside: (event) => setState(() {
                     isRenaming = false;
                     titleController.text = widget.data.title;

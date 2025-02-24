@@ -64,7 +64,12 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
     final Widget firstItem = widget.data.nodeData is VSWidgetNode &&
             (widget.data.nodeData as VSWidgetNode).child != null
         ? (widget.data.nodeData as VSWidgetNode).child!
-        : Text(widget.data.title);
+        : Expanded(child: Text(widget.data.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.black),
+          ),
+          );
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,9 +97,9 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
             },
 
             feedback:  Icon(
-              Icons.square, //-----------------  Icons.circle  مقدمه الخط بتاع التوصيل 
+              Icons.circle, //-----------------  Icons.circle  مقدمه الخط بتاع التوصيل 
               color: widget.data.interfaceColor, // widget.data.interfaceColor  لون راس الايقون
-              size: 15,
+              size: 13,
               
             ),
             child: wrapWithToolTip(
