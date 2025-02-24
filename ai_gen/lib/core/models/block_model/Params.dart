@@ -25,6 +25,6 @@ class Params {
 
   @override
   String toString() {
-    return 'Params{name: $name, type: $type, defaultValue: $value}';
+    return '{$name: $value}';
   }
 }

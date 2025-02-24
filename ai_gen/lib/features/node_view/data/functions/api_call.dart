@@ -3,16 +3,16 @@ import 'package:ai_gen/core/classes/model_class.dart';
 import 'package:dio/dio.dart';
 
 class ApiCall {
-  Future<Map<String, dynamic>> _makeAPICall(
+  Future<Map<String, dynamic>> makeAPICall(
     String endpoint, {
-    required Map<String, dynamic> data,
+    required Map<String, dynamic>? data,
     Map<String, dynamic> Function(Map<String, dynamic>)? processResponse,
   }) async {
     final dio = Dio();
 
     try {
       final response = await dio.post(
-        "http://127.0.0.1:8000/$endpoint/",
+        "http://127.0.0.1:8000/api/$endpoint",
         data: data,
         options: Options(contentType: Headers.jsonContentType),
       );
@@ -32,7 +32,7 @@ class ApiCall {
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(
-            'Failed to perform the operation: ${e.response?.statusCode}');
+            'Failed to perform the operation with status code ${e.response?.statusCode}');
       } else {
         throw Exception('Network error: ${e.message}');
       }
@@ -44,7 +44,7 @@ class ApiCall {
     double testSize = 0.2,
     int? randomState,
   }) async {
-    return await _makeAPICall(
+    return await makeAPICall(
       'train_test_split',
       data: {
         'data': data,
@@ -63,7 +63,7 @@ class ApiCall {
     Nafe3Json? x,
     Nafe3Json? y,
   ) async {
-    return await _makeAPICall(
+    return await makeAPICall(
       'fit_model',
       data: {
         "X": {
@@ -92,7 +92,7 @@ class ApiCall {
     AIModel model,
     Nafe3Json? x,
   ) async {
-    return await _makeAPICall(
+    return await makeAPICall(
       'predict',
       data: {
         'X': {
@@ -115,7 +115,7 @@ class ApiCall {
     Nafe3Json? data,
     Nafe3Json? preprocessor,
   ) async {
-    return await _makeAPICall(
+    return await makeAPICall(
       'fit_preprocessor',
       data: {
         'data': data,
@@ -129,7 +129,7 @@ class ApiCall {
     Nafe3Json? data,
     Nafe3Json? preprocessor,
   ) async {
-    return await _makeAPICall(
+    return await makeAPICall(
       'transform',
       data: {
         'data': data,
