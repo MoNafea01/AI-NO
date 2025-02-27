@@ -1,9 +1,9 @@
 # Core workflow execution logic
 # core/workflow_executor.py
-from core.nodes.other.dataLoader import DataLoader
-from core.nodes.preprocessing.preprocessor import Preprocessor
-from core.nodes.model.model import Model
-from project.core.nodes.other.metrics import Evaluator
+from .nodes.other.dataLoader import DataLoader
+from .nodes.preprocessing.preprocessor import Preprocessor
+from .nodes.model.model import Model
+from .nodes.other.evaluator import Evaluator
 
 class WorkflowExecutor:
     def __init__(self, workflow):

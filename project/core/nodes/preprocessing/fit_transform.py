@@ -1,6 +1,6 @@
 from .preprocessor import Preprocessor
 from .utils import PayloadBuilder
-from ..utils import NodeLoader, NodeSaver
+from ...repositories.node_repository import NodeLoader, NodeSaver
 
 class PreprocessorFitterTransformer:
     """Handles the fitting and transformation of preprocessors."""

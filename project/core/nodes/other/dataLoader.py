@@ -2,8 +2,11 @@
 # backend/core/nodes/dataLoader.py
 import os
 import pandas as pd
-from ..utils import NodeSaver, NodeNameHandler, PayloadBuilder, NodeLoader, DATASETS as datasets
 from .. import set_ds_name
+from ..utils import NodeNameHandler, PayloadBuilder
+from ..configs.datasets import DATASETS as datasets
+from ...repositories.node_repository import NodeLoader, NodeSaver
+
 
 class BaseDataLoader:
     """Abstract base class for all data loaders."""

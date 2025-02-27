@@ -1,6 +1,7 @@
-from .models import MODELS as models
+from ..configs.models import MODELS as models
 from .utils import PayloadBuilder
-from ..utils import NodeSaver, NodeLoader, NodeNameHandler
+from ..utils import NodeNameHandler
+from ...repositories.node_repository import NodeSaver, NodeLoader
 from sklearn.base import BaseEstimator
 
 
