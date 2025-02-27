@@ -86,10 +86,10 @@ class NodeBuilder {
   }
 
   VSInputData _paramInput(Params param) {
-    return VsTextInputData(
-      type: param.name ?? "type",
-      controller: TextEditingController(text: param.value.toString()),
-    );
+    final controller = TextEditingController(text: param.value.toString());
+    controller.addListener(() => param.value = controller.text);
+
+    return VsTextInputData(type: param.name, controller: controller);
   }
 
   List<VSOutputData> _buildOutputData(BlockModel block) {
@@ -98,23 +98,22 @@ class NodeBuilder {
             type: "${outputDot}Output",
             outputFunction: (data) async {
               final params = {};
-
               if (block.params != null) {
-                for (var e in block.params!) {
-                  params.addAll({e.name!: e.value});
+                for (var param in block.params!) {
+                  params[param.name] = param.value;
                 }
               }
-              print("params : $params");
 
-              return await ApiCall().makeAPICall(
-                block.apiCall!,
-                data: {
-                  "model_name": block.nodeName,
-                  "model_type": block.type,
-                  "task": block.task,
-                  "params": params,
-                },
-              );
+              final Map<String, dynamic> data = {
+                "model_name": block.nodeName,
+                "model_type": block.type,
+                "task": block.task,
+                "params": params,
+              };
+
+              print(data);
+
+              return await ApiCall().makeAPICall(block.apiCall!, data: data);
             },
           );
         }).toList() ??

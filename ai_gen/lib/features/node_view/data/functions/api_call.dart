@@ -18,6 +18,7 @@ class ApiCall {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        print(response.data);
         final jsonResponse = Map<String, dynamic>.from(response.data);
 
         // Process response if a processor function is provided

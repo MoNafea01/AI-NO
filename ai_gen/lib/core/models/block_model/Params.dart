@@ -1,16 +1,15 @@
 class Params {
-  String? name;
+  String name;
   String? type;
   dynamic value;
 
   Params({
-    this.name,
+    this.name = 'param_name',
     this.type,
     this.value,
   });
 
-  Params.fromJson(dynamic json) {
-    name = json['name'];
+  Params.fromJson(dynamic json) : name = json['name'] ?? 'param_name' {
     type = json['type'];
     value = json['default'];
   }
@@ -25,6 +24,6 @@ class Params {
 
   @override
   String toString() {
-    return '{$name: $value}';
+    return '{$name: $value ($type)}';
   }
 }
