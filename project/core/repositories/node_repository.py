@@ -7,7 +7,13 @@ import os
 
 
 class NodeSaver:
-    """Handles saving nodes."""
+    """
+    Handles saving nodes.\n
+    NodeSaver()(payload, path): It saves the node to the database and path provided.\n
+    payload: dict - The node payload.\n
+    path: str - The path to save the node to.\n
+    Returns a dictionary with the message, node_id, node_name, params, task, and node_type.
+    """
     
     def __call__(self, payload, path: str = None):
         if not isinstance(payload, dict):
