@@ -77,7 +77,7 @@ class _VSContextMenuState extends State<VSContextMenu> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SizedBox(
-            width: 150,
+            width: 160,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widgets,

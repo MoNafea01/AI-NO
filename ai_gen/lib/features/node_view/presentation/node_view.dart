@@ -1,22 +1,28 @@
+import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:ai_gen/node_package/widgets/GridCubit/grid_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
-import 'package:ai_gen/node_package/vs_node_view.dart';
 
 class NodeView extends StatefulWidget {
-  const NodeView({super.key});
+  const NodeView({required this.nodeBuilder, super.key});
 
+  final List<dynamic> nodeBuilder;
   @override
   State<NodeView> createState() => _NodeViewState();
 }
 
 class _NodeViewState extends State<NodeView> {
   Iterable<String>? results;
+  late final VSNodeDataProvider nodeDataProvider;
 
-  VSNodeDataProvider nodeDataProvider = VSNodeDataProvider(
-    nodeManager: VSNodeManager(nodeBuilders: NodeBuilder.nodeBuilders),
-  );
+  @override
+  void initState() {
+    // TODO: implement initState
+    nodeDataProvider = VSNodeDataProvider(
+      nodeManager: VSNodeManager(nodeBuilders: widget.nodeBuilder),
+    );
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,49 +46,64 @@ class _NodeViewState extends State<NodeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        WidgetStateProperty.all<Color>(Colors.orange),
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        side: const BorderSide(
-                            color: Colors.black,
-                            width: 2), // Set border color to black
-                        borderRadius: BorderRadius.circular(
-                            20), // Optional: border radius
+                _evaluateButton(),
+                if (results != null)
+                  ...results!.map(
+                    (e) => Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(e),
                       ),
                     ),
                   ),
-                  onPressed: () async {
-                    List<MapEntry<String, dynamic>> entries = nodeDataProvider
-                        .nodeManager.getOutputNodes
-                        .map((e) => e.evaluate())
-                        .toList();
-                    for (var i = 0; i < entries.length; i++) {
-                      var asyncOutput = await entries[i].value;
-                      entries[i] = MapEntry(entries[i].key, asyncOutput);
-                    }
-                    setState(() {
-                      results = entries.map((e) => "${e.key}: ${e.value}");
-                    });
-                  },
-                  child: const Text(
-                    "Evaluate",
-                    style: TextStyle(color: Colors.black, fontSize: 17),
-                  ),
-                ),
-                if (results != null)
-                  ...results!.map((e) => Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(e),
-                        ),
-                      )),
               ],
             ),
           ),
+          _testButton(),
         ],
+      ),
+    );
+  }
+
+  Positioned _testButton() {
+    return Positioned(
+      bottom: 50,
+      left: 10,
+      child: ElevatedButton(
+        onPressed: () {},
+        child: const Text("Test"),
+      ),
+    );
+  }
+
+  ElevatedButton _evaluateButton() {
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.all<Color>(Colors.orange),
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            side: const BorderSide(
+                color: Colors.black, width: 2), // Set border color to black
+            borderRadius: BorderRadius.circular(20), // Optional: border radius
+          ),
+        ),
+      ),
+      onPressed: () async {
+        List<MapEntry<String, dynamic>> entries = nodeDataProvider
+            .nodeManager.getOutputNodes
+            .map((e) => e.evaluate())
+            .toList();
+
+        for (var i = 0; i < entries.length; i++) {
+          var asyncOutput = await entries[i].value;
+          entries[i] = MapEntry(entries[i].key, asyncOutput);
+        }
+
+        setState(() => results = entries.map((e) => "${e.key}: ${e.value}"));
+      },
+      child: const Text(
+        "Evaluate",
+        style: TextStyle(color: Colors.black, fontSize: 17),
       ),
     );
   }

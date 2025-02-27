@@ -1,7 +1,7 @@
 import 'package:ai_gen/core/classes/model_class.dart';
 import 'package:dio/dio.dart';
 
-Future<AIModel> createModel(Map<String, dynamic> modelData) async {
+Future<AIModel> apiCall(Map<String, dynamic> modelData) async {
   final dio = Dio();
 
   Map<String, dynamic> data = {
@@ -11,10 +11,10 @@ Future<AIModel> createModel(Map<String, dynamic> modelData) async {
     "params": modelData['params'],
   };
 
-  print(data);
+  // print(data);
   try {
     final response = await dio.post(
-      'http://127.0.0.1:8000/create_model/',
+      'http://127.0.0.1:8000/api/create_model/',
       data: data,
       options: Options(contentType: Headers.jsonContentType),
     );
