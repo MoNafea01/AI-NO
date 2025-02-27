@@ -39,41 +39,26 @@ class NodeBuilder {
   //     }
   //   },
   // };
-  List<VSSubgroup> _buildCategories(
-      Map<String, Map<String, Map<String, List<BlockModel>>>>
-          categorizedBlocks) {
-    return categorizedBlocks.entries.map(
-      (blockCategory) {
-        final String categoryName = blockCategory.key;
-        final Map<String, Map<String, List<BlockModel>>> categoryTypes =
-            blockCategory.value;
 
-        final List<VSSubgroup> typeTasks = _buildTypes(categoryTypes);
-        return VSSubgroup(name: categoryName, subgroup: typeTasks);
-      },
-    ).toList();
+  List<VSSubgroup> _buildCategories(Map<String, Map> blocksMap) {
+    return _buildSubgroups(blocksMap, _buildTypes);
   }
 
-  List<VSSubgroup> _buildTypes(
-      Map<String, Map<String, List<BlockModel>>> categorizedBlocks) {
-    return categorizedBlocks.entries.map(
-      (blockType) {
-        final String typeName = blockType.key;
-        final Map<String, List<BlockModel>> tasksList = blockType.value;
-
-        final List<VSSubgroup> typeTasks = _buildTasks(tasksList);
-        return VSSubgroup(name: typeName, subgroup: typeTasks);
-      },
-    ).toList();
+  List<VSSubgroup> _buildTypes(Map<String, Map> categorizedBlocks) {
+    return _buildSubgroups(categorizedBlocks, _buildTasks);
   }
 
   List<VSSubgroup> _buildTasks(Map<String, List<BlockModel>> taskMap) {
-    return taskMap.entries.map((blockTask) {
-      final String taskName = blockTask.key;
-      final List<BlockModel> blocksList = blockTask.value;
+    return _buildSubgroups(taskMap, _buildBlockNodes);
+  }
 
-      final blockNodes = _buildBlockNodes(blocksList);
-      return VSSubgroup(name: taskName, subgroup: blockNodes);
+  List<VSSubgroup> _buildSubgroups(
+      Map<String, dynamic> blocksCategory, Function buildFunction) {
+    return blocksCategory.entries.map((entry) {
+      final name = entry.key;
+      final value = entry.value;
+      final subgroups = buildFunction(value);
+      return VSSubgroup(name: name, subgroup: subgroups);
     }).toList();
   }
 
