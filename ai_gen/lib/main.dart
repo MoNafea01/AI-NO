@@ -1,3 +1,5 @@
+import 'package:ai_gen/features/node_view/presentation/screens/HomeScreen/home_screen.dart';
+import 'package:ai_gen/features/node_view/presentation/screens/splashScreen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -76,7 +78,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       home: const Scaffold(
         backgroundColor: Colors.white,
         
-        body: GridLoader()),
+        body:
+         SplashScreen()
+       // GridLoader()
+        //ProjectsDashboard()
+        ),
     );
   }
 }
