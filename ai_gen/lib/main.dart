@@ -1,10 +1,8 @@
-import 'package:ai_gen/features/node_view/presentation/screens/HomeScreen/home_screen.dart';
 import 'package:ai_gen/features/node_view/presentation/screens/splashScreen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'core/network/server_manager/server_manager.dart';
-import 'features/node_view/presentation/grid_loader.dart';
 
 void main() async {
   // Create ServerManager
@@ -69,20 +67,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
       debugShowCheckedModeBanner: false,
       title: 'AI Gen',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 46, 46, 46),
       ),
-      home: const Scaffold(
-        backgroundColor: Colors.white,
-        
-        body:
-         SplashScreen()
-       // GridLoader()
-        //ProjectsDashboard()
-        ),
+      home: const Scaffold(backgroundColor: Colors.white, body: SplashScreen()),
     );
   }
 }

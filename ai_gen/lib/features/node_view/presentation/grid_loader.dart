@@ -9,6 +9,10 @@ class GridLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext _) {
+    return Scaffold(body: _gridBody());
+  }
+
+  BlocProvider<BlockLoaderCubit> _gridBody() {
     return BlocProvider(
       create: (context) => BlockLoaderCubit(),
       child: BlocBuilder<BlockLoaderCubit, BlockLoaderState>(
@@ -27,5 +31,3 @@ class GridLoader extends StatelessWidget {
     );
   }
 }
-
-

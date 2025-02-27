@@ -1,5 +1,4 @@
 import 'package:ai_gen/features/node_view/presentation/grid_loader.dart';
-import 'package:ai_gen/features/node_view/presentation/screens/splashScreen/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 class ProjectsDashboard extends StatelessWidget {
@@ -39,10 +38,10 @@ class ProjectsDashboard extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundImage: AssetImage("assets/profile.jpg"),
-                    ),
+                    // const CircleAvatar(
+                    //   radius: 20,
+                    //   backgroundImage: AssetImage("assets/profile.jpg"),
+                    // ),
                     const SizedBox(height: 10),
                     IconButton(
                       icon: const Icon(Icons.logout, color: Colors.redAccent),
