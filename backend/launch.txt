@@ -1,0 +1,7 @@
+currentfolder>flutter\Scripts\activate
+
+
+(flutter)......>cd flutter/project
+
+
+(flutter)....../flutter/project>python manage.py runserver
