@@ -1,7 +1,7 @@
 import numpy as np
 from .model import Model
 from .utils import PayloadBuilder
-from ..utils import NodeSaver, NodeLoader
+from ...repositories.node_repository import NodeSaver, NodeLoader
 
 
 class ModelFitter:

@@ -1,5 +1,6 @@
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-from ..utils import NodeSaver, NodeLoader, PayloadBuilder, METRICS as metrics
+from ..utils import PayloadBuilder
+from ..configs.metrics import METRICS as metrics
+from ...repositories.node_repository import NodeLoader, NodeSaver
 
 class Evaluator:
     def __init__(self, metric='accuracy', y_true=None, y_pred=None, params=None):

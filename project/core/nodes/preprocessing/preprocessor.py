@@ -1,6 +1,7 @@
-from .preprocessors import PREPROCESSORS as preprocessors
+from ..configs.preprocessors import PREPROCESSORS as preprocessors
 from .utils import PayloadBuilder
-from ..utils import NodeSaver, NodeLoader, NodeNameHandler
+from ..utils import NodeNameHandler
+from ...repositories.node_repository import NodeSaver, NodeLoader
 
 class Preprocessor:
     """Handles preprocessors creation and parameter management."""

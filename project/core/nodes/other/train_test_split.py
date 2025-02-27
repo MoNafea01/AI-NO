@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split
-from ..utils import NodeSaver, NodeLoader
+from ...repositories.node_repository import NodeSaver, NodeLoader
 from ..utils import PayloadBuilder
 
 class TrainTestSplit:
