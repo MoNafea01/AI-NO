@@ -28,11 +28,11 @@ class CreateModelView(APIView):
             data = serializer.validated_data
             # Create Model instance using the data
             model_instance = Model(
-                model_name=data.get('model_name'),
-                model_type=data.get('model_type'),
+                model_name=data.get('node_name'),
+                model_type=data.get('node_type'),
                 task=data.get('task'),
                 params=data.get('params'),
-                model_path= data.get('model_path')
+                model_path= data.get('node_path')
             )
             output_channel = request.query_params.get('output', None)
             response_data = model_instance(output_channel)
@@ -46,11 +46,11 @@ class CreateModelView(APIView):
             data = serializer.validated_data
             # Create Model instance using the data
             model_instance = Model(
-                model_name=data.get('model_name'),
-                model_type=data.get('model_type'),
+                model_name=data.get('node_name'),
+                model_type=data.get('node_type'),
                 task=data.get('task'),
                 params=data.get('params'),
-                model_path= data.get('model_path')
+                model_path= data.get('node_path')
             )
             node_id = request.query_params.get('node_id', None)
             success, message = NodeUpdater()(node_id, model_instance())
@@ -83,8 +83,8 @@ class FitModelAPIView(APIView):
                 # Extract validated data
                 X = serializer.validated_data.get('X')
                 y = serializer.validated_data.get('y')
-                model = serializer.validated_data.get('model')
-                model_path = serializer.validated_data.get('model_path')
+                model = serializer.validated_data.get('node')
+                model_path = serializer.validated_data.get('node_path')
 
                 # Instantiate Fit and perform the fitting
                 fitter = FitModel(X=X, y=y, model=model, model_path=model_path)
@@ -102,8 +102,8 @@ class FitModelAPIView(APIView):
             # Extract data from the serializer
             X = serializer.validated_data.get('X')
             y = serializer.validated_data.get('y')
-            model = serializer.validated_data.get('model')
-            model_path = serializer.validated_data.get('model_path')
+            model = serializer.validated_data.get('node')
+            model_path = serializer.validated_data.get('node_path')
 
             # Instantiate Fit and perform the fitting
             fitter = FitModel(X=X, y=y, model=model, model_path=model_path)
@@ -139,8 +139,8 @@ class PredictAPIView(APIView):
         serializer = PredictSerializer(data=request.data)
         if serializer.is_valid():
             X = serializer.validated_data.get('X')
-            model = serializer.validated_data.get('model')
-            model_path = serializer.validated_data.get('model_path')
+            model = serializer.validated_data.get('node')
+            model_path = serializer.validated_data.get('node_path')
 
             try:
                 # Perform prediction
@@ -158,8 +158,8 @@ class PredictAPIView(APIView):
             if serializer.is_valid():
                 # Extract data from the serializer
                 X = serializer.validated_data.get('X')
-                model = serializer.validated_data.get('model')
-                model_path = serializer.validated_data.get('model_path')
+                model = serializer.validated_data.get('node')
+                model_path = serializer.validated_data.get('node_path')
 
                 # Instantiate Fit and perform the fitting
                 predictor = Predict(X, model=model, model_path=model_path)
@@ -194,10 +194,10 @@ class PreprocessorAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = PreprocessorSerializer(data=request.data)
         if serializer.is_valid():
-            preprocessor_name = serializer.validated_data.get('preprocessor_name')
-            preprocessor_type = serializer.validated_data.get('preprocessor_type')
+            preprocessor_name = serializer.validated_data.get('node_name')
+            preprocessor_type = serializer.validated_data.get('node_type')
             params = serializer.validated_data.get('params')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
+            preprocessor_path = serializer.validated_data.get('node_path')
             try:
                 # Create the Preprocessor
                 preprocessor = Preprocessor(preprocessor_name, preprocessor_type, params=params, preprocessor_path=preprocessor_path)
@@ -213,10 +213,10 @@ class PreprocessorAPIView(APIView):
             serializer = PreprocessorSerializer(data=request.data)
             if serializer.is_valid():
                 # Extract data from the serializer
-                preprocessor_name = serializer.validated_data.get('preprocessor_name')
-                preprocessor_type = serializer.validated_data.get('preprocessor_type')
+                preprocessor_name = serializer.validated_data.get('node_name')
+                preprocessor_type = serializer.validated_data.get('node_type')
                 params = serializer.validated_data.get('params')
-                preprocessor_path = serializer.validated_data.get('preprocessor_path')
+                preprocessor_path = serializer.validated_data.get('node_path')
                 # Create Model instance using the data
                 preprocessor = Preprocessor(preprocessor_name, preprocessor_type, params=params, preprocessor_path=preprocessor_path)
                 node_id = request.query_params.get('node_id', None)
@@ -251,8 +251,8 @@ class FitPreprocessorAPIView(APIView):
         serializer = FitPreprocessorSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
+            preprocessor = serializer.validated_data.get('node')
+            preprocessor_path = serializer.validated_data.get('node_path')
             try:
                 # Create a Fit instance
                 fit_instance = FitPreprocessor(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
@@ -269,8 +269,8 @@ class FitPreprocessorAPIView(APIView):
         if serializer.is_valid():
             # Extract data from the serializer
             data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
+            preprocessor = serializer.validated_data.get('node')
+            preprocessor_path = serializer.validated_data.get('node_path')
 
             # Instantiate Fit and perform the fitting
             fitter = FitPreprocessor(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
@@ -307,8 +307,8 @@ class TransformAPIView(APIView):
         serializer = TransformSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')  # Extract preprocessor (as JSON object)
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')  # Extract preprocessor path
+            preprocessor = serializer.validated_data.get('node')  # Extract preprocessor (as JSON object)
+            preprocessor_path = serializer.validated_data.get('node_path')  # Extract preprocessor path
             try:
                 # Create a Transform instance and get the result
                 transform_instance = Transform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
@@ -326,8 +326,8 @@ class TransformAPIView(APIView):
         if serializer.is_valid():
             # Extract validated data
             data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
+            preprocessor = serializer.validated_data.get('node')
+            preprocessor_path = serializer.validated_data.get('node_path')
             
             # Create Transform instance
             transform_instance = Transform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
@@ -369,8 +369,8 @@ class FitTransformAPIView(APIView):
         serializer = FitTransformSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')  # Extract preprocessor (as JSON object or path)
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')  # Extract preprocessor path
+            preprocessor = serializer.validated_data.get('node')  # Extract preprocessor (as JSON object or path)
+            preprocessor_path = serializer.validated_data.get('node_path')  # Extract preprocessor path
             try:
                 # Create a FitTransform instance and get the result
                 fit_transform_instance = FitTransform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
@@ -386,8 +386,8 @@ class FitTransformAPIView(APIView):
         serializer = FitTransformSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
+            preprocessor = serializer.validated_data.get('node')
+            preprocessor_path = serializer.validated_data.get('node_path')
             
             fit_transform_instance = FitTransform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
             node_id = request.query_params.get('node_id', None)
@@ -642,7 +642,7 @@ class NodeLoaderAPIView(APIView):
         if serializer.is_valid():
             try:
                 node_id = serializer.validated_data.get('node_id')
-                path = serializer.validated_data.get('path')
+                path = serializer.validated_data.get('node_path')
                 loader = NodeLoader()
             
                 node_data, payload = loader(node_id=node_id, path=path)
@@ -657,7 +657,7 @@ class NodeLoaderAPIView(APIView):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
             node_id = serializer.validated_data.get('node_id')
-            path = serializer.validated_data.get('path')
+            path = serializer.validated_data.get('node_path')
             loader = NodeLoader()
             node_data, payload = loader(node_id=node_id, path=path)
             payload.update({"node_data": node_data})
@@ -693,7 +693,7 @@ class NodeSaveAPIView(APIView):
         if serializer.is_valid():
             try:
                 payload = request.data.get("node")
-                path = request.data.get("path")  # Optional path parameter
+                path = request.data.get("node_path")  # Optional path parameter
                 saver = NodeSaver()
                 payload.update({"node_id": id(saver)})
                 response = saver(payload, path=path)
@@ -707,7 +707,7 @@ class NodeSaveAPIView(APIView):
         serializer = NodeSaverSerializer(data=request.data)
         if serializer.is_valid():
             payload = request.data.get("node")
-            path = request.data.get("path")
+            path = request.data.get("node_path")
             saver = NodeSaver()
             response = saver(payload, path=path)
             node_id = request.query_params.get('node_id', None)
@@ -733,6 +733,11 @@ class NodeSaveAPIView(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ComponentAPIViewSet(viewsets.ModelViewSet):
+    queryset = Component.objects.all()
+    serializer_class = ComponentSerializer
+
+
 class ClearNodesAPIView(APIView):
     def post(self, request):
         try:
@@ -741,11 +746,6 @@ class ClearNodesAPIView(APIView):
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-   
-
-class ComponentAPIViewSet(viewsets.ModelViewSet):
-    queryset = Component.objects.all()
-    serializer_class = ComponentSerializer
 
 
 class ExcelUploadAPIView(APIView):
@@ -813,4 +813,3 @@ class ExcelUploadAPIView(APIView):
             
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
