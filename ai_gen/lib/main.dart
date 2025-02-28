@@ -1,10 +1,26 @@
-import 'package:ai_gen/features/node_view/presentation/screens/splashScreen/splash_screen.dart';
+
+import 'package:ai_gen/features/node_view/screens/splashScreen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'core/network/server_manager/server_manager.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Ensure window manager is initialized
+
+  await windowManager.ensureInitialized();
+
+  // Set the minimum window size (e.g., 800x500)
+  windowManager.setMinimumSize(const Size(800, 500));
+
+  // Set the initial size to match the constraints
+  windowManager.setSize(const Size(1200, 800));
+
+  // Make the window resizable but not smaller than the minimum size
+  windowManager.setResizable(true);
   // Create ServerManager
   ServerManager serverManager =
       GetIt.I.registerSingleton<ServerManager>(ServerManager());
