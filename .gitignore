@@ -11,4 +11,4 @@ db.sqlite3
 
 
 #Ignore saved nodes
-core/nodes/saved/*
+project/core/nodes/saved/*
