@@ -10,8 +10,8 @@ class ServerManager {
   Future<void> startServer() async {
     if (_isServerRunning) return;
 
-    String pathEldemy =
-        "D:\\College\\4th\\Graduation Project\\simple_task\\backend\\run_server.bat";
+    String projectPath = Directory.current.path;
+    String pathEldemy = '$projectPath\\..\\backend\\run_server.bat';
     // String pathShaltoot = "D:\\GraduationProject\\backend\\run_server.bat";
     try {
       String batchFilePath = pathEldemy;
