@@ -1,8 +1,8 @@
 import 'package:ai_gen/core/models/block_model/BlockModel.dart';
 import 'package:ai_gen/core/models/block_model/Params.dart';
 import 'package:ai_gen/features/node_view/data/serialization/block_serializer.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/preprocessor_interface.dart';
 import 'package:ai_gen/node_package/custom_widgets/vs_text_input_data.dart';
-import 'package:ai_gen/node_package/data/standard_interfaces/vs_model_interface.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
@@ -82,7 +82,7 @@ class NodeBuilder {
   }
 
   VSInputData _inputDots(String inputDot, VSOutputData<dynamic>? ref) {
-    return VSOldModelInputData(type: inputDot, initialConnection: ref);
+    return VSModelInputData(type: inputDot, initialConnection: ref);
   }
 
   VSInputData _paramInput(Params param) {
@@ -96,6 +96,12 @@ class NodeBuilder {
     if (block.category == "Models" && block.outputDots?.length == 1) {
       return [
         VSModelOutputData(type: "${block.outputDots![0]}Output", block: block),
+      ];
+    }
+    if (block.category == "Preprocessors" && block.outputDots?.length == 1) {
+      return [
+        VSPreprocessorOutputData(
+            type: "${block.outputDots![0]}Output", block: block),
       ];
     }
     return block.outputDots?.map((outputDot) {

@@ -6,9 +6,9 @@ import 'package:ai_gen/features/node_view/presentation/node_builder/custom_inter
 import 'package:ai_gen/node_package/data/custom_interfaces/aino_general_Interface.dart';
 import 'package:flutter/material.dart';
 
-class VSModelInputData extends VSAINOGeneralInputData {
+class VSPreprocessorInputData extends VSAINOGeneralInputData {
   ///Basic List input interface
-  VSModelInputData({
+  VSPreprocessorInputData({
     required super.type,
     super.title,
     super.toolTip,
@@ -17,15 +17,15 @@ class VSModelInputData extends VSAINOGeneralInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [VSModelOutputData];
+  List<Type> get acceptedTypes => [VSPreprocessorOutputData];
 
   @override
   Color get interfaceColor => NodeColors.modelColor;
 }
 
-class VSModelOutputData extends VSAINOGeneralOutputData {
+class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
   ///Basic List output interface
-  VSModelOutputData({
+  VSPreprocessorOutputData({
     required super.type,
     required this.block,
   });
@@ -38,7 +38,6 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
       final Map<String, dynamic> apiBody = {
         "node_name": block.nodeName,
         "node_type": block.type,
-        "task": block.task,
         "params": block.paramsToJson,
       };
 

@@ -31,7 +31,9 @@ class ApiCall {
         throw Exception('Failed to perform the operation');
       }
     } on DioException catch (e) {
-      if (e.response != null) {
+      print("dio exception $e");
+      return {"error": e.response?.data ?? "Server error"};
+      if (e.response?.data != null) {
         throw Exception(
             'Failed to perform the operation with status code ${e.response?.statusCode}');
       } else {
