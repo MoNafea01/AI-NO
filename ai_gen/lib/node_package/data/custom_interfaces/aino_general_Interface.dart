@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 
 const Color _interfaceColor = Colors.blue;
 
-class VSGeneralInputData extends VSInputData {
+class VSAINOGeneralInputData extends VSInputData {
   ///Basic List input interface
-  VSGeneralInputData({
+  VSAINOGeneralInputData({
     required super.type,
     super.title,
     super.toolTip,
@@ -16,15 +16,15 @@ class VSGeneralInputData extends VSInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [VSGeneralOutputData];
+  List<Type> get acceptedTypes => [VSAINOGeneralOutputData];
 
   @override
   Color get interfaceColor => _interfaceColor;
 }
 
-class VSGeneralOutputData extends VSOutputData {
+class VSAINOGeneralOutputData extends VSOutputData {
   ///Basic List output interface
-  VSGeneralOutputData({
+  VSAINOGeneralOutputData({
     required super.type,
     FutureOr Function(Map<String, dynamic> data)? super.outputFunction,
   });

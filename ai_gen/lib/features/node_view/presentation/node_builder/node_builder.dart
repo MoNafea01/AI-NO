@@ -1,12 +1,12 @@
 import 'package:ai_gen/core/models/block_model/BlockModel.dart';
 import 'package:ai_gen/core/models/block_model/Params.dart';
-import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
 import 'package:ai_gen/features/node_view/data/serialization/block_serializer.dart';
 import 'package:ai_gen/node_package/custom_widgets/vs_text_input_data.dart';
-import 'package:ai_gen/node_package/data/custom_interfaces/general_Interface.dart';
 import 'package:ai_gen/node_package/data/standard_interfaces/vs_model_interface.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';
+
+import 'custom_interfaces/model_interface.dart';
 
 class NodeBuilder {
   Future<List<Object>> buildBlocks() async {
@@ -82,7 +82,7 @@ class NodeBuilder {
   }
 
   VSInputData _inputDots(String inputDot, VSOutputData<dynamic>? ref) {
-    return VSModelInputData(type: inputDot, initialConnection: ref);
+    return VSOldModelInputData(type: inputDot, initialConnection: ref);
   }
 
   VSInputData _paramInput(Params param) {
@@ -93,48 +93,14 @@ class NodeBuilder {
   }
 
   List<VSOutputData> _buildOutputData(BlockModel block) {
+    if (block.category == "Models" && block.outputDots?.length == 1) {
+      return [
+        VSModelOutputData(type: "${block.outputDots![0]}Output", block: block),
+      ];
+    }
     return block.outputDots?.map((outputDot) {
-          return VSGeneralOutputData(
-            type: "${outputDot}Output",
-            outputFunction: (data) async {
-              final params = {};
-              if (block.params != null) {
-                for (var param in block.params!) {
-                  params[param.name] = param.value;
-                }
-              }
-
-              final Map<String, dynamic> data = {
-                "model_name": block.nodeName,
-                "model_type": block.type,
-                "task": block.task,
-                "params": params,
-              };
-
-              print(data);
-
-              return await ApiCall().makeAPICall(block.apiCall!, data: data);
-            },
-          );
+          return VSModelOutputData(type: "${outputDot}Output", block: block);
         }).toList() ??
         [];
   }
-  // List<VSOutputData> _buildOutputData(BlockModel block) {
-  //   return block.outputDots?.map((outputDot) {
-  //         return VSModelOutputData(
-  //           type: "${outputDot}Output",
-  //           outputFunction: (data) async {
-  //             final aiModel = AIModel(
-  //               modelName: block.nodeName,
-  //               modelType: block.type,
-  //               task: block.task,
-  //               params: {},
-  //             );
-  //
-  //             return await apiCall(aiModel.createModelToJson());
-  //           },
-  //         );
-  //       }).toList() ??
-  //       [];
-  // }
 }

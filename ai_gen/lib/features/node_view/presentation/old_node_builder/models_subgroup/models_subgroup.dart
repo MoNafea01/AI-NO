@@ -31,7 +31,7 @@ class ModelsSubGroup extends VSSubgroup {
               VsTextInputData(type: "Parameter", controller: Knnrcontroller)
             ],
             outputData: [
-              VSModelOutputData(
+              VSOldModelOutputData(
                 type: "Output",
                 outputFunction: (data) => apiCall(
                   {
@@ -58,7 +58,7 @@ class ModelsSubGroup extends VSSubgroup {
               VsTextInputData(type: "Parameter", controller: Knnccontroller)
             ],
             outputData: [
-              VSModelOutputData(
+              VSOldModelOutputData(
                 type: "Output",
                 outputFunction: (data) => apiCall(
                   {
@@ -85,7 +85,7 @@ class ModelsSubGroup extends VSSubgroup {
             widgetOffset: offset,
             inputData: [],
             outputData: [
-              VSModelOutputData(
+              VSOldModelOutputData(
                 type: "Output",
                 outputFunction: (data) => apiCall(
                   {
@@ -105,7 +105,7 @@ class ModelsSubGroup extends VSSubgroup {
             widgetOffset: offset,
             inputData: [],
             outputData: [
-              VSModelOutputData(
+              VSOldModelOutputData(
                 type: "Output",
                 outputFunction: (data) => apiCall(
                   {
@@ -125,7 +125,7 @@ class ModelsSubGroup extends VSSubgroup {
             widgetOffset: offset,
             inputData: [],
             outputData: [
-              VSModelOutputData(
+              VSOldModelOutputData(
                 type: "Output",
                 outputFunction: (data) => apiCall(
                   {
@@ -157,7 +157,7 @@ class ModelsSubGroup extends VSSubgroup {
               VsTextInputData(type: "Parameter", controller: rbfSvccontroller),
             ],
             outputData: [
-              VSModelOutputData(
+              VSOldModelOutputData(
                 type: "Output",
                 outputFunction: (data) => apiCall(
                   {
@@ -181,7 +181,7 @@ class ModelsSubGroup extends VSSubgroup {
               VsTextInputData(type: "Parameter", controller: polySvccontroller),
             ],
             outputData: [
-              VSModelOutputData(
+              VSOldModelOutputData(
                 type: "Output",
                 outputFunction: (data) => apiCall(
                   {
@@ -206,7 +206,7 @@ class ModelsSubGroup extends VSSubgroup {
                   type: "Parameter", controller: sigmoidSvccontroller),
             ],
             outputData: [
-              VSModelOutputData(
+              VSOldModelOutputData(
                 type: "Output",
                 outputFunction: (data) => apiCall(
                   {
@@ -237,7 +237,7 @@ class ModelsSubGroup extends VSSubgroup {
                 widgetOffset: offset,
                 inputData: [],
                 outputData: [
-                  VSModelOutputData(
+                  VSOldModelOutputData(
                     type: "Output",
                     outputFunction: (data) => apiCall(
                       AIModel(
@@ -261,7 +261,7 @@ class ModelsSubGroup extends VSSubgroup {
                       type: "Parameter", controller: ridgeController)
                 ],
                 outputData: [
-                  VSModelOutputData(
+                  VSOldModelOutputData(
                     type: "Output",
                     outputFunction: (data) => apiCall(
                       AIModel(
@@ -286,7 +286,7 @@ class ModelsSubGroup extends VSSubgroup {
                       type: "Parameter", controller: lassoController)
                 ],
                 outputData: [
-                  VSModelOutputData(
+                  VSOldModelOutputData(
                     type: "Output",
                     outputFunction: (data) => apiCall(
                       {
@@ -311,7 +311,7 @@ class ModelsSubGroup extends VSSubgroup {
                       type: "Parameter", controller: sgdRegressioncontroller)
                 ],
                 outputData: [
-                  VSModelOutputData(
+                  VSOldModelOutputData(
                     type: "Output",
                     outputFunction: (data) => apiCall(
                       {
@@ -349,7 +349,7 @@ class ModelsSubGroup extends VSSubgroup {
                     type: "Parameter", controller: Penaltycontroller),
               ],
               outputData: [
-                VSModelOutputData(
+                VSOldModelOutputData(
                   type: "Output",
                   outputFunction: (data) => apiCall(
                     {
@@ -378,7 +378,7 @@ class ModelsSubGroup extends VSSubgroup {
                     type: "Parameter", controller: ridgeClassifiercontroller),
               ],
               outputData: [
-                VSModelOutputData(
+                VSOldModelOutputData(
                   type: "Output",
                   outputFunction: (data) => apiCall(
                     {
@@ -405,7 +405,7 @@ class ModelsSubGroup extends VSSubgroup {
                     type: "Parameter", controller: sgdClassifiercontroller),
               ],
               outputData: [
-                VSModelOutputData(
+                VSOldModelOutputData(
                   type: "Output",
                   outputFunction: (data) => apiCall(
                     {

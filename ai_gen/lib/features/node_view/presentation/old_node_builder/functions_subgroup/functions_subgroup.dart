@@ -30,7 +30,7 @@ class FunctionsSubgroup extends VSSubgroup {
       setValue: (value) {},
       getValue: () => "",
       inputData: [
-        VSModelInputData(
+        VSOldModelInputData(
           type: "data",
           initialConnection: ref,
         ),
@@ -63,7 +63,7 @@ class FunctionsSubgroup extends VSSubgroup {
       setValue: (value) {},
       getValue: () => "",
       inputData: [
-        VSModelInputData(
+        VSOldModelInputData(
           type: "data",
           initialConnection: ref,
         ),
@@ -95,7 +95,7 @@ class FunctionsSubgroup extends VSSubgroup {
       setValue: (value) {},
       getValue: () => "",
       inputData: [
-        VSModelInputData(
+        VSOldModelInputData(
           type: "Model",
           initialConnection: ref,
         ),
@@ -128,7 +128,7 @@ class FunctionsSubgroup extends VSSubgroup {
       setValue: (value) {},
       getValue: () => "",
       inputData: [
-        VSModelInputData(
+        VSOldModelInputData(
           type: "Model",
           initialConnection: ref,
         ),

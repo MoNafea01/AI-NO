@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 class ApiCall {
   Future<Map<String, dynamic>> makeAPICall(
     String endpoint, {
-    required Map<String, dynamic>? data,
+    required Map<String, dynamic>? apiData,
     Map<String, dynamic> Function(Map<String, dynamic>)? processResponse,
   }) async {
     final dio = Dio();
@@ -13,7 +13,7 @@ class ApiCall {
     try {
       final response = await dio.post(
         "http://127.0.0.1:8000/api/$endpoint",
-        data: data,
+        data: apiData,
         options: Options(contentType: Headers.jsonContentType),
       );
 
@@ -47,7 +47,7 @@ class ApiCall {
   }) async {
     return await makeAPICall(
       'train_test_split',
-      data: {
+      apiData: {
         'data': data,
         'test_size': testSize,
         'random_state': randomState,
@@ -66,7 +66,7 @@ class ApiCall {
   ) async {
     return await makeAPICall(
       'fit_model',
-      data: {
+      apiData: {
         "X": {
           "message": "Data split successful",
           "data": [
@@ -95,7 +95,7 @@ class ApiCall {
   ) async {
     return await makeAPICall(
       'predict',
-      data: {
+      apiData: {
         'X': {
           "message": "Data split successful",
           "data": [
@@ -118,7 +118,7 @@ class ApiCall {
   ) async {
     return await makeAPICall(
       'fit_preprocessor',
-      data: {
+      apiData: {
         'data': data,
         'preprocessor': preprocessor,
       },
@@ -132,7 +132,7 @@ class ApiCall {
   ) async {
     return await makeAPICall(
       'transform',
-      data: {
+      apiData: {
         'data': data,
         'preprocessor': preprocessor,
       },

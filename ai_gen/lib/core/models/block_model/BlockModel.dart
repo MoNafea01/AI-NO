@@ -65,4 +65,12 @@ class BlockModel {
     json['api_call'] = apiCall;
     return json;
   }
+
+  // to be used in the API call as the api data
+  Map<String, dynamic> get paramsToJson {
+    Map<String, dynamic> paramsMap = {};
+    params?.forEach((param) => paramsMap[param.name] = param.value);
+
+    return paramsMap;
+  }
 }

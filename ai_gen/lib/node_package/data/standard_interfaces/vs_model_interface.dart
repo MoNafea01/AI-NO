@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 
 const Color _interfaceColor = Colors.blue;
 
-class VSModelInputData extends VSInputData {
+class VSOldModelInputData extends VSInputData {
   ///Basic List input interface
-  VSModelInputData({
+  VSOldModelInputData({
     required super.type,
     super.title,
     super.toolTip,
@@ -17,15 +17,15 @@ class VSModelInputData extends VSInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [VSModelOutputData];
+  List<Type> get acceptedTypes => [VSOldModelOutputData];
 
   @override
   Color get interfaceColor => _interfaceColor;
 }
 
-class VSModelOutputData extends VSOutputData<AIModel> {
+class VSOldModelOutputData extends VSOutputData<AIModel> {
   ///Basic List output interface
-  VSModelOutputData({
+  VSOldModelOutputData({
     required super.type,
     FutureOr<AIModel> Function(Map<String, dynamic> data)? super.outputFunction,
   });
