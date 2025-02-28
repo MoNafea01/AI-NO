@@ -41,7 +41,8 @@ class PredictSerializer(serializers.Serializer):
 
 class PreprocessorSerializer(serializers.Serializer):
     node_name = serializers.CharField(required=False)  # Add all supported scalers
-    node_type = serializers.ChoiceField(choices=['scaler', 'encoding', 'imputation', 'binarization'], required=False)
+    node_type = serializers.ChoiceField(choices=['scaler', 'encoder', 'imputer', 'binarizer'], required=False)
+
     params = serializers.JSONField(required=False)
     node_path = serializers.CharField(required=False)
     def validate(self, data):
