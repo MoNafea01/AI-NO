@@ -108,7 +108,7 @@ class _InteractiveVSNodeViewBodyState
             Positioned(
               bottom: MediaQuery.of(context).size.height / 30,
               right: MediaQuery.of(context).size.width / 2 - 100,
-              child: const FLoatingWIdgets(),
+              child: const FloatingWidgets(),
             ),
             Positioned(
               right: 50,

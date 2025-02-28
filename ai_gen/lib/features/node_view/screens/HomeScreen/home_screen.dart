@@ -20,17 +20,13 @@ class ProjectsDashboard extends StatelessWidget {
           // Sidebar
           Container(
             width: 80,
-            
             decoration: const BoxDecoration(
-              color:  Color(0xfff2f2f2),
-              border:  Border(
+              color: Color(0xfff2f2f2),
+              border: Border(
                 right: BorderSide(color: Colors.black, width: 0.7),
                 left: BorderSide(color: Colors.black, width: 1),
               ),
-
             ),
-            
-            
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -56,7 +52,8 @@ class ProjectsDashboard extends StatelessWidget {
                 Column(
                   children: [
                     const Text("Profile",
-                        style: TextStyle(color: Color(0xff64748B),fontSize: 16)),
+                        style:
+                            TextStyle(color: Color(0xff64748B), fontSize: 16)),
                     const SizedBox(height: 10),
                     const CircleAvatar(
                       radius: 20,
@@ -79,7 +76,7 @@ class ProjectsDashboard extends StatelessWidget {
           // Main Content
           Expanded(
             child: Padding(
-             padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -103,7 +100,7 @@ class ProjectsDashboard extends StatelessWidget {
                       Expanded(
                         child: TextField(
                           decoration: InputDecoration(
-                             enabledBorder: const OutlineInputBorder(
+                            enabledBorder: const OutlineInputBorder(
                               borderSide: BorderSide(
                                   color:
                                       Colors.black), // الإطار في الحالة العادية
