@@ -2,7 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
-
+# ./core/nodes/saved/
 # Ignore Django-specific cache and migration files
 *.log
 *.pot
