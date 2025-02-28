@@ -1,7 +1,7 @@
 from .preprocessor import Preprocessor
 from .fit import Fit
 from .utils import PayloadBuilder
-from ..utils import NodeLoader, NodeSaver
+from ...repositories.node_repository import NodeLoader, NodeSaver
 
 
 class PreprocessorTransformer:

@@ -4,84 +4,85 @@ from .models import Component
 
 
 class ModelSerializer(serializers.Serializer):
-    model_name = serializers.CharField(max_length=100, required=False)
-    model_type = serializers.CharField(max_length=100, required=False)
+    node_name = serializers.CharField(max_length=100, required=False)
+    node_type = serializers.CharField(max_length=100, required=False)
     task = serializers.CharField(max_length=100, required=False)
     params = serializers.JSONField(required=False)
-    model_path = serializers.CharField(required=False)
+    node_path = serializers.CharField(required=False)
     def validate(self, data:dict):
         """
-        Ensure at least one of 'model' or 'model_path' is provided.
+        Ensure at least one of 'node_name' or 'node_path' is provided.
         """
-        return validate(data, ('model_name', 'model_path'))
+        return validate(data, ('node_name', 'node_path'))
 
 
 class FitModelSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
     y = serializers.JSONField(required=True)
-    model_path = serializers.CharField(required=False)
-    model = serializers.JSONField(required=False)
+    node_path = serializers.CharField(required=False)
+    node = serializers.JSONField(required=False)
     def validate(self, data):
         """
-        Ensure at least one of 'model' or 'model_path' is provided.
+        Ensure at least one of 'node' or 'node_path' is provided.
         """
-        return validate(data, ('model', 'model_path'))
+        return validate(data, ('node', 'node_path'))
 
 
 class PredictSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
-    model = serializers.JSONField(required=False)
-    model_path = serializers.CharField(required=False)
+    node = serializers.JSONField(required=False)
+    node_path = serializers.CharField(required=False)
     def validate(self, data):
         """
-        Ensure at least one of 'model' or 'model_path' is provided.
+        Ensure at least one of 'node' or 'node_path' is provided.
         """
-        return validate(data, ('model', 'model_path'))
+        return validate(data, ('node', 'node_path'))
 
 
 class PreprocessorSerializer(serializers.Serializer):
-    preprocessor_name = serializers.CharField(required=False)  # Add all supported scalers
-    preprocessor_type = serializers.ChoiceField(choices=['scaler', 'encoding', 'imputation', 'binarization'], required=False)
+    node_name = serializers.CharField(required=False)  # Add all supported scalers
+    node_type = serializers.ChoiceField(choices=['scaler', 'encoder', 'imputer', 'binarizer'], required=False)
+
     params = serializers.JSONField(required=False)
-    preprocessor_path = serializers.CharField(required=False)
+    node_path = serializers.CharField(required=False)
     def validate(self, data):
         """
-        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
+        Ensure at least one of 'node' or 'node_path' is provided.
         """
-        return validate(data, ('preprocessor_name', 'preprocessor_path'))
+        return validate(data, ('node_name', 'node_path'))
 
 
 class FitPreprocessorSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=False)
-    preprocessor_path = serializers.CharField(required=False)
+    node = serializers.JSONField(required=False)
+    node_path = serializers.CharField(required=False)
     def validate(self, data):
         """
-        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
+        Ensure at least one of 'node' or 'node_path' is provided.
         """
-        return validate(data, ('preprocessor', 'preprocessor_path'))
+        return validate(data, ('node', 'node_path'))
 
 
 class TransformSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=False)
-    preprocessor_path = serializers.CharField(required=False)
+    node = serializers.JSONField(required=False)
+    node_path = serializers.CharField(required=False)
     def validate(self, data):
         """
-        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
+        Ensure at least one of 'node' or 'node_path' is provided.
         """
-        return validate(data, ('preprocessor', 'preprocessor_path'))
+        return validate(data, ('node', 'node_path'))
 
 
 class FitTransformSerializer(serializers.Serializer):
     data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=False)
-    preprocessor_path = serializers.CharField(required=False)
+    node = serializers.JSONField(required=False)
+    node_path = serializers.CharField(required=False)
     def validate(self, data):
         """
-        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
+        Ensure at least one of 'node' or 'node_path' is provided.
         """
-        return validate(data, ('preprocessor', 'preprocessor_path'))
+        return validate(data, ('node', 'node_path'))
 
 
 class SplitterSerializer(serializers.Serializer):
@@ -108,25 +109,26 @@ class DataLoaderSerializer(serializers.Serializer):
         return validate(data, ('dataset_name', 'dataset_path'))
 
 
-class NodeLoaderSerializer(serializers.Serializer):
-    node_id = serializers.IntegerField(required=False)
-    path = serializers.CharField(required=False)
-    def validate(self, data):
-        """
-        Ensure at least one of 'node_name' or 'node_path' is provided.
-        """
-        return validate(data, ('node_id', 'path'))
-    
-class NodeSaverSerializer(serializers.Serializer):
-    node = serializers.JSONField(required=True)
-    path = serializers.CharField(required=True)
-    
-
 class EvaluatorSerializer(serializers.Serializer):
     metric = serializers.CharField(required=True)
     y_true = serializers.JSONField(required=True)
     y_pred = serializers.JSONField(required=True)
     params = serializers.JSONField(required=False)
+
+
+class NodeLoaderSerializer(serializers.Serializer):
+    node_id = serializers.IntegerField(required=False)
+    node_path = serializers.CharField(required=False)
+    def validate(self, data):
+        """
+        Ensure at least one of 'node_name' or 'node_path' is provided.
+        """
+        return validate(data, ('node_id', 'node_path'))
+
+
+class NodeSaverSerializer(serializers.Serializer):
+    node = serializers.JSONField(required=True)
+    node_path = serializers.CharField(required=True)
 
 
 class ComponentSerializer(serializers.ModelSerializer):
