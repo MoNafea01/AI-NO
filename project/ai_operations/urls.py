@@ -1,9 +1,12 @@
 # api/urls.py
 from django.urls import path, include
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from rest_framework.routers import DefaultRouter
 from .views import *
 router = DefaultRouter()
-router.register(r'components', ComponentAPIViewSet)
+# router.register(r'components', ComponentAPIViewSet)
+component_list = ComponentAPIViewSet.as_view({'get': 'list', 'post': 'create'})
+component_detail = ComponentAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -23,10 +26,18 @@ urlpatterns = [
     path('splitter/', SplitterAPIView.as_view(), name='splitter'),
     path('joiner/', JoinerAPIView.as_view(), name='joiner'),
     
+    path('components/', component_list, name='component-list'),
+    path('components/<int:pk>/', component_detail, name='component-detail'),
+
     path('save_node/', NodeSaveAPIView.as_view(), name='save_node'),
     path('load_node/', NodeLoaderAPIView.as_view(), name='load_node'),
     path('clear_nodes/', ClearNodesAPIView.as_view(), name='clear_nodes'),
 
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
 
+    # Generates the raw OpenAPI schema
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # Redoc UI (alternative)
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

@@ -168,15 +168,18 @@ class NodeUpdater:
             
             folder_path = NodeDirectoryManager.get_nodes_dir(folder)
             original_id = payload.get("node_id")
-            payload['node_data'] = []
-
+            
             folders = None
             if node.node_name in multi_channel_nodes:
                 is_multi_channel = True
                 folders = ['data', 'data']
+                payload['node_data'] = []
             elif node.node_name in special_case_nodes:
                 is_special_case = True
                 folders = ['preprocessors', 'data']
+                payload['node_data'] = []
+            else:
+                payload['node_data'] = NodeLoader()(original_id)[0]
             
             if folders:
                 for i, f in enumerate(folders, 1):
