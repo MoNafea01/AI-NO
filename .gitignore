@@ -1,1 +1,9 @@
-"*.pyc" 
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore Django-specific cache and migration files
+*.log
+*.pot
+*.py[co]
