@@ -7,6 +7,8 @@ router = DefaultRouter()
 # router.register(r'components', ComponentAPIViewSet)
 component_list = ComponentAPIViewSet.as_view({'get': 'list', 'post': 'create'})
 component_detail = ComponentAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})
+node_list = NodeAPIViewSet.as_view({'get': 'list', 'post': 'create'})
+node_detail = NodeAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -25,15 +27,16 @@ urlpatterns = [
     path('train_test_split/', TrainTestSplitAPIView.as_view(), name='train_test_split'),
     path('splitter/', SplitterAPIView.as_view(), name='splitter'),
     path('joiner/', JoinerAPIView.as_view(), name='joiner'),
-    
-    path('components/', component_list, name='component-list'),
-    path('components/<int:pk>/', component_detail, name='component-detail'),
 
     path('save_node/', NodeSaveAPIView.as_view(), name='save_node'),
     path('load_node/', NodeLoaderAPIView.as_view(), name='load_node'),
     path('clear_nodes/', ClearNodesAPIView.as_view(), name='clear_nodes'),
 
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
+    path('components/', component_list, name='component-list'),
+    path('components/<int:pk>/', component_detail, name='component-detail'),
+    path('nodes/', node_list, name='node-list'),
+    path('nodes/<int:pk>/', node_detail, name='node-detail'),
 
     # Generates the raw OpenAPI schema
     path('schema/', SpectacularAPIView.as_view(), name='schema'),

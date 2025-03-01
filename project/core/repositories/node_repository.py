@@ -41,7 +41,8 @@ class NodeSaver:
         joblib.dump(node, buffer)
         buffer.seek(0)
         node_bytes = buffer.read()
-        node_bytes = base64.b64encode(node_bytes).decode()
+        # node_bytes = base64.b64encode(node_bytes).decode()
+        # print("length of node_bytes: ", len(node_bytes))
         Node.objects.update_or_create(
             node_id=node_id,
             defaults={
@@ -78,7 +79,7 @@ class NodeLoader:
                     raise ValueError(f"Error loading node from path: {e}")
             
             node_entry = Node.objects.get(node_id=node_id)
-            node_data = base64.b64decode(node_entry.node_data)
+            node_data = node_entry.node_data
             buffer = BytesIO(node_data)
             node_name = node_entry.node_name
             return self.build_payload(joblib.load(buffer), node_name)
