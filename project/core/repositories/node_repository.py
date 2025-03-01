@@ -1,5 +1,6 @@
 import joblib
 from io import BytesIO
+import base64
 from ai_operations.models import Node, Component
 from django.core.exceptions import ObjectDoesNotExist
 from ..nodes.utils import NodeDirectoryManager, NodeNameHandler, DirectoryManager
@@ -40,6 +41,7 @@ class NodeSaver:
         joblib.dump(node, buffer)
         buffer.seek(0)
         node_bytes = buffer.read()
+        node_bytes = base64.b64encode(node_bytes).decode()
         Node.objects.update_or_create(
             node_id=node_id,
             defaults={
@@ -74,9 +76,10 @@ class NodeLoader:
                     return self.build_payload(node_data, node_name)
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
-                
+            
             node_entry = Node.objects.get(node_id=node_id)
-            buffer = BytesIO(node_entry.node_data)
+            node_data = base64.b64decode(node_entry.node_data)
+            buffer = BytesIO(node_data)
             node_name = node_entry.node_name
             return self.build_payload(joblib.load(buffer), node_name)
         
