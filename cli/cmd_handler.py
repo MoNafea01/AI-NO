@@ -16,7 +16,7 @@ def cmd_handler(command,mode=False):
         if mode:
             command = "aino " + command
 
-        args = command.split()  # Split the command into a list of arguments, if not
+        args = command.split()  # Split the command into a list of arguments, ["aino", command]
         if not args:
             return "No command entered."
 
@@ -25,6 +25,8 @@ def cmd_handler(command,mode=False):
             return "Mode deactivated."
 
         elif cmd == "aino":
+            if len(args) == 1:
+                return "No sub-command entered."
             sub_cmd = args[1]
             if len(args) == 1:
                 return handle_sub_command(sub_cmd)
@@ -35,6 +37,10 @@ def cmd_handler(command,mode=False):
         return f"Error: {str(e)}"
 
 def handle_sub_command(sub_cmd, args):
+    """
+    Handles the sub-command entered by the user.
+    takes the sub-command and the arguments as input.
+    """
     commands = {
         "create_user": create_user, "mkusr": create_user,
         "select_user": select_user, "selusr": select_user,
@@ -69,6 +75,7 @@ def handle_sub_command(sub_cmd, args):
     elif len(args) == 1:
         arg = args
     else:
+        # TODO: You will need to edit this part to handle multiple arguments.
         arg = [args[0]] 
         if args[1].startswith("("):
             arg.extend(re.findall(r'\(.*?\)', ' '.join(args[1:])))
