@@ -16,7 +16,9 @@ def cmd_handler(command,mode=False):
         if mode:
             command = "aino " + command
 
+
         args = command.split()  # Split the command into a list of arguments, ["aino", command]
+
         if not args:
             return "No command entered."
 
