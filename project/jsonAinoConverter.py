@@ -46,6 +46,7 @@ class AinoprjConverter:
             print(f"Error: {e}")
 
     def ainoprj_to_json(self):
+        self.encrypt = False
         try:
             with open(self.source_path, 'r', encoding='utf-8') as f:
                 encrypted_data = f.read()
