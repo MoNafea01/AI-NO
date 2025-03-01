@@ -5,28 +5,26 @@ import os
 def main():
     print("Welcome to Aino CMD Interface!")
     # Load data
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_store.json')
-    load_data_from_file(path)
+    load_data_from_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_store.json'))
     mode = False
     while True:
         try:
             user_input = input(">> ").strip()
-            if user_input.lower() in {"exit", "quit"}:
-                print("Exiting Aino CMD Interface. Goodbye!")
-                save_data_to_file(path)
-                break
-            if len(user_input.split()) > 1:
-                if user_input.split()[1].lower() == "mode":
+            inputs_list = user_input.split()
+            if len(inputs_list) > 1:
+                if inputs_list[1].lower() == "mode":
                     mode = True
-            if len(user_input.split()) == 1:
-                if user_input.split()[0].lower() == "nomode":
+            if len(inputs_list) == 1:
+                if inputs_list[0].lower() == "nomode":
                     mode = False
             result = cmd_handler(user_input,mode)
             if result:
                 print(result)
+            if result == "Exiting Aino CMD Interface. Goodbye!":
+                break
         except KeyboardInterrupt:
-            print("\nExiting Aino CMD Interface. Goodbye!")
-            save_data_to_file(path)
+            from cmd_handler import exit_aino
+            print(exit_aino())
             break
         except Exception as e:
             print(f"Error: {str(e)}")

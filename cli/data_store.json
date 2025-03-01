@@ -1,59 +1,15 @@
 {
     "users": {
-        "admin": {
-            "password": "admin",
-            "projects": {
-                "prj1": {
-                    "logreg_workflow": {
-                        "load_iris": {
-                            "ports": "([],['port1'])",
-                            "params": "([])"
-                        },
-                        "train_test_split1": {
-                            "ports": "(['port1'],['port2','port3'])",
-                            "params": "(['test_size',0.2],['random_state',42],['features_name','data'])"
-                        },
-                        "train_test_split2": {
-                            "ports": "(['port1'],['port4','port5'])",
-                            "params": "(['test_size',0.2],['random_state',42],['features_name','target'])"
-                        },
-                        "standard_scaler": {
-                            "ports": "([],['port6'])",
-                            "params": "([])"
-                        },
-                        "fit_transform": {
-                            "ports": "(['port6','port2'],['port7'])",
-                            "params": "([])"
-                        },
-                        "transform": {
-                            "ports": "(['port3'],['port8'])",
-                            "params": "([])"
-                        },
-                        "logestic_regression": {
-                            "ports": "([],['port9'])",
-                            "params": "([])"
-                        },
-                        "fit": {
-                            "ports": "(['port9','port7','port4'],['port10'])",
-                            "params": "([])"
-                        },
-                        "predict": {
-                            "ports": "(['port10','port8'],['port11'])",
-                            "params": "([])"
-                        },
-                        "accurac_score": {
-                            "ports": "(['port11','port5'],[])",
-                            "params": "([])"
-                        }
-                    }
-                }
-            }
+        "lol": {
+            "password": "101",
+            "projects": {}
         }
     },
-    "active_user": null,
+    "active_user": "lol",
     "active_project": null,
     "active_workflow": null,
     "admin": [
-        "admin"
+        "lol",
+        "lol"
     ]
 }

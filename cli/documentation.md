@@ -15,7 +15,7 @@ CMD interface
 
    `aino create_user user_name password` # create a new user, replace if exists
    
-   `aino load_user user_name password`   # load an existing user
+   `aino select_user user_name password`   # load an existing user
    
 2- projects
 
@@ -59,7 +59,7 @@ example:
 -------------
 
 ### making a logistic regression model to predict iris dataset
-```aino load_user admin admin```
+```aino select_user admin admin```
 > User admin loaded.
 
 ```aino list_projects```
