@@ -42,7 +42,6 @@ class NodeSaver:
         buffer.seek(0)
         node_bytes = buffer.read()
         # node_bytes = base64.b64encode(node_bytes).decode()
-        # print("length of node_bytes: ", len(node_bytes))
         Node.objects.update_or_create(
             node_id=node_id,
             defaults={
