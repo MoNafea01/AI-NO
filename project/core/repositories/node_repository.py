@@ -63,8 +63,8 @@ class NodeSaver:
 
 
 class NodeLoader:
-    """Handles loading nodes."""   
-    def __call__(self, node_id=None, path=None) -> tuple[bytearray, dict]:
+    """Handles loading nodes."""
+    def __call__(self, node_id=None, path=None, from_db=False, return_serialized=False, return_bytes=False) -> dict:
         if not (node_id or path):
             raise ValueError("Either node_id or path must be provided.")
         
@@ -73,30 +73,42 @@ class NodeLoader:
                 try:
                     node_data = joblib.load(path)
                     node_name, node_id = NodeNameHandler.handle_name(path)
-                    return self.build_payload(node_data, node_name)
+                    return self.build_payload(node_data, node_name, from_db, node_id)
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
-            
             node_entry = Node.objects.get(node_id=node_id)
             node_data = node_entry.node_data
             buffer = BytesIO(node_data)
             node_name = node_entry.node_name
-            return self.build_payload(joblib.load(buffer), node_name)
+            return self.build_payload(joblib.load(buffer), node_name, from_db, node_id, return_serialized, return_bytes)
         
         except ObjectDoesNotExist:
             raise ValueError(f"Node with node_id {node_id} does not exist.")
         except Exception as e:
             raise ValueError(f"Error loading node: {e}")
     
-    def build_payload(self, node_data, name):
-        return node_data, {
-            "message": f"Node {name} Loaded.",
-            "node_name": "node_loader",
-            "node_id": id(self),
-            "params": {},
-            "task": "load_node",
-            "node_type": "loader"
-        }
+    def build_payload(self, node_data, name, from_db=False, node_id=None, return_serialized=False, return_bytes=False):
+        payload = {
+                "message": f"Node {name} Loaded.",
+                "node_name": "node_loader",
+                "node_id": id(self),
+                "params": {},
+                "task": "load_node",
+                "node_type": "loader"
+            }
+        if from_db: # returns node information
+            payload = Node.objects.filter(node_id=node_id).values().first()
+            payload.pop("created_at"), payload.pop("updated_at")
+            if return_bytes: # retrieve binaries for node, it should True & from_db=True
+                node_data = payload.pop("node_data")
+
+        if return_serialized:
+            if not isinstance(node_data, bytes):
+                node_data = Node.objects.filter(node_id=node_id).values().first().pop("node_data")
+            node_data = base64.b64encode(node_data).decode()
+        payload.update({"node_data": node_data})
+        return payload
+        
 
 
 class NodeDeleter:
@@ -133,8 +145,6 @@ class NodeDeleter:
             node.delete()
 
             if from_view:
-                from ..nodes import clear_ds_name
-                clear_ds_name(node_id)
                 for i in range(1,3):
                     node = Node.objects.filter(node_id=node_id + i)
                     if node.exists():
@@ -149,9 +159,7 @@ class NodeDeleter:
 
 class NodeUpdater:
     """Updates a node in the database."""
-    def __call__(self, node_id, payload):
-        from ..nodes.config import setup_config
-        from ..nodes import clear_ds_name
+    def __call__(self, node_id, payload, return_serialized=False):
         if not node_id:
             raise ValueError("Node ID must be provided.")
         node_id = int(node_id) if node_id else None
@@ -182,15 +190,15 @@ class NodeUpdater:
                 folders = ['preprocessors', 'data']
                 payload['node_data'] = []
             else:
-                payload['node_data'] = NodeLoader()(original_id)[0]
-            
+                payload['node_data'] = NodeLoader()(original_id).get('node_data')
             if folders:
                 for i, f in enumerate(folders, 1):
-                    config = setup_config(node.node_name, str(i), original_id)
+                    config = NodeLoader()(original_id+i,from_db=True)
+                    config.pop("node_id")
                     f_path = NodeDirectoryManager.get_nodes_dir(f)
                     tmp_id = original_id + i
                     new_id = node_id + i
-                    data, _ = NodeLoader()(tmp_id)
+                    data = NodeLoader()(tmp_id).get('node_data')
                     new_payload = payload.copy()
                     new_payload['node_id'] = new_id
                     new_payload['node_data'] = data
@@ -198,8 +206,6 @@ class NodeUpdater:
                     payload['node_data'].append(data)
                     NodeSaver()(new_payload, path=f_path)
                     NodeDeleter()(tmp_id)
-            clear_ds_name(original_id)
-
             payload['node_id'] = node_id
             NodeSaver()(payload, path=folder_path)
             NodeDeleter()(original_id, is_special_case, is_multi_channel)
@@ -208,8 +214,10 @@ class NodeUpdater:
                 node_path = os.path.join(folder_path, f"{node.node_name}_{node_id}.pkl")
                 if os.path.exists(node_path):
                     os.remove(node_path)
-            
-            return True, f"Node {node_id} updated."
+            node_data = NodeLoader()(node_id, from_db=True, return_serialized=return_serialized).get('node_data')
+            message = f"Node {node_id} updated."
+            payload.update({"message": message, "node_data": node_data})
+            return True, payload
         except ObjectDoesNotExist:
             return False, f"Node {node_id} does not exist."
         except Exception as e:

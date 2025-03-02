@@ -55,7 +55,7 @@ class Model:
     def _create_from_path(self):
         '''Creates the model payload using the model path.'''
         try:
-            model, _ = NodeLoader()(path=self.model_path) # load the model from the path given
+            model = NodeLoader()(path=self.model_path).get("node_data") # load the model from the path given
             model_name, _ = NodeNameHandler.handle_name(self.model_path) # get the model name from the path
             model_type, task = self.find_model_type_and_task(model_name, models) # get the model type and task
             
@@ -72,7 +72,6 @@ class Model:
                                                     model, model_name, 
                                                     node_type=model_type, 
                                                     task=task)
-            
             # save the model to the disk & database
             NodeSaver()(payload, path=f"core\\nodes\\saved\\models")
 
@@ -94,7 +93,11 @@ class Model:
     def __str__(self):
         return str(self.payload)
 
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
+        return_serialized = kwargs.get("return_serialized", False)
+        if return_serialized:
+            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            self.payload.update({"node_data": node_data})
         return self.payload
 
 
