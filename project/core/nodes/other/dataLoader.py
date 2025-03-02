@@ -2,10 +2,9 @@
 # backend/core/nodes/dataLoader.py
 import os
 import pandas as pd
-from .. import set_ds_name
 from ..utils import NodeNameHandler, PayloadBuilder
 from ..configs.datasets import DATASETS as datasets
-from ...repositories.node_repository import NodeLoader, NodeSaver
+from ...repositories.node_repository import NodeLoader, NodeSaver, NodeDeleter
 
 
 class BaseDataLoader:
@@ -39,7 +38,7 @@ class CustomDataLoader:
                 raise FileNotFoundError(f"dataset not found: {self.dataset_path}")
             
             if self.dataset_path.endswith('.pkl'):
-                data = NodeLoader()(path=self.dataset_path)[0]
+                data = NodeLoader()(path=self.dataset_path).get('node_data')
                 X, y = data
                 
             elif self.dataset_path.endswith('.csv'):
@@ -77,7 +76,6 @@ class DataLoader:
             dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
         payload = PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data")
         n_id = payload['node_id']
-        set_ds_name(dataset_name, n_id)
         payloadX = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: X", X, "data_loader", node_type="loader", task="load_data", node_id=n_id+1)
         payloady = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: y", y, "data_loader", node_type="loader", task="load_data", node_id =n_id+2)
         NodeSaver()(payloadX, path="core/nodes/saved/data")
@@ -91,13 +89,21 @@ class DataLoader:
     def __str__(self):
         return str(self.payload)
 
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
         payload = self.payload[0]
         for arg in args:
             if arg == '1':
                 payload = self.payload[1]
+                NodeDeleter()(self.payload[2]['node_id'])
+                NodeDeleter()(self.payload[0]['node_id'])
             elif arg == '2':
                 payload = self.payload[2]
+                NodeDeleter()(self.payload[1]['node_id'])
+                NodeDeleter()(self.payload[0]['node_id'])
+        return_serialized = kwargs.get("return_serialized", False)
+        if return_serialized:
+            node_data = NodeLoader()(payload.get("node_id"), return_serialized=True, from_db=True).get('node_data')
+            payload.update({"node_data": node_data})
         return payload
 
 

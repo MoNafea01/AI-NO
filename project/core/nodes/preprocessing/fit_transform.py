@@ -1,6 +1,6 @@
 from .preprocessor import Preprocessor
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeLoader, NodeSaver
+from ...repositories.node_repository import NodeLoader, NodeSaver, NodeDeleter
 
 class PreprocessorFitterTransformer:
     """Handles the fitting and transformation of preprocessors."""
@@ -23,7 +23,7 @@ class FitTransform:
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeLoader()(data.get("node_id"))[0] if isinstance(data, dict) else data
+        self.data = NodeLoader()(data.get("node_id")).get('node_data') if isinstance(data, dict) else data
         self.payload = self._fit_transform()
 
     def _fit_transform(self):
@@ -36,14 +36,14 @@ class FitTransform:
 
     def _fit_transform_from_id(self):
         try:
-            preprocessor, _ = NodeLoader()(self.preprocessor.get("node_id"))  # Load preprocessor using ID from database
+            preprocessor = NodeLoader()(self.preprocessor.get("node_id"))  # Load preprocessor using ID from database
             return self._fit_transform_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting and transforming preprocessor by ID: {e}")
 
     def _fit_transform_from_path(self):
         try:
-            preprocessor, _ = NodeLoader()(path=self.preprocessor_path)
+            preprocessor = NodeLoader()(path=self.preprocessor_path).get('node_data')
             return self._fit_transform_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting and transforming preprocessor by path: {e}")
@@ -71,13 +71,21 @@ class FitTransform:
     def __str__(self):
         return str(self.payload)
     
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
         payload = self.payload[0]
         for arg in args:
             if arg == 'model':
                 payload = self.payload[1]
+                NodeDeleter()(self.payload[2]['node_id'])
+                NodeDeleter()(self.payload[0]['node_id'])
             elif arg == 'data':
                 payload = self.payload[2]
+                NodeDeleter()(self.payload[1]['node_id'])
+                NodeDeleter()(self.payload[0]['node_id'])
+        return_serialized = kwargs.get("return_serialized", False)
+        if return_serialized:
+            node_data = NodeLoader()(payload.get("node_id"), from_db=True, return_serialized=True).get('node_data')
+            payload.update({"node_data": node_data})
         return payload
     
 
