@@ -1,0 +1,55 @@
+[
+    {
+        "node_id": 1687309349376,
+        "node_name": "preprocessor_fitter",
+        "node_type": "preprocessor",
+        "task": "fit_preprocessor",
+        "message": "Preprocessor fitted",
+        "node_data": "gASVhwAAAAAAAACMGnNrbGVhcm4ubGluZWFyX21vZGVsLl9iYXNllIwQTGluZWFyUmVncmVzc2lvbpSTlCmBlH2UKIwNZml0X2ludGVyY2VwdJSIjAZjb3B5X1iUiIwGbl9qb2JzlE6MCHBvc2l0aXZllImMEF9za2xlYXJuX3ZlcnNpb26UjAUxLjYuMJR1Yi4=",
+        "params": {
+            "mean_": [
+                5.843333333333335,
+                3.057333333333334,
+                3.7580000000000027,
+                1.199333333333334
+            ],
+            "scale_": [
+                0.8253012917851409,
+                0.43441096773549437,
+                1.7594040657753032,
+                0.7596926279021594
+            ],
+            "var_": [
+                0.6811222222222222,
+                0.1887128888888887,
+                3.0955026666666674,
+                0.5771328888888888
+            ]
+        },
+        "x_loc": 5,
+        "y_loc": 4,
+        "input_nodes": [
+            1687312831824
+        ],
+        "output_nodes": [
+            1687311112896
+        ]
+    },
+    {
+        "node_id": 1687312831824,
+        "node_name": "preprocessor_transformer",
+        "node_type": "preprocessor",
+        "task": "transform_preprocessor",
+        "message": "Preprocessor transformed",
+        "node_data": "gASVhwAAAAAAAACMGnNrbGVhcm4ubGluZWFyX21vZGVsLl9iYXNllIwQTGluZWFyUmVncmVzc2lvbpSTlCmBlH2UKIwNZml0X2ludGVyY2VwdJSIjAZjb3B5X1iUiIwGbl9qb2JzlE6MCHBvc2l0aXZllImMEF9za2xlYXJuX3ZlcnNpb26UjAUxLjYuMJR1Yi4=",
+        "params": {},
+        "x_loc": 5,
+        "y_loc": 5,
+        "input_nodes": [
+            1687309349376
+        ],
+        "output_nodes": [
+            1687311112896
+        ]
+    }
+]

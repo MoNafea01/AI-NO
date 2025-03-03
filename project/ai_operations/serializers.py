@@ -1,6 +1,7 @@
 # api/serializers.py
 from rest_framework import serializers
-from .models import Component
+from .models import Component, Node
+import base64
 
 
 class ModelSerializer(serializers.Serializer):
@@ -42,7 +43,6 @@ class PredictSerializer(serializers.Serializer):
 class PreprocessorSerializer(serializers.Serializer):
     node_name = serializers.CharField(required=False)  # Add all supported scalers
     node_type = serializers.ChoiceField(choices=['scaler', 'encoder', 'imputer', 'binarizer'], required=False)
-
     params = serializers.JSONField(required=False)
     node_path = serializers.CharField(required=False)
     def validate(self, data):
@@ -140,6 +140,29 @@ class ComponentSerializer(serializers.ModelSerializer):
             'input_channels': {'allow_null': True},
             'output_channels': {'allow_null': True}
         }
+
+class NodeSerializer(serializers.ModelSerializer):
+    node_data = serializers.CharField(write_only=True, required=False)
+    class Meta:
+        model = Node
+        fields = '__all__'
+        extra_kwargs = {
+            'params': {'allow_null': True},
+        }
+    def create(self, validated_data):
+        """Decode Base64-encoded node_data before saving"""
+        node_data_base64 = validated_data.pop('node_data', None)
+        if node_data_base64:
+            validated_data['node_data'] = base64.b64decode(node_data_base64)
+        return super().create(validated_data)
+    
+    def to_representation(self, instance):
+        """Customize serialization to convert binary data to Base64"""
+        representation = super().to_representation(instance)
+        if instance.node_data:
+            representation['node_data'] = base64.b64encode(instance.node_data).decode()
+
+        return representation
 
 
 def validate(data, *args:tuple):

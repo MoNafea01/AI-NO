@@ -1,15 +1,24 @@
-from handlers.user_handler import handle_user_command
+from handlers.user_handler import handle_user_command 
 from handlers.project_handler import handle_project_command
 from handlers.workflow_handler import handle_workflow_command
 from handlers.block_handler import handle_block_command
 import re
-
+create_user, select_user, remove_user, make_admin = handle_user_command, handle_user_command, handle_user_command, handle_user_command
+create_project, select_project, remove_project, deselect_project, list_projects = handle_project_command, handle_project_command, handle_project_command, handle_project_command, handle_project_command
+create_workflow, select_workflow, remove_workflow, deselect_workflow, list_workflows, finish_workflow = handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command
+create_block, edit_block, remove_block, explore_block, list_blocks = handle_block_command, handle_block_command, handle_block_command, handle_block_command, handle_block_command
 def cmd_handler(command,mode=False):
+    """
+    Handles the command entered by the user.
+    if mode is True, the command is prefixed with "aino".
+    """
     try:
         if mode:
             command = "aino " + command
 
-        args = command.split()
+
+        args = command.split()  # Split the command into a list of arguments, ["aino", command] 
+
         if not args:
             return "No command entered."
 
@@ -18,6 +27,8 @@ def cmd_handler(command,mode=False):
             return "Mode deactivated."
 
         elif cmd == "aino":
+            if len(args) == 1:
+                return "No sub-command entered."
             sub_cmd = args[1]
             if len(args) == 1:
                 return handle_sub_command(sub_cmd)
@@ -28,39 +39,45 @@ def cmd_handler(command,mode=False):
         return f"Error: {str(e)}"
 
 def handle_sub_command(sub_cmd, args):
+    """
+    Handles the sub-command entered by the user.
+    takes the sub-command and the arguments as input.
+    """
     commands = {
-        "create_user": handle_user_command, "mkusr": handle_user_command,
-        "select_user": handle_user_command, "selusr": handle_user_command,
-        "remove_user": handle_user_command, "rmusr": handle_user_command,
-        "make_admin": handle_user_command, "mkadm": handle_user_command,
+        "create_user": create_user, "mkusr": create_user,
+        "select_user": select_user, "selusr": select_user,
+        "remove_user": remove_user, "rmusr": remove_user,
+        "make_admin": make_admin, "mkadm": make_admin,
 
-        "create_project": handle_project_command, "mkprj": handle_project_command,
-        "select_project": handle_project_command, "selprj": handle_project_command,
-        "deselect_project": handle_project_command, "dselprj": handle_project_command,
-        "list_projects": handle_project_command, "lsprj": handle_project_command,
-        "remove_project": handle_project_command, "rmprj": handle_project_command,
+        "create_project": create_project, "mkprj": create_project,
+        "select_project": select_project, "selprj": select_project,
+        "deselect_project": deselect_project, "dselprj": deselect_project,
+        "list_projects": list_projects, "lsprj": list_projects,
+        "remove_project": remove_project, "rmprj": remove_project,
 
-        "create_workflow": handle_workflow_command, "mkwf": handle_workflow_command,
-        "select_workflow": handle_workflow_command, "selwf": handle_workflow_command,
-        "deselect_workflow": handle_workflow_command, "dselwf": handle_workflow_command,
-        "list_workflows": handle_workflow_command, "lswf": handle_workflow_command,
-        "finish_workflow": handle_workflow_command, "fnwf": handle_workflow_command,
-        "remove_workflow": handle_workflow_command, "rmwf": handle_workflow_command,
+        "create_workflow": create_workflow, "mkwf": create_workflow,
+        "select_workflow": select_workflow, "selwf": select_workflow,
+        "deselect_workflow": deselect_workflow, "dselwf": deselect_workflow,
+        "list_workflows": list_workflows, "lswf": list_workflows,
+        "finish_workflow": finish_workflow, "fnwf": finish_workflow,
+        "remove_workflow": remove_workflow, "rmwf": remove_workflow,
 
-        "make": handle_block_command, "mkblk": handle_block_command, 
-        "edit": handle_block_command, "edblk": handle_block_command,
-        "remove": handle_block_command, "rmblk": handle_block_command,
-        "list_blocks": handle_block_command, "lsblk": handle_block_command,
-        "explore": handle_block_command, "exblk": handle_block_command,
+        "make": create_block, "mkblk": create_block, 
+        "edit": edit_block, "edblk": edit_block,
+        "remove": remove_block, "rmblk": remove_block,
+        "list_blocks": list_blocks, "lsblk": list_blocks,
+        "explore": explore_block, "exblk": explore_block,
         
         "list_commands": help_commands, "help": help_commands,
-        "aino": activate_mode
+        "aino": activate_mode,
+        "exit": exit_aino, "quit": exit_aino,
     }
     if len(args) == 0:
         arg = []
     elif len(args) == 1:
         arg = args
     else:
+        # TODO: You will need to edit this part to handle multiple arguments.
         arg = [args[0]] 
         if args[1].startswith("("):
             arg.extend(re.findall(r'\(.*?\)', ' '.join(args[1:])))
@@ -153,3 +170,10 @@ def help_commands(*args):
     """
 def activate_mode(*args):
     return "Mode activated."
+
+def exit_aino(*args, **kwargs):
+    import os
+    from save_load import save_data_to_file
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_store.json')
+    save_data_to_file(path)
+    return "Exiting Aino CMD Interface. Goodbye!"

@@ -24,7 +24,7 @@ class Predict:
     def __init__(self, X, model=None, model_path=None):
         self.model = model
         self.model_path = model_path
-        self.X = NodeLoader()(X.get("node_id"))[0] if isinstance(X, dict) else X
+        self.X = NodeLoader()(X.get("node_id")).get('node_data') if isinstance(X, dict) else X
         self.payload = self._predict()
 
     def _predict(self):
@@ -37,14 +37,14 @@ class Predict:
 
     def _predict_from_id(self):
         try:
-            model, _ = NodeLoader()(self.model.get("node_id"))  # Load model using ID from database
+            model = NodeLoader()(self.model.get("node_id")).get('node_data')  # Load model using ID from database
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by ID: {e}")
 
     def _predict_from_path(self):
         try:
-            model, _ = NodeLoader()(path=self.model_path)
+            model = NodeLoader()(path=self.model_path).get('node_data')
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by path: {e}")
@@ -64,7 +64,11 @@ class Predict:
     def __str__(self):
         return str(self.payload)
 
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
+        return_serialized = kwargs.get("return_serialized", False)
+        if return_serialized:
+            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            self.payload.update({"node_data": node_data})
         return self.payload
 
 

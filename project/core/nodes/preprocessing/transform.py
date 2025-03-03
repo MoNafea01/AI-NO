@@ -24,7 +24,7 @@ class Transform:
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeLoader()(data.get("node_id"))[0] if isinstance(data, dict) else data
+        self.data = NodeLoader()(data.get("node_id")).get('node_data') if isinstance(data, dict) else data
         self.payload = self._transform()
 
     def _transform(self):
@@ -37,14 +37,14 @@ class Transform:
 
     def _transform_from_id(self):
         try:
-            prepocessor, _ = NodeLoader()(self.preprocessor.get("node_id"))  # Load model using ID from database
+            prepocessor = NodeLoader()(self.preprocessor.get("node_id")).get('node_data')  # Load model using ID from database
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by ID: {e}")
 
     def _transform_from_path(self):
         try:
-            prepocessor, _ = NodeLoader()(path=self.preprocessor_path)
+            prepocessor = NodeLoader()(path=self.preprocessor_path).get('node_data')
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by path: {e}")
@@ -64,7 +64,11 @@ class Transform:
     def __str__(self):
         return str(self.payload)
 
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
+        return_serialized = kwargs.get("return_serialized", False)
+        if return_serialized:
+            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            self.payload.update({"node_data": node_data})
         return self.payload
 
 if __name__ == '__main__':
