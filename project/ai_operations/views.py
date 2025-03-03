@@ -456,7 +456,7 @@ class FitTransformAPIView(APIView, NodeQueryMixin):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id, is_special_case=True, from_view=True)
+            success, message = NodeDeleter()(node_id, is_special_case=True)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -501,7 +501,7 @@ class SplitterAPIView(APIView, NodeQueryMixin):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id, is_multi_channel=True, from_view=True)
+            success, message = NodeDeleter()(node_id, is_multi_channel=True)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -596,7 +596,7 @@ class TrainTestSplitAPIView(APIView, NodeQueryMixin):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id, is_multi_channel=True, from_view=True)
+            success, message = NodeDeleter()(node_id, is_multi_channel=True)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -642,7 +642,7 @@ class DataLoaderAPIView(APIView, NodeQueryMixin):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id, is_multi_channel=True, from_view=True)
+            success, message = NodeDeleter()(node_id, is_multi_channel=True)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
