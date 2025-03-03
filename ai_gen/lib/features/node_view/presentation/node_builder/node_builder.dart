@@ -1,11 +1,14 @@
 import 'package:ai_gen/core/models/block_model/BlockModel.dart';
 import 'package:ai_gen/core/models/block_model/Params.dart';
+import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
 import 'package:ai_gen/features/node_view/data/serialization/block_serializer.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/preprocessor_interface.dart';
-import 'package:ai_gen/node_package/custom_widgets/vs_text_input_data.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
+import 'custom_interfaces/data_loader_interface.dart';
 import 'custom_interfaces/model_interface.dart';
 
 class NodeBuilder {
@@ -76,13 +79,19 @@ class NodeBuilder {
 
   List<VSInputData> _buildInputData(BlockModel block, VSOutputData? ref) {
     return [
-      ...block.params?.map(_paramInput) ?? [],
-      ...block.inputDots?.map((inputDot) => _inputDots(inputDot, ref)) ?? [],
+      if (block.nodeName == "data_loader")
+        ...block.params?.map(_paramInput) ?? [],
+      ...block.inputDots?.map((inputDot) => _inputDots(block, inputDot, ref)) ??
+          [],
     ];
   }
 
-  VSInputData _inputDots(String inputDot, VSOutputData<dynamic>? ref) {
-    return VSModelInputData(type: inputDot, initialConnection: ref);
+  VSInputData _inputDots(
+      BlockModel block, String inputDot, VSOutputData<dynamic>? ref) {
+    if (inputDot == "model") {
+      return VSModelInputData(type: inputDot, initialConnection: ref);
+    }
+    return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
   }
 
   VSInputData _paramInput(Params param) {
@@ -93,20 +102,46 @@ class NodeBuilder {
   }
 
   List<VSOutputData> _buildOutputData(BlockModel block) {
-    if (block.category == "Models" && block.outputDots?.length == 1) {
+    if (block.nodeName == "data_loader") {
+      Map<String, dynamic>? postResponse;
       return [
-        VSModelOutputData(type: "${block.outputDots![0]}Output", block: block),
+        DataLoaderOutputData(
+          type: "X",
+          outputFunction: (p0) async {
+            postResponse =
+                await ApiCall().makeAPICall(block.apiCall!, apiData: {});
+            final xResponse = postResponse;
+            xResponse!["node_id"];
+            return xResponse;
+          },
+        ),
+        DataLoaderOutputData(
+          type: "Y",
+          outputFunction: (p0) async {
+            while (postResponse == null) {
+              await Future.delayed(const Duration(milliseconds: 100));
+            }
+            final yResponse = postResponse;
+
+            yResponse!["node_id"];
+            return yResponse;
+          },
+        )
       ];
     }
-    if (block.category == "Preprocessors" && block.outputDots?.length == 1) {
-      return [
-        VSPreprocessorOutputData(
-            type: "${block.outputDots![0]}Output", block: block),
-      ];
-    }
-    return block.outputDots?.map((outputDot) {
-          return VSModelOutputData(type: "${outputDot}Output", block: block);
-        }).toList() ??
+    return block.outputDots?.map(
+          (outputDot) {
+            if (outputDot == "model") {
+              return VSModelOutputData(type: outputDot, block: block);
+            }
+            if (outputDot == "preprocessor") {
+              return VSPreprocessorOutputData(type: outputDot, block: block);
+            }
+
+            return VSAINOGeneralOutputData(
+                type: "$outputDot Output", block: block);
+          },
+        ).toList() ??
         [];
   }
 }

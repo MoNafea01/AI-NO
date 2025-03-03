@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:ai_gen/core/models/block_model/BlockModel.dart';
 import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
-import 'package:ai_gen/node_package/data/custom_interfaces/aino_general_Interface.dart';
 import 'package:flutter/material.dart';
 
 class VSModelInputData extends VSAINOGeneralInputData {
@@ -27,10 +26,8 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
   ///Basic List output interface
   VSModelOutputData({
     required super.type,
-    required this.block,
+    required super.block,
   });
-
-  final BlockModel block;
 
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {
@@ -41,8 +38,6 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
         "task": block.task,
         "params": block.paramsToJson,
       };
-
-      print(apiBody);
 
       return await ApiCall().makeAPICall(block.apiCall!, apiData: apiBody);
     };

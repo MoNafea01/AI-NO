@@ -10,6 +10,7 @@ class ApiCall {
   }) async {
     final dio = Dio();
 
+    print("apiData: $apiData");
     try {
       final response = await dio.post(
         "http://127.0.0.1:8000/api/$endpoint",

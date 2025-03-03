@@ -1,6 +1,6 @@
 import 'package:ai_gen/core/classes/model_class.dart';
 import 'package:ai_gen/features/node_view/data/functions/create_model.dart';
-import 'package:ai_gen/node_package/custom_widgets/vs_text_input_data.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:ai_gen/node_package/data/standard_interfaces/vs_model_interface.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';

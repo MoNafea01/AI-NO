@@ -1,6 +1,6 @@
 import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
 import 'package:ai_gen/features/node_view/data/functions/train_test_split.dart';
-import 'package:ai_gen/node_package/custom_widgets/vs_text_input_data.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:ai_gen/node_package/data/standard_interfaces/vs_list_interface.dart';
 import 'package:ai_gen/node_package/data/standard_interfaces/vs_map_interface.dart';
 import 'package:ai_gen/node_package/data/standard_interfaces/vs_model_interface.dart';

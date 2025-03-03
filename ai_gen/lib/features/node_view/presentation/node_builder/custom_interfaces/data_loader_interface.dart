@@ -1,13 +1,12 @@
-import 'dart:async';
-
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:ai_gen/node_package/data/vs_interface.dart';
 import 'package:flutter/material.dart';
 
-const Color _interfaceColor = Colors.blue;
+const Color _interfaceColor = NodeColors.generalColor;
 
-class VSAINOGeneralInputData extends VSInputData {
+class DataLoaderInputData extends VSInputData {
   ///Basic List input interface
-  VSAINOGeneralInputData({
+  DataLoaderInputData({
     required super.type,
     super.title,
     super.toolTip,
@@ -16,18 +15,15 @@ class VSAINOGeneralInputData extends VSInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [VSAINOGeneralOutputData];
+  List<Type> get acceptedTypes => [DataLoaderOutputData];
 
   @override
   Color get interfaceColor => _interfaceColor;
 }
 
-class VSAINOGeneralOutputData extends VSOutputData {
+class DataLoaderOutputData extends VSOutputData {
   ///Basic List output interface
-  VSAINOGeneralOutputData({
-    required super.type,
-    FutureOr Function(Map<String, dynamic> data)? super.outputFunction,
-  });
+  DataLoaderOutputData({required super.type, super.outputFunction});
 
   @override
   Color get interfaceColor => _interfaceColor;
