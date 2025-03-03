@@ -4,8 +4,8 @@ from ...repositories.node_repository import NodeLoader, NodeSaver
 
 class Evaluator:
     def __init__(self, metric='accuracy', y_true=None, y_pred=None, params=None):
-        self.y_true = NodeLoader()(y_true.get("node_id"))[0] if isinstance(y_true, dict) else y_true
-        self.y_pred = NodeLoader()(y_pred.get("node_id"))[0] if isinstance(y_pred, dict) else y_pred
+        self.y_true = NodeLoader()(y_true.get("node_id")).get('node_data') if isinstance(y_true, dict) else y_true
+        self.y_pred = NodeLoader()(y_pred.get("node_id")).get('node_data') if isinstance(y_pred, dict) else y_pred
         self.params = params if params else {}
         self.metric = metric
         self.payload = self.evaluate(self.y_true, self.y_pred)
@@ -28,7 +28,11 @@ class Evaluator:
     def __str__(self):
         return f"metric: {self.payload}"
     
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
+        return_serialized = kwargs.get("return_serialized", False)
+        if return_serialized:
+            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            self.payload.update({"node_data": node_data})
         return self.payload
 
 if __name__ == "__main__":
