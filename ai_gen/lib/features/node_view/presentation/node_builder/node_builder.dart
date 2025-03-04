@@ -8,8 +8,8 @@ import 'package:ai_gen/features/node_view/presentation/node_builder/custom_inter
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
-import 'custom_interfaces/data_loader_interface.dart';
 import 'custom_interfaces/model_interface.dart';
+import 'custom_interfaces/multi_output_interface.dart';
 
 class NodeBuilder {
   Future<List<Object>> buildBlocks() async {
@@ -23,6 +23,7 @@ class NodeBuilder {
             widgetOffset: offset,
             ref: ref,
           ),
+
       ..._buildCategories(categorizedBlocks),
     ];
   }
@@ -44,15 +45,15 @@ class NodeBuilder {
   // };
 
   List<VSSubgroup> _buildCategories(Map<String, Map> blocksMap) {
-    return _buildSubgroups(blocksMap, _buildTypes);
-  }
+    List<VSSubgroup> buildTasks(Map<String, List<BlockModel>> taskMap) {
+      return _buildSubgroups(taskMap, _buildBlockNodes);
+    }
 
-  List<VSSubgroup> _buildTypes(Map<String, Map> categorizedBlocks) {
-    return _buildSubgroups(categorizedBlocks, _buildTasks);
-  }
+    List<VSSubgroup> buildTypes(Map<String, Map> categorizedBlocks) {
+      return _buildSubgroups(categorizedBlocks, buildTasks);
+    }
 
-  List<VSSubgroup> _buildTasks(Map<String, List<BlockModel>> taskMap) {
-    return _buildSubgroups(taskMap, _buildBlockNodes);
+    return _buildSubgroups(blocksMap, buildTypes);
   }
 
   List<VSSubgroup> _buildSubgroups(
@@ -91,6 +92,9 @@ class NodeBuilder {
     if (inputDot == "model") {
       return VSModelInputData(type: inputDot, initialConnection: ref);
     }
+    if (block.category == "preprocessor") {
+      return VSModelInputData(type: inputDot, initialConnection: ref);
+    }
     return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
   }
 
@@ -102,36 +106,15 @@ class NodeBuilder {
   }
 
   List<VSOutputData> _buildOutputData(BlockModel block) {
-    if (block.nodeName == "data_loader") {
-      Map<String, dynamic>? postResponse;
-      return [
-        DataLoaderOutputData(
-          type: "X",
-          outputFunction: (p0) async {
-            postResponse =
-                await ApiCall().makeAPICall(block.apiCall!, apiData: {});
-            final xResponse = postResponse;
-            xResponse!["node_id"];
-            return xResponse;
-          },
-        ),
-        DataLoaderOutputData(
-          type: "Y",
-          outputFunction: (p0) async {
-            while (postResponse == null) {
-              await Future.delayed(const Duration(milliseconds: 100));
-            }
-            final yResponse = postResponse;
-
-            yResponse!["node_id"];
-            return yResponse;
-          },
-        )
-      ];
+    // if (block.nodeName == "data_loader") {
+    //   return dataLoader(block);
+    // }
+    if (block.outputDots != null && block.outputDots!.length > 1) {
+      return multiOutputNodes(block);
     }
     return block.outputDots?.map(
           (outputDot) {
-            if (outputDot == "model") {
+            if (block.category == "Models") {
               return VSModelOutputData(type: outputDot, block: block);
             }
             if (outputDot == "preprocessor") {
@@ -143,5 +126,55 @@ class NodeBuilder {
           },
         ).toList() ??
         [];
+  }
+
+  List<VSOutputData> multiOutputNodes(BlockModel block) {
+    Map<String, dynamic>? postResponse;
+    final List<VSOutputData> outputData = [];
+
+    for (int i = 0; i < block.outputDots!.length; i++) {
+      if (i == 0) {
+        outputData.add(
+          MultiOutputOutputData(
+            type: block.outputDots![i],
+            outputFunction: (inputData) async {
+              postResponse = null;
+              final Map<String, dynamic> apiBody = {};
+              if (block.nodeName == "data_loader") {
+                apiBody["dataset_name"] = "diabetes";
+              } else {
+                for (var input in inputData.entries) {
+                  apiBody[input.key] = await input.value;
+                }
+              }
+
+              postResponse =
+                  await ApiCall().postAPICall(block.apiCall!, apiData: apiBody);
+
+              dynamic nodeId = postResponse!["node_id"];
+              return await ApiCall()
+                  .getAPICall("${block.apiCall!}?node_id=$nodeId&output=1");
+            },
+          ),
+        );
+        continue;
+      }
+      outputData.add(
+        MultiOutputOutputData(
+          type: block.outputDots![i],
+          outputFunction: (inputData) async {
+            while (postResponse == null) {
+              await Future.delayed(const Duration(milliseconds: 100));
+            }
+
+            dynamic nodeId = postResponse!["node_id"];
+            return await ApiCall().getAPICall(
+              "${block.apiCall!}?node_id=$nodeId&output=2",
+            );
+          },
+        ),
+      );
+    }
+    return outputData;
   }
 }

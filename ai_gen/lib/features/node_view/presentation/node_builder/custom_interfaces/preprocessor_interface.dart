@@ -38,7 +38,7 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
         "params": block.paramsToJson,
       };
 
-      return await ApiCall().makeAPICall(block.apiCall!, apiData: apiBody);
+      return await ApiCall().postAPICall(block.apiCall!, apiData: apiBody);
     };
   }
 

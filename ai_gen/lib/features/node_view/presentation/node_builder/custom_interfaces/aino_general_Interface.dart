@@ -19,7 +19,11 @@ class VSAINOGeneralInputData extends VSInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [VSAINOGeneralOutputData];
+  List<Type> get acceptedTypes => [];
+
+  // to accept all types (like the evaluate node)
+  @override
+  bool acceptInput(VSOutputData? data) => true;
 
   @override
   Color get interfaceColor => _interfaceColor;
@@ -37,15 +41,17 @@ class VSAINOGeneralOutputData extends VSOutputData {
       print("\nNode name: ${block.nodeName}");
       final Map<String, dynamic> apiBody = {};
       for (var input in data.entries) {
-        apiBody[input.key] = input.value;
+        apiBody[input.key] = await input.value;
       }
       // if (block.nodeName == "data_loader") {
       //   print('data_loader');
       //   return {};
       // }
 
+      print("fitter body: $apiBody");
+
       var response =
-          await ApiCall().makeAPICall(block.apiCall!, apiData: apiBody);
+          await ApiCall().postAPICall(block.apiCall!, apiData: apiBody);
       print("response: $response");
       return response;
     };
