@@ -36,7 +36,7 @@ class FitTransform:
 
     def _fit_transform_from_id(self):
         try:
-            preprocessor = NodeLoader()(self.preprocessor.get("node_id"))  # Load preprocessor using ID from database
+            preprocessor = NodeLoader()(self.preprocessor.get("node_id")).get('node_data')  # Load preprocessor using ID from database
             return self._fit_transform_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting and transforming preprocessor by ID: {e}")
@@ -74,11 +74,11 @@ class FitTransform:
     def __call__(self, *args, **kwargs):
         payload = self.payload[0]
         for arg in args:
-            if arg == 'model':
+            if arg == '1':
                 payload = self.payload[1]
                 NodeDeleter()(self.payload[2]['node_id'])
                 NodeDeleter()(self.payload[0]['node_id'])
-            elif arg == 'data':
+            elif arg == '2':
                 payload = self.payload[2]
                 NodeDeleter()(self.payload[1]['node_id'])
                 NodeDeleter()(self.payload[0]['node_id'])
