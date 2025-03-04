@@ -31,6 +31,7 @@ urlpatterns = [
     path('save_node/', NodeSaveAPIView.as_view(), name='save_node'),
     path('load_node/', NodeLoaderAPIView.as_view(), name='load_node'),
     path('clear_nodes/', ClearNodesAPIView.as_view(), name='clear_nodes'),
+    path('clear_components/', ClearComponentsAPIView.as_view(), name='clear_components'),
 
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
     path('components/', component_list, name='component-list'),
