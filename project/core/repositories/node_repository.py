@@ -14,7 +14,8 @@ Saving(to db):
     Object     -> I/O Object | dump it into IO buffer using joblib
     I/O Object -> Binary     | read buffer
     Binary     -> DB         | save method
----------------------------                         
+
+
 Loading(from db):                
     DB         -> Binary     | get method
     Binary     -> I/O Object | pass it to BytesIO
@@ -280,6 +281,7 @@ class NodeUpdater:
             payload: dict, 
             return_serialized: bool = False
             ) -> tuple:
+
         if not node_id:
             raise ValueError("Node ID must be provided.")
         node_id = int(node_id) if node_id else None
@@ -321,6 +323,7 @@ class NodeUpdater:
                 for i, f in enumerate(folders, 1):
                     config = NodeLoader()(original_id+i,from_db=True)   # returns new node's payload
                     config.pop("node_id")                               # we don't need its id
+
                     f_path = NodeDirectoryManager.get_nodes_dir(f)
                     # id for new node (not necessary as its id should be like old one)
                     tmp_id = original_id + i
@@ -331,6 +334,7 @@ class NodeUpdater:
 
                     # The following section is important
                     # it saves payload with new changes while appending its data to the original one
+
                     new_payload = payload.copy()
                     new_payload['node_id'] = new_id
                     new_payload['node_data'] = data
@@ -346,6 +350,7 @@ class NodeUpdater:
                     NodeDeleter()(tmp_id)
             
             # now we assign the old node's id for the new node so it takes same identifier
+
             payload['node_id'] = node_id
             NodeSaver()(payload, path=folder_path)      # ...وتوتة توتة خلصت الحدوتة الحمدلله
             NodeDeleter()(original_id, is_special_case, is_multi_channel)
@@ -355,6 +360,7 @@ class NodeUpdater:
                 delete_node_file(node.node_name, node.node_id,folder)
 
             # serialization part
+
             node_data = NodeLoader()(node_id, from_db=True, return_serialized=return_serialized).get('node_data')
             message = f"Node {node_id} updated."
             payload.update({"message": message, "node_data": node_data})
