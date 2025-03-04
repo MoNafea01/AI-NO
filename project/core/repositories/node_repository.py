@@ -14,7 +14,8 @@ Saving(to db):
     Object     -> I/O Object | dump it into IO buffer using joblib
     I/O Object -> Binary     | read buffer
     Binary     -> DB         | save method
---------                         
+
+
 Loading(from db):                
     DB         -> Binary     | get method
     Binary     -> I/O Object | pass it to BytesIO
@@ -199,7 +200,6 @@ class NodeLoader:
 
 
 
-
 class NodeDeleter:
     """
     ### This Class can only be called \n
@@ -255,7 +255,6 @@ class NodeDeleter:
                         if node.exists():
                             node.delete()
                             delete_node_file(node_name, node_id + i, folder)
-
 
             return True, f"Node {node_id} deleted."
         except ObjectDoesNotExist:
