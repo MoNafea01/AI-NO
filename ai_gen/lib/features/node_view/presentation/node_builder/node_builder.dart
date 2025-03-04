@@ -89,10 +89,10 @@ class NodeBuilder {
 
   VSInputData _inputDots(
       BlockModel block, String inputDot, VSOutputData<dynamic>? ref) {
-    if (inputDot == "model") {
+    if (inputDot == "model" || inputDot == "fittedModel") {
       return VSModelInputData(type: inputDot, initialConnection: ref);
     }
-    if (block.category == "preprocessor") {
+    if (inputDot == "preprocessor") {
       return VSModelInputData(type: inputDot, initialConnection: ref);
     }
     return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
@@ -121,8 +121,7 @@ class NodeBuilder {
               return VSPreprocessorOutputData(type: outputDot, block: block);
             }
 
-            return VSAINOGeneralOutputData(
-                type: "$outputDot Output", block: block);
+            return VSAINOGeneralOutputData(type: outputDot, block: block);
           },
         ).toList() ??
         [];

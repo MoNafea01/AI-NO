@@ -174,7 +174,7 @@ class PredictAPIView(APIView, NodeQueryMixin):
         serializer = PredictSerializer(data=request.data)
         if serializer.is_valid():
             X = serializer.validated_data.get('X')
-            model = serializer.validated_data.get('model')
+            model = serializer.validated_data.get('fitted_model')
             model_path = serializer.validated_data.get('model_path')
 
             try:
@@ -194,7 +194,7 @@ class PredictAPIView(APIView, NodeQueryMixin):
             if serializer.is_valid():
                 # Extract data from the serializer
                 X = serializer.validated_data.get('X')
-                model = serializer.validated_data.get('model')
+                model = serializer.validated_data.get('fitted_model')
                 model_path = serializer.validated_data.get('model_path')
 
                 # Instantiate Fit and perform the fitting

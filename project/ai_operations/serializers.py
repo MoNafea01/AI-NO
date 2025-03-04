@@ -31,13 +31,13 @@ class FitModelSerializer(serializers.Serializer):
 
 class PredictSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
-    model = serializers.JSONField(required=False)
+    fitted_model = serializers.JSONField(required=False)
     model_path = serializers.CharField(required=False)
     def validate(self, data):
         """
         Ensure at least one of 'model' or 'model_path' is provided.
         """
-        return validate(data, ('model', 'model_path'))
+        return validate(data, ('fitted_model', 'model_path'))
 
 
 class PreprocessorSerializer(serializers.Serializer):

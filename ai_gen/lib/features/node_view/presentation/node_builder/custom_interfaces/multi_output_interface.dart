@@ -3,7 +3,7 @@ import 'package:ai_gen/node_package/data/standard_interfaces/vs_dynamic_interfac
 import 'package:ai_gen/node_package/data/vs_interface.dart';
 import 'package:flutter/material.dart';
 
-const Color _interfaceColor = NodeColors.generalColor;
+const Color _interfaceColor = NodeColors.functionColor;
 
 class MultiOutputInputInterface extends VSInputData {
   ///Basic List input interface
