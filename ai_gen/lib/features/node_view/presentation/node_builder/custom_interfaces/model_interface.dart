@@ -24,19 +24,19 @@ class VSModelInputData extends VSAINOGeneralInputData {
 
 class VSModelOutputData extends VSAINOGeneralOutputData {
   ///Basic List output interface
-  VSModelOutputData({required super.type, required super.block});
+  VSModelOutputData({required super.type, required super.node});
 
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {
     return (Map<String, dynamic> data) async {
       final Map<String, dynamic> apiBody = {
-        "model_name": block.nodeName,
-        "model_type": block.type,
-        "task": block.task,
-        "params": block.paramsToJson,
+        "model_name": node.name,
+        "model_type": node.type,
+        "task": node.task,
+        "params": node.paramsToJson,
       };
 
-      return await ApiCall().postAPICall(block.apiCall!, apiData: apiBody);
+      return await ApiCall().postAPICall(node.apiCall!, apiData: apiBody);
     };
   }
 

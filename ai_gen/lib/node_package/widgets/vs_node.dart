@@ -77,7 +77,7 @@ class _VSNodeState extends State<VSNode> {
         child: Card(
           color: isSelected
               ? Colors.blue
-              :  const Color(0xff349CFE), // ✅ Ensure blue selection
+              : const Color(0xff349CFE), // ✅ Ensure blue selection
           elevation: isSelected ? 10 : 2, // ✅ Add elevation for selected node
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),

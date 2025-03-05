@@ -1,7 +1,7 @@
-import 'package:ai_gen/core/models/block_model/BlockModel.dart';
-import 'package:ai_gen/core/models/block_model/Params.dart';
+import 'package:ai_gen/core/models/node_model/Params.dart';
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
-import 'package:ai_gen/features/node_view/data/serialization/block_serializer.dart';
+import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/preprocessor_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
@@ -12,9 +12,9 @@ import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
 
 class NodeBuilder {
-  Future<List<Object>> buildBlocks() async {
-    final Map<String, Map<String, Map<String, List<BlockModel>>>>
-        categorizedBlocks = await BlockSerializer().categorizeBlocks();
+  Future<List<Object>> buildNodesMenu() async {
+    final Map<String, Map<String, Map<String, List<NodeModel>>>> allNodes =
+        await NodeSerializer().categorizeNodes();
 
     return [
       // output node
@@ -24,71 +24,78 @@ class NodeBuilder {
             ref: ref,
           ),
 
-      ..._buildCategories(categorizedBlocks),
+      ..._buildCategorizedNodes(allNodes),
     ];
   }
 
-  // Blocks Scheme
-  // Map<String, Map<String, Map<String, List<BlockModel>>>> mapScheme = {
+  // Nodes Scheme
+  // Map<String, Map<String, Map<String, List<NodeModel>>>> mapScheme = {
   //   "Models": {
-  //     "linear_models": {
-  //       "regression": [BlockModel(), BlockModel()],
-  //       "classification": [BlockModel()],
-  //       "clustering": [BlockModel()],
-  //     },
-  //     "svm": {
-  //       "regression": [BlockModel(), BlockModel()],
-  //       "classification": [BlockModel()],
-  //       "clustering": [BlockModel()],
-  //     }
+  //        "linear_models": {
+  //                "regression": [NodeModel(), NodeModel()],
+  //                "classification": [NodeModel()],
+  //          },
+  //          "svm": {
+  //                "regression": [NodeModel(), NodeModel()],
+  //                "classification": [NodeModel()],
+  //                "clustering": [NodeModel()],
+  //          }
   //   },
   // };
 
-  List<VSSubgroup> _buildCategories(Map<String, Map> blocksMap) {
-    List<VSSubgroup> buildTasks(Map<String, List<BlockModel>> taskMap) {
-      return _buildSubgroups(taskMap, _buildBlockNodes);
-    }
+  // first subgroup that contains the types
+  List<VSSubgroup> _buildCategorizedNodes(Map<String, Map> allNodes) {
+    return _buildSubgroups(allNodes, _buildTypes);
+  }
 
-    List<VSSubgroup> buildTypes(Map<String, Map> categorizedBlocks) {
-      return _buildSubgroups(categorizedBlocks, buildTasks);
-    }
+  // second subgroup that contains the tasks
+  List<VSSubgroup> _buildTypes(Map<String, Map> nodesCategory) {
+    return _buildSubgroups(nodesCategory, _buildTasks);
+  }
 
-    return _buildSubgroups(blocksMap, buildTypes);
+  // third subgroup that contains the nodes
+  List<VSSubgroup> _buildTasks(Map<String, List<NodeModel>> nodesType) {
+    return _buildSubgroups(nodesType, _buildNodes);
   }
 
   List<VSSubgroup> _buildSubgroups(
-      Map<String, dynamic> blocksCategory, Function buildFunction) {
-    return blocksCategory.entries.map((entry) {
-      final name = entry.key;
-      final value = entry.value;
-      final subgroups = buildFunction(value);
-      return VSSubgroup(name: name, subgroup: subgroups);
+    Map<String, dynamic> category,
+    Function group,
+  ) {
+    return category.entries.map((entry) {
+      final String name = entry.key;
+      final List<dynamic> subgroup = group(entry.value);
+      return VSSubgroup(name: name, subgroup: subgroup);
     }).toList();
   }
 
-  List<Function(Offset, VSOutputData?)> _buildBlockNodes(
-      List<BlockModel> blocksList) {
-    return blocksList.map((BlockModel block) {
-      return (Offset offset, VSOutputData? ref) => VSNodeData(
-            type: block.nodeName!,
-            widgetOffset: offset,
-            inputData: _buildInputData(block, ref),
-            outputData: _buildOutputData(block),
-          );
-    }).toList();
+  // build the last List of nodes
+  List<Function(Offset, VSOutputData?)> _buildNodes(List<NodeModel> nodesList) {
+    return nodesList.map((NodeModel node) => _buildNode(node)).toList();
   }
 
-  List<VSInputData> _buildInputData(BlockModel block, VSOutputData? ref) {
+  //build the node itself
+  Function(Offset, VSOutputData?) _buildNode(NodeModel node) {
+    return (Offset offset, VSOutputData? ref) {
+      return VSNodeData(
+        type: node.name,
+        widgetOffset: offset,
+        inputData: _buildInputData(node, ref),
+        outputData: _buildOutputData(node),
+      );
+    };
+  }
+
+  List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      if (block.nodeName == "data_loader")
-        ...block.params?.map(_paramInput) ?? [],
-      ...block.inputDots?.map((inputDot) => _inputDots(block, inputDot, ref)) ??
+      if (node.name == "data_loader") ...node.params?.map(_paramInput) ?? [],
+      ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
           [],
     ];
   }
 
   VSInputData _inputDots(
-      BlockModel block, String inputDot, VSOutputData<dynamic>? ref) {
+      NodeModel node, String inputDot, VSOutputData<dynamic>? ref) {
     if (inputDot == "model" || inputDot == "fittedModel") {
       return VSModelInputData(type: inputDot, initialConnection: ref);
     }
@@ -105,41 +112,38 @@ class NodeBuilder {
     return VsTextInputData(type: param.name, controller: controller);
   }
 
-  List<VSOutputData> _buildOutputData(BlockModel block) {
-    // if (block.nodeName == "data_loader") {
-    //   return dataLoader(block);
-    // }
-    if (block.outputDots != null && block.outputDots!.length > 1) {
-      return multiOutputNodes(block);
+  List<VSOutputData> _buildOutputData(NodeModel node) {
+    if (node.outputDots != null && node.outputDots!.length > 1) {
+      return multiOutputNodes(node);
     }
-    return block.outputDots?.map(
+    return node.outputDots?.map(
           (outputDot) {
-            if (block.category == "Models") {
-              return VSModelOutputData(type: outputDot, block: block);
+            if (node.category == "Models") {
+              return VSModelOutputData(type: outputDot, node: node);
             }
             if (outputDot == "preprocessor") {
-              return VSPreprocessorOutputData(type: outputDot, block: block);
+              return VSPreprocessorOutputData(type: outputDot, node: node);
             }
 
-            return VSAINOGeneralOutputData(type: outputDot, block: block);
+            return VSAINOGeneralOutputData(type: outputDot, node: node);
           },
         ).toList() ??
         [];
   }
 
-  List<VSOutputData> multiOutputNodes(BlockModel block) {
+  List<VSOutputData> multiOutputNodes(NodeModel node) {
     Map<String, dynamic>? postResponse;
     final List<VSOutputData> outputData = [];
 
-    for (int i = 0; i < block.outputDots!.length; i++) {
+    for (int i = 0; i < node.outputDots!.length; i++) {
       if (i == 0) {
         outputData.add(
           MultiOutputOutputData(
-            type: block.outputDots![i],
+            type: node.outputDots![i],
             outputFunction: (inputData) async {
               postResponse = null;
               final Map<String, dynamic> apiBody = {};
-              if (block.nodeName == "data_loader") {
+              if (node.name == "data_loader") {
                 apiBody["dataset_name"] = "diabetes";
               } else {
                 for (var input in inputData.entries) {
@@ -148,11 +152,11 @@ class NodeBuilder {
               }
 
               postResponse =
-                  await ApiCall().postAPICall(block.apiCall!, apiData: apiBody);
+                  await ApiCall().postAPICall(node.apiCall!, apiData: apiBody);
 
               dynamic nodeId = postResponse!["node_id"];
               return await ApiCall()
-                  .getAPICall("${block.apiCall!}?node_id=$nodeId&output=1");
+                  .getAPICall("${node.apiCall!}?node_id=$nodeId&output=1");
             },
           ),
         );
@@ -160,7 +164,7 @@ class NodeBuilder {
       }
       outputData.add(
         MultiOutputOutputData(
-          type: block.outputDots![i],
+          type: node.outputDots![i],
           outputFunction: (inputData) async {
             while (postResponse == null) {
               await Future.delayed(const Duration(milliseconds: 100));
@@ -168,7 +172,7 @@ class NodeBuilder {
 
             dynamic nodeId = postResponse!["node_id"];
             return await ApiCall().getAPICall(
-              "${block.apiCall!}?node_id=$nodeId&output=2",
+              "${node.apiCall!}?node_id=$nodeId&output=2",
             );
           },
         ),

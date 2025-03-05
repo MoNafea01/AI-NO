@@ -1,9 +1,9 @@
 import 'Params.dart';
 
-class BlockModel {
+class NodeModel {
   num? id;
   int? index;
-  String? nodeName;
+  String name;
   String? displayName;
   String category;
   String type;
@@ -13,9 +13,9 @@ class BlockModel {
   List<String>? outputDots;
   String? apiCall;
 
-  BlockModel({
+  NodeModel({
     this.id,
-    this.nodeName,
+    this.name = "Node",
     this.displayName,
     this.category = "others",
     this.type = "others",
@@ -26,14 +26,15 @@ class BlockModel {
     this.apiCall,
   });
 
-  BlockModel.fromJson(dynamic json)
-      : category = json['category'] ?? "cat ${json['id']}",
+  NodeModel.fromJson(dynamic json)
+      : name = json['node_name'] ?? "Node",
+        category = json['category'] ?? "cat ${json['id']}",
         type = json['node_type'] ?? "type ${json['id']}",
         task = json['task'] ?? "task ${json['id']}" {
     if (json['id'] != null) id = num.parse(json['id'].toString());
     if (json['idx'] != null) index = int.parse(json['idx'].toString());
-    nodeName = json['node_name'] ?? "Node";
-    displayName = json['display_name'] ?? nodeName;
+
+    displayName = json['display_name'] ?? name;
 
     if (json['params'] != null) {
       params = (json['params'] as List)
@@ -54,7 +55,7 @@ class BlockModel {
     final Map<String, dynamic> json = <String, dynamic>{};
     json['id'] = id;
     json['idx'] = index;
-    json['node_name'] = nodeName;
+    json['node_name'] = name;
     json['display_name'] = displayName;
     json['category'] = category;
     json['node_type'] = type;

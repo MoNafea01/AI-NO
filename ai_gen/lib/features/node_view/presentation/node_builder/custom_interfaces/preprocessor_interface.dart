@@ -26,19 +26,19 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
   ///Basic List output interface
   VSPreprocessorOutputData({
     required super.type,
-    required super.block,
+    required super.node,
   });
 
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {
     return (Map<String, dynamic> data) async {
       final Map<String, dynamic> apiBody = {
-        "node_name": block.nodeName,
-        "node_type": block.type,
-        "params": block.paramsToJson,
+        "node_name": node.name,
+        "node_type": node.type,
+        "params": node.paramsToJson,
       };
 
-      return await ApiCall().postAPICall(block.apiCall!, apiData: apiBody);
+      return await ApiCall().postAPICall(node.apiCall!, apiData: apiBody);
     };
   }
 

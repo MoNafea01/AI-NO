@@ -1,4 +1,4 @@
-import 'package:ai_gen/core/models/block_model/BlockModel.dart';
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:dio/dio.dart';
 
 import 'network_constants.dart';
@@ -9,19 +9,19 @@ class ServerCalls {
 
   final Dio dio = Dio();
 
-  Future<List<BlockModel>> getBlocks() async {
+  Future<List<NodeModel>> getNodes() async {
     try {
       final Response response = await dio.get("$_baseURL/$_allComponentsApi");
-      List<BlockModel> blocks = [];
+      List<NodeModel> nodes = [];
 
       if (response.statusCode == 200) {
         if (response.data != null) {
-          response.data.forEach((blockData) {
-            BlockModel blockModel = BlockModel.fromJson(blockData);
-            blocks.add(blockModel);
+          response.data.forEach((nodeData) {
+            NodeModel node = NodeModel.fromJson(nodeData);
+            nodes.add(node);
           });
 
-          return blocks;
+          return nodes;
         } else {
           throw Exception('server error: response data is null');
         }

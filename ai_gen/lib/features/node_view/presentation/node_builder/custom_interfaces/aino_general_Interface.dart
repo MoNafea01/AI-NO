@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ai_gen/core/models/block_model/BlockModel.dart';
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:ai_gen/node_package/data/vs_interface.dart';
@@ -32,13 +32,13 @@ class VSAINOGeneralInputData extends VSInputData {
 class VSAINOGeneralOutputData extends VSOutputData {
   ///Basic List output interface
   VSAINOGeneralOutputData(
-      {required super.type, required this.block, super.outputFunction});
+      {required super.type, required this.node, super.outputFunction});
 
-  final BlockModel block;
+  final NodeModel node;
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {
     return (data) async {
-      print("\nNode name: ${block.nodeName}");
+      print("\nNode name: ${node.name}");
       final Map<String, dynamic> apiBody = {};
       for (var input in data.entries) {
         apiBody[input.key] = await input.value;
@@ -51,7 +51,7 @@ class VSAINOGeneralOutputData extends VSOutputData {
       print("fitter body: $apiBody");
 
       var response =
-          await ApiCall().postAPICall(block.apiCall!, apiData: apiBody);
+          await ApiCall().postAPICall(node.apiCall!, apiData: apiBody);
       print("response: $response");
       return response;
     };
