@@ -34,7 +34,7 @@ class NodeModel {
     if (json['id'] != null) id = num.parse(json['id'].toString());
     if (json['idx'] != null) index = int.parse(json['idx'].toString());
 
-    displayName = json['display_name'] ?? name;
+    displayName = json['displayed_name'] ?? name;
 
     if (json['params'] != null) {
       params = (json['params'] as List)
@@ -56,7 +56,7 @@ class NodeModel {
     json['id'] = id;
     json['idx'] = index;
     json['node_name'] = name;
-    json['display_name'] = displayName;
+    json['displayed_name'] = displayName;
     json['category'] = category;
     json['node_type'] = type;
     json['task'] = task;

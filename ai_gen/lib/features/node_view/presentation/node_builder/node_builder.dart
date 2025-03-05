@@ -79,6 +79,8 @@ class NodeBuilder {
     return (Offset offset, VSOutputData? ref) {
       return VSNodeData(
         type: node.name,
+        title: node.displayName,
+        toolTip: "Tool tip hello world",
         widgetOffset: offset,
         inputData: _buildInputData(node, ref),
         outputData: _buildOutputData(node),
