@@ -82,7 +82,7 @@ abstract class VSInputData extends VSInterfaceData {
     return Icon(
       icon,
       key: anchor,
-      color: const Color(0xffE6E6E6),
+      color: interfaceColor,
       size: 18,
     );
   }
@@ -138,7 +138,7 @@ abstract class VSOutputData<T> extends VSInterfaceData {
     }
 
     return Icon(
-      Icons.square,  //-----------------
+      Icons.square, //-----------------
       key: anchor,
       color: const Color(0xffE6E6E6),
       size: 19,

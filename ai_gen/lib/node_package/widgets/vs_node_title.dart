@@ -73,25 +73,20 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
               ),
             ),
             PopupMenuButton<PopupOptions>(
-              tooltip: "",
-              child: const Icon(
-                Icons.more_vert,
-                size: 20,
-              ),
+              tooltip: widget.data.menuToolTip ??
+                  "", // added an optional menu tooltip if needed
+              child: const Icon(Icons.more_vert, size: 20),
               onSelected: (value) {
                 switch (value) {
                   case PopupOptions.rename:
-                    setState(
-                      () => isRenaming = true,
-                    );
+                    setState(() => isRenaming = true);
                     break;
                   case PopupOptions.delete:
-                    VSNodeDataProvider.of(context).removeNodes(
-                      [widget.data],
-                    );
+                    VSNodeDataProvider.of(context).removeNodes([widget.data]);
                     break;
                 }
               },
+
               itemBuilder: (BuildContext context) => [
                 const PopupMenuItem<PopupOptions>(
                   value: PopupOptions.rename,

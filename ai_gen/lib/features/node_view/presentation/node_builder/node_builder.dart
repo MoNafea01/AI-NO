@@ -80,7 +80,8 @@ class NodeBuilder {
       return VSNodeData(
         type: node.name,
         title: node.displayName,
-        toolTip: "Tool tip hello world",
+        toolTip: "Here will be the function guide",
+        menuToolTip: "Optional menu tip",
         widgetOffset: offset,
         inputData: _buildInputData(node, ref),
         outputData: _buildOutputData(node),

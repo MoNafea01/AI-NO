@@ -15,6 +15,7 @@ class VSNodeData {
     this.nodeWidth,
     this.onUpdatedConnection,
     this.toolTip,
+    this.menuToolTip,
     String? title,
   })  : _id = id ?? getRandomString(10),
         _title = title ?? "" {
@@ -58,6 +59,7 @@ class VSNodeData {
 
   ///A tooltip displayed on the widget
   final String? toolTip;
+  final String? menuToolTip;
 
   ///This function gets called when any input interface updates its connected node
   ///
