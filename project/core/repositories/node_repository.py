@@ -14,8 +14,7 @@ Saving(to db):
     Object     -> I/O Object | dump it into IO buffer using joblib
     I/O Object -> Binary     | read buffer
     Binary     -> DB         | save method
-
-
+---------------------------                         
 Loading(from db):                
     DB         -> Binary     | get method
     Binary     -> I/O Object | pass it to BytesIO
@@ -29,14 +28,14 @@ SPECIAL_CASE_NODES = ["fitter_transformer"]
 
 class NodeSaver:
     """
-    ### This Class can only be called \n
-    (no initialization)\n
-    #### It saves the node to the database and path provided.\n
-    ## Takes:
-    payload: dict - The node payload.\n
-    path: str - The path to save the node to.\n
+    ### This Class can only be called   
+    (no initialization)     
+    It saves the node to the database and path provided.   
+    ## Args:
+    - payload (dict) :  The node payload.   
+    path (str) : The path to save the node to.  
     ## Returns: 
-    Dictionary with the message, node_id, node_name, params, task, and node_type.
+    Dictionary with node information.
     """
     def __call__(
             self, 
@@ -100,26 +99,26 @@ class NodeSaver:
 
 class NodeLoader:
     """
-    ### This Class can only be called \n
-    (no initialization)\n
-    #### it can load a node by its id from database or through its path\n
-    ## Takes: \n
-    node_id: int - id for node in database \n
-    path: str - node path in your device (accepts pkl files only) \n 
-    from_db: bool - this term maybe misleading but the meaning of it that 
-    you want to return payload information from database (it's important 
-    for you determine if you want to return NodeLoader payload or the loaded 
-    node payload instead) if true return node payload, else returns
-    node loader payload \n 
-    return_serialized: bool - returns data as serialized version (base64) \n 
-    return_bytes: bool - return node data as binary (not object) \n
-    ## Returns \n
-    Payload: dict - with node informations
-    ### Example: \n
-    ``` NodeLoader()(node_id=node_id, from_db=True) 
-    output: {"node_name": "logistic_regression",...}\n
-    NodeLoader()(node_id=node_id, from_db=False)
-    output: {"node_name": "node_loader",...}
+    ### This Class can only be called   
+    (no initialization)     
+    it can load a node by its id from database or through its path  
+    ## Args: 
+    - node_id (int) : id for node in database 
+    - path (str) : node path in your device (accepts pkl files only) 
+    - from_db (bool) : this term maybe misleading but the meaning of it that    
+    you want to return payload information from database (it's important    
+    for you determine if you want to return NodeLoader payload or the loaded    
+    node payload instead) if true return node payload, else returns 
+    node loader payload     
+    - return_serialized (bool) : returns data as serialized version (base64)    
+    return_bytes (bool) : return node data as binary (not object)   
+    ## Returns 
+    Payload (dict) : with node information
+    ### Example: 
+        - NodeLoader()(node_id=node_id, from_db=True)     
+        output: {"node_name": "logistic_regression",...}    
+        - NodeLoader()(node_id=node_id, from_db=False)    
+        output: {"node_name": "node_loader",...}
     """
     def __call__(
             self, 
@@ -202,19 +201,20 @@ class NodeLoader:
 
 class NodeDeleter:
     """
-    ### This Class can only be called \n
-    (no initialization)\n
-    ## Takes: \n 
-    node_id: int - id for node from database\n
-    is_special_case: bool - for nodes have files in distinguished directories \n
-    is_multiple_channel: bool - for nodes haved multiple files at same directory\n
-    to delete a node, it's an easy task if the data is saved in database only, 
-    but our software also saves it into a backup folder organized 
-    into 3 main categories: {models, preprocessors, data},
-    so our task is much harder we need to identify if this node saves its 
-    files into multiple directories (special_case), and identify if it saves
+    ### This Class can only be called   
+    (no initialization) 
+    ## Args:    
+    - node_id (int) : id for node from database   
+    - is_special_case (bool) : for nodes have files in distinguished directories   
+    - is_multiple_channel (bool) : for nodes haved multiple files at same directory   
+    ## Description:
+    To delete a node, it's an easy task if the data is saved in database only,  
+    but our software also saves it into a backup folder organized   
+    into 3 main categories: {models, preprocessors, data},  
+    so our task is much harder we need to identify if this node saves its   
+    files into multiple directories (special_case), and identify if it saves    
     multiple files or not (multiple_channel) 
-    ## Returns: \n
+    ## Returns: 
     success message
     """
     def __call__(
@@ -266,13 +266,13 @@ class NodeDeleter:
 
 class NodeUpdater:
     """
-    ### This Class can only be called \n
-    (no initialization)\n
-    ## Takes: \n
-    node_id: int - id for node in database \n
-    paload: dict - node info \n
-    return_serialized: bool - return data in serialized version (base64)
-    ## Returns: \n
+    ### This Class can only be called   
+    (no initialization)     
+    ## Args:   
+    node_id (int) : id for node in database     
+    payload (dict) : node info    
+    return_serialized (bool) : return data in serialized version (base64)
+    ## Returns: 
     success message
     """
     def __call__(
@@ -281,7 +281,6 @@ class NodeUpdater:
             payload: dict, 
             return_serialized: bool = False
             ) -> tuple:
-
         if not node_id:
             raise ValueError("Node ID must be provided.")
         node_id = int(node_id) if node_id else None
@@ -323,7 +322,6 @@ class NodeUpdater:
                 for i, f in enumerate(folders, 1):
                     config = NodeLoader()(original_id+i,from_db=True)   # returns new node's payload
                     config.pop("node_id")                               # we don't need its id
-
                     f_path = NodeDirectoryManager.get_nodes_dir(f)
                     # id for new node (not necessary as its id should be like old one)
                     tmp_id = original_id + i
@@ -334,7 +332,6 @@ class NodeUpdater:
 
                     # The following section is important
                     # it saves payload with new changes while appending its data to the original one
-
                     new_payload = payload.copy()
                     new_payload['node_id'] = new_id
                     new_payload['node_data'] = data
@@ -350,7 +347,6 @@ class NodeUpdater:
                     NodeDeleter()(tmp_id)
             
             # now we assign the old node's id for the new node so it takes same identifier
-
             payload['node_id'] = node_id
             NodeSaver()(payload, path=folder_path)      # ...وتوتة توتة خلصت الحدوتة الحمدلله
             NodeDeleter()(original_id, is_special_case, is_multi_channel)
@@ -360,7 +356,6 @@ class NodeUpdater:
                 delete_node_file(node.node_name, node.node_id,folder)
 
             # serialization part
-
             node_data = NodeLoader()(node_id, from_db=True, return_serialized=return_serialized).get('node_data')
             message = f"Node {node_id} updated."
             payload.update({"message": message, "node_data": node_data})
