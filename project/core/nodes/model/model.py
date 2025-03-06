@@ -15,7 +15,10 @@ class Model:
         self.model_type = model_type
         self.task = task
         self.model_path = model_path
-        self.params = params if params else self._get_default_params()
+        default_params = self._get_default_params()
+        default_params.update(params) if params else {}
+        print(default_params)
+        self.params = default_params
         self.payload = self._create_model()
 
     def _get_default_params(self) -> BaseEstimator:

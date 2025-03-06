@@ -3,10 +3,9 @@ from ..configs.metrics import METRICS as metrics
 from ...repositories.node_repository import NodeLoader, NodeSaver
 
 class Evaluator:
-    def __init__(self, metric='accuracy', y_true=None, y_pred=None, params=None):
+    def __init__(self, metric='accuracy', y_true=None, y_pred=None):
         self.y_true = NodeLoader()(y_true.get("node_id")).get('node_data') if isinstance(y_true, dict) else y_true
         self.y_pred = NodeLoader()(y_pred.get("node_id")).get('node_data') if isinstance(y_pred, dict) else y_pred
-        self.params = params if params else {}
         self.metric = metric
         self.payload = self.evaluate(self.y_true, self.y_pred)
 
