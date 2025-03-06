@@ -48,12 +48,15 @@ class _NodeViewState extends State<NodeView> {
                 _evaluateButton(),
                 if (results != null)
                   ...results!.map(
-                    (e) => Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(e),
-                      ),
-                    ),
+                    (scopeOutput) {
+                      scopeOutput = scopeOutput.replaceAll(",", ",\n");
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(scopeOutput),
+                        ),
+                      );
+                    },
                   ),
               ],
             ),

@@ -6,6 +6,7 @@ class NodeModel {
   int? index;
   String name;
   String? displayName;
+  String? description;
   String category;
   String type;
   String task;
@@ -19,6 +20,7 @@ class NodeModel {
     this.index,
     this.name = "Node",
     this.displayName,
+    this.description,
     this.category = "others",
     this.type = "others",
     this.task = "others",
@@ -47,6 +49,7 @@ class NodeModel {
       index: index ?? this.index,
       name: name ?? this.name,
       displayName: displayName ?? this.displayName,
+      description: description,
       category: category ?? this.category,
       type: type ?? this.type,
       task: task ?? this.task,
@@ -66,6 +69,7 @@ class NodeModel {
     if (json['idx'] != null) index = int.parse(json['idx'].toString());
 
     displayName = json['displayed_name'] ?? name;
+    description = json['description'];
 
     if (json['params'] != null) {
       params = (json['params'] as List)
@@ -88,6 +92,7 @@ class NodeModel {
     json['idx'] = index;
     json['node_name'] = name;
     json['displayed_name'] = displayName;
+    json['description'] = description;
     json['category'] = category;
     json['node_type'] = type;
     json['task'] = task;

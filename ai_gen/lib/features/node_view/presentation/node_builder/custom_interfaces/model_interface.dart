@@ -36,7 +36,7 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
         "params": node.paramsToJson,
       };
 
-      return await ApiCall().runNode(node, apiData: apiBody);
+      return await ApiCall().runNode(node, apiBody);
     };
   }
 

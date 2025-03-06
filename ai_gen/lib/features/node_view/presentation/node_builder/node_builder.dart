@@ -78,10 +78,11 @@ class NodeBuilder {
   Function(Offset, VSOutputData?) _buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
       NodeModel newNode = node.copyWith();
+      print(newNode.description);
       return VSNodeData(
         type: newNode.name,
         title: newNode.displayName,
-        toolTip: "``Here will be the function guide",
+        toolTip: newNode.description,
         menuToolTip: "Optional menu tip",
         widgetOffset: offset,
         inputData: _buildInputData(newNode, ref),
@@ -159,11 +160,10 @@ class NodeBuilder {
                 }
               }
 
-              postResponse = await ApiCall().runNode(node, apiData: apiBody);
+              postResponse = await ApiCall().runNode(node, apiBody);
 
               node.nodeId = postResponse!["node_id"];
-              return await ApiCall()
-                  .getAPICall("${node.apiCall!}?node_id=${node.id}&output=1");
+              return await ApiCall().getNode(node, 1);
             },
           ),
         );
@@ -178,9 +178,7 @@ class NodeBuilder {
             }
 
             node.id = postResponse!["node_id"];
-            return await ApiCall().getAPICall(
-              "${node.apiCall!}?node_id=${node.id}&output=2",
-            );
+            return await ApiCall().getNode(node, 2);
           },
         ),
       );
