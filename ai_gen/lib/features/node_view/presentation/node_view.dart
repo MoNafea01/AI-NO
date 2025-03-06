@@ -17,7 +17,6 @@ class _NodeViewState extends State<NodeView> {
 
   @override
   void initState() {
-   
     nodeDataProvider = VSNodeDataProvider(
       nodeManager: VSNodeManager(nodeBuilders: widget.nodeBuilder),
     );
@@ -59,19 +58,7 @@ class _NodeViewState extends State<NodeView> {
               ],
             ),
           ),
-          _testButton(),
         ],
-      ),
-    );
-  }
-
-  Positioned _testButton() {
-    return Positioned(
-      bottom: 50,
-      left: 10,
-      child: ElevatedButton(
-        onPressed: () {},
-        child: const Text("Test"),
       ),
     );
   }
@@ -79,7 +66,8 @@ class _NodeViewState extends State<NodeView> {
   ElevatedButton _evaluateButton() {
     return ElevatedButton(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(const Color(0xff4CAF4F)),
+        backgroundColor:
+            WidgetStateProperty.all<Color>(const Color(0xff4CAF4F)),
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             side: const BorderSide(
@@ -104,14 +92,16 @@ class _NodeViewState extends State<NodeView> {
       child: Container(
         width: 80,
         height: 60,
-        decoration:BoxDecoration(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-        ) ,
+        ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-        Icon(Icons.play_arrow,color: Colors.white,)
-            ,
+            Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+            ),
             Text(
               "Run",
               style: TextStyle(color: Colors.white, fontSize: 17),

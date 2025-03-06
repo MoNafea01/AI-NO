@@ -1,8 +1,9 @@
+import 'dart:ui';
+
 import 'package:ai_gen/node_package/common.dart';
 import 'package:ai_gen/node_package/data/offset_extension.dart';
 import 'package:ai_gen/node_package/data/vs_interface.dart';
 import 'package:ai_gen/node_package/data/vs_node_manager.dart';
-import 'package:flutter/gestures.dart';
 
 class VSNodeData {
   ///Holds all relevant node data
@@ -12,6 +13,7 @@ class VSNodeData {
     required this.widgetOffset,
     required this.inputData,
     required this.outputData,
+    this.deleteAction,
     this.nodeWidth,
     this.onUpdatedConnection,
     this.toolTip,
@@ -26,6 +28,8 @@ class VSNodeData {
       value.nodeData = this;
     }
   }
+
+  final VoidCallback? deleteAction;
 
   ///The nodes ID
   ///

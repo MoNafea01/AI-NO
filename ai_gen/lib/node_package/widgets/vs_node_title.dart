@@ -82,6 +82,7 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
                     setState(() => isRenaming = true);
                     break;
                   case PopupOptions.delete:
+                    widget.data.deleteAction?.call();
                     VSNodeDataProvider.of(context).removeNodes([widget.data]);
                     break;
                 }

@@ -50,8 +50,7 @@ class VSAINOGeneralOutputData extends VSOutputData {
 
       print("fitter body: $apiBody");
 
-      var response =
-          await ApiCall().postAPICall(node.apiCall!, apiData: apiBody);
+      var response = await ApiCall().runNode(node, apiData: apiBody);
       print("response: $response");
       return response;
     };

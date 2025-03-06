@@ -1,6 +1,5 @@
-import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
-import 'package:ai_gen/features/node_view/data/functions/train_test_split.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
+import 'package:ai_gen/features/node_view/presentation/old_node_builder/old_apicalls/train_test_split.dart';
 import 'package:ai_gen/node_package/data/standard_interfaces/vs_list_interface.dart';
 import 'package:ai_gen/node_package/data/standard_interfaces/vs_map_interface.dart';
 import 'package:ai_gen/node_package/data/standard_interfaces/vs_model_interface.dart';
@@ -44,7 +43,8 @@ class FunctionsSubgroup extends VSSubgroup {
           type: "Fitted data",
           outputFunction: (data) async {
             data["data"] = await data["data"];
-            Map<String, dynamic> predictions = await ApiCall().fit_preprocessor(
+            Map<String, dynamic> predictions =
+                await OldApiCall().fit_preprocessor(
               data["data"],
               data["preprocessor"],
             );
@@ -77,7 +77,7 @@ class FunctionsSubgroup extends VSSubgroup {
           type: "transformed",
           outputFunction: (data) async {
             data["data"] = await data["data"];
-            Map<String, dynamic> predictions = await ApiCall().transform(
+            Map<String, dynamic> predictions = await OldApiCall().transform(
               data["data"],
               data["preprocessor"],
             );
@@ -109,7 +109,7 @@ class FunctionsSubgroup extends VSSubgroup {
           type: "predictions",
           outputFunction: (data) async {
             data["Model"] = await data["Model"];
-            Map<String, dynamic> predictions = await ApiCall().predict(
+            Map<String, dynamic> predictions = await OldApiCall().predict(
               data["Model"],
               data["X"],
             );
@@ -147,7 +147,7 @@ class FunctionsSubgroup extends VSSubgroup {
           outputFunction: (data) async {
             print("Fitted Model $data");
             data["Model"] = await data["Model"];
-            Map<String, dynamic> fittedModel = await ApiCall().fitModel(
+            Map<String, dynamic> fittedModel = await OldApiCall().fitModel(
               data["Model"],
               data["X"],
               data["Y"],
@@ -162,7 +162,7 @@ class FunctionsSubgroup extends VSSubgroup {
 
   static VSWidgetNode _trainTestSplit(
       Offset offset, VSOutputData<dynamic>? ref) {
-    Future<Map<String, List<double>>>? splitDataFuture;
+    Future<Map<String, dynamic>>? splitDataFuture;
     final testSizeController = TextEditingController()..text = "0.5";
     final randomStateController = TextEditingController()..text = "2";
     return VSWidgetNode(
@@ -189,12 +189,12 @@ class FunctionsSubgroup extends VSSubgroup {
           type: "X_train",
           outputFunction: (data) async {
             data["data"] = await data["data"];
-            splitDataFuture = trainTestSplit(
+            splitDataFuture = OldApiCall().trainTestSplit(
               data["data"],
               testSize: double.parse(testSizeController.text),
               randomState: int.parse(randomStateController.text),
             );
-            Map<String, List<double>> splitData = await splitDataFuture!;
+            Map<String, dynamic> splitData = await splitDataFuture!;
 
             return splitData['X_train']!;
           },
@@ -204,9 +204,9 @@ class FunctionsSubgroup extends VSSubgroup {
           outputFunction: (data) async {
             data["data"] = await data["data"];
 
-            splitDataFuture ??= trainTestSplit(data["data"]);
+            splitDataFuture ??= OldApiCall().trainTestSplit(data["data"]);
 
-            Map<String, List<double>> splitData = await splitDataFuture!;
+            Map<String, dynamic> splitData = await splitDataFuture!;
 
             return splitData['X_test']!;
           },

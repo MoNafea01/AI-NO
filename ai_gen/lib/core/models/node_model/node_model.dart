@@ -2,6 +2,7 @@ import 'Params.dart';
 
 class NodeModel {
   num? id;
+  dynamic nodeId;
   int? index;
   String name;
   String? displayName;
@@ -15,6 +16,7 @@ class NodeModel {
 
   NodeModel({
     this.id,
+    this.index,
     this.name = "Node",
     this.displayName,
     this.category = "others",
@@ -25,6 +27,35 @@ class NodeModel {
     this.outputDots,
     this.apiCall,
   });
+
+  NodeModel copyWith({
+    num? id,
+    dynamic nodeId,
+    int? index,
+    String? name,
+    String? displayName,
+    String? category,
+    String? type,
+    String? task,
+    List<Params>? params,
+    List<String>? inputDots,
+    List<String>? outputDots,
+    String? apiCall,
+  }) {
+    return NodeModel(
+      id: id ?? this.id,
+      index: index ?? this.index,
+      name: name ?? this.name,
+      displayName: displayName ?? this.displayName,
+      category: category ?? this.category,
+      type: type ?? this.type,
+      task: task ?? this.task,
+      params: params ?? this.params,
+      inputDots: inputDots ?? this.inputDots,
+      outputDots: outputDots ?? this.outputDots,
+      apiCall: apiCall ?? this.apiCall,
+    );
+  }
 
   NodeModel.fromJson(dynamic json)
       : name = json['node_name'] ?? "Node",

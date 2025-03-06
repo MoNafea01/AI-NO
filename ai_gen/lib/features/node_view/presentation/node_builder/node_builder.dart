@@ -19,7 +19,7 @@ class NodeBuilder {
     return [
       // output node
       (Offset offset, VSOutputData? ref) => VSOutputNode(
-            type: "Evaluate",
+            type: "Scope",
             widgetOffset: offset,
             ref: ref,
           ),
@@ -77,21 +77,25 @@ class NodeBuilder {
   //build the node itself
   Function(Offset, VSOutputData?) _buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
+      NodeModel newNode = node.copyWith();
       return VSNodeData(
-        type: node.name,
-        title: node.displayName,
-        toolTip: "Here will be the function guide",
+        type: newNode.name,
+        title: newNode.displayName,
+        toolTip: "``Here will be the function guide",
         menuToolTip: "Optional menu tip",
         widgetOffset: offset,
-        inputData: _buildInputData(node, ref),
-        outputData: _buildOutputData(node),
+        inputData: _buildInputData(newNode, ref),
+        outputData: _buildOutputData(newNode),
+        deleteAction: () {
+          newNode.nodeId != null ? ApiCall().deleteNode(newNode.nodeId) : null;
+        },
       );
     };
   }
 
   List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      if (node.name == "data_loader") ...node.params?.map(_paramInput) ?? [],
+      ...node.params?.map(_paramInput) ?? [],
       ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
           [],
     ];
@@ -154,12 +158,11 @@ class NodeBuilder {
                 }
               }
 
-              postResponse =
-                  await ApiCall().postAPICall(node.apiCall!, apiData: apiBody);
+              postResponse = await ApiCall().runNode(node, apiData: apiBody);
 
-              dynamic nodeId = postResponse!["node_id"];
+              node.nodeId = postResponse!["node_id"];
               return await ApiCall()
-                  .getAPICall("${node.apiCall!}?node_id=$nodeId&output=1");
+                  .getAPICall("${node.apiCall!}?node_id=${node.id}&output=1");
             },
           ),
         );
@@ -173,9 +176,9 @@ class NodeBuilder {
               await Future.delayed(const Duration(milliseconds: 100));
             }
 
-            dynamic nodeId = postResponse!["node_id"];
+            node.id = postResponse!["node_id"];
             return await ApiCall().getAPICall(
-              "${node.apiCall!}?node_id=$nodeId&output=2",
+              "${node.apiCall!}?node_id=${node.id}&output=2",
             );
           },
         ),
