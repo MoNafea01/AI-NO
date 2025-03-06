@@ -1,6 +1,12 @@
 import json
 import sys
 import base64
+import hashlib
+import os
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+
+os.environ["AESC_KEY"] = "aino_secret_key"
 
 class AinoprjConverter:
     types = {
@@ -16,12 +22,28 @@ class AinoprjConverter:
         self.source_path = source_path
         self.destination_path = destination_path
         self.encrypt = encrypt
+        self.SECRET_KEY = self.get_secret_key()
+
+    def get_secret_key(self):
+        """Retrieve the encryption key from an environment variable."""
+        key = os.getenv("AESC_KEY")
+        if not key:
+            raise ValueError("Encryption key not set! Use: export AESC_KEY='your_key'")
+        return hashlib.sha256(key.encode()).digest()[:16]  # Derive 16-byte key from SHA-256 hash
 
     def encrypt_data(self, data):
-        return base64.b64encode(data.encode()).decode() if self.encrypt else data
+        if not self.encrypt:
+            return data
+        cipher = AES.new(self.SECRET_KEY, AES.MODE_CBC, iv=self.SECRET_KEY)  # Using key as IV (for simplicity)
+        encrypted_bytes = cipher.encrypt(pad(data.encode(), AES.block_size))
+        return base64.b64encode(encrypted_bytes).decode()
 
     def decrypt_data(self, encrypted_data):
-        return base64.b64decode(encrypted_data).decode() if self.encrypt else encrypted_data
+        if not self.encrypt:
+            return encrypted_data
+        cipher = AES.new(self.SECRET_KEY, AES.MODE_CBC, iv=self.SECRET_KEY)
+        decrypted_bytes = unpad(cipher.decrypt(base64.b64decode(encrypted_data)), AES.block_size)
+        return decrypted_bytes.decode()
 
     def json_to_ainoprj(self):
         try:
@@ -41,7 +63,7 @@ class AinoprjConverter:
             with open(self.destination_path, 'w', encoding='utf-8') as f:
                 f.write(encrypted_data)
             
-            print("Conversion successful: JSON to AINOPRJ")
+            print("Conversion successful: JSON to AINOPRJ (Encrypted)")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -51,10 +73,10 @@ class AinoprjConverter:
             with open(self.source_path, 'r', encoding='utf-8') as f:
                 encrypted_data = f.read()
                 if len(encrypted_data.split('\n')) == 1:
-                    self.encrypt = True
+                    self.encrypt = True  # If data is a single line, assume it's encrypted
                 decrypted_data = self.decrypt_data(encrypted_data)
+
             nodes = []
-            
             for line in decrypted_data.split('\n'):
                 line = line.lstrip()
                 if line in ["AINOPRJ_START", "AINOPRJ_END"]:
@@ -75,7 +97,7 @@ class AinoprjConverter:
             with open(self.destination_path, 'w', encoding='utf-8') as f:
                 json.dump(nodes, f, indent=4)
             
-            print("Conversion successful: AINOPRJ to JSON")
+            print("Conversion successful: AINOPRJ to JSON (Decrypted)")
         except Exception as e:
             print(f"Error: {e}")
 
@@ -104,7 +126,7 @@ def main():
         print("Error: Formats must be 'json' or 'ainoprj'.")
         sys.exit(1)
     
-    encrypt = encrypt_enabled.lower() == "true"
+    encrypt = encrypt_enabled.lower() in ["true", "yes", "True", "Yes", "1"]
     converter = AinoprjConverter(in_format, out_format, source_path, destination_path, encrypt)
     converter.convert()
 

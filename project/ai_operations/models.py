@@ -24,6 +24,7 @@ class Node(models.Model):
 
 class Component(models.Model):
     displayed_name = models.CharField(max_length=255, default="")
+    description = models.CharField(max_length=255, default="")
     idx = models.IntegerField(default=0)
     category = models.CharField(max_length=255, default="")
     node_name = models.CharField(max_length=255)
