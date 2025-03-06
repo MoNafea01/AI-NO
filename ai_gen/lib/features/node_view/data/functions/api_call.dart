@@ -24,7 +24,6 @@ class ApiCall {
         );
       }
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print(response.data);
         final Map<String, dynamic> mapResponse =
             Map<String, dynamic>.from(response.data);
         print(mapResponse);

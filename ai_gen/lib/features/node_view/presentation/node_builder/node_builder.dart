@@ -87,7 +87,8 @@ class NodeBuilder {
         inputData: _buildInputData(newNode, ref),
         outputData: _buildOutputData(newNode),
         deleteAction: () {
-          newNode.nodeId != null ? ApiCall().deleteNode(newNode.nodeId) : null;
+          print("${newNode.name} Deleted");
+          if (newNode.nodeId != null) ApiCall().deleteNode(newNode);
         },
       );
     };
