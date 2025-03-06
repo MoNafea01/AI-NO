@@ -110,10 +110,9 @@ class DataLoaderSerializer(serializers.Serializer):
 
 
 class EvaluatorSerializer(serializers.Serializer):
-    metric = serializers.CharField(required=True)
+    params = serializers.JSONField(required=True)
     y_true = serializers.JSONField(required=True)
     y_pred = serializers.JSONField(required=True)
-    params = serializers.JSONField(required=False)
 
 
 class NodeLoaderSerializer(serializers.Serializer):

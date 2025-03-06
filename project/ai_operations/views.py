@@ -656,12 +656,12 @@ class EvaluatorAPIView(APIView, NodeQueryMixin):
     def post(self, request):
         serializer = EvaluatorSerializer(data=request.data)
         if serializer.is_valid():
-            metric = serializer.validated_data.get('metric')
             y_true = serializer.validated_data.get('y_true')
             y_pred = serializer.validated_data.get('y_pred')
             params = serializer.validated_data.get('params')
+            metric = params.get('metric')
 
-            evaluator = Evaluator(metric=metric, y_true=y_true, y_pred=y_pred, params=params)
+            evaluator = Evaluator(metric=metric, y_true=y_true, y_pred=y_pred)
             output_channel = request.query_params.get('output', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             response_data = evaluator(output_channel, return_serialized=return_serialized)
@@ -671,15 +671,16 @@ class EvaluatorAPIView(APIView, NodeQueryMixin):
     def put(self, request):
         serializer = EvaluatorSerializer(data=request.data)
         if serializer.is_valid():
-            metric = serializer.validated_data.get('metric')
             y_true = serializer.validated_data.get('y_true')
             y_pred = serializer.validated_data.get('y_pred')
             params = serializer.validated_data.get('params')
-            evaluator = Evaluator(metric=metric, y_true=y_true, y_pred=y_pred, params=params)
+            metric = params.get('metric')
+            evaluator = Evaluator(metric=metric, y_true=y_true, y_pred=y_pred)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             success, message = NodeUpdater()(node_id, evaluator(), return_serialized=return_serialized)
-            
+            if not return_serialized:
+                    del message["node_data"]
             if success:
                 return Response(message, status=status.HTTP_200_OK)
             else:
