@@ -103,7 +103,6 @@ class CreateModelView(APIView, NodeQueryMixin):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    
 
 
 class FitModelAPIView(APIView, NodeQueryMixin):
@@ -829,6 +828,7 @@ class ClearNodesAPIView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ClearComponentsAPIView(APIView):
     def post(self, request):
         try:
@@ -904,6 +904,7 @@ class ExcelUploadAPIView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class NodeAPIViewSet(viewsets.ModelViewSet):
     queryset = Node.objects.all()
     serializer_class = NodeSerializer
@@ -918,6 +919,3 @@ class NodeAPIViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-

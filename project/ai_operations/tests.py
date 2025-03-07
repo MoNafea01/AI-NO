@@ -4,6 +4,7 @@ from rest_framework import status
 from .models import Node, Component
 from .serializers import ModelSerializer
 
+
 class NodeModelTestCase(TestCase):
     def setUp(self):
         self.node = Node.objects.create(
