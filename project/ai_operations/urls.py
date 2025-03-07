@@ -33,6 +33,8 @@ urlpatterns = [
     path('clear_nodes/', ClearNodesAPIView.as_view(), name='clear_nodes'),
     path('clear_components/', ClearComponentsAPIView.as_view(), name='clear_components'),
 
+    path('create_input/', InputAPIView.as_view(), name='create_input'),
+
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
     path('components/', component_list, name='component-list'),
     path('components/<int:pk>/', component_detail, name='component-detail'),
@@ -44,4 +46,5 @@ urlpatterns = [
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     # Redoc UI (alternative)
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+
 ]

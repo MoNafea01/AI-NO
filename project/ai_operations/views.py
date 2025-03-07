@@ -15,6 +15,7 @@ from core.nodes.preprocessing.fit import Fit as FitPreprocessor
 from core.repositories.node_repository import NodeLoader, NodeSaver, NodeDeleter, NodeUpdater, ClearAllNodes
 from core.nodes.other.custom import Joiner, Splitter
 from core.nodes.other.evaluator import Evaluator
+from core.nodes.nets.input_layer import Input
 from .serializers import *
 import pandas as pd
 import json
@@ -164,6 +165,55 @@ class FitModelAPIView(APIView, NodeQueryMixin):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class InputAPIView(APIView, NodeQueryMixin):
+    def post(self, request):
+        serializer = InputSerializer(data=request.data)
+        if serializer.is_valid():
+            input_shape = (serializer.validated_data.get('input_size'),)
+            name = serializer.validated_data.get('name')
+            input_path = serializer.validated_data.get('input_path')
+            try:
+                input_instance = Input(input_shape, name, input_path)
+                output_channel = request.query_params.get('output', None)
+                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+                response_data = input_instance(output_channel, return_serialized=return_serialized)
+                return Response(response_data, status=status.HTTP_200_OK)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request):
+        serializer = InputSerializer(data=request.data)
+        if serializer.is_valid():
+            input_shape = (serializer.validated_data.get('input_size'),)
+            name = serializer.validated_data.get('name')
+            input_path = serializer.validated_data.get('input_path')
+            input_instance = Input(input_shape, name, input_path)
+            node_id = request.query_params.get('node_id', None)
+            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+            success, message = NodeUpdater()(node_id, input_instance(), return_serialized=return_serialized)
+            if not return_serialized:
+                    del message["node_data"]
+            if success:
+                return Response(message, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request):
+        node_id = request.query_params.get('node_id')
+        if not node_id:
+            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            success, message = NodeDeleter()(node_id)
+            if success:
+                return Response({"message": f"Node {node_id} deleted successfully."},
+                    status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 class PredictAPIView(APIView, NodeQueryMixin):
     """
     API view to handle predictions using a trained model.
@@ -173,7 +223,7 @@ class PredictAPIView(APIView, NodeQueryMixin):
         serializer = PredictSerializer(data=request.data)
         if serializer.is_valid():
             X = serializer.validated_data.get('X')
-            model = serializer.validated_data.get('fitted_model')
+            model = serializer.validated_data.get('model')
             model_path = serializer.validated_data.get('model_path')
 
             try:
@@ -193,7 +243,7 @@ class PredictAPIView(APIView, NodeQueryMixin):
             if serializer.is_valid():
                 # Extract data from the serializer
                 X = serializer.validated_data.get('X')
-                model = serializer.validated_data.get('fitted_model')
+                model = serializer.validated_data.get('model')
                 model_path = serializer.validated_data.get('model_path')
 
                 # Instantiate Fit and perform the fitting

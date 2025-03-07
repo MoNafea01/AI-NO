@@ -17,6 +17,17 @@ class ModelSerializer(serializers.Serializer):
         return validate(data, ('model_name', 'model_path'))
 
 
+class InputSerializer(serializers.Serializer):
+    input_size = serializers.IntegerField(required=False, allow_null=True)
+    name = serializers.CharField(required=False, allow_null=True)
+    input_path = serializers.CharField(required=False, allow_null=True)
+    def validate(self, data:dict):
+        """
+        Ensure at least one of 'name' or 'input_path' is provided.
+        """
+        return validate(data, ('input_size', 'input_path'))
+
+
 class FitModelSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
     y = serializers.JSONField(required=True)
@@ -31,13 +42,13 @@ class FitModelSerializer(serializers.Serializer):
 
 class PredictSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
-    fitted_model = serializers.JSONField(required=False)
+    model = serializers.JSONField(required=False)
     model_path = serializers.CharField(required=False)
     def validate(self, data):
         """
         Ensure at least one of 'model' or 'model_path' is provided.
         """
-        return validate(data, ('fitted_model', 'model_path'))
+        return validate(data, ('model', 'model_path'))
 
 
 class PreprocessorSerializer(serializers.Serializer):
