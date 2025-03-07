@@ -397,6 +397,8 @@ def get_folder_by_task(task: str) -> str:
         return "models"
     elif task in {"preprocessing", "fit_preprocessor", "fit_transform"}:
         return "preprocessors"
+    elif task in {"neural_network"}:
+        return "nn"
     else:
         return "data"
 

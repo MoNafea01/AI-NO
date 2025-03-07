@@ -17,7 +17,6 @@ class Model:
         self.model_path = model_path
         default_params = self._get_default_params()
         default_params.update(params) if params else {}
-        print(default_params)
         self.params = default_params
         self.payload = self._create_model()
 
