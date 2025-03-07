@@ -11,12 +11,12 @@ void main() async {
   ServerManager serverManager = GetIt.I.get<ServerManager>();
 
   // Stop any existing servers
-  // await serverManager.stopServer();
+  await serverManager.stopServer();
 
   // Start server and wait for it to be fully operational
-  // if (true) {
-  //   await serverManager.startServer();
-  // }
+  if (true) {
+    await serverManager.startServer();
+  }
 
   runApp(const MyApp());
 }
