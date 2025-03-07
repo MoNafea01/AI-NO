@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
+import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:ai_gen/node_package/data/vs_interface.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 const Color _interfaceColor = NodeColors.generalColor;
 
@@ -43,15 +44,10 @@ class VSAINOGeneralOutputData extends VSOutputData {
       for (var input in data.entries) {
         apiBody[input.key] = await input.value;
       }
-      // if (block.nodeName == "data_loader") {
-      //   print('data_loader');
-      //   return {};
-      // }
 
-      print("fitter body: $apiBody");
-
-      var response = await ApiCall().runNode(node, apiBody);
-      print("response: $response");
+      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      Map<String, dynamic> response =
+          await nodeServerCalls.runNode(node, apiBody);
       return response;
     };
   }

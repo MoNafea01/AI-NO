@@ -1,12 +1,14 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/network/server_calls.dart';
+import 'package:get_it/get_it.dart';
 
 class NodeSerializer {
   Future<Map<String, Map<String, Map<String, List<NodeModel>>>>>
       categorizeNodes() async {
     try {
+      ServerCalls serverCalls = GetIt.I.get<ServerCalls>();
       // read the nodes from the server
-      List<NodeModel> nodes = await ServerCalls().getNodes();
+      List<NodeModel> nodes = await serverCalls.getNodes();
 
       // categorize nodes by category, type, and task and return them in a 3 level map
       return _categorizeNodes(nodes);

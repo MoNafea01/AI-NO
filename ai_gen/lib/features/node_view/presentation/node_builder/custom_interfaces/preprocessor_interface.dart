@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
+import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class VSPreprocessorInputData extends VSAINOGeneralInputData {
   ///Basic List input interface
@@ -33,12 +34,12 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
       get _outputFunction {
     return (Map<String, dynamic> data) async {
       final Map<String, dynamic> apiBody = {
-        "node_name": node.name,
-        "node_type": node.type,
+        "preprocessor_name": node.name,
+        "preprocessor_type": node.type,
         "params": node.paramsToJson,
       };
-
-      return await ApiCall().runNode(node, apiBody);
+      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      return await nodeServerCalls.runNode(node, apiBody);
     };
   }
 

@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:get_it/get_it.dart';
 
 class ServerManager {
   Process? _serverProcess;
   bool _isServerRunning = false;
-  final Dio _dio = Dio();
+  final Dio _dio = GetIt.instance<Dio>();
 
   Future<void> startServer() async {
     if (_isServerRunning) return;
@@ -26,7 +27,7 @@ class ServerManager {
       });
 
       _serverProcess!.stderr.listen((data) {
-        print('Server Error: ${String.fromCharCodes(data)}');
+        print('ELDemy Server Error: ${String.fromCharCodes(data)}');
       });
 
       _serverProcess!.exitCode.then((exitCode) {

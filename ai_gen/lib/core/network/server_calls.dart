@@ -1,5 +1,6 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:dio/dio.dart';
+import 'package:get_it/get_it.dart';
 
 import 'network_constants.dart';
 
@@ -7,7 +8,7 @@ class ServerCalls {
   final String _baseURL = NetworkConstants.baseURL;
   final String _allComponentsApi = NetworkConstants.allComponentsApi;
 
-  final Dio dio = Dio();
+  final Dio dio = GetIt.I.get<Dio>();
 
   Future<List<NodeModel>> getNodes() async {
     try {

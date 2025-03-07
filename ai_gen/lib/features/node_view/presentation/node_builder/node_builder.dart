@@ -1,12 +1,13 @@
 import 'package:ai_gen/core/models/node_model/Params.dart';
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
+import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/preprocessor_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
@@ -78,18 +79,19 @@ class NodeBuilder {
   Function(Offset, VSOutputData?) _buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
       NodeModel newNode = node.copyWith();
-      print(newNode.description);
       return VSNodeData(
         type: newNode.name,
         title: newNode.displayName,
         toolTip: newNode.description,
-        menuToolTip: "Optional menu tip",
+        menuToolTip: "",
         widgetOffset: offset,
         inputData: _buildInputData(newNode, ref),
         outputData: _buildOutputData(newNode),
         deleteAction: () {
           print("${newNode.name} Deleted");
-          if (newNode.nodeId != null) ApiCall().deleteNode(newNode);
+          final NodeServerCalls nodeServerCalls =
+              GetIt.I.get<NodeServerCalls>();
+          if (newNode.nodeId != null) nodeServerCalls.deleteNode(newNode);
         },
       );
     };
@@ -109,7 +111,7 @@ class NodeBuilder {
       return VSModelInputData(type: inputDot, initialConnection: ref);
     }
     if (inputDot == "preprocessor") {
-      return VSModelInputData(type: inputDot, initialConnection: ref);
+      return VSPreprocessorInputData(type: inputDot, initialConnection: ref);
     }
     return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
   }
@@ -159,11 +161,12 @@ class NodeBuilder {
                   apiBody[input.key] = await input.value;
                 }
               }
-
-              postResponse = await ApiCall().runNode(node, apiBody);
+              final NodeServerCalls nodeServerCalls =
+                  GetIt.I.get<NodeServerCalls>();
+              postResponse = await nodeServerCalls.runNode(node, apiBody);
 
               node.nodeId = postResponse!["node_id"];
-              return await ApiCall().getNode(node, 1);
+              return await nodeServerCalls.getNode(node, 1);
             },
           ),
         );
@@ -178,7 +181,9 @@ class NodeBuilder {
             }
 
             node.id = postResponse!["node_id"];
-            return await ApiCall().getNode(node, 2);
+            final NodeServerCalls nodeServerCalls =
+                GetIt.I.get<NodeServerCalls>();
+            return await nodeServerCalls.getNode(node, 2);
           },
         ),
       );

@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:ai_gen/features/node_view/data/functions/api_call.dart';
+import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class VSModelInputData extends VSAINOGeneralInputData {
   ///Basic List input interface
@@ -35,8 +36,8 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
         "task": node.task,
         "params": node.paramsToJson,
       };
-
-      return await ApiCall().runNode(node, apiBody);
+      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      return await nodeServerCalls.runNode(node, apiBody);
     };
   }
 
