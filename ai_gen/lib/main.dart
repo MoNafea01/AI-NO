@@ -4,7 +4,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'core/di/getit_intialize.dart';
 import 'core/network/server_manager/server_manager.dart';
-import 'features/node_view/screens/splashScreen/splash_screen.dart';
+import 'features/screens/splashScreen/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -86,7 +86,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       debugShowCheckedModeBanner: false,
       title: 'AI Gen',
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(255, 46, 46, 46),
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: const SplashScreen(),
     );

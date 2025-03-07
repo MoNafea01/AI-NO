@@ -1,5 +1,4 @@
-import 'package:ai_gen/features/node_view/presentation/grid_loader.dart';
-import 'package:ai_gen/features/node_view/screens/SmallScreenWarning/small_screen_warning.dart';
+import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:ai_gen/node_package/widgets/Resuable%20Widgets/custom_text_icon_button.dart';
 import 'package:flutter/material.dart';
 
@@ -153,7 +152,7 @@ class ProjectsDashboard extends StatelessWidget {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const GridLoader()));
+                                  builder: (context) => const NodeView()));
                         },
                       ),
                     ],

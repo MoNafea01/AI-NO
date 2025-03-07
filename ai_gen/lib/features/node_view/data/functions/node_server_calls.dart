@@ -1,8 +1,39 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/core/network/network_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
 class NodeServerCalls {
+  final String _baseURL = NetworkConstants.baseURL;
+  final String _allComponentsEndPoint = NetworkConstants.allComponentsApi;
+
+  final Dio _dio = GetIt.I.get<Dio>();
+
+  Future<List<NodeModel>> loadAllNodes() async {
+    try {
+      final Response response =
+          await _dio.get("$_baseURL/$_allComponentsEndPoint");
+      List<NodeModel> nodes = [];
+
+      if (response.statusCode == 200) {
+        if (response.data != null) {
+          response.data.forEach((nodeData) {
+            NodeModel node = NodeModel.fromJson(nodeData);
+            nodes.add(node);
+          });
+
+          return nodes;
+        } else {
+          throw Exception('server error: response data is null');
+        }
+      } else {
+        throw Exception("server error: error code ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Server Error: $e");
+    }
+  }
+
   Future<Map<String, dynamic>> runNode(NodeModel node, dynamic apiBody) async {
     return await _apiCall(
       apiCall: (dio) async {
@@ -20,7 +51,7 @@ class NodeServerCalls {
 
   Future<Response> _post(Dio dio, NodeModel node, dynamic apiBody) async {
     return await dio.post(
-      "http://127.0.0.1:8000/api/${node.apiCall}",
+      "$_baseURL/${node.apiCall}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
@@ -30,7 +61,7 @@ class NodeServerCalls {
     print("ELDemy:: ${node.nodeId}: ${DateTime.timestamp()}");
 
     final x = await dio.put(
-      "http://127.0.0.1:8000/api/${node.apiCall}?node_id=${node.nodeId}",
+      "$_baseURL/${node.apiCall}?node_id=${node.nodeId}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
@@ -47,7 +78,7 @@ class NodeServerCalls {
     return _apiCall(
       apiCall: (dio) async {
         return await dio.get(
-          "http://127.0.0.1:8000/api/${node.apiCall!}?node_id=${node.nodeId}&output=$outputChannel",
+          "$_baseURL/${node.apiCall!}?node_id=${node.nodeId}&output=$outputChannel",
           data: apiBody,
           options: Options(contentType: Headers.jsonContentType),
         );
@@ -59,7 +90,7 @@ class NodeServerCalls {
     _apiCall(
       apiCall: (dio) async {
         return await dio.delete(
-          "http://127.0.0.1:8000/api/${node.apiCall!}?node_id=${node.nodeId}",
+          "$_baseURL/${node.apiCall!}?node_id=${node.nodeId}",
         );
       },
     );
@@ -110,7 +141,7 @@ class NodeServerCalls {
 //   try {
 //     if (node.nodeId == null) {
 //       response = await dio.post(
-//         "http://127.0.0.1:8000/api/${node.apiCall}",
+//         "$_baseURL/${node.apiCall}",
 //         data: apiData,
 //         options: Options(contentType: Headers.jsonContentType),
 //       );

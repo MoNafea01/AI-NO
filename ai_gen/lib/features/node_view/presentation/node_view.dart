@@ -1,116 +1,30 @@
-import 'package:ai_gen/node_package/vs_node_view.dart';
-import 'package:ai_gen/node_package/widgets/GridCubit/grid_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class NodeView extends StatefulWidget {
-  const NodeView({required this.nodeBuilder, super.key});
+import 'cubits/grid_node_view_cubit.dart';
+import 'grid_node_view.dart';
 
-  final List<dynamic> nodeBuilder;
-  @override
-  State<NodeView> createState() => _NodeViewState();
-}
-
-class _NodeViewState extends State<NodeView> {
-  Iterable<String>? results;
-  late final VSNodeDataProvider nodeDataProvider;
+class NodeView extends StatelessWidget {
+  const NodeView({super.key});
 
   @override
-  void initState() {
-    nodeDataProvider = VSNodeDataProvider(
-      nodeManager: VSNodeManager(nodeBuilders: widget.nodeBuilder),
-    );
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext _) {
     return BlocProvider(
-      create: (context) => GridCubit(),
-      child: Stack(
-        children: [
-          InteractiveVSNodeView(
-            width: 5000,
-            height: 5000,
-            nodeDataProvider: nodeDataProvider,
-          ),
-          // const Positioned(
-          //   bottom: 0,
-          //   right: 0,
-          //   child: Legend(),
-          // ),
-          Positioned(
-            top: 20,
-            right: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _evaluateButton(),
-                if (results != null)
-                  ...results!.map(
-                    (scopeOutput) {
-                      scopeOutput = scopeOutput.replaceAll(",", ",\n");
-                      return Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(scopeOutput),
-                        ),
-                      );
-                    },
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  ElevatedButton _evaluateButton() {
-    return ElevatedButton(
-      style: ButtonStyle(
-        backgroundColor:
-            WidgetStateProperty.all<Color>(const Color(0xff4CAF4F)),
-        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            side: const BorderSide(
-                color: Colors.black, width: 1), // Set border color to black
-            borderRadius: BorderRadius.circular(16), // Optional: border radius
-          ),
-        ),
-      ),
-      onPressed: () async {
-        List<MapEntry<String, dynamic>> entries = nodeDataProvider
-            .nodeManager.getOutputNodes
-            .map((e) => e.evaluate())
-            .toList();
-
-        for (var i = 0; i < entries.length; i++) {
-          var asyncOutput = await entries[i].value;
-          entries[i] = MapEntry(entries[i].key, asyncOutput);
-        }
-
-        setState(() => results = entries.map((e) => "${e.key}: ${e.value}"));
-      },
-      child: Container(
-        width: 80,
-        height: 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Icon(
-              Icons.play_arrow,
-              color: Colors.white,
-            ),
-            Text(
-              "Run",
-              style: TextStyle(color: Colors.white, fontSize: 17),
-            ),
-          ],
-        ),
+      create: (context) => GridNodeViewCubit()..buildNodes(),
+      child: BlocBuilder<GridNodeViewCubit, GridNodeViewState>(
+        builder: (context, state) {
+          if (state is GridNodeViewLoading || state is GridNodeViewInitial) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          } else if (state is NodeViewSuccess) {
+            return const GridNodeView();
+          } else if (state is NodeViewFailure) {
+            return Scaffold(body: Center(child: Text(state.errMessage)));
+          } else {
+            return const Scaffold(body: SizedBox());
+          }
+        },
       ),
     );
   }

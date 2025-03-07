@@ -1,5 +1,4 @@
-
-import 'package:ai_gen/features/node_view/screens/HomeScreen/home_screen.dart';
+import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,12 +14,11 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        // Check if the widget is still mounted
+        // Check if the screen is still in the widget tree (not disposed)
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const ProjectsDashboard()),
         );
-        print("Navigating to GridLoader...");
       }
     });
   }
@@ -28,15 +26,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset("assets/images/ProjectLogo.png", height: 130),
             const SizedBox(height: 10),
-            const Text("Model Craft",
-                style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+            const Text(
+              "Model Craft",
+              style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),

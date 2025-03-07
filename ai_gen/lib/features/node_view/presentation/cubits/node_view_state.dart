@@ -1,18 +1,15 @@
-part of 'node_view_cubit.dart';
+part of 'grid_node_view_cubit.dart';
 
 @immutable
-sealed class NodeLoaderState {}
+sealed class GridNodeViewState {}
 
-final class NodeViewInitial extends NodeLoaderState {}
+final class GridNodeViewInitial extends GridNodeViewState {}
 
-final class NodeViewLoading extends NodeLoaderState {}
+final class GridNodeViewLoading extends GridNodeViewState {}
 
-final class NodeViewSuccess extends NodeLoaderState {
-  final List<Object> nodeBuilder;
-  NodeViewSuccess(this.nodeBuilder);
-}
+final class NodeViewSuccess extends GridNodeViewState {}
 
-final class NodeViewFailure extends NodeLoaderState {
+final class NodeViewFailure extends GridNodeViewState {
   final String errMessage;
 
   NodeViewFailure(this.errMessage);
