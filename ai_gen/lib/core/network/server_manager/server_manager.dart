@@ -1,18 +1,21 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:get_it/get_it.dart';
 
 class ServerManager {
   Process? _serverProcess;
   bool _isServerRunning = false;
-  final Dio _dio = Dio();
+  final Dio _dio = GetIt.instance<Dio>();
 
   Future<void> startServer() async {
     if (_isServerRunning) return;
 
-    String pathEldemy = "D:\\College\\4th\\Graduation Project\\simple_task";
+    String projectPath = Directory.current.path;
+    String pathEldemy = '$projectPath\\..\\backend\\run_server.bat';
+    // String pathShaltoot = "D:\\GraduationProject\\backend\\run_server.bat";
     try {
-      String batchFilePath = "$pathEldemy\\backend\\run_server.bat";
+      String batchFilePath = pathEldemy;
 
       await _killExistingServers();
 
@@ -24,7 +27,7 @@ class ServerManager {
       });
 
       _serverProcess!.stderr.listen((data) {
-        print('Server Error: ${String.fromCharCodes(data)}');
+        print('ELDemy Server Error: ${String.fromCharCodes(data)}');
       });
 
       _serverProcess!.exitCode.then((exitCode) {

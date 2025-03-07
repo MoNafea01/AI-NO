@@ -2,22 +2,25 @@ import 'package:ai_gen/core/classes/json_class.dart';
 import 'package:ai_gen/core/classes/model_class.dart';
 import 'package:dio/dio.dart';
 
-class ApiCall {
-  Future<Map<String, dynamic>> _makeAPICall(
-    String endpoint, {
-    required Map<String, dynamic> data,
+class OldApiCall {
+  Future<Map<String, dynamic>> postAPICall(
+    String endPoint, {
+    required Map<String, dynamic>? apiData,
     Map<String, dynamic> Function(Map<String, dynamic>)? processResponse,
   }) async {
     final dio = Dio();
 
+    print("apiData: $apiData");
+    final Response response;
     try {
-      final response = await dio.post(
-        "http://127.0.0.1:8000/$endpoint/",
-        data: data,
+      response = await dio.post(
+        "http://127.0.0.1:8000/api/$endPoint",
+        data: apiData,
         options: Options(contentType: Headers.jsonContentType),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        print(response.data);
         final jsonResponse = Map<String, dynamic>.from(response.data);
 
         // Process response if a processor function is provided
@@ -30,9 +33,11 @@ class ApiCall {
         throw Exception('Failed to perform the operation');
       }
     } on DioException catch (e) {
-      if (e.response != null) {
+      print("dio exception $e");
+      return {"error": e.response?.data ?? "Server error"};
+      if (e.response?.data != null) {
         throw Exception(
-            'Failed to perform the operation: ${e.response?.statusCode}');
+            'Failed to perform the operation with status code ${e.response?.statusCode}');
       } else {
         throw Exception('Network error: ${e.message}');
       }
@@ -44,9 +49,9 @@ class ApiCall {
     double testSize = 0.2,
     int? randomState,
   }) async {
-    return await _makeAPICall(
+    return await postAPICall(
       'train_test_split',
-      data: {
+      apiData: {
         'data': data,
         'test_size': testSize,
         'random_state': randomState,
@@ -63,9 +68,9 @@ class ApiCall {
     Nafe3Json? x,
     Nafe3Json? y,
   ) async {
-    return await _makeAPICall(
+    return await postAPICall(
       'fit_model',
-      data: {
+      apiData: {
         "X": {
           "message": "Data split successful",
           "data": [
@@ -92,9 +97,9 @@ class ApiCall {
     AIModel model,
     Nafe3Json? x,
   ) async {
-    return await _makeAPICall(
+    return await postAPICall(
       'predict',
-      data: {
+      apiData: {
         'X': {
           "message": "Data split successful",
           "data": [
@@ -115,9 +120,9 @@ class ApiCall {
     Nafe3Json? data,
     Nafe3Json? preprocessor,
   ) async {
-    return await _makeAPICall(
+    return await postAPICall(
       'fit_preprocessor',
-      data: {
+      apiData: {
         'data': data,
         'preprocessor': preprocessor,
       },
@@ -129,9 +134,9 @@ class ApiCall {
     Nafe3Json? data,
     Nafe3Json? preprocessor,
   ) async {
-    return await _makeAPICall(
+    return await postAPICall(
       'transform',
-      data: {
+      apiData: {
         'data': data,
         'preprocessor': preprocessor,
       },

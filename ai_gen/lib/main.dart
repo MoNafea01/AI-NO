@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import 'core/di/getit_intialize.dart';
 import 'core/network/server_manager/server_manager.dart';
 import 'features/node_view/presentation/grid_loader.dart';
 
 void main() async {
   // Create ServerManager
-  ServerManager serverManager =
-      GetIt.I.registerSingleton<ServerManager>(ServerManager());
+  initializeGetIt();
+  ServerManager serverManager = GetIt.I.get<ServerManager>();
 
   // Stop any existing servers
   await serverManager.stopServer();
@@ -17,7 +18,6 @@ void main() async {
     await serverManager.startServer();
   }
 
-  // print(await ApiCall().trainTestSplit([1, 2, 3, 4], testSize: 0.2, randomState: 1));
   runApp(const MyApp());
 }
 
@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 46, 46, 46),
       ),
-      home: const Scaffold(body: GridLoader()),
+      home: const Scaffold(backgroundColor: Colors.white, body: GridLoader()),
     );
   }
 }

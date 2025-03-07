@@ -17,7 +17,6 @@ class _NodeViewState extends State<NodeView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     nodeDataProvider = VSNodeDataProvider(
       nodeManager: VSNodeManager(nodeBuilders: widget.nodeBuilder),
     );
@@ -41,37 +40,28 @@ class _NodeViewState extends State<NodeView> {
           //   child: Legend(),
           // ),
           Positioned(
-            top: 230,
-            right: 10,
+            top: 20,
+            right: 20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 _evaluateButton(),
                 if (results != null)
                   ...results!.map(
-                    (e) => Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(e),
-                      ),
-                    ),
+                    (scopeOutput) {
+                      scopeOutput = scopeOutput.replaceAll(",", ",\n");
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(scopeOutput),
+                        ),
+                      );
+                    },
                   ),
               ],
             ),
           ),
-          _testButton(),
         ],
-      ),
-    );
-  }
-
-  Positioned _testButton() {
-    return Positioned(
-      bottom: 50,
-      left: 10,
-      child: ElevatedButton(
-        onPressed: () {},
-        child: const Text("Test"),
       ),
     );
   }
@@ -79,12 +69,13 @@ class _NodeViewState extends State<NodeView> {
   ElevatedButton _evaluateButton() {
     return ElevatedButton(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(Colors.orange),
+        backgroundColor:
+            WidgetStateProperty.all<Color>(const Color(0xff4CAF4F)),
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             side: const BorderSide(
-                color: Colors.black, width: 2), // Set border color to black
-            borderRadius: BorderRadius.circular(20), // Optional: border radius
+                color: Colors.black, width: 1), // Set border color to black
+            borderRadius: BorderRadius.circular(16), // Optional: border radius
           ),
         ),
       ),
@@ -101,9 +92,25 @@ class _NodeViewState extends State<NodeView> {
 
         setState(() => results = entries.map((e) => "${e.key}: ${e.value}"));
       },
-      child: const Text(
-        "Evaluate",
-        style: TextStyle(color: Colors.black, fontSize: 17),
+      child: Container(
+        width: 80,
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+            ),
+            Text(
+              "Run",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -131,7 +131,7 @@ class GridState {
 
   GridState({
     this.showGrid = false,
-    this.gridSpacing = 20.0,
+    this.gridSpacing = 30.0,
     this.gridColor = Colors.grey,
     this.zoomLevel = 1.0,
     this.showColorPicker = false,

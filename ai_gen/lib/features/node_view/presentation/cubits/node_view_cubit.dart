@@ -4,20 +4,20 @@ import 'package:meta/meta.dart';
 
 part 'node_view_state.dart';
 
-class BlockLoaderCubit extends Cubit<BlockLoaderState> {
-  BlockLoaderCubit() : super(NodeViewInitial()) {
-    buildBlocks();
+class NodeLoaderCubit extends Cubit<NodeLoaderState> {
+  NodeLoaderCubit() : super(NodeViewInitial()) {
+    buildNodes();
   }
 
-  Future buildBlocks() async {
+  Future buildNodes() async {
     try {
       emit(NodeViewLoading());
 
-      final List<Object> nodeBuilder = await NodeBuilder().buildBlocks();
+      final List<Object> nodeBuilder = await NodeBuilder().buildNodesMenu();
 
       emit(NodeViewSuccess(nodeBuilder));
     } catch (e) {
-      emit(NodeViewFailure("Failed to load blocks"));
+      emit(NodeViewFailure(e.toString()));
     }
   }
 }

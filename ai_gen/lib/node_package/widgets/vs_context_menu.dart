@@ -46,11 +46,16 @@ class _VSContextMenuState extends State<VSContextMenu> {
               nodeBuilders = entry.value;
             }),
             child: Row(
+              mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(entry.key),
+                Text(entry.key,style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                  ),
                 const Icon(
                   Icons.arrow_forward_ios,
+                  color: Colors.white, /////////////////////
                   size: 20,
                 ),
               ],
@@ -68,12 +73,14 @@ class _VSContextMenuState extends State<VSContextMenu> {
         ));
       }
       if (entry.key != entries.last.key) {
-        widgets.add(const Divider());
+        widgets.add(const Divider(color: Color.fromARGB(255, 14, 11, 11)));////
       }
     }
 
     return GestureDetector(
       child: Card(
+        elevation: 2,
+        color: const Color(0xff349CFE),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SizedBox(

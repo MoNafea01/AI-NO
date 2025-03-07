@@ -1,111 +1,193 @@
-import 'package:ai_gen/core/classes/model_class.dart';
-import 'package:ai_gen/core/models/block_model/BlockModel.dart';
-import 'package:ai_gen/core/models/block_model/Params.dart';
-import 'package:ai_gen/features/node_view/data/functions/create_model.dart';
-import 'package:ai_gen/features/node_view/data/serialization/block_serializer.dart';
-import 'package:ai_gen/node_package/custom_widgets/vs_text_input_data.dart';
-import 'package:ai_gen/node_package/data/standard_interfaces/vs_model_interface.dart';
+import 'package:ai_gen/core/models/node_model/Params.dart';
+import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
+import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/preprocessor_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:ai_gen/node_package/vs_node_view.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+
+import 'custom_interfaces/model_interface.dart';
+import 'custom_interfaces/multi_output_interface.dart';
 
 class NodeBuilder {
-  Future<List<Object>> buildBlocks() async {
-    final Map<String, Map<String, List<BlockModel>>> categorizedBlocks =
-        await BlockSerializer().getBlocks();
+  Future<List<Object>> buildNodesMenu() async {
+    final Map<String, Map<String, Map<String, List<NodeModel>>>> allNodes =
+        await NodeSerializer().categorizeNodes();
 
     return [
       // output node
       (Offset offset, VSOutputData? ref) => VSOutputNode(
-            type: "Output",
+            type: "Scope",
             widgetOffset: offset,
             ref: ref,
           ),
-      ..._buildTypes(categorizedBlocks),
+
+      ..._buildCategorizedNodes(allNodes),
     ];
   }
 
-  Map<String, Map<String, List<BlockModel>>> mapScheme = {
-    "linear_models": {
-      "regression": [BlockModel(), BlockModel()],
-      "classification": [BlockModel()],
-      "clustering": [BlockModel()],
-    },
-    "svm": {
-      "regression": [BlockModel(), BlockModel()],
-      "classification": [BlockModel()],
-      "clustering": [BlockModel()],
-    }
-  };
-  List<VSSubgroup> _buildTypes(
-      Map<String, Map<String, List<BlockModel>>> categorizedBlocks) {
-    return categorizedBlocks.entries.map(
-      (blockType) {
-        final String typeName = blockType.key;
-        final List<VSSubgroup> typeTasks = _buildTasks(blockType.value);
+  // Nodes Scheme
+  // Map<String, Map<String, Map<String, List<NodeModel>>>> mapScheme = {
+  //   "Models": {
+  //        "linear_models": {
+  //                "regression": [NodeModel(), NodeModel()],
+  //                "classification": [NodeModel()],
+  //          },
+  //          "svm": {
+  //                "regression": [NodeModel(), NodeModel()],
+  //                "classification": [NodeModel()],
+  //                "clustering": [NodeModel()],
+  //          }
+  //   },
+  // };
 
-        return VSSubgroup(name: typeName, subgroup: typeTasks);
-      },
-    ).toList();
+  // first subgroup that contains the types
+  List<VSSubgroup> _buildCategorizedNodes(Map<String, Map> allNodes) {
+    return _buildSubgroups(allNodes, _buildTypes);
   }
 
-  List<VSSubgroup> _buildTasks(Map<String, List<BlockModel>> taskMap) {
-    return taskMap.entries.map((blockTask) {
-      final String taskName = blockTask.key;
-      final List<BlockModel> blocksList = blockTask.value;
+  // second subgroup that contains the tasks
+  List<VSSubgroup> _buildTypes(Map<String, Map> nodesCategory) {
+    return _buildSubgroups(nodesCategory, _buildTasks);
+  }
 
-      final blockNodes = _buildBlockNodes(blocksList);
-      return VSSubgroup(name: taskName, subgroup: blockNodes);
+  // third subgroup that contains the nodes
+  List<VSSubgroup> _buildTasks(Map<String, List<NodeModel>> nodesType) {
+    return _buildSubgroups(nodesType, _buildNodes);
+  }
+
+  List<VSSubgroup> _buildSubgroups(
+    Map<String, dynamic> category,
+    Function group,
+  ) {
+    return category.entries.map((entry) {
+      final String name = entry.key;
+      final List<dynamic> subgroup = group(entry.value);
+      return VSSubgroup(name: name, subgroup: subgroup);
     }).toList();
   }
 
-  List<Function(Offset, VSOutputData?)> _buildBlockNodes(
-      List<BlockModel> blocksList) {
-    return blocksList.map((BlockModel block) {
-      return (Offset offset, VSOutputData? ref) => VSNodeData(
-            type: block.nodeName!,
-            widgetOffset: offset,
-            inputData: _buildInputData(block, ref),
-            outputData: _buildOutputData(block),
-          );
-    }).toList();
+  // build the last List of nodes
+  List<Function(Offset, VSOutputData?)> _buildNodes(List<NodeModel> nodesList) {
+    return nodesList.map((NodeModel node) => _buildNode(node)).toList();
   }
 
-  List<VSInputData> _buildInputData(BlockModel block, VSOutputData? ref) {
+  //build the node itself
+  Function(Offset, VSOutputData?) _buildNode(NodeModel node) {
+    return (Offset offset, VSOutputData? ref) {
+      NodeModel newNode = node.copyWith();
+      return VSNodeData(
+        type: newNode.name,
+        title: newNode.displayName,
+        toolTip: newNode.description,
+        menuToolTip: "",
+        widgetOffset: offset,
+        inputData: _buildInputData(newNode, ref),
+        outputData: _buildOutputData(newNode),
+        deleteAction: () {
+          print("${newNode.name} Deleted");
+          final NodeServerCalls nodeServerCalls =
+              GetIt.I.get<NodeServerCalls>();
+          if (newNode.nodeId != null) nodeServerCalls.deleteNode(newNode);
+        },
+      );
+    };
+  }
+
+  List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      ...block.params?.map(_paramInput) ?? [],
-      ...block.inputDots?.map((inputDot) => _inputDots(inputDot, ref)) ?? [],
+      ...node.params?.map(_paramInput) ?? [],
+      ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
+          [],
     ];
   }
 
-  VSInputData _inputDots(String inputDot, VSOutputData<dynamic>? ref) {
-    return VSModelInputData(type: inputDot, initialConnection: ref);
+  VSInputData _inputDots(
+      NodeModel node, String inputDot, VSOutputData<dynamic>? ref) {
+    if (inputDot == "model" || inputDot == "fittedModel") {
+      return VSModelInputData(type: inputDot, initialConnection: ref);
+    }
+    if (inputDot == "preprocessor") {
+      return VSPreprocessorInputData(type: inputDot, initialConnection: ref);
+    }
+    return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
   }
 
   VSInputData _paramInput(Params param) {
-    return VsTextInputData(
-      type: param.name ?? "type",
-      controller: TextEditingController(text: param.defaultValue.toString()),
-    );
+    final controller = TextEditingController(text: param.value.toString());
+    controller.addListener(() => param.value = controller.text);
+
+    return VsTextInputData(type: param.name, controller: controller);
   }
 
-  List<VSOutputData> _buildOutputData(BlockModel block) {
-    return block.outputDots?.map((outputDot) {
-          return VSModelOutputData(
-            type: "${outputDot}Output",
-            outputFunction: (data) async {
-              print(data.entries);
-              // print("outputFunction: ${data.entries}");
-              final aiModel = AIModel(
-                modelName: block.nodeName,
-                modelType: block.nodeType,
-                task: block.task,
-                params: {},
-              );
+  List<VSOutputData> _buildOutputData(NodeModel node) {
+    if (node.outputDots != null && node.outputDots!.length > 1) {
+      return multiOutputNodes(node);
+    }
+    return node.outputDots?.map(
+          (outputDot) {
+            if (node.category == "Models") {
+              return VSModelOutputData(type: outputDot, node: node);
+            }
+            if (outputDot == "preprocessor") {
+              return VSPreprocessorOutputData(type: outputDot, node: node);
+            }
 
-              return await apiCall(aiModel.createModelToJson());
-            },
-          );
-        }).toList() ??
+            return VSAINOGeneralOutputData(type: outputDot, node: node);
+          },
+        ).toList() ??
         [];
+  }
+
+  List<VSOutputData> multiOutputNodes(NodeModel node) {
+    Map<String, dynamic>? postResponse;
+    final List<VSOutputData> outputData = [];
+
+    for (int i = 0; i < node.outputDots!.length; i++) {
+      if (i == 0) {
+        outputData.add(
+          MultiOutputOutputData(
+            type: node.outputDots![i],
+            outputFunction: (inputData) async {
+              postResponse = null;
+              final Map<String, dynamic> apiBody = {};
+              if (node.name == "data_loader") {
+                apiBody["dataset_name"] = "diabetes";
+              } else {
+                for (var input in inputData.entries) {
+                  apiBody[input.key] = await input.value;
+                }
+              }
+              final NodeServerCalls nodeServerCalls =
+                  GetIt.I.get<NodeServerCalls>();
+              postResponse = await nodeServerCalls.runNode(node, apiBody);
+
+              node.nodeId = postResponse!["node_id"];
+              return await nodeServerCalls.getNode(node, 1);
+            },
+          ),
+        );
+        continue;
+      }
+      outputData.add(
+        MultiOutputOutputData(
+          type: node.outputDots![i],
+          outputFunction: (inputData) async {
+            while (postResponse == null) {
+              await Future.delayed(const Duration(milliseconds: 100));
+            }
+
+            node.id = postResponse!["node_id"];
+            final NodeServerCalls nodeServerCalls =
+                GetIt.I.get<NodeServerCalls>();
+            return await nodeServerCalls.getNode(node, 2);
+          },
+        ),
+      );
+    }
+    return outputData;
   }
 }

@@ -76,14 +76,14 @@ abstract class VSInputData extends VSInterfaceData {
     }
 
     final icon = connectedInterface == null
-        ? Icons.radio_button_unchecked
-        : Icons.radio_button_checked;
+        ? Icons.check_box_outline_blank
+        : Icons.indeterminate_check_box_sharp;
 
     return Icon(
       icon,
       key: anchor,
       color: interfaceColor,
-      size: 15,
+      size: 18,
     );
   }
 
@@ -138,10 +138,10 @@ abstract class VSOutputData<T> extends VSInterfaceData {
     }
 
     return Icon(
-      Icons.circle,
+      Icons.square, //-----------------
       key: anchor,
-      color: interfaceColor,
-      size: 15,
+      color: const Color(0xffE6E6E6),
+      size: 19,
     );
   }
 

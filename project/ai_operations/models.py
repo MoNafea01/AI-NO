@@ -8,7 +8,7 @@ from django.db import models
 #     updated_at = models.DateTimeField(auto_now=True)
 
 class Node(models.Model):
-    node_id = models.IntegerField(primary_key=True)
+    node_id = models.BigIntegerField(primary_key=True)
     node_name = models.CharField(max_length=255)
     message = models.CharField(max_length=255, default="Done")
     node_data = models.BinaryField(null=True, blank=True)
@@ -25,7 +25,7 @@ class Node(models.Model):
 class Component(models.Model):
     displayed_name = models.CharField(max_length=255, default="")
     description = models.CharField(max_length=255, default="")
-    idx = models.IntegerField(default=0)
+    idx = models.BigIntegerField(default=0)
     category = models.CharField(max_length=255, default="")
     node_name = models.CharField(max_length=255)
     node_type = models.CharField(max_length=255, default="general")

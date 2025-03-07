@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../vs_node_view.dart';
+import '../../../../../node_package/vs_node_view.dart';
 
 class VsTextInputData extends VSInputData {
   ///Basic int input interface

@@ -64,7 +64,12 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
     final Widget firstItem = widget.data.nodeData is VSWidgetNode &&
             (widget.data.nodeData as VSWidgetNode).child != null
         ? (widget.data.nodeData as VSWidgetNode).child!
-        : Text(widget.data.title);
+        : Expanded(child: Text(widget.data.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.black),
+          ),
+          );
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,7 +80,7 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
             startPoint: getWidgetCenter(renderBox),
             endPoint: dragPos,
             startColor: widget.data.interfaceColor,
-            endColor: widget.data.interfaceColor,
+            endColor: widget.data.interfaceColor,  //widget.data.interfaceColor  
           ),
           child: Draggable<VSOutputData>(
             data: widget.data,
@@ -90,10 +95,12 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
                 outputData: widget.data,
               );
             },
-            feedback: Icon(
-              Icons.circle,
-              color: widget.data.interfaceColor,
-              size: 15,
+
+            feedback:  Icon(
+              Icons.circle, //-----------------  Icons.circle  مقدمه الخط بتاع التوصيل 
+              color: widget.data.interfaceColor, // widget.data.interfaceColor  لون راس الايقون
+              size: 13,
+              
             ),
             child: wrapWithToolTip(
               toolTip: widget.data.toolTip,
