@@ -56,13 +56,14 @@ class NodeServerCalls {
   }
 
   Future<Map<String, dynamic>> deleteNode(NodeModel node) async {
-    return _apiCall(
+    _apiCall(
       apiCall: (dio) async {
         return await dio.delete(
           "http://127.0.0.1:8000/api/${node.apiCall!}?node_id=${node.nodeId}",
         );
       },
     );
+    return {"message": "${node.name} deleted Successfully"};
   }
 
   Future<Map<String, dynamic>> _apiCall({

@@ -45,3 +45,6 @@ app.*.map.json
 # Ignore compiled Python files
 __pycache__/
 
+#ignore android build
+*.cc
+*cmake
