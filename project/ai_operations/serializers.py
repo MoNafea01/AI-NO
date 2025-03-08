@@ -28,6 +28,18 @@ class InputSerializer(serializers.Serializer):
         return validate(data, ('input_size', 'input_path'))
 
 
+class DenseSerializer(serializers.Serializer):
+    units = serializers.IntegerField()
+    activation = serializers.CharField()
+    prev_node = serializers.JSONField()
+    path = serializers.CharField(required=False, allow_null=True)
+    def validate(self, data:dict):
+        """
+        Ensure at least one of 'name' or 'path' is provided.
+        """
+        return validate(data, ('prev_node', 'path'))
+
+
 class FitModelSerializer(serializers.Serializer):
     X = serializers.JSONField(required=True)
     y = serializers.JSONField(required=True)

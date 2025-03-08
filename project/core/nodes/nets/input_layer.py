@@ -1,6 +1,9 @@
+
+
 from keras.api.layers import Input as input_layer
 from ...repositories.node_repository import NodeSaver, NodeLoader
-from ...nodes.utils import PayloadBuilder
+from .utils import PayloadBuilder
+
 
 
 class Input:
@@ -40,14 +43,8 @@ class Input:
     def create_handler(self, input_layer):
         '''Creates the payload.'''
         try:
-            payload = PayloadBuilder.build_payload(
-                message="Input layer created", 
-                node=input_layer, 
-                node_name="input_layer",
-                node_type="neural_network", 
-                task="neural_network",
-                params= {"input_shape": input_layer.shape},
-                )
+            payload = PayloadBuilder.build_payload("Input layer created", input_layer, "input_layer", params= {"shape": input_layer.shape})
+            
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
             del payload["node_data"]
 
@@ -65,7 +62,7 @@ class Input:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload
 

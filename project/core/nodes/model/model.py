@@ -70,10 +70,7 @@ class Model:
                         model_type: str = None, task:str = None) -> dict:
         '''Creates the payload for the model.'''
         try:
-            payload = PayloadBuilder.build_payload(f"Model created: {model_name}", 
-                                                    model, model_name, 
-                                                    node_type=model_type, 
-                                                    task=task)
+            payload = PayloadBuilder.build_payload(f"Model created: {model_name}", model, model_name, node_type=model_type, task=task)
             # save the model to the disk & database
             NodeSaver()(payload, path=f"core\\nodes\\saved\\models")
 
@@ -98,7 +95,7 @@ class Model:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload
 

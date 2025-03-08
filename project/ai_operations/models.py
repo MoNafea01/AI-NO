@@ -16,6 +16,7 @@ class Node(models.Model):
     task = models.CharField(max_length=255,default='general')
     node_type = models.CharField(max_length=255, default="general")
     # project_id = models.OneToOneField('Project', on_delete=models.CASCADE)
+    children = models.JSONField(null=True, blank=True, default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):

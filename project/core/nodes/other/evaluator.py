@@ -16,8 +16,7 @@ class Evaluator:
             
             output = metrics[self.metric](y_true, y_pred)
             output = round(output,2)
-            payload = PayloadBuilder.build_payload(f"{self.metric} score", output, 
-                                                   "evaluator", node_type="metric", task="evaluate")
+            payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate")
             NodeSaver()(payload, "core/nodes/saved/data")
             del payload['node_data']
             return payload
@@ -30,7 +29,7 @@ class Evaluator:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload
 

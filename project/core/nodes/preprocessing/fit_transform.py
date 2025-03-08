@@ -53,10 +53,19 @@ class FitTransform:
         try:
             fitter_transformer = PreprocessorFitterTransformer(preprocessor, self.data)
             fitted_preprocessor, output = fitter_transformer.fit_transform_preprocessor()
-            payload = PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output), "fitter_transformer", node_type="fitter_transformer", task="fit_transform")
-            n_id = payload['node_id']
-            payload_fitted = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "fitter_transformer", node_type="fitter_transformer", task="fit_preprocessor", node_id=n_id+1)
-            payload_data = PayloadBuilder.build_payload("Preprocessor transformed", output, "fitter_transformer", node_type="fitter_transformer", task="transform", node_id=n_id+2)
+            payload = PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output), 
+                                                   "fitter_transformer", node_type="fitter_transformer", task="fit_transform")
+            
+            payload_fitted = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "fitter_transformer", 
+                                                          node_type="fitter_transformer", task="fit_preprocessor")
+            payload_data = PayloadBuilder.build_payload("Preprocessor transformed", output, "fitter_transformer", 
+                                                        node_type="fitter_transformer", task="transform")
+            
+            payload['children'] = {
+                "fitted_preprocessor": payload_fitted['node_id'],
+                "transformed_data": payload_data['node_id']
+            }
+            
             NodeSaver()(payload, "core/nodes/saved/preprocessors")
             NodeSaver()(payload_data, "core/nodes/saved/data")
             NodeSaver()(payload_fitted, "core/nodes/saved/preprocessors")
@@ -84,7 +93,7 @@ class FitTransform:
                 NodeDeleter()(self.payload[0]['node_id'])
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(payload.get("node_id"), from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(payload.get("node_id")).get('node_data')
             payload.update({"node_data": node_data})
         return payload
     

@@ -12,9 +12,14 @@ class TrainTestSplit:
         try:
             out1, out2 = train_test_split(self.data,**self.params)
             payload = PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split")
-            n_id = payload['node_id']
-            payload1 = PayloadBuilder.build_payload("Train data", out1, "train_test_split", node_type="splitter", task="split", node_id=n_id+1)
-            payload2 = PayloadBuilder.build_payload("Test data", out2, "train_test_split", node_type="splitter", task="split", node_id=n_id+2)
+            payload1 = PayloadBuilder.build_payload("Train data", out1, "train_test_split", node_type="splitter", task="split")
+            payload2 = PayloadBuilder.build_payload("Test data", out2, "train_test_split", node_type="splitter", task="split")
+
+            payload['children'] = {
+                "train_data": payload1['node_id'],
+                "test_data": payload2['node_id']
+            }
+            
             NodeSaver()(payload, "core/nodes/saved/data")
             NodeSaver()(payload1, "core/nodes/saved/data")
             NodeSaver()(payload2, "core/nodes/saved/data")
@@ -41,7 +46,7 @@ class TrainTestSplit:
                 NodeDeleter()(self.payload[0]['node_id'])
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(payload.get("node_id"), from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(payload.get("node_id")).get('node_data')
             payload.update({"node_data": node_data})
         return payload
 

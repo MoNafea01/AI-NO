@@ -51,11 +51,9 @@ class Preprocessor:
     
     def _create_handler(self, preprocessor, preprocessor_name=None, preprocessor_type=None, task=None):
         try:
-            payload = PayloadBuilder.build_payload(f"Preprocessor created: {preprocessor_name}", 
-                                                    preprocessor=preprocessor,
-                                                    node_name=preprocessor_name,
-                                                    node_type=preprocessor_type,
-                                                    task=task)
+            payload = PayloadBuilder.build_payload(f"Preprocessor created: {preprocessor_name}", preprocessor, preprocessor_name, 
+                                                   node_type=preprocessor_type,task=task)
+            
             NodeSaver()(payload, path=f"core\\nodes\\saved\\preprocessors")
             del payload['node_data']
             return payload
@@ -79,7 +77,7 @@ class Preprocessor:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload
 

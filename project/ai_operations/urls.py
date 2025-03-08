@@ -34,6 +34,7 @@ urlpatterns = [
     path('clear_components/', ClearComponentsAPIView.as_view(), name='clear_components'),
 
     path('create_input/', InputAPIView.as_view(), name='create_input'),
+    path('dense/', DenseAPIView.as_view(), name='dense'),
 
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
     path('components/', component_list, name='component-list'),

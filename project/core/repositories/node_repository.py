@@ -53,6 +53,7 @@ class NodeSaver:
         node = payload.get('node_data')
         task = payload.get('task', "general")
         node_type = payload.get('node_type', "general")
+        children = payload.get("children", {})
         
         # save to path
         if path:
@@ -84,6 +85,7 @@ class NodeSaver:
                 'params': params,
                 'task': task,
                 'node_type': node_type,
+                'children': children
             }
         )
         # returns node_saver payload for preview
@@ -92,7 +94,8 @@ class NodeSaver:
                 "node_name": "node_saver",
                 "params": {},
                 "task": "save",
-                "node_type": "saver"
+                "node_type": "saver",
+                "children": children
                 }
 
 
@@ -115,18 +118,24 @@ class NodeLoader:
     ## Returns 
     Payload (dict) : with node information
     ### Example: 
-        - NodeLoader()(node_id=node_id, from_db=True)     
+        - NodeLoader(from_db=True)(node_id=node_id)     
         output: {"node_name": "logistic_regression",...}    
-        - NodeLoader()(node_id=node_id, from_db=False)    
+        - NodeLoader(from_db=False)(node_id=node_id)    
         output: {"node_name": "node_loader",...}
     """
+
+    def __init__(self, from_db : bool = False, 
+                 return_serialized : bool = False, 
+                 return_bytes : bool = False):
+        
+        self.from_db = from_db
+        self.return_serialized = return_serialized
+        self.return_bytes = return_bytes
+
     def __call__(
             self, 
             node_id: int = None, 
             path: str = None, 
-            from_db: bool = False, 
-            return_serialized:bool = False, 
-            return_bytes: bool = False
             ) -> dict:
         
         if not (node_id or path):
@@ -141,7 +150,7 @@ class NodeLoader:
                     # node_data now is loaded, we need to get its name, and id to create a payload for it
                     # payload isn't a necessary thing, but we use it to identify a node
                     node_name, node_id = NodeNameHandler.handle_name(path)
-                    return self.build_payload(node_data, node_name, from_db, node_id)
+                    return self.build_payload(node_data, node_name, node_id)
                 
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
@@ -159,7 +168,7 @@ class NodeLoader:
             buffer = BytesIO(node_data)         # return an I/O object to buffer variable
             node_name = node_entry.node_name    # get the node_name, we will need it for payload
             # load the object whatever it is through joblib
-            return self.build_payload(joblib.load(buffer), node_name, from_db, node_id, return_serialized, return_bytes)
+            return self.build_payload(joblib.load(buffer), node_name, node_id)
         
         except ObjectDoesNotExist:
             raise ValueError(f"Node with node_id {node_id} does not exist.")
@@ -167,30 +176,31 @@ class NodeLoader:
         except Exception as e:
             raise ValueError(f"Error loading node: {e}")
     
-    def build_payload(self, node_data, name, from_db=False, node_id=None, return_serialized=False, return_bytes=False):
+    def build_payload(self, node_data, name, node_id=None):
         payload = {
                 "message": f"Node {name} Loaded.",
                 "node_name": "node_loader",
                 "node_id": id(self),
                 "params": {},
                 "task": "load_node",
-                "node_type": "loader"
+                "node_type": "loader",
+                "children": {},
             }
         
-        if from_db: # returns node information
-            payload = Node.objects.filter(node_id=node_id).values().first()
+        if self.from_db: # returns node information
+            payload = Node.objects.filter(node_id = node_id).values().first()
             payload.pop("created_at"), payload.pop("updated_at") # removed them to avoid time-date serialization error occured
             """
             from_db must be True to return node_data as binary
             """
-            if return_bytes: # retrieve binaries for node, it should be True & from_db=True
+            if self.return_bytes: # retrieve binaries for node, it should be True & from_db=True
                 node_data = payload.pop("node_data")
 
-        if return_serialized:
+        if self.return_serialized:
             # this function makes sure that node_data is a binary data, if not then get it
             # from database as we want to serialize it
             if not isinstance(node_data, bytes):
-                node_data = Node.objects.filter(node_id=node_id).values().first().pop("node_data")
+                node_data = Node.objects.filter(node_id = node_id).values().first().pop("node_data")
             node_data = base64.b64encode(node_data).decode()
         
         payload.update({"node_data": node_data})
@@ -217,11 +227,16 @@ class NodeDeleter:
     ## Returns: 
     success message
     """
+
+    def __init__(self, is_special_case : bool = False, 
+                 is_multi_channel :bool = False):
+        
+        self.is_special_case = is_special_case
+        self.is_multi_channel = is_multi_channel
+
     def __call__(
             self, 
             node_id, 
-            is_special_case=False, 
-            is_multi_channel=False, 
             ) -> tuple:
 
         if not node_id:
@@ -236,25 +251,27 @@ class NodeDeleter:
             # define the folder that node is saved into
             folder = get_folder_by_task(node.task)
             # delete node from folder and db
-            delete_node_file(node_name, node_id, folder)
-            node.delete()
 
             # if we have our node files in multiple directories, then we will try to delete it
             folders = None
-            if is_multi_channel:
+            if self.is_multi_channel:
                 folders = ['data', 'data']
-            elif is_special_case:
+            elif self.is_special_case:
                 folders = ['preprocessors', 'data']
 
             if folders:
                 for folder in folders:
-                    # I have made id of our node-related nodes to be more than it with one or 2
-                    # for simplicity
-                    for i in range(1,3):
-                        node = Node.objects.filter(node_id = node_id+i)
-                        if node.exists():
-                            node.delete()
-                            delete_node_file(node_name, node_id + i, folder)
+                    old_node = Node.objects.filter(node_id = node_id)
+                    children = old_node.values().first().get("children")
+                    if children:
+                        for key, value in children.items():
+                            child = Node.objects.filter(node_id = value)
+                            if child.exists():
+                                child.delete()
+                                delete_node_file(node_name, value, folder)
+
+            delete_node_file(node_name, node_id, folder)
+            node.delete()
 
             return True, f"Node {node_id} deleted."
         except ObjectDoesNotExist:
@@ -275,12 +292,10 @@ class NodeUpdater:
     ## Returns: 
     success message
     """
-    def __call__(
-            self, 
-            node_id: int, 
-            payload: dict, 
-            return_serialized: bool = False
-            ) -> tuple:
+    def __init__(self, return_serialized : bool = False):
+        self.return_serialized = return_serialized
+
+    def __call__(self, node_id: int, payload: dict, ) -> tuple:
         if not node_id:
             raise ValueError("Node ID must be provided.")
         node_id = int(node_id) if node_id else None
@@ -319,44 +334,41 @@ class NodeUpdater:
                 payload['node_data'] = NodeLoader()(original_id).get('node_data')
 
             if folders:
-                for i, f in enumerate(folders, 1):
-                    config = NodeLoader()(original_id+i,from_db=True)   # returns new node's payload
-                    config.pop("node_id")                               # we don't need its id
-                    f_path = NodeDirectoryManager.get_nodes_dir(f)
-                    # id for new node (not necessary as its id should be like old one)
-                    tmp_id = original_id + i
-                    # id for old node (which will be assigned to the new node)
-                    new_id = node_id + i 
-                    # get new node's data, as payload doesn't have it
-                    data = NodeLoader()(tmp_id).get('node_data')       
+                o_ids = list(payload.get("children").values())
+                new_ids = list(Node.objects.filter(node_id = node_id).values().first().get("children").values())
+                
+                configs = []
+                for o_id in o_ids:
+                    config = NodeLoader(from_db=True)(o_id)
+                    config.pop("node_id"), config.pop("node_data")
+                    configs.append(config)
 
-                    # The following section is important
-                    # it saves payload with new changes while appending its data to the original one
+                for i, f in enumerate(folders):
+                    f_path = NodeDirectoryManager.get_nodes_dir(f)
+                    tmp_id = o_ids[i]
+                    new_id = new_ids[i]
+                    data = NodeLoader()(tmp_id).get('node_data')
+                    
                     new_payload = payload.copy()
                     new_payload['node_id'] = new_id
                     new_payload['node_data'] = data
-                    new_payload.update(**config)
-
-                    # to make things clear the original node data is a combination of its parts
-                    # for example train_test_split node:-
-                    # original node data will be (train_data, test_data)
-                    # while the train part will only take train_data, and the test part
-                    # will take test_data, that's why I have appended data to the original one
+                    new_payload.update(**configs[i])
                     payload['node_data'].append(data)
                     NodeSaver()(new_payload, path=f_path)
                     NodeDeleter()(tmp_id)
             
             # now we assign the old node's id for the new node so it takes same identifier
             payload['node_id'] = node_id
+            payload['children'] = node.children
             NodeSaver()(payload, path=folder_path)      # ...وتوتة توتة خلصت الحدوتة الحمدلله
-            NodeDeleter()(original_id, is_special_case, is_multi_channel)
+            NodeDeleter(is_special_case, is_multi_channel)(original_id)
             
             # this part to delete node if its name isn't same as new one's name
             if node.node_name != payload.get("node_name"):
                 delete_node_file(node.node_name, node.node_id,folder)
 
             # serialization part
-            node_data = NodeLoader()(node_id, from_db=True, return_serialized=return_serialized).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=self.return_serialized)(node_id).get('node_data')
             message = f"Node {node_id} updated."
             payload.update({"message": message, "node_data": node_data})
             return True, payload

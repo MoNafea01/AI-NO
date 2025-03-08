@@ -17,6 +17,7 @@ class Joiner:
         try:
             joined_data = (self.data_1, self.data_2)
             payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join")
+            
             NodeSaver()(payload, "core/nodes/saved/data")
             del payload['node_data']
             return payload
@@ -29,7 +30,7 @@ class Joiner:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload
 
@@ -51,9 +52,13 @@ class Splitter:
         try:
             out1, out2 = self.data
             payload = PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split")
-            n_id = payload['node_id']
-            payload1 = PayloadBuilder.build_payload("data_1", out1, "splitter", node_type="custom", task="split", node_id=n_id+1)
-            payload2 = PayloadBuilder.build_payload("data_2", out2, "splitter", node_type="custom", task="split", node_id=n_id+2)
+            payload1 = PayloadBuilder.build_payload("data_1", out1, "splitter", node_type="custom", task="split")
+            payload2 = PayloadBuilder.build_payload("data_2", out2, "splitter", node_type="custom", task="split")
+            
+            payload['children'] = {
+                "data_1": payload1['node_id'],
+                "data_2": payload2['node_id']
+            }
             NodeSaver()(payload, "core/nodes/saved/data")
             NodeSaver()(payload1, "core/nodes/saved/data")
             NodeSaver()(payload2, "core/nodes/saved/data")

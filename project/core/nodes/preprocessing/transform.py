@@ -54,7 +54,9 @@ class Transform:
         try:
             transformer = PreprocessorTransformer(preprocessor, self.data)
             output = transformer.transform_data()
-            payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', node_type='transformer')
+            payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', 
+                                                   node_type='transformer')
+            
             NodeSaver()(payload, "core/nodes/saved/data")
             del payload['node_data']
             return payload
@@ -67,7 +69,7 @@ class Transform:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload
 

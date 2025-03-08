@@ -29,7 +29,8 @@ class PayloadBuilder:
             "node_id": id(preprocessor),
             "node_name": node_name,
             "node_data": preprocessor,
-            "task": "preprocessing"
+            "task": "preprocessing",
+            "children": {},
         }
         payload.update(kwargs)
         return payload

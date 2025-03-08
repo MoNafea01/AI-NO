@@ -16,6 +16,7 @@ from core.repositories.node_repository import NodeLoader, NodeSaver, NodeDeleter
 from core.nodes.other.custom import Joiner, Splitter
 from core.nodes.other.evaluator import Evaluator
 from core.nodes.nets.input_layer import Input
+from core.nodes.nets.dense_layer import DenseLayer
 from .serializers import *
 import pandas as pd
 import json
@@ -31,15 +32,23 @@ class NodeQueryMixin:
             node_id = request.query_params.get('node_id')
             channel = request.query_params.get('output')
             if channel == '1':
-                node = Node.objects.filter(node_id=int(node_id)+1)
-                if node.exists():
-                    node_id = str(int(node_id) + 1)
+                parent_node = Node.objects.filter(node_id=int(node_id))
+                if parent_node.exists():
+                    children = parent_node.values().first().get('children')
+                    child_id = list(children.values())[0]
+                    if child_id:
+                        node_id = str(child_id)
+
             elif channel in ['2', 'data']:
-                node = Node.objects.filter(node_id=int(node_id)+2)
-                if node.exists():
-                    node_id = str(int(node_id) + 2)
+                parent_node = Node.objects.filter(node_id=int(node_id))
+                if parent_node.exists():
+                    children = parent_node.values().first().get('children')
+                    child_id = list(children.values())[1]
+                    if child_id:
+                        node_id = str(child_id)
+
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            payload = NodeLoader()(node_id=node_id, from_db=True, return_serialized=return_serialized)
+            payload = NodeLoader(from_db=True, return_serialized=return_serialized)(node_id=node_id)
             if not return_serialized:
                 del payload['node_data']
             return Response(payload, status=status.HTTP_200_OK)
@@ -82,7 +91,7 @@ class CreateModelView(APIView, NodeQueryMixin):
             )
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, model_instance(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, model_instance())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -141,7 +150,7 @@ class FitModelAPIView(APIView, NodeQueryMixin):
             fitter = FitModel(X=X, y=y, model=model, model_path=model_path)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, fitter(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, fitter())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -191,7 +200,59 @@ class InputAPIView(APIView, NodeQueryMixin):
             input_instance = Input(input_shape, name, input_path)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, input_instance(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, input_instance())
+            if not return_serialized:
+                    del message["node_data"]
+            if success:
+                return Response(message, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request):
+        node_id = request.query_params.get('node_id')
+        if not node_id:
+            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            success, message = NodeDeleter()(node_id)
+            if success:
+                return Response({"message": f"Node {node_id} deleted successfully."},
+                    status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DenseAPIView(APIView, NodeQueryMixin):
+    def post(self, request):
+        serializer = DenseSerializer(data=request.data)
+        if serializer.is_valid():
+            units = serializer.validated_data.get('units')
+            activation = serializer.validated_data.get('activation')
+            prev_node = serializer.validated_data.get('prev_node')
+            path = serializer.validated_data.get('path')
+            try:
+                dense_instance = DenseLayer(units, prev_node, activation, path)
+                output_channel = request.query_params.get('output', None)
+                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+                response_data = dense_instance(output_channel, return_serialized=return_serialized)
+                return Response(response_data, status=status.HTTP_200_OK)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request):
+        serializer = DenseSerializer(data=request.data)
+        if serializer.is_valid():
+            units = serializer.validated_data.get('units')
+            activation = serializer.validated_data.get('activation')
+            prev_node = serializer.validated_data.get('prev_node')
+            path = serializer.validated_data.get('path')
+            dense_instance = DenseLayer(units, prev_node, activation, path)
+            node_id = request.query_params.get('node_id', None)
+            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+            success, message = NodeUpdater(return_serialized)(node_id, dense_instance())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -250,7 +311,7 @@ class PredictAPIView(APIView, NodeQueryMixin):
                 predictor = Predict(X, model=model, model_path=model_path)
                 node_id = request.query_params.get('node_id', None)
                 return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                success, message = NodeUpdater()(node_id, predictor(), return_serialized=return_serialized)
+                success, message = NodeUpdater(return_serialized)(node_id, predictor())
                 if not return_serialized:
                     del message["node_data"]
                 if success:
@@ -310,7 +371,7 @@ class PreprocessorAPIView(APIView, NodeQueryMixin):
             preprocessor = Preprocessor(preprocessor_name, preprocessor_type, params=params, preprocessor_path=preprocessor_path)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, preprocessor(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, preprocessor())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -369,7 +430,7 @@ class FitPreprocessorAPIView(APIView, NodeQueryMixin):
             fitter = FitPreprocessor(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, fitter(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, fitter())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -433,7 +494,7 @@ class TransformAPIView(APIView, NodeQueryMixin):
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             # Update the node using NodeUpdater
-            success, message = NodeUpdater()(node_id, transform_instance(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, transform_instance())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -491,7 +552,7 @@ class FitTransformAPIView(APIView, NodeQueryMixin):
             fit_transform_instance = FitTransform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, fit_transform_instance(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, fit_transform_instance())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -505,7 +566,7 @@ class FitTransformAPIView(APIView, NodeQueryMixin):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id, is_special_case=True)
+            success, message = NodeDeleter(is_special_case=True)(node_id)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -536,7 +597,7 @@ class SplitterAPIView(APIView, NodeQueryMixin):
             splitter_instance = Splitter(data)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, splitter_instance(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, splitter_instance())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -550,7 +611,7 @@ class SplitterAPIView(APIView, NodeQueryMixin):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id, is_multi_channel=True)
+            success, message = NodeDeleter(is_multi_channel=True)(node_id)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -581,7 +642,7 @@ class JoinerAPIView(APIView, NodeQueryMixin):
             joiner = Joiner(data_1, data_2)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, joiner(), return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False)
+            success, message = NodeUpdater(return_serialized)(node_id, joiner())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -633,7 +694,7 @@ class TrainTestSplitAPIView(APIView, NodeQueryMixin):
             splitter = TrainTestSplit(data=data, params=params)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, splitter(), return_serialized=return_serialized) 
+            success, message = NodeUpdater(return_serialized)(node_id, splitter()) 
             if success:
                 return Response(message, status=status.HTTP_200_OK)
             else:
@@ -645,7 +706,7 @@ class TrainTestSplitAPIView(APIView, NodeQueryMixin):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id, is_multi_channel=True)
+            success, message = NodeDeleter(is_multi_channel=True)(node_id)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -677,7 +738,7 @@ class DataLoaderAPIView(APIView, NodeQueryMixin):
             loader = DataLoader(dataset_name=dataset_name, dataset_path=dataset_path)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, loader(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, loader())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -691,7 +752,7 @@ class DataLoaderAPIView(APIView, NodeQueryMixin):
         if not node_id:
             return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter()(node_id, is_multi_channel=True)
+            success, message = NodeDeleter(is_multi_channel=True)(node_id)
             if success:
                 return Response({"message": f"Node {node_id} deleted successfully."},
                     status=status.HTTP_204_NO_CONTENT)
@@ -727,7 +788,7 @@ class EvaluatorAPIView(APIView, NodeQueryMixin):
             evaluator = Evaluator(metric=metric, y_true=y_true, y_pred=y_pred)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater()(node_id, evaluator(), return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, evaluator())
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -763,7 +824,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                 return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
                 payload = loader(node_id=node_id, path=path)
                 NodeSaver()(payload)
-                payload = NodeLoader()(node_id=payload.get("node_id"), from_db=True, return_serialized=return_serialized)
+                payload = NodeLoader(from_db=True, return_serialized=return_serialized)(node_id=payload.get("node_id"))
                 if not return_serialized:
                     del payload["node_data"]
                 return Response(payload, status=status.HTTP_200_OK)
@@ -779,9 +840,9 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
             payload = loader(node_id=node_id, path=path)
             NodeSaver()(payload)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            payload = NodeLoader()(node_id=payload.get("node_id"), from_db=True)
+            payload = NodeLoader(from_db=True)(node_id=payload.get("node_id"))
             node_id = request.query_params.get('node_id', None)
-            success, message = NodeUpdater()(node_id, payload, return_serialized=return_serialized)
+            success, message = NodeUpdater(return_serialized)(node_id, payload)
             if not return_serialized:
                     del message["node_data"]
             if success:
@@ -820,7 +881,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
                 res = saver(payload, path=path)
                 response = saver(res)
                 if return_serialized:
-                    node_data = NodeLoader()(node_id=response.get("node_id"), return_serialized=True).get("node_data")
+                    node_data = NodeLoader(return_serialized=True)(node_id=response.get("node_id")).get("node_data")
                     response["node_data"] = node_data
                 return Response(response, status=status.HTTP_200_OK)
             except ValueError as e:
@@ -841,7 +902,9 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
             res = saver(payload, path=path)
             response = saver(res)
             node_id = request.query_params.get('node_id', None)
-            success, message = NodeUpdater()(node_id, response,return_serialized=returned_serialized)
+            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+
+            success, message = NodeUpdater(return_serialized)(node_id, response)
             if returned_serialized:
                     message['node_data'] = NodeLoader()(message.get('node_id'), return_serialized=True).get('node_data')
             if success:

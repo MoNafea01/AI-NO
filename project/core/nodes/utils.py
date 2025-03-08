@@ -42,14 +42,15 @@ class NodeNameHandler:
 class PayloadBuilder:
     """Constructs payloads for saving and response."""
     @staticmethod
-    def build_payload(message, node, node_name, **kwargs):
+    def build_payload(message, node_data, node_name, **kwargs):
         payload = {
             "message": message,
-            "params": NodeAttributeExtractor.get_attributes(node),
-            "node_id": id(node),
+            "params": NodeAttributeExtractor.get_attributes(node_data),
+            "node_id": id(node_data),
             "node_name": node_name,
-            "node_data": node,
-            "task": "custom"
+            "node_data": node_data,
+            "task": "custom",
+            "children": {},
         }
         payload.update(kwargs)
         return payload

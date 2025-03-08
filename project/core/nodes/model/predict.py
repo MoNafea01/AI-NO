@@ -55,6 +55,7 @@ class Predict:
             predictor = ModelPredictor(model, self.X)
             predictions = predictor.predict_model()
             payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict')
+            
             NodeSaver()(payload, "core/nodes/saved/data")
             del payload['node_data']
             return payload
@@ -67,7 +68,7 @@ class Predict:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload
 
