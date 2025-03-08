@@ -125,20 +125,6 @@ class CreateModelView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    # def delete(self, request):
-    #     node_id = request.query_params.get('node_id')
-    #     if not node_id:
-    #         return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-    #     try:
-    #         success, message = NodeDeleter()(node_id)
-    #         if success:
-    #             return Response({"message": f"Node {node_id} deleted successfully."},
-    #                 status=status.HTTP_204_NO_CONTENT)
-    #         else:
-    #             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-    #     except Exception as e:
-    #             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FitModelAPIView(APIView, NodeQueryMixin):
