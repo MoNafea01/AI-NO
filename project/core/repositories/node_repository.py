@@ -1,7 +1,7 @@
 import joblib
 from io import BytesIO
 import base64
-from api.models import Node, Component
+from ai_operations.models import Node, Component
 from django.core.exceptions import ObjectDoesNotExist
 from ..nodes.utils import NodeDirectoryManager, NodeNameHandler, DirectoryManager
 import os
