@@ -4,7 +4,8 @@ from keras.api.layers import Input as input_layer
 from ...repositories.node_repository import NodeSaver, NodeLoader
 from .utils import PayloadBuilder
 
-
+global n_id
+n_id = 0
 
 class Input:
     '''Handles input layer creation.'''
@@ -27,6 +28,8 @@ class Input:
         try:
             input_shape = NodeLoader()(self.input_shape.get("node_id")).get('node_data') if isinstance(self.input_shape, dict) else self.input_shape
             input_name = NodeLoader()(self.name.get("node_id")).get('node_data') if isinstance(self.name, dict) else self.name
+            if not input_name:
+                input_name = self.gen_id()
             return self.create_handler(input_layer(shape=input_shape, name=input_name))
         except Exception as e:
             raise ValueError(f"Error creating input layer from json: {e}")
@@ -43,7 +46,8 @@ class Input:
     def create_handler(self, input_layer):
         '''Creates the payload.'''
         try:
-            payload = PayloadBuilder.build_payload("Input layer created", input_layer, "input_layer", params= {"shape": input_layer.shape})
+            payload = PayloadBuilder.build_payload("Input layer created", input_layer, "input_layer", 
+                                                   params= {"shape": input_layer.shape,"name": input_layer.name})
             
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
             del payload["node_data"]
@@ -53,6 +57,12 @@ class Input:
         except Exception as e:
             raise ValueError(f"Error creating input layer payload: {e}")
     
+    def gen_id(self):
+        global n_id
+        n_id += 1
+        name = f"input_layer_{n_id}"
+        return name
+
     def __str__(self):
         return str(self.payload)
     

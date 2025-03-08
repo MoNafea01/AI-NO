@@ -3,20 +3,30 @@ from rest_framework.response import Response
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser
+
 from core.nodes.other.dataLoader import DataLoader
+
 from core.nodes.model.model import Model
 from core.nodes.model.fit import Fit as FitModel
 from core.nodes.model.predict import Predict
-from core.nodes.preprocessing.preprocessor import Preprocessor
-from core.nodes.preprocessing.transform import Transform
-from core.nodes.other.train_test_split import TrainTestSplit
-from core.nodes.preprocessing.fit_transform import FitTransform
-from core.nodes.preprocessing.fit import Fit as FitPreprocessor
-from core.repositories.node_repository import NodeLoader, NodeSaver, NodeDeleter, NodeUpdater, ClearAllNodes
-from core.nodes.other.custom import Joiner, Splitter
 from core.nodes.other.evaluator import Evaluator
+
+from core.nodes.preprocessing.preprocessor import Preprocessor
+from core.nodes.preprocessing.fit import Fit as FitPreprocessor
+from core.nodes.preprocessing.transform import Transform
+from core.nodes.preprocessing.fit_transform import FitTransform
+
+from core.nodes.other.train_test_split import TrainTestSplit
+from core.nodes.other.custom import Joiner, Splitter
+
+from core.repositories.node_repository import (
+    NodeLoader, NodeSaver, 
+    NodeDeleter, NodeUpdater, ClearAllNodes)
+
+
 from core.nodes.nets.input_layer import Input
 from core.nodes.nets.dense_layer import DenseLayer
+from core.nodes.nets.sequential import SequentialNet
 from .serializers import *
 import pandas as pd
 import json
@@ -35,23 +45,39 @@ class NodeQueryMixin:
                 parent_node = Node.objects.filter(node_id=int(node_id))
                 if parent_node.exists():
                     children = parent_node.values().first().get('children')
-                    child_id = list(children.values())[0]
-                    if child_id:
-                        node_id = str(child_id)
+                    child_id = list(children.values())
+                    if len(child_id) > 0:
+                        node_id = str(child_id[0])
 
             elif channel in ['2', 'data']:
                 parent_node = Node.objects.filter(node_id=int(node_id))
                 if parent_node.exists():
                     children = parent_node.values().first().get('children')
-                    child_id = list(children.values())[1]
-                    if child_id:
-                        node_id = str(child_id)
+                    child_id = list(children.values())
+                    if len(child_id) > 1:
+                        node_id = str(child_id[1])
 
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             payload = NodeLoader(from_db=True, return_serialized=return_serialized)(node_id=node_id)
             if not return_serialized:
                 del payload['node_data']
             return Response(payload, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request):
+        node_id = request.query_params.get('node_id')
+        node_name = Node.objects.filter(node_id=node_id).values('node_name').first().get('node_name')
+        is_multi_channel = node_name in ["data_loader", "train_test_split", "splitter"]
+        is_special_case = node_name in ['fitter_transformer']
+        if not node_id:
+            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            success, message = NodeDeleter(is_special_case, is_multi_channel)(node_id)
+            if success:
+                return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -100,19 +126,19 @@ class CreateModelView(APIView, NodeQueryMixin):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    # def delete(self, request):
+    #     node_id = request.query_params.get('node_id')
+    #     if not node_id:
+    #         return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+    #     try:
+    #         success, message = NodeDeleter()(node_id)
+    #         if success:
+    #             return Response({"message": f"Node {node_id} deleted successfully."},
+    #                 status=status.HTTP_204_NO_CONTENT)
+    #         else:
+    #             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+    #     except Exception as e:
+    #             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FitModelAPIView(APIView, NodeQueryMixin):
@@ -158,20 +184,6 @@ class FitModelAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class InputAPIView(APIView, NodeQueryMixin):
@@ -208,20 +220,6 @@ class InputAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DenseAPIView(APIView, NodeQueryMixin):
@@ -230,10 +228,10 @@ class DenseAPIView(APIView, NodeQueryMixin):
         if serializer.is_valid():
             units = serializer.validated_data.get('units')
             activation = serializer.validated_data.get('activation')
-            prev_node = serializer.validated_data.get('prev_node')
             path = serializer.validated_data.get('path')
+            name = serializer.validated_data.get('name')
             try:
-                dense_instance = DenseLayer(units, prev_node, activation, path)
+                dense_instance = DenseLayer(units, activation, path, name)
                 output_channel = request.query_params.get('output', None)
                 return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
                 response_data = dense_instance(output_channel, return_serialized=return_serialized)
@@ -247,9 +245,9 @@ class DenseAPIView(APIView, NodeQueryMixin):
         if serializer.is_valid():
             units = serializer.validated_data.get('units')
             activation = serializer.validated_data.get('activation')
-            prev_node = serializer.validated_data.get('prev_node')
             path = serializer.validated_data.get('path')
-            dense_instance = DenseLayer(units, prev_node, activation, path)
+            name = serializer.validated_data.get('name')
+            dense_instance = DenseLayer(units, activation, path, name)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             success, message = NodeUpdater(return_serialized)(node_id, dense_instance())
@@ -260,20 +258,43 @@ class DenseAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+      
+
+class SequentialAPIView(APIView, NodeQueryMixin):
+    def post(self, request):
+        serializer = SequentialSerializer(data=request.data)
+        if serializer.is_valid():
+            layers = serializer.validated_data.get('layers')
+            name = serializer.validated_data.get('name')
+            path = serializer.validated_data.get('path')
+            try:
+                sequential_instance = SequentialNet(layers, name, path)
+                output_channel = request.query_params.get('output', None)
+                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+                response_data = sequential_instance(output_channel, return_serialized=return_serialized)
+                return Response(response_data, status=status.HTTP_200_OK)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
+    def put(self, request):
+        serializer = SequentialSerializer(data=request.data)
+        if serializer.is_valid():
+            layers = serializer.validated_data.get('layers')
+            name = serializer.validated_data.get('name')
+            path = serializer.validated_data.get('path')
+            sequential_instance = SequentialNet(layers, name, path)
+            node_id = request.query_params.get('node_id', None)
+            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+            success, message = NodeUpdater(return_serialized)(node_id, sequential_instance())
+            if not return_serialized:
+                    del message["node_data"]
             if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
+                return Response(message, status=status.HTTP_200_OK)
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PredictAPIView(APIView, NodeQueryMixin):
     """
@@ -319,20 +340,6 @@ class PredictAPIView(APIView, NodeQueryMixin):
                 else:
                     return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PreprocessorAPIView(APIView, NodeQueryMixin):
@@ -379,20 +386,6 @@ class PreprocessorAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FitPreprocessorAPIView(APIView, NodeQueryMixin):
@@ -438,20 +431,6 @@ class FitPreprocessorAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TransformAPIView(APIView, NodeQueryMixin):
@@ -502,20 +481,6 @@ class TransformAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FitTransformAPIView(APIView, NodeQueryMixin):
@@ -560,20 +525,6 @@ class FitTransformAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter(is_special_case=True)(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SplitterAPIView(APIView, NodeQueryMixin):
@@ -605,20 +556,6 @@ class SplitterAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter(is_multi_channel=True)(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class JoinerAPIView(APIView, NodeQueryMixin):
@@ -650,20 +587,6 @@ class JoinerAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TrainTestSplitAPIView(APIView, NodeQueryMixin):
@@ -700,20 +623,6 @@ class TrainTestSplitAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter(is_multi_channel=True)(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DataLoaderAPIView(APIView, NodeQueryMixin):
@@ -746,20 +655,6 @@ class DataLoaderAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter(is_multi_channel=True)(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EvaluatorAPIView(APIView, NodeQueryMixin):
@@ -796,21 +691,6 @@ class EvaluatorAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class NodeLoaderAPIView(APIView, NodeQueryMixin):
@@ -850,20 +730,6 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
             else:
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class NodeSaveAPIView(APIView, NodeQueryMixin):
@@ -913,20 +779,6 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            success, message = NodeDeleter()(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."},
-                    status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class ComponentAPIViewSet(viewsets.ModelViewSet):
     queryset = Component.objects.all()
@@ -934,7 +786,7 @@ class ComponentAPIViewSet(viewsets.ModelViewSet):
 
 
 class ClearNodesAPIView(APIView):
-    def post(self, request):
+    def delete(self, request):
         try:
             response = ClearAllNodes()()
             return Response(response, status=status.HTTP_200_OK)
@@ -943,7 +795,7 @@ class ClearNodesAPIView(APIView):
 
 
 class ClearComponentsAPIView(APIView):
-    def post(self, request):
+    def delete(self, request):
         try:
             response = ClearAllNodes()('components')
             return Response(response, status=status.HTTP_200_OK)

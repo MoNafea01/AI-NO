@@ -1,19 +1,25 @@
-from keras.api.layers import Dense, Input
+from keras.api.layers import Dense
 from ...repositories.node_repository import NodeSaver, NodeLoader
 from .utils import PayloadBuilder
 
+global n_id
+n_id = 0
+
 class DenseLayer:
     '''Handles dense layer creation.'''
-    def __init__(self, units: int, prev_node, activation: str, path: str = None):
+    def __init__(self, units: int, activation: str, path: str = None, name: str = None):
         '''Initializes the Dense object.'''
         self.units = NodeLoader()(units.get("node_id")).get('node_data') if isinstance(units, dict) else units 
         self.activation = NodeLoader()(activation.get("node_id")).get('node_data') if isinstance(activation, dict) else activation
-        self.prev_node = prev_node
+        self.name = NodeLoader()(name.get("node_id")).get('node_data') if isinstance(name, dict) else name
         self.layer_path = path
         self.payload = self._create_dense()
 
     def _create_dense(self) -> dict:
         '''Creates the dense layer payload.'''
+        if not self.name:
+            self.name = self.gen_id()
+
         if self.layer_path:
             return self._create_from_path()
         else:
@@ -22,9 +28,8 @@ class DenseLayer:
     def _create_from_dict(self) -> dict:
         '''Creates the dense layer payload using json provided.'''
         try:
-            prev_node = NodeLoader()(self.prev_node.get("node_id")).get('node_data') if isinstance(self.prev_node, dict) else self.prev_node
-            prev_node = Input(shape=prev_node.shape[1:], name="reloaded_input")
-            return self.create_handler(Dense(units=self.units, activation=self.activation)(prev_node))
+            dense_layer = Dense(units=self.units, activation=self.activation, name=self.name)
+            return self.create_handler(dense_layer)
         except Exception as e:
             raise ValueError(f"Error creating dense layer from json: {e}")
 
@@ -42,7 +47,7 @@ class DenseLayer:
         print(dense_layer)
         try:
             payload = PayloadBuilder.build_payload("Dense layer created", dense_layer, "dense_layer", 
-                                                   params= {"units": self.units, "activation": self.activation})
+                                                   params= {"units": self.units, "activation": self.activation, "name": dense_layer.name})
             
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
             del payload["node_data"]
@@ -51,6 +56,12 @@ class DenseLayer:
         
         except Exception as e:
             raise ValueError(f"Error creating dense layer payload: {e}")
+    
+    def gen_id(self):
+        global n_id
+        n_id += 1
+        name = f"dense_layer_{n_id}"
+        return name
     
     def __str__(self):
         return str(self.payload)
