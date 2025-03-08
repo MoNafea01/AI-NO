@@ -7,11 +7,11 @@ n_id = 0
 
 class SequentialNet:
     '''Handles sequential model creation.'''
-    def __init__(self, layers: list, name: str = None, path: str = None):
+    def __init__(self, layer: dict, name: str = None, path: str = None):
         '''Initializes the Sequential object.'''
-        self.layers = [NodeLoader()(layer.get("node_id")).get('node_data') if isinstance(layer, dict) else layer for layer in layers]
-        self.layers_names = [NodeLoader(from_db=True)(layer.get("node_id")).get('node_name') if isinstance(layer, dict) else layer for layer in layers]
+        self.layer = NodeLoader(from_db=True)(layer.get("node_id")).get('node_id') if isinstance(layer, dict) else layer
         self.name = NodeLoader()(name.get("node_id")).get('node_data') if isinstance(name, dict) else name
+        self.layers, self.layers_names  = self.get_layers()
         self.path = path
         self.model = self._create_model()
         self.payload = self._create_payload()
@@ -36,6 +36,18 @@ class SequentialNet:
             return payload
         except Exception as e:
             raise ValueError(f"Error creating model payload: {e}")
+    
+    def get_layers(self):
+        cur_id = self.layer
+        layers_ids = [cur_id]
+        while True:
+            cur_id = NodeLoader(from_db=True)(cur_id).get("children").get('previous_node')
+            if not cur_id:
+                break
+            layers_ids.append(cur_id)
+        layers = [NodeLoader()(layer_id).get('node_data') for layer_id in layers_ids]
+        layers_names = [NodeLoader()(layer_id).get('node_data').name for layer_id in layers_ids]
+        return list(reversed(layers)), list(reversed(layers_names))
     
     def gen_id(self):
         global n_id

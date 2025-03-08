@@ -1,7 +1,7 @@
 import joblib
 from io import BytesIO
 import base64
-from ai_operations.models import Node, Component
+from api.models import Node, Component
 from django.core.exceptions import ObjectDoesNotExist
 from ..nodes.utils import NodeDirectoryManager, NodeNameHandler, DirectoryManager
 import os
@@ -24,6 +24,7 @@ Loading(from db):
 
 MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter"]
 SPECIAL_CASE_NODES = ["fitter_transformer"]
+PARENT_NODES = ["dense_layer"]
 
 
 class NodeSaver:
@@ -336,7 +337,6 @@ class NodeUpdater:
             if folders:
                 o_ids = list(payload.get("children").values())
                 new_ids = list(Node.objects.filter(node_id = node_id).values().first().get("children").values())
-                
                 configs = []
                 for o_id in o_ids:
                     config = NodeLoader(from_db=True)(o_id)
@@ -359,7 +359,8 @@ class NodeUpdater:
             
             # now we assign the old node's id for the new node so it takes same identifier
             payload['node_id'] = node_id
-            payload['children'] = node.children
+            if payload['node_name'] not in PARENT_NODES:
+                payload['children'] = node.children
             NodeSaver()(payload, path=folder_path)      # ...وتوتة توتة خلصت الحدوتة الحمدلله
             NodeDeleter(is_special_case, is_multi_channel)(original_id)
             

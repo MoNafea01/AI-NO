@@ -29,25 +29,26 @@ class InputSerializer(serializers.Serializer):
 
 
 class DenseSerializer(serializers.Serializer):
-    units = serializers.IntegerField()
+    units = serializers.IntegerField(required=False, default=1)
     activation = serializers.CharField(required=False, default='relu')
+    prev_node = serializers.JSONField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data:dict):
         """
         Ensure at least one of 'name' or 'path' is provided.
         """
-        return validate(data, ('units', 'path'))
+        return validate(data, ('prev_node', 'path'))
 
 class SequentialSerializer(serializers.Serializer):
-    layers = serializers.ListField(child=serializers.JSONField())
+    layer = serializers.JSONField()
     name = serializers.JSONField(required=False)
     path = serializers.CharField(required=False)
     def validate(self, data:dict):
         """
         Ensure at least one of 'name' or 'path' is provided.
         """
-        return validate(data, ('layers', 'path'))
+        return validate(data, ('layer', 'path'))
 
 
 class FitModelSerializer(serializers.Serializer):

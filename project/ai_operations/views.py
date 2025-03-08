@@ -216,8 +216,9 @@ class DenseAPIView(APIView, NodeQueryMixin):
             activation = serializer.validated_data.get('activation')
             path = serializer.validated_data.get('path')
             name = serializer.validated_data.get('name')
+            prev_node = serializer.validated_data.get('prev_node')
             try:
-                dense_instance = DenseLayer(units, activation, path, name)
+                dense_instance = DenseLayer(prev_node, units, activation, path, name)
                 output_channel = request.query_params.get('output', None)
                 return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
                 response_data = dense_instance(output_channel, return_serialized=return_serialized)
@@ -233,7 +234,8 @@ class DenseAPIView(APIView, NodeQueryMixin):
             activation = serializer.validated_data.get('activation')
             path = serializer.validated_data.get('path')
             name = serializer.validated_data.get('name')
-            dense_instance = DenseLayer(units, activation, path, name)
+            prev_node = serializer.validated_data.get('prev_node')
+            dense_instance = DenseLayer(prev_node, units, activation, path, name)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             success, message = NodeUpdater(return_serialized)(node_id, dense_instance())
@@ -250,11 +252,11 @@ class SequentialAPIView(APIView, NodeQueryMixin):
     def post(self, request):
         serializer = SequentialSerializer(data=request.data)
         if serializer.is_valid():
-            layers = serializer.validated_data.get('layers')
+            layer = serializer.validated_data.get('layer')
             name = serializer.validated_data.get('name')
             path = serializer.validated_data.get('path')
             try:
-                sequential_instance = SequentialNet(layers, name, path)
+                sequential_instance = SequentialNet(layer, name, path)
                 output_channel = request.query_params.get('output', None)
                 return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
                 response_data = sequential_instance(output_channel, return_serialized=return_serialized)
@@ -266,10 +268,10 @@ class SequentialAPIView(APIView, NodeQueryMixin):
     def put(self, request):
         serializer = SequentialSerializer(data=request.data)
         if serializer.is_valid():
-            layers = serializer.validated_data.get('layers')
+            layer = serializer.validated_data.get('layer')
             name = serializer.validated_data.get('name')
             path = serializer.validated_data.get('path')
-            sequential_instance = SequentialNet(layers, name, path)
+            sequential_instance = SequentialNet(layer, name, path)
             node_id = request.query_params.get('node_id', None)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             success, message = NodeUpdater(return_serialized)(node_id, sequential_instance())
