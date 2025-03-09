@@ -1,4 +1,5 @@
 import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/features/node_view/presentation/widgets/center_actions.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,6 +30,8 @@ class _GridNodeViewState extends State<GridNodeView> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.sizeOf(context).height;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
     return Scaffold(
       appBar: _appBar(),
       body: Stack(
@@ -36,32 +39,42 @@ class _GridNodeViewState extends State<GridNodeView> {
           InteractiveVSNodeView(
             width: 5000,
             height: 5000,
+            showGrid: true,
             nodeDataProvider: nodeDataProvider,
           ),
           Positioned(
             top: 20,
             right: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _evaluateButton(),
-                if (context.watch<GridNodeViewCubit>().results != null)
-                  ...context.watch<GridNodeViewCubit>().results!.map(
-                    (scopeOutput) {
-                      scopeOutput = scopeOutput.replaceAll(",", ",\n");
-                      return Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(scopeOutput),
-                        ),
-                      );
-                    },
-                  ),
-              ],
-            ),
+            child: _outputCards(context),
+          ),
+          Positioned(
+            bottom: screenHeight / 45,
+            left: screenWidth / 2 - 100,
+            child: CenterActions(),
           ),
         ],
       ),
+    );
+  }
+
+  Column _outputCards(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        _evaluateButton(),
+        if (context.watch<GridNodeViewCubit>().results != null)
+          ...context.watch<GridNodeViewCubit>().results!.map(
+            (scopeOutput) {
+              scopeOutput = scopeOutput.replaceAll(",", ",\n");
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(scopeOutput),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 

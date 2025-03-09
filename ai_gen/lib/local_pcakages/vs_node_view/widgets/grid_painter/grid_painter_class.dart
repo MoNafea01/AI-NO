@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class GridPainter extends CustomPainter {
+class GridPainterClass extends CustomPainter {
   final double _gridSpacing;
   final Color _color;
 
-  GridPainter({double? gridSpacing, Color? color})
-      : _gridSpacing = gridSpacing ?? 50,
+  GridPainterClass({double? gridSpacing, Color? color})
+      : _gridSpacing = gridSpacing ?? 30,
         _color = color ?? Colors.grey;
 
   @override

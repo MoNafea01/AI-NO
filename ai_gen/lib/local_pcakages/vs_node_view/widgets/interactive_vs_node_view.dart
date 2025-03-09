@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../data/vs_node_data_provider.dart';
+import 'grid_painter/grid_painter.dart';
 import 'vs_node_view.dart';
 
 class InteractiveVSNodeView extends StatefulWidget {
@@ -111,10 +112,21 @@ class _InteractiveVSNodeViewState extends State<InteractiveVSNodeView> {
       child: SizedBox(
         width: width,
         height: height,
-        child: widget.baseNodeView ??
-            VSNodeView(
-              nodeDataProvider: widget.nodeDataProvider,
-            ),
+        child: Stack(
+          children: [
+            if (widget.showGrid)
+              GridPainter(
+                width: width,
+                height: height,
+                color: widget.gridColor,
+                spacing: widget.gridSpacing,
+              ),
+            widget.baseNodeView ??
+                VSNodeView(
+                  nodeDataProvider: widget.nodeDataProvider,
+                ),
+          ],
+        ),
       ),
     );
   }
