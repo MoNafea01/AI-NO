@@ -1,7 +1,9 @@
 import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/core/themes/asset_paths.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../cubits/grid_node_view_cubit.dart';
 import 'custom_button.dart';
 
 class CenterActions extends StatelessWidget {
@@ -9,6 +11,8 @@ class CenterActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GridNodeViewCubit gridNodeViewCubit =
+        context.read<GridNodeViewCubit>();
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -19,23 +23,25 @@ class CenterActions extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
         children: [
-          CustomIconButton(
-            icon: Icons.add,
-            iconColor: Colors.black,
-            backgroundColor: Colors.transparent,
-          ),
-          CustomIconButton(
-            icon: Icons.grid_4x4_sharp,
-            // : Icons.grid_off_rounded,
-          ),
+          CustomIconButton(icon: Icons.add, active: false),
+          _toggleGridButton(gridNodeViewCubit),
           AssetIconButton(iconPath: AssetsPaths.arrowSelector),
           CustomIconButton(
             icon: Icons.keyboard_arrow_down_sharp,
-            iconColor: Colors.black,
-            backgroundColor: Colors.transparent,
+            active: false,
           ),
         ],
       ),
+    );
+  }
+
+  CustomIconButton _toggleGridButton(GridNodeViewCubit gridNodeViewCubit) {
+    return CustomIconButton(
+      icon: gridNodeViewCubit.showGrid
+          ? Icons.grid_4x4_sharp
+          : Icons.grid_off_rounded,
+      onTap: gridNodeViewCubit.toggleGrid,
+      active: gridNodeViewCubit.showGrid,
     );
   }
 }

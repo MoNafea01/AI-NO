@@ -39,7 +39,7 @@ class _GridNodeViewState extends State<GridNodeView> {
           InteractiveVSNodeView(
             width: 5000,
             height: 5000,
-            showGrid: true,
+            showGrid: context.watch<GridNodeViewCubit>().showGrid,
             nodeDataProvider: nodeDataProvider,
           ),
           Positioned(

@@ -6,10 +6,19 @@ import 'package:meta/meta.dart';
 part 'node_view_state.dart';
 
 class GridNodeViewCubit extends Cubit<GridNodeViewState> {
-  GridNodeViewCubit() : super(GridNodeViewInitial());
+  GridNodeViewCubit()
+      : showGrid = true,
+        super(GridNodeViewInitial());
 
   late final VSNodeDataProvider nodeDataProvider;
   Iterable<String>? results;
+  late bool showGrid;
+
+  void toggleGrid() {
+    showGrid = !showGrid;
+    emit(NodeViewSuccess());
+  }
+
   Future buildNodes() async {
     try {
       emit(GridNodeViewLoading());
