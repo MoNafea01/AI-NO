@@ -258,18 +258,18 @@ class NodeDeleter:
             if self.is_multi_channel:
                 folders = ['data', 'data']
             elif self.is_special_case:
-                folders = ['preprocessors', 'data']
+                folders = ['data', 'preprocessors']
 
             if folders:
-                for folder in folders:
-                    old_node = Node.objects.filter(node_id = node_id)
-                    children = old_node.values().first().get("children")
-                    if children:
+                old_node = Node.objects.filter(node_id = node_id)
+                children = old_node.values().first().get("children")
+                if children:
+                    for folder in folders:
                         for key, value in children.items():
                             child = Node.objects.filter(node_id = value)
+                            delete_node_file(node_name, value, folder)
                             if child.exists():
                                 child.delete()
-                                delete_node_file(node_name, value, folder)
 
             delete_node_file(node_name, node_id, folder)
             node.delete()

@@ -5,6 +5,8 @@ from rest_framework import status
 from rest_framework.parsers import MultiPartParser
 
 from core.nodes.other.dataLoader import DataLoader
+from core.nodes.other.train_test_split import TrainTestSplit
+from core.nodes.other.custom import Joiner, Splitter
 
 from core.nodes.model.model import Model
 from core.nodes.model.fit import Fit as FitModel
@@ -15,9 +17,6 @@ from core.nodes.preprocessing.preprocessor import Preprocessor
 from core.nodes.preprocessing.fit import Fit as FitPreprocessor
 from core.nodes.preprocessing.transform import Transform
 from core.nodes.preprocessing.fit_transform import FitTransform
-
-from core.nodes.other.train_test_split import TrainTestSplit
-from core.nodes.other.custom import Joiner, Splitter
 
 from core.repositories.node_repository import (
     NodeLoader, NodeSaver, 
@@ -41,21 +40,13 @@ class NodeQueryMixin:
         try:
             node_id = request.query_params.get('node_id')
             channel = request.query_params.get('output')
-            if channel == '1':
-                parent_node = Node.objects.filter(node_id=int(node_id))
-                if parent_node.exists():
-                    children = parent_node.values().first().get('children')
+            if channel in ['1', '2']:
+                parent_node = NodeLoader()(node_id=node_id)
+                if parent_node:
+                    children = parent_node.get("children")
                     child_id = list(children.values())
                     if len(child_id) > 0:
-                        node_id = str(child_id[0])
-
-            elif channel in ['2', 'data']:
-                parent_node = Node.objects.filter(node_id=int(node_id))
-                if parent_node.exists():
-                    children = parent_node.values().first().get('children')
-                    child_id = list(children.values())
-                    if len(child_id) > 1:
-                        node_id = str(child_id[1])
+                        node_id = str(child_id[0]) if channel == '1' else str(child_id[1]) if channel == '2' else node_id
 
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             payload = NodeLoader(return_serialized=return_serialized)(node_id=node_id)
@@ -66,18 +57,23 @@ class NodeQueryMixin:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
-        node_id = request.query_params.get('node_id')
-        node_name = Node.objects.filter(node_id=node_id).values('node_name').first().get('node_name')
-        is_multi_channel = node_name in ["data_loader", "train_test_split", "splitter"]
-        is_special_case = node_name in ['fitter_transformer']
-        if not node_id:
-            return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            success, message = NodeDeleter(is_special_case, is_multi_channel)(node_id)
-            if success:
-                return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            node_id = request.query_params.get('node_id')
+            node = NodeLoader()(node_id=node_id)
+            node_name = node.get('node_name')
+            is_multi_channel = node_name in ["data_loader", "train_test_split", "splitter"]
+            is_special_case = node_name in ['fitter_transformer']
+            if not node_id:
+                return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                success, message = NodeDeleter(is_special_case, is_multi_channel)(node_id)
+                if success:
+                    return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+                else:
+                    return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
