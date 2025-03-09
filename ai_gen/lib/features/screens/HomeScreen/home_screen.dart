@@ -1,6 +1,7 @@
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
-import 'package:ai_gen/node_package/widgets/Resuable%20Widgets/custom_text_icon_button.dart';
 import 'package:flutter/material.dart';
+
+import 'widgets/custom_icon_text_button.dart';
 
 class ProjectsDashboard extends StatelessWidget {
   const ProjectsDashboard({super.key});

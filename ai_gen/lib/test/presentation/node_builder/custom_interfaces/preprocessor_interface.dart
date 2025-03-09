@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -5,9 +7,9 @@ import 'package:get_it/get_it.dart';
 import 'aino_general_Interface.dart';
 import 'interface_colors.dart';
 
-class VSModelInputData extends VSAINOGeneralInputData {
+class VSPreprocessorInputData extends VSAINOGeneralInputData {
   ///Basic List input interface
-  VSModelInputData({
+  VSPreprocessorInputData({
     required super.type,
     super.title,
     super.toolTip,
@@ -16,23 +18,25 @@ class VSModelInputData extends VSAINOGeneralInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [VSModelOutputData];
+  List<Type> get acceptedTypes => [VSPreprocessorOutputData];
 
   @override
   Color get interfaceColor => NodeColors.modelColor;
 }
 
-class VSModelOutputData extends VSAINOGeneralOutputData {
+class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
   ///Basic List output interface
-  VSModelOutputData({required super.type, required super.node});
+  VSPreprocessorOutputData({
+    required super.type,
+    required super.node,
+  });
 
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {
     return (Map<String, dynamic> data) async {
       final Map<String, dynamic> apiBody = {
-        "model_name": node.name,
-        "model_type": node.type,
-        "task": node.task,
+        "preprocessor_name": node.name,
+        "preprocessor_type": node.type,
         "params": node.paramsToJson,
       };
       final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();

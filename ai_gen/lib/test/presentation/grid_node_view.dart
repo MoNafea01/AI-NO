@@ -1,7 +1,8 @@
 import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vs_node_view/data/vs_node_data_provider.dart';
+import 'package:vs_node_view/widgets/interactive_vs_node_view.dart';
 
 import 'cubits/grid_node_view_cubit.dart';
 
@@ -30,7 +31,7 @@ class _GridNodeViewState extends State<GridNodeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _appBar(),
+      // appBar: _appBar(),
       body: Stack(
         children: [
           InteractiveVSNodeView(

@@ -1,5 +1,7 @@
-import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_int_interface.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_num_interface.dart';
+import 'package:vs_node_view/data/vs_interface.dart';
 
 class VsTextInputData extends VSInputData {
   ///Basic int input interface

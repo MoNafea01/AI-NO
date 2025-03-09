@@ -1,7 +1,8 @@
 import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
-import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:vs_node_view/data/vs_node_data_provider.dart';
+import 'package:vs_node_view/data/vs_node_manager.dart';
 
 part 'node_view_state.dart';
 

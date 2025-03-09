@@ -1,5 +1,10 @@
-import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_bool_interface.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_double_interface.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_dynamic_interface.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_int_interface.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_num_interface.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_string_interface.dart';
 
 class Legend extends StatelessWidget {
   const Legend({super.key});

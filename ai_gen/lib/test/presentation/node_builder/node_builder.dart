@@ -2,9 +2,12 @@ import 'package:ai_gen/core/models/node_model/Params.dart';
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
-import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:vs_node_view/data/vs_interface.dart';
+import 'package:vs_node_view/data/vs_node_data.dart';
+import 'package:vs_node_view/data/vs_subgroup.dart';
+import 'package:vs_node_view/special_nodes/vs_output_node.dart';
 
 import 'custom_interfaces/aino_general_Interface.dart';
 import 'custom_interfaces/model_interface.dart';
@@ -138,7 +141,7 @@ class NodeBuilder {
 
             return VSAINOGeneralOutputData(type: outputDot, node: node);
           },
-        ).toList() ??
+        ).toList() as List<VSOutputData>? ??
         [];
   }
 

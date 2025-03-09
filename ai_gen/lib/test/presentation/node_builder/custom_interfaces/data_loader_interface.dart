@@ -1,6 +1,6 @@
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
-import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
+import 'package:vs_node_view/data/vs_interface.dart';
 
 const Color _interfaceColor = NodeColors.generalColor;
 

@@ -4,7 +4,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'core/di/getit_intialize.dart';
 import 'core/network/server_manager/server_manager.dart';
-import 'features/screens/splashScreen/splash_screen.dart';
+import 'features/node_view/presentation/node_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +33,6 @@ void main() async {
     await serverManager.startServer();
   }
 
-  // print(await ApiCall().trainTestSplit([1, 2, 3, 4], testSize: 0.2, randomState: 1));
   runApp(const MyApp());
 }
 
@@ -88,7 +87,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const SplashScreen(),
+      home: const NodeView(),
     );
   }
 }

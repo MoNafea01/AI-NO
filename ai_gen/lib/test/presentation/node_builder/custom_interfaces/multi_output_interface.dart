@@ -1,6 +1,6 @@
-import 'package:ai_gen/local_pcakages/vs_node_view/data/standard_interfaces/vs_dynamic_interface.dart';
-import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
+import 'package:vs_node_view/data/standard_interfaces/vs_dynamic_interface.dart';
+import 'package:vs_node_view/data/vs_interface.dart';
 
 import 'interface_colors.dart';
 
