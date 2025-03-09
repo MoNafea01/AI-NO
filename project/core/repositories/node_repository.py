@@ -24,7 +24,7 @@ Loading(from db):
 
 MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter"]
 SPECIAL_CASE_NODES = ["fitter_transformer"]
-PARENT_NODES = ["dense_layer"]
+PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer"]
 
 
 class NodeSaver:

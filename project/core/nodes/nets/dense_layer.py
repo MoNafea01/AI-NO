@@ -45,11 +45,13 @@ class DenseLayer:
 
     def create_handler(self, dense_layer):
         '''Creates the payload.'''
-        print(dense_layer)
         try:
-            payload = PayloadBuilder.build_payload("Dense layer created", dense_layer, "dense_layer", children={"prev_node" : self.prev_node},
+            payload = PayloadBuilder.build_payload("Dense layer created", dense_layer, "dense_layer",
                                                    params= {"units": self.units, "activation": self.activation, "name": dense_layer.name})
             
+            if self.prev_node:
+                payload.update({'children':{"prev_node": self.prev_node}})
+
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
             del payload["node_data"]
 

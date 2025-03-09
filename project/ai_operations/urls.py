@@ -35,7 +35,12 @@ urlpatterns = [
 
     path('create_input/', InputAPIView.as_view(), name='create_input'),
     path('dense/', DenseAPIView.as_view(), name='dense'),
+    path('flatten/', FlattenAPIView.as_view(), name='flatten'),
+    path('conv2d/', Conv2DAPIView.as_view(), name='conv2d'),
+    path('maxpool2d/', MaxPool2DAPIView.as_view(), name='maxpool2d'),
+    path('dropout/', DropoutAPIView.as_view(), name='dropout'),
     path('sequential/', SequentialAPIView.as_view(), name='sequential'),
+    
 
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
     path('components/', component_list, name='component-list'),
