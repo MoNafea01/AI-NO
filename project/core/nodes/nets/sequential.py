@@ -9,7 +9,7 @@ class SequentialNet:
     '''Handles sequential model creation.'''
     def __init__(self, layer: dict, name: str = None, path: str = None):
         '''Initializes the Sequential object.'''
-        self.layer = NodeLoader(from_db=True)(layer.get("node_id")).get('node_id') if isinstance(layer, dict) else layer
+        self.layer = NodeLoader()(layer.get("node_id")).get('node_id') if isinstance(layer, dict) else layer
         self.name = NodeLoader()(name.get("node_id")).get('node_data') if isinstance(name, dict) else name
         self.layers, self.layers_names  = self.get_layers()
         self.path = path
@@ -41,13 +41,13 @@ class SequentialNet:
         cur_id = self.layer
         layers_ids = [cur_id]
         while True:
-            cur_id = NodeLoader(from_db=True)(cur_id).get("children").get('previous_node')
+            cur_id = NodeLoader()(cur_id).get("children").get('prev_node')
             if not cur_id:
                 break
             layers_ids.append(cur_id)
         layers = [NodeLoader()(layer_id).get('node_data') for layer_id in layers_ids]
         layers_names = [NodeLoader()(layer_id).get('node_data').name for layer_id in layers_ids]
-        return list(reversed(layers)), list(reversed(layers_names))
+        return layers[::-1], layers_names[::-1]
     
     def gen_id(self):
         global n_id
@@ -64,6 +64,6 @@ class SequentialNet:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload

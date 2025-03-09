@@ -46,7 +46,7 @@ class TrainTestSplit:
                 NodeDeleter()(self.payload[0]['node_id'])
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(from_db=True, return_serialized=True)(payload.get("node_id")).get('node_data')
+            node_data = NodeLoader(return_serialized=True)(payload.get("node_id")).get('node_data')
             payload.update({"node_data": node_data})
         return payload
 

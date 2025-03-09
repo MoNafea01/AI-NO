@@ -9,7 +9,7 @@ class DenseLayer:
     '''Handles dense layer creation.'''
     def __init__(self, prev_node, units: int, activation: str, path: str = None, name: str = None):
         '''Initializes the Dense object.'''
-        self.prev_node = NodeLoader(from_db=True)(prev_node.get('node_id')).get('node_id') if isinstance(prev_node, dict) else prev_node
+        self.prev_node = NodeLoader()(prev_node.get('node_id')).get('node_id') if isinstance(prev_node, dict) else prev_node
         self.units = NodeLoader()(units.get("node_id")).get('node_data') if isinstance(units, dict) else units 
         self.activation = NodeLoader()(activation.get("node_id")).get('node_data') if isinstance(activation, dict) else activation
         self.name = NodeLoader()(name.get("node_id")).get('node_data') if isinstance(name, dict) else name
@@ -47,7 +47,7 @@ class DenseLayer:
         '''Creates the payload.'''
         print(dense_layer)
         try:
-            payload = PayloadBuilder.build_payload("Dense layer created", dense_layer, "dense_layer", children={"previous_node" : self.prev_node},
+            payload = PayloadBuilder.build_payload("Dense layer created", dense_layer, "dense_layer", children={"prev_node" : self.prev_node},
                                                    params= {"units": self.units, "activation": self.activation, "name": dense_layer.name})
             
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
@@ -73,6 +73,6 @@ class DenseLayer:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(from_db=True, return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
             self.payload.update({"node_data": node_data})
         return self.payload

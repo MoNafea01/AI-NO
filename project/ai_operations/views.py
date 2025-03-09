@@ -58,7 +58,7 @@ class NodeQueryMixin:
                         node_id = str(child_id[1])
 
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            payload = NodeLoader(from_db=True, return_serialized=return_serialized)(node_id=node_id)
+            payload = NodeLoader(return_serialized=return_serialized)(node_id=node_id)
             if not return_serialized:
                 del payload['node_data']
             return Response(payload, status=status.HTTP_200_OK)
@@ -688,11 +688,11 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
             try:
                 node_id = serializer.validated_data.get('node_id')
                 path = serializer.validated_data.get('node_path')
-                loader = NodeLoader()
+                loader = NodeLoader(from_db=False)
                 return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
                 payload = loader(node_id=node_id, path=path)
                 NodeSaver()(payload)
-                payload = NodeLoader(from_db=True, return_serialized=return_serialized)(node_id=payload.get("node_id"))
+                payload = NodeLoader(return_serialized=return_serialized)(node_id=payload.get("node_id"))
                 if not return_serialized:
                     del payload["node_data"]
                 return Response(payload, status=status.HTTP_200_OK)
@@ -704,11 +704,11 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         if serializer.is_valid():
             node_id = serializer.validated_data.get('node_id')
             path = serializer.validated_data.get('node_path')
-            loader = NodeLoader()
+            loader = NodeLoader(from_db=False)
             payload = loader(node_id=node_id, path=path)
             NodeSaver()(payload)
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            payload = NodeLoader(from_db=True)(node_id=payload.get("node_id"))
+            payload = NodeLoader()(node_id=payload.get("node_id"))
             node_id = request.query_params.get('node_id', None)
             success, message = NodeUpdater(return_serialized)(node_id, payload)
             if not return_serialized:

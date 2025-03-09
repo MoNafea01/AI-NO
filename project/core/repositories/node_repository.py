@@ -125,7 +125,7 @@ class NodeLoader:
         output: {"node_name": "node_loader",...}
     """
 
-    def __init__(self, from_db : bool = False, 
+    def __init__(self, from_db : bool = True, 
                  return_serialized : bool = False, 
                  return_bytes : bool = False):
         
@@ -339,7 +339,7 @@ class NodeUpdater:
                 new_ids = list(Node.objects.filter(node_id = node_id).values().first().get("children").values())
                 configs = []
                 for o_id in o_ids:
-                    config = NodeLoader(from_db=True)(o_id)
+                    config = NodeLoader()(o_id)
                     config.pop("node_id"), config.pop("node_data")
                     configs.append(config)
 
@@ -361,6 +361,7 @@ class NodeUpdater:
             payload['node_id'] = node_id
             if payload['node_name'] not in PARENT_NODES:
                 payload['children'] = node.children
+                
             NodeSaver()(payload, path=folder_path)      # ...وتوتة توتة خلصت الحدوتة الحمدلله
             NodeDeleter(is_special_case, is_multi_channel)(original_id)
             
@@ -369,7 +370,7 @@ class NodeUpdater:
                 delete_node_file(node.node_name, node.node_id,folder)
 
             # serialization part
-            node_data = NodeLoader(from_db=True, return_serialized=self.return_serialized)(node_id).get('node_data')
+            node_data = NodeLoader(return_serialized=self.return_serialized)(node_id).get('node_data')
             message = f"Node {node_id} updated."
             payload.update({"message": message, "node_data": node_data})
             return True, payload
