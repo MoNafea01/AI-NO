@@ -82,6 +82,7 @@ class NodeBuilder {
       return VSNodeData(
         type: newNode.name,
         title: newNode.displayName,
+        nodeColor: newNode.nodeColor,
         toolTip: newNode.description,
         // menuToolTip: "",
         widgetOffset: offset,
@@ -130,7 +131,10 @@ class NodeBuilder {
     return node.outputDots?.map(
           (outputDot) {
             if (node.category == "Models") {
-              return VSModelOutputData(type: outputDot, node: node);
+              return VSModelOutputData(
+                type: outputDot,
+                node: node,
+              );
             }
             if (outputDot == "preprocessor") {
               return VSPreprocessorOutputData(type: outputDot, node: node);

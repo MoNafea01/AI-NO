@@ -1,4 +1,4 @@
-import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 
 import '../common.dart';
 import 'offset_extension.dart';
@@ -15,6 +15,7 @@ class VSNodeData {
     required this.outputData,
     this.nodeWidth,
     this.onUpdatedConnection,
+    this.nodeColor = Colors.lightBlue,
     this.toolTip,
     String? title,
   })  : _id = id ?? getRandomString(10),
@@ -49,6 +50,8 @@ class VSNodeData {
 
   ///The output interfaces of this node
   Iterable<VSOutputData> outputData;
+
+  final Color nodeColor;
 
   ///The title displayed on the node
   ///

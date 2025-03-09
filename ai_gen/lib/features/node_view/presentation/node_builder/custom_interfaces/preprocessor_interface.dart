@@ -13,7 +13,8 @@ class VSPreprocessorInputData extends VSAINOGeneralInputData {
     super.title,
     super.toolTip,
     super.initialConnection,
-    super.interfaceIconBuilder,
+    super.inputIcon,
+    super.connectedInputIcon,
   });
 
   @override
@@ -38,6 +39,7 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
         "preprocessor_type": node.type,
         "params": node.paramsToJson,
       };
+
       final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
       return await nodeServerCalls.runNode(node, apiBody);
     };

@@ -1,3 +1,4 @@
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:flutter/material.dart';
 
 import '../common.dart';
@@ -91,7 +92,12 @@ class _VSNodeInputState extends State<VSNodeInput> {
             updateConnectedNode(details.data);
           },
         ),
-        Text(widget.data.title),
+        if (widget.data is! VsTextInputData)
+          Padding(
+            // to ensure a space between the text and the input icon.
+            padding: const EdgeInsets.only(left: 24),
+            child: Text(widget.data.title),
+          ),
       ],
     );
   }

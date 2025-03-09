@@ -69,7 +69,11 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        firstItem,
+        Padding(
+          // ensure a space between the text and the output icon
+          padding: const EdgeInsets.only(right: 24),
+          child: firstItem,
+        ),
         CustomPaint(
           foregroundPainter: GradientLinePainter(
             startPoint: getWidgetCenter(renderBox),
@@ -91,7 +95,7 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
               );
             },
             feedback: Icon(
-              Icons.circle,
+              widget.data.outputIcon,
               color: widget.data.interfaceColor,
               size: 15,
             ),

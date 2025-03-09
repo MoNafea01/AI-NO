@@ -15,7 +15,8 @@ class VSAINOGeneralInputData extends VSInputData {
     super.title,
     super.toolTip,
     super.initialConnection,
-    super.interfaceIconBuilder,
+    super.inputIcon,
+    super.connectedInputIcon,
   });
 
   @override
@@ -31,8 +32,13 @@ class VSAINOGeneralInputData extends VSInputData {
 
 class VSAINOGeneralOutputData extends VSOutputData {
   ///Basic List output interface
-  VSAINOGeneralOutputData(
-      {required super.type, required this.node, super.outputFunction});
+  VSAINOGeneralOutputData({
+    required super.type,
+    required this.node,
+    super.outputFunction,
+    super.interfaceIconBuilder,
+    super.outputIcon,
+  });
 
   final NodeModel node;
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)

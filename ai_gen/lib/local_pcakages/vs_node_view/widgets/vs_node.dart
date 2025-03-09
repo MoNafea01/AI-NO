@@ -64,7 +64,7 @@ class _VSNodeState extends State<VSNode> {
 
     return Draggable(
       onDragEnd: (_) {
-        //ensure the user is not dragging the node
+        //ensure the user is dragging the node
         if (_anchor.currentContext == null) return;
 
         final RenderBox renderBox =
@@ -95,21 +95,23 @@ class _VSNodeState extends State<VSNode> {
           ),
         ),
       ),
-      child: Card(
-        color: nodeProvider.selectedNodes.contains(widget.data.id)
-            ? Colors.lightBlue
-            : null,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: widget.data.nodeWidth ?? widget.width,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                widget.nodeTitleBuilder?.call(context, widget.data) ??
-                    VSNodeTitle(data: widget.data),
-                ...interfaceWidgets,
-              ],
+      child: IntrinsicWidth(
+        child: IntrinsicHeight(
+          child: Card(
+            color: nodeProvider.selectedNodes.contains(widget.data.id)
+                ? Colors.lightBlue
+                : widget.data.nodeColor,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  widget.nodeTitleBuilder?.call(context, widget.data) ??
+                      VSNodeTitle(data: widget.data),
+                  ...interfaceWidgets,
+                ],
+              ),
             ),
           ),
         ),

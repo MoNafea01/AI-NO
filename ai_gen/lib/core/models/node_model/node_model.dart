@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'Params.dart';
 
 class NodeModel {
@@ -29,6 +31,25 @@ class NodeModel {
     this.outputDots,
     this.apiCall,
   });
+
+  Color get nodeColor {
+    switch (category) {
+      case "Models":
+        return Colors.green;
+      case "Preprocessors":
+        return Colors.yellow;
+      case "Core":
+        return Colors.blue;
+      case "Custom":
+        return Colors.grey;
+      case "Input":
+        return Colors.orange;
+      case "Output":
+        return Colors.purple;
+      default:
+        return Colors.lightBlue;
+    }
+  }
 
   NodeModel copyWith({
     num? id,

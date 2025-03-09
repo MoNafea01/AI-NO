@@ -12,8 +12,12 @@ class VSModelInputData extends VSAINOGeneralInputData {
     super.title,
     super.toolTip,
     super.initialConnection,
-    super.interfaceIconBuilder,
   });
+
+  @override
+  IconData get connectedInputIcon => Icons.square_rounded;
+  @override
+  IconData get inputIcon => Icons.square_outlined;
 
   @override
   List<Type> get acceptedTypes => [VSModelOutputData];
@@ -25,6 +29,9 @@ class VSModelInputData extends VSAINOGeneralInputData {
 class VSModelOutputData extends VSAINOGeneralOutputData {
   ///Basic List output interface
   VSModelOutputData({required super.type, required super.node});
+
+  @override
+  IconData get outputIcon => Icons.square_rounded;
 
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {

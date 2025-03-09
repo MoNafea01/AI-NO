@@ -56,10 +56,15 @@ abstract class VSInputData extends VSInterfaceData {
     super.interfaceIconBuilder,
     super.title,
     super.toolTip,
+    this.inputIcon = Icons.radio_button_unchecked,
+    this.connectedInputIcon = Icons.radio_button_checked,
     VSOutputData? initialConnection,
   }) {
     connectedInterface = initialConnection;
   }
+
+  final IconData inputIcon;
+  final IconData connectedInputIcon;
 
   ///The Icon displayed for this interface
   ///
@@ -74,9 +79,7 @@ abstract class VSInputData extends VSInterfaceData {
       return interfaceIconBuilder!(context, anchor, this);
     }
 
-    final icon = connectedInterface == null
-        ? Icons.radio_button_unchecked
-        : Icons.radio_button_checked;
+    final icon = connectedInterface == null ? inputIcon : connectedInputIcon;
 
     return Icon(
       icon,
@@ -122,8 +125,11 @@ abstract class VSOutputData<T> extends VSInterfaceData {
     super.interfaceIconBuilder,
     super.title,
     super.toolTip,
+    this.outputIcon = Icons.circle,
     this.outputFunction,
   });
+
+  final IconData outputIcon;
 
   ///The Icon displayed for this interface
   ///
@@ -136,12 +142,7 @@ abstract class VSOutputData<T> extends VSInterfaceData {
       return interfaceIconBuilder!(context, anchor, this);
     }
 
-    return Icon(
-      Icons.circle,
-      key: anchor,
-      color: interfaceColor,
-      size: 15,
-    );
+    return Icon(outputIcon, key: anchor, color: interfaceColor, size: 15);
   }
 
   ///The function this interface will execute on evaluation
