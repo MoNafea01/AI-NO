@@ -17,6 +17,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
       final List<Object> nodeBuilder = await NodeBuilder().buildNodesMenu();
       nodeDataProvider = VSNodeDataProvider(
         nodeManager: VSNodeManager(nodeBuilders: nodeBuilder),
+        withAppbar: true,
       );
       emit(NodeViewSuccess());
     } catch (e) {

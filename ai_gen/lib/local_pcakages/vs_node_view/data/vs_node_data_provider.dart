@@ -23,12 +23,16 @@ class VSNodeDataProvider extends ChangeNotifier {
 
     ///Set this to false if you dont want undo functionality
     this.historyManager,
+    this.withAppbar = false,
+    this.appbarHeight = 56,
   }) {
     if (historyManager != null) {
       historyManager!.provider = this;
       historyManager!.updateHistory();
     }
   }
+  final bool withAppbar;
+  final double appbarHeight;
 
   ///Gets the closest [VSNodeDataProvider] from the widget tree
   static VSNodeDataProvider of(BuildContext context) {
@@ -199,8 +203,11 @@ class VSNodeDataProvider extends ChangeNotifier {
   }
 
   ///Helper function to apply [viewportOffset] and [viewportScale] to a Offset
-  Offset applyViewPortTransfrom(Offset inital) =>
-      (inital - viewportOffset) * viewportScale;
+  Offset applyViewPortTransfrom(Offset inital) {
+    return withAppbar
+        ? (inital - Offset(0, appbarHeight) - viewportOffset) * viewportScale
+        : (inital - viewportOffset) * viewportScale;
+  }
 
   ///Opens the context menu at a given postion
   ///
