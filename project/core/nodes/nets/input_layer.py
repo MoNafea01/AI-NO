@@ -1,79 +1,35 @@
+from keras.api.layers import Input
+from .base_layer import BaseLayer
 
+global input_id
+input_id = 0
 
-from keras.api.layers import Input as input_layer
-from ...repositories.node_repository import NodeSaver, NodeLoader
-from .utils import PayloadBuilder
-
-global n_id
-n_id = 0
-
-class Input:
+class InputLayer(BaseLayer):
     '''Handles input layer creation.'''
-    def __init__(self, shape: tuple, name: str = None, input_path: str = None):
+    def __init__(self, shape: tuple, name: str = None, path: str = None):
         '''Initializes the Input object.'''
-        self.input_shape = shape
-        self.name = name
-        self.input_path = input_path
-        self.payload = self._create_input()
-
-    def _create_input(self) -> dict:
-        '''Creates the input layer payload.'''
-        if self.input_path:
-            return self._create_from_path()
-        else:
-            return self._create_from_dict()
-
-    def _create_from_dict(self) -> dict:
-        '''Creates the input layer payload using json provided.'''
-        try:
-            input_shape = NodeLoader()(self.input_shape.get("node_id")).get('node_data') if isinstance(self.input_shape, dict) else self.input_shape
-            input_name = NodeLoader()(self.name.get("node_id")).get('node_data') if isinstance(self.name, dict) else self.name
-            if not input_name:
-                input_name = self.gen_id()
-            return self.create_handler(input_layer(shape=input_shape, name=input_name))
-        except Exception as e:
-            raise ValueError(f"Error creating input layer from json: {e}")
-
-    def _create_from_path(self) -> dict:
-        '''Creates the input layer payload using the input path.'''
-        try:
-            input_ = NodeLoader()(path=self.input_path).get("node_data") # load the input from the path given
-            return self.create_handler(input_)
-        except Exception as e:
-            raise ValueError(f"Error creating input layer from path: {e}")
+        self.shape, self.name, self.layer_path = self.load_args(shape, name, path)
+        self.payload = self.load_layer()
     
-
-    def create_handler(self, input_layer):
-        '''Creates the payload.'''
-        try:
-            payload = PayloadBuilder.build_payload("Input layer created", input_layer, "input_layer", 
-                                                   params= {"shape": input_layer.shape,"name": input_layer.name})
-            
-            NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
-            payload.pop("node_data", None)
-
-            return payload
-        
-        except Exception as e:
-            raise ValueError(f"Error creating input layer payload: {e}")
+    @property
+    def layer_class(self):
+        return Input
     
-    def gen_id(self):
-        global n_id
-        n_id += 1
-        name = f"input_layer_{n_id}"
-        return name
-
-    def __str__(self):
-        return str(self.payload)
+    @property
+    def layer_name(self):
+        return self.gen_name()
     
-    def __repr__(self):
-        return str(self.payload)
+    def gen_name(self):
+        '''Generates an id for the layer.'''
+        global input_id
+        input_id += 1
+        return f"input_layer_{input_id}"
     
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
-            self.payload.update({"node_data": node_data})
-        return self.payload
-
-
+    def get_params(self):
+        return {"shape": self.shape, "name": self.name}
+    
+    def payload_configs(self):
+        return {
+            "message": "Input layer created",
+            "node_name": "input_layer",
+        }

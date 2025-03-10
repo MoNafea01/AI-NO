@@ -18,12 +18,10 @@ from core.nodes.preprocessing.fit import Fit as FitPreprocessor
 from core.nodes.preprocessing.transform import Transform
 from core.nodes.preprocessing.fit_transform import FitTransform
 
-from core.nodes.nets.input_layer import Input
-from core.nodes.nets.dense_layer import DenseLayer
+from core.nodes.nets.input_layer import InputLayer
+from core.nodes.nets.dnn_layers import DenseLayer, DropoutLayer
+from core.nodes.nets.cnn_layers import Conv2DLayer, MaxPool2DLayer
 from core.nodes.nets.flatten_layer import FlattenLayer
-from core.nodes.nets.dropout_layer import DropoutLayer
-from core.nodes.nets.conv2d_layer import Conv2DLayer
-from core.nodes.nets.maxpool2d_layer import MaxPool2DLayer
 from core.nodes.nets.sequential import SequentialNet
 
 
@@ -289,10 +287,10 @@ class InputAPIView(BaseNodeAPIView):
         return InputSerializer
 
     def get_processor(self, validated_data):
-        return Input(
+        return InputLayer(
             shape=validated_data.get("shape"),
             name=validated_data.get("name"),
-            input_path=validated_data.get("input_path"),
+            path=validated_data.get("path"),
         )
 
 
@@ -402,7 +400,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
     def get_serialized_payload(self, node_id, path, return_serialized):
         """Loads a node, saves it, and optionally serializes it."""
         loader = NodeLoader(from_db=False)
-        l = NodeLoader(from_db=True)
+        l = NodeLoader()
         payload = loader(node_id=node_id, path=path)
         node = l(node_id=node_id, path=path)
         payload.update({"node_name":node.get("node_name")})
