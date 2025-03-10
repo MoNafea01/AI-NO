@@ -118,12 +118,12 @@ class FitTransformSerializer(serializers.Serializer):
 class InputSerializer(serializers.Serializer):
     shape = serializers.JSONField(required=False, allow_null=True)
     name = serializers.CharField(required=False, allow_null=True)
-    input_path = serializers.CharField(required=False, allow_null=True)
+    path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data:dict):
         """
         Ensure at least one of 'name' or 'input_path' is provided.
         """
-        return validate(data, ('shape', 'input_path'))
+        return validate(data, ('shape', 'path'))
 
 
 class DenseSerializer(serializers.Serializer):
@@ -193,7 +193,7 @@ class MaxPool2DSerializer(serializers.Serializer):
 
 
 class SequentialSerializer(serializers.Serializer):
-    layer = serializers.JSONField()
+    layer = serializers.JSONField(required=False)
     name = serializers.JSONField(required=False)
     path = serializers.CharField(required=False)
     def validate(self, data:dict):

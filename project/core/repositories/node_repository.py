@@ -151,7 +151,7 @@ class NodeLoader:
                     # node_data now is loaded, we need to get its name, and id to create a payload for it
                     # payload isn't a necessary thing, but we use it to identify a node
                     node_name, node_id = NodeNameHandler.handle_name(path)
-                    return self.build_payload(node_data, node_name, node_id)
+                    return self.build_payload(node_data, node_name, node_id, path)
                 
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
@@ -169,7 +169,7 @@ class NodeLoader:
             buffer = BytesIO(node_data)         # return an I/O object to buffer variable
             node_name = node_entry.node_name    # get the node_name, we will need it for payload
             # load the object whatever it is through joblib
-            return self.build_payload(joblib.load(buffer), node_name, node_id)
+            return self.build_payload(joblib.load(buffer), node_name, node_id, path)
         
         except ObjectDoesNotExist:
             raise ValueError(f"Node with node_id {node_id} does not exist.")
@@ -177,7 +177,10 @@ class NodeLoader:
         except Exception as e:
             raise ValueError(f"Error loading node: {e}")
     
-    def build_payload(self, node_data, name, node_id=None):
+    def build_payload(self, node_data, name, node_id, path):
+        if path:
+            self.from_db = False
+            
         payload = {
                 "message": f"Node {name} Loaded.",
                 "node_name": "node_loader",
@@ -190,7 +193,7 @@ class NodeLoader:
         
         if self.from_db: # returns node information
             payload = Node.objects.filter(node_id = node_id).values().first()
-            payload.pop("created_at"), payload.pop("updated_at") # removed them to avoid time-date serialization error occured
+            payload.pop("created_at", None), payload.pop("updated_at", None) # removed them to avoid time-date serialization error occured
             """
             from_db must be True to return node_data as binary
             """
