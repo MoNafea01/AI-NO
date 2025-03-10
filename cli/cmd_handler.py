@@ -1,4 +1,4 @@
-from handlers.user_handler import handle_user_command 
+from handlers.user_handler import handle_user_command
 from handlers.project_handler import handle_project_command
 from handlers.workflow_handler import handle_workflow_command
 from handlers.block_handler import handle_block_command
@@ -7,6 +7,7 @@ create_user, select_user, remove_user, make_admin = handle_user_command, handle_
 create_project, select_project, remove_project, deselect_project, list_projects = handle_project_command, handle_project_command, handle_project_command, handle_project_command, handle_project_command
 create_workflow, select_workflow, remove_workflow, deselect_workflow, list_workflows, finish_workflow = handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command
 create_block, edit_block, remove_block, explore_block, list_blocks = handle_block_command, handle_block_command, handle_block_command, handle_block_command, handle_block_command
+get_recent = handle_user_command
 def cmd_handler(command,mode=False):
     """
     Handles the command entered by the user.
@@ -43,8 +44,7 @@ def handle_sub_command(sub_cmd, args):
     Handles the sub-command entered by the user.
     takes the sub-command and the arguments as input.
     """
-    commands = {
-        "create_user": create_user, "mkusr": create_user,
+    commands = {"create_user": create_user, "mkusr": create_user,
         "select_user": select_user, "selusr": select_user,
         "remove_user": remove_user, "rmusr": remove_user,
         "make_admin": make_admin, "mkadm": make_admin,
@@ -67,6 +67,8 @@ def handle_sub_command(sub_cmd, args):
         "remove": remove_block, "rmblk": remove_block,
         "list_blocks": list_blocks, "lsblk": list_blocks,
         "explore": explore_block, "exblk": explore_block,
+
+        "recent": get_recent,
         
         "list_commands": help_commands, "help": help_commands,
         "aino": activate_mode,
@@ -74,16 +76,9 @@ def handle_sub_command(sub_cmd, args):
     }
     if len(args) == 0:
         arg = []
-    elif len(args) == 1:
-        arg = args
     else:
         # TODO: You will need to edit this part to handle multiple arguments.
-        arg = [args[0]] 
-        if args[1].startswith("("):
-            arg.extend(re.findall(r'\(.*?\)', ' '.join(args[1:])))
-        else:
-            arg.extend(args[1:])
-
+        arg = args
     if sub_cmd in commands:
         return commands[sub_cmd](sub_cmd,arg)
     else:
@@ -168,6 +163,7 @@ def help_commands(*args):
 
         help
     """
+
 def activate_mode(*args):
     return "Mode activated."
 

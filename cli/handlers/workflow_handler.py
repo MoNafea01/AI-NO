@@ -25,7 +25,7 @@ def create_workflow(workflow_name):
     if project is None:
         return "No project selected."
     
-    project[workflow_name] = {}
+    project['workflows'][workflow_name] = []
     data_store["active_workflow"] = workflow_name
     return f"Workflow {workflow_name} created."
 
@@ -36,7 +36,7 @@ def select_workflow(workflow_name):
     if project is None:
         return "No project selected."
     
-    if workflow_name in project:
+    if workflow_name in project['workflows']:
         data_store["active_workflow"] = workflow_name
         return f"Workflow {workflow_name} selected."
     return "Workflow does not exist."
@@ -55,7 +55,7 @@ def remove_workflow(workflow_name):
         return "No project selected."
     
     if workflow_name in project:
-        del project[workflow_name]
+        del project['workflows'][workflow_name]
         return f"Workflow {workflow_name} removed."
     return "Workflow does not exist."
 
@@ -66,7 +66,7 @@ def list_workflows():
 
     if project is None:
         return "No project selected."
-    return "Workflows: " + ", ".join(project.keys())
+    return "Workflows: " + ", ".join(project['workflows'].keys())
 
 
 def finish_workflow():

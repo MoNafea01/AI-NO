@@ -16,6 +16,7 @@ def handle_user_command(sub_cmd, args):
         "rmusr": remove_user,
         "make_admin": make_admin,
         "mkadm": make_admin,
+        'recent': get_recent
     }
 
     if sub_cmd in commands:
@@ -78,3 +79,15 @@ def is_sudo():
     admins = data_store["admin"]
     if active_user in admins:
         return True
+
+def get_recent():
+    import json
+    with open(data_file_path) as json_file:
+        json_data = json.load(json_file)
+    active_user = json_data['active_user']
+    active_project = json_data['active_project']
+    if active_project == '':
+        return "No recent projects"
+    set_data_store(json_data)
+    recent_workflow = get_data_store()['active_workflow']
+    return recent_workflow
