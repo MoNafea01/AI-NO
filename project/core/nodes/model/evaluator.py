@@ -18,7 +18,7 @@ class Evaluator:
             output = round(output,2)
             payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate")
             NodeSaver()(payload, "core/nodes/saved/data")
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error evaluating model: {e}")

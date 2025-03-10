@@ -65,7 +65,7 @@ class PredictSerializer(serializers.Serializer):
 
 
 class EvaluatorSerializer(serializers.Serializer):
-    params = serializers.JSONField(required=True)
+    metric = serializers.CharField(required=True)
     y_true = serializers.JSONField(required=True)
     y_pred = serializers.JSONField(required=True)
 

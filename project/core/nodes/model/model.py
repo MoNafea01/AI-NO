@@ -75,7 +75,7 @@ class Model:
             NodeSaver()(payload, path=f"core\\nodes\\saved\\models")
 
             # Remove the actual node object from the payload because it can't be serialized
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error creating model: {e}")

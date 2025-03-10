@@ -56,7 +56,7 @@ class Conv2DLayer:
                 payload.update({'children':{"prev_node": self.prev_node}})
 
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
-            del payload["node_data"]
+            payload.pop("node_data", None)
 
             return payload
         

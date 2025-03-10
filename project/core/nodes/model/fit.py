@@ -61,7 +61,7 @@ class Fit:
             payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model")
             
             NodeSaver()(payload, "core/nodes/saved/models")
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error fitting model: {e}")

@@ -24,7 +24,7 @@ class TrainTestSplit:
             NodeSaver()(payload1, "core/nodes/saved/data")
             NodeSaver()(payload2, "core/nodes/saved/data")
             del payload1['node_data']
-            del payload['node_data']
+            payload.pop("node_data", None)
             del payload2['node_data']
             return payload, payload1, payload2
         except Exception as e:

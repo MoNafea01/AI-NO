@@ -71,7 +71,7 @@ class FitTransform:
             NodeSaver()(payload_fitted, "core/nodes/saved/preprocessors")
             del payload_data['node_data']
             del payload_fitted['node_data']
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload, payload_fitted, payload_data
         except Exception as e:
             raise ValueError(f"Error fitting and transforming preprocessor: {e}")

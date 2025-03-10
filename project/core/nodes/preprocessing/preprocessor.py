@@ -55,7 +55,7 @@ class Preprocessor:
                                                    node_type=preprocessor_type,task=task)
             
             NodeSaver()(payload, path=f"core\\nodes\\saved\\preprocessors")
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error creating preprocessor: {e}")

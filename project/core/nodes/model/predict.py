@@ -57,7 +57,7 @@ class Predict:
             payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict')
             
             NodeSaver()(payload, "core/nodes/saved/data")
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error Predicting model: {e}")

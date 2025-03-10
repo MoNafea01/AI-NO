@@ -51,7 +51,7 @@ class MaxPool2DLayer:
                                                    params= {"pool_size": self.pool_size, "strides": self.strides, "padding": self.padding, "name": maxpool2d_layer.name})
             
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
-            del payload["node_data"]
+            payload.pop("node_data", None)
 
             return payload
         

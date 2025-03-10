@@ -48,7 +48,7 @@ class FlattenLayer:
                                                    params= {"name": flatten_layer.name})
             
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
-            del payload["node_data"]
+            payload.pop("node_data", None)
 
             return payload
         

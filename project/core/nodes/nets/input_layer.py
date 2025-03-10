@@ -9,9 +9,9 @@ n_id = 0
 
 class Input:
     '''Handles input layer creation.'''
-    def __init__(self, input_shape: tuple, name: str = None, input_path: str = None):
+    def __init__(self, shape: tuple, name: str = None, input_path: str = None):
         '''Initializes the Input object.'''
-        self.input_shape = input_shape
+        self.input_shape = shape
         self.name = name
         self.input_path = input_path
         self.payload = self._create_input()
@@ -50,7 +50,7 @@ class Input:
                                                    params= {"shape": input_layer.shape,"name": input_layer.name})
             
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
-            del payload["node_data"]
+            payload.pop("node_data", None)
 
             return payload
         

@@ -86,9 +86,9 @@ class DataLoader:
         NodeSaver()(payloadX, path="core/nodes/saved/data")
         NodeSaver()(payloady, path="core/nodes/saved/data")
         NodeSaver()(payload, path="core/nodes/saved/data")
-        del payloadX['node_data']
-        del payloady['node_data']
-        del payload['node_data']
+        payloadX.pop("node_data", None)
+        payloady.pop("node_data", None)
+        payload.pop("node_data", None)
         self.payload = payload, payloadX, payloady
 
     def __str__(self):

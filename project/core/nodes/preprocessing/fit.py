@@ -58,7 +58,7 @@ class Fit:
                                                    node_type="fitter", task="fit_preprocessor")
             
             NodeSaver()(payload, "core/nodes/saved/preprocessors")
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor: {e}")

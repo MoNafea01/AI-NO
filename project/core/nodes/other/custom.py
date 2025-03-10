@@ -19,7 +19,7 @@ class Joiner:
             payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join")
             
             NodeSaver()(payload, "core/nodes/saved/data")
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error joining data: {e}")
@@ -37,13 +37,12 @@ class Joiner:
 
 class Splitter:
     """
-    This Class is responsible for splitting the data into two parts.\n
-    to get the first part of the data, call the instance with 'out1' as an argument\n
-    to get the second part of the data, call the instance with 'out2' as an argument\n
-    it also accept a dictionary as an argument\n
-    Note that the dictionary must have a key named "data" that has a list of two elements\n
+    This Class is responsible for splitting the data into two parts.    
+    to get the first part of the data, call the instance with 'out1' as an argument     
+    to get the second part of the data, call the instance with 'out2' as an argument    
+    it also accept a dictionary as an argument  
+    Note that the dictionary must have a key named "data" that has a list of two elements   
     """
-
     def __init__(self, data):
         self.data = NodeLoader()(data.get("node_id")).get('node_data') if isinstance(data, dict) else data
         self.payload = self.split()
@@ -62,7 +61,7 @@ class Splitter:
             NodeSaver()(payload, "core/nodes/saved/data")
             NodeSaver()(payload1, "core/nodes/saved/data")
             NodeSaver()(payload2, "core/nodes/saved/data")
-            del payload['node_data']
+            payload.pop("node_data", None)
             del payload1['node_data']
             del payload2['node_data']
             return payload, payload1, payload2

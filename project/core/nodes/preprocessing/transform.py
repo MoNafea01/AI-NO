@@ -58,7 +58,7 @@ class Transform:
                                                    node_type='transformer')
             
             NodeSaver()(payload, "core/nodes/saved/data")
-            del payload['node_data']
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error transformation of data: {e}")

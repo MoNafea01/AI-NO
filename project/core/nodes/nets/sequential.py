@@ -32,7 +32,7 @@ class SequentialNet:
             payload = PayloadBuilder.build_payload("Sequential model created", self.model, "sequential_model", 
                                                    params= {"layers": self.layers_names, "name": self.model.name}, node_type="nn_model")
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
-            del payload["node_data"]
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error creating model payload: {e}")

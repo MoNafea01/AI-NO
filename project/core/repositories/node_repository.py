@@ -367,7 +367,7 @@ class NodeUpdater:
             
             # this part to delete node if its name isn't same as new one's name
             if node.node_name != payload.get("node_name"):
-                delete_node_file(node.node_name, node.node_id,folder)
+                delete_node_file(node.node_name, node.node_id, folder)
 
             # serialization part
             node_data = NodeLoader(return_serialized=self.return_serialized)(node_id).get('node_data')
@@ -424,21 +424,3 @@ def delete_node_file(node_name, node_id, folder):
     node_path = os.path.join(NodeDirectoryManager.get_nodes_dir(folder), f"{node_name}_{node_id}.pkl")
     if os.path.exists(node_path):
         os.remove(node_path)
-
-
-
-# class NodeRepository:
-#     def save_node(self, payload, path: str = None):
-#         return NodeSaver()(payload, path)
-    
-#     def load_node(self, node_id=None, path=None):
-#         return NodeLoader()(node_id, path)
-    
-#     def delete_node(self, node_id: str, is_special_case=False, 
-#                     is_multi_channel=False):
-#         return NodeDeleter()(node_id, is_special_case, is_multi_channel)    
-#     def update_node(self, node_id, payload):
-#         return NodeUpdater()(node_id, payload)
-    
-#     def clear_all_nodes(self, *args):
-#         return ClearAllNodes()(*args)

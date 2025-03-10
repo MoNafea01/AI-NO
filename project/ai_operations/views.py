@@ -11,7 +11,7 @@ from core.nodes.other.custom import Joiner, Splitter
 from core.nodes.model.model import Model
 from core.nodes.model.fit import Fit as FitModel
 from core.nodes.model.predict import Predict
-from core.nodes.other.evaluator import Evaluator
+from core.nodes.model.evaluator import Evaluator
 
 from core.nodes.preprocessing.preprocessor import Preprocessor
 from core.nodes.preprocessing.fit import Fit as FitPreprocessor
@@ -35,6 +35,10 @@ from .serializers import *
 import pandas as pd
 import json
 
+MODELS_TASKS = ["regression", "classification", "fit_model", "predict", "evaluate"]
+PREPROCESSORS = ["preprocessing", "fit_preprocessor", "transform", "fit_transform"]
+LAYERS = ["neural_network"]
+DATA_NODES = ["load_data", "split","join"]
 
 class NodeQueryMixin:
     """
@@ -56,7 +60,7 @@ class NodeQueryMixin:
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             payload = NodeLoader(return_serialized=return_serialized)(node_id=node_id)
             if not return_serialized:
-                del payload['node_data']
+                payload.pop('node_data', None)
             return Response(payload, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -83,801 +87,365 @@ class NodeQueryMixin:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DataLoaderAPIView(APIView, NodeQueryMixin):
+class BaseNodeAPIView(APIView, NodeQueryMixin):
+    def get_serializer_class(self):
+        """Override this method to return the appropriate serializer class."""
+        raise NotImplementedError
+
+    def get_processor(self, validated_data):
+        """Override this method to return the processing class instance."""
+        raise NotImplementedError
+
     def post(self, request):
-        serializer = DataLoaderSerializer(data=request.data)
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            dataset_name = serializer.validated_data.get('dataset_name')
-            dataset_path = serializer.validated_data.get('dataset_path')
-            loader = DataLoader(dataset_name=dataset_name, dataset_path=dataset_path)
+            processor = self.get_processor(serializer.validated_data)
             output_channel = request.query_params.get('output', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            response_data = loader(output_channel, return_serialized=return_serialized)
             
+            return_serialized = request.query_params.get('return_serialized', '0') == '1'
+            response_data = processor(output_channel, return_serialized=return_serialized)
             return Response(response_data, status=status.HTTP_200_OK)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def put(self, request):
-        serializer = DataLoaderSerializer(data=request.data)
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            dataset_name = serializer.validated_data.get('dataset_name')
-            dataset_path = serializer.validated_data.get('dataset_path')
-            loader = DataLoader(dataset_name=dataset_name, dataset_path=dataset_path)
+            processor = self.get_processor(serializer.validated_data)
             node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, loader())
+            return_serialized = request.query_params.get('return_serialized', '0') == '1'
+            success, message = NodeUpdater(return_serialized)(node_id, processor())
+
             if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class TrainTestSplitAPIView(APIView, NodeQueryMixin):
-    def post(self, request, *args, **kwargs):
-        serializer = TrainTestSplitSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                # Extract validated data
-                data = serializer.validated_data.get('data')
-                params = serializer.validated_data.get('params')
-
-                # Instantiate TrainTestSplit and perform the split
-                splitter = TrainTestSplit(data=data,params=params)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                output_channel = request.query_params.get('output', None)
-                response_data = splitter(output_channel, return_serialized=return_serialized)
-
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = TrainTestSplitSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data.get('data')
-            params = serializer.validated_data.get('params')
-            splitter = TrainTestSplit(data=data, params=params)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, splitter()) 
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class SplitterAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = SplitterSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data.get('data')
-            # Initialize and use the Splitter class
-            splitter_instance = Splitter(data)
-            output_channel = request.query_params.get('output', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            response_data = splitter_instance(output_channel, return_serialized=return_serialized)
+                message.pop("node_data", None)
             
-            return Response(response_data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = SplitterSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data.get('data')
-            splitter_instance = Splitter(data)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, splitter_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
+            return Response(message if success else {"error": message}, status=status_code)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class JoinerAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = JoinerSerializer(data=request.data)
-        if serializer.is_valid():
-            data_1 = serializer.validated_data.get('data_1')
-            data_2 = serializer.validated_data.get('data_2')
-            joiner = Joiner(data_1, data_2)
-            output_channel = request.query_params.get('output', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            response_data = joiner(output_channel, return_serialized=return_serialized)
-            return Response(response_data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = JoinerSerializer(data=request.data)
-        if serializer.is_valid():
-            data_1 = serializer.validated_data.get('data_1')
-            data_2 = serializer.validated_data.get('data_2')
-            joiner = Joiner(data_1, data_2)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, joiner())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class DataLoaderAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return DataLoaderSerializer
+
+    def get_processor(self, validated_data):
+        return DataLoader(
+            dataset_name=validated_data.get('dataset_name'),
+            dataset_path=validated_data.get('dataset_path')
+        )
 
 
-class CreateModelView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = ModelSerializer(data=request.data)
-        if serializer.is_valid():
-            # Extract data from the serializer
-            data = serializer.validated_data
-            # Create Model instance using the data
-            model_instance = Model(
-                model_name=data.get('model_name'),
-                model_type=data.get('model_type'),
-                task=data.get('task'),
-                params=data.get('params'),
-                model_path= data.get('model_path'),
-            )
-            output_channel = request.query_params.get('output', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            response_data = model_instance(output_channel, return_serialized=return_serialized)
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = ModelSerializer(data=request.data)
-        if serializer.is_valid():
-            # Extract data from the serializer
-            data = serializer.validated_data
-            # Create Model instance using the data
-            model_instance = Model(
-                model_name=data.get('model_name'),
-                model_type=data.get('model_type'),
-                task=data.get('task'),
-                params=data.get('params'),
-                model_path= data.get('model_path'),
-            )
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, model_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class TrainTestSplitAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return TrainTestSplitSerializer
+
+    def get_processor(self, validated_data):
+        return TrainTestSplit(
+            data=validated_data.get('data'),
+            params=validated_data.get('params')
+        )
 
 
-class FitModelAPIView(APIView, NodeQueryMixin):
-    def post(self, request, *args, **kwargs):
-        serializer = FitModelSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                # Extract validated data
-                X = serializer.validated_data.get('X')
-                y = serializer.validated_data.get('y')
-                model = serializer.validated_data.get('model')
-                model_path = serializer.validated_data.get('model_path')
+class SplitterAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return SplitterSerializer
 
-                # Instantiate Fit and perform the fitting
-                fitter = FitModel(X=X, y=y, model=model, model_path=model_path)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = fitter(output_channel, return_serialized=return_serialized)
-
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = FitModelSerializer(data=request.data)
-        if serializer.is_valid():
-            # Extract data from the serializer
-            X = serializer.validated_data.get('X')
-            y = serializer.validated_data.get('y')
-            model = serializer.validated_data.get('model')
-            model_path = serializer.validated_data.get('model_path')
-
-            # Instantiate Fit and perform the fitting
-            fitter = FitModel(X=X, y=y, model=model, model_path=model_path)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, fitter())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response( message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_processor(self, validated_data):
+        return Splitter(
+            data=validated_data.get('data')
+        )
 
 
-class PredictAPIView(APIView, NodeQueryMixin):
-    """
-    API view to handle predictions using a trained model.
-    """
+class JoinerAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return JoinerSerializer
 
-    def post(self, request, *args, **kwargs):
-        serializer = PredictSerializer(data=request.data)
-        if serializer.is_valid():
-            X = serializer.validated_data.get('X')
-            model = serializer.validated_data.get('model')
-            model_path = serializer.validated_data.get('model_path')
-
-            try:
-                # Perform prediction
-                predictor = Predict(X, model=model, model_path=model_path)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = predictor(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request):
-            serializer = PredictSerializer(data=request.data)
-            if serializer.is_valid():
-                # Extract data from the serializer
-                X = serializer.validated_data.get('X')
-                model = serializer.validated_data.get('model')
-                model_path = serializer.validated_data.get('model_path')
-
-                # Instantiate Fit and perform the fitting
-                predictor = Predict(X, model=model, model_path=model_path)
-                node_id = request.query_params.get('node_id', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                success, message = NodeUpdater(return_serialized)(node_id, predictor())
-                if not return_serialized:
-                    del message["node_data"]
-                if success:
-                    return Response(message, status=status.HTTP_200_OK)
-                else:
-                    return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_processor(self, validated_data):
+        return Joiner(
+            data_1=validated_data.get('data_1'), 
+            data_2=validated_data.get('data_2')
+        )
 
 
-class EvaluatorAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = EvaluatorSerializer(data=request.data)
-        if serializer.is_valid():
-            y_true = serializer.validated_data.get('y_true')
-            y_pred = serializer.validated_data.get('y_pred')
-            params = serializer.validated_data.get('params')
-            metric = params.get('metric')
+class CreateModelView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return ModelSerializer
 
-            evaluator = Evaluator(metric=metric, y_true=y_true, y_pred=y_pred)
-            output_channel = request.query_params.get('output', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            response_data = evaluator(output_channel, return_serialized=return_serialized)
-            return Response(response_data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = EvaluatorSerializer(data=request.data)
-        if serializer.is_valid():
-            y_true = serializer.validated_data.get('y_true')
-            y_pred = serializer.validated_data.get('y_pred')
-            params = serializer.validated_data.get('params')
-            metric = params.get('metric')
-            evaluator = Evaluator(metric=metric, y_true=y_true, y_pred=y_pred)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, evaluator())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_processor(self, validated_data):
+        return Model(
+            model_name=validated_data.get('model_name'),
+            model_type=validated_data.get('model_type'),
+            task=validated_data.get('task'),
+            params=validated_data.get('params'),
+            model_path=validated_data.get('model_path'),
+        )
 
 
-class PreprocessorAPIView(APIView, NodeQueryMixin):
-    """
-    API view to create a Preprocessor instance.
-    """
+class FitModelAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return FitModelSerializer
 
-    def post(self, request, *args, **kwargs):
-        serializer = PreprocessorSerializer(data=request.data)
-        if serializer.is_valid():
-            preprocessor_name = serializer.validated_data.get('preprocessor_name')
-            preprocessor_type = serializer.validated_data.get('preprocessor_type')
-            params = serializer.validated_data.get('params')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
-            try:
-                # Create the Preprocessor
-                preprocessor = Preprocessor(preprocessor_name, preprocessor_type, params=params, preprocessor_path=preprocessor_path)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                output_channel = request.query_params.get('output', None)
-                response_data = preprocessor(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request):
-        serializer = PreprocessorSerializer(data=request.data)
-        if serializer.is_valid():
-            # Extract data from the serializer
-            preprocessor_name = serializer.validated_data.get('preprocessor_name')
-            preprocessor_type = serializer.validated_data.get('preprocessor_type')
-            params = serializer.validated_data.get('params')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
-            # Create Model instance using the data
-            preprocessor = Preprocessor(preprocessor_name, preprocessor_type, params=params, preprocessor_path=preprocessor_path)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, preprocessor())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_processor(self, validated_data):
+        return FitModel(
+            X=validated_data.get('X'),
+            y=validated_data.get('y'),
+            model=validated_data.get('model'),
+            model_path=validated_data.get('model_path'),
+        )
 
 
-class FitPreprocessorAPIView(APIView, NodeQueryMixin):
-    """
-    API view for fitting a preprocessor on the given data.
-    """
+class PredictAPIView(BaseNodeAPIView):
+    """API view to handle predictions using a trained model."""
 
-    def post(self, request, *args, **kwargs):
-        serializer = FitPreprocessorSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
-            try:
-                # Create a Fit instance
-                fit_instance = FitPreprocessor(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = fit_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = FitPreprocessorSerializer(data=request.data)
-        if serializer.is_valid():
-            # Extract data from the serializer
-            data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
+    def get_serializer_class(self):
+        return PredictSerializer
 
-            # Instantiate Fit and perform the fitting
-            fitter = FitPreprocessor(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, fitter())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_processor(self, validated_data):
+        return Predict(
+            X=validated_data.get('X'),
+            model=validated_data.get('model'),
+            model_path=validated_data.get('model_path'),
+        )
 
 
-class TransformAPIView(APIView, NodeQueryMixin):
-    """
-    API view for transforming data using the given preprocessor.
-    """
+class EvaluatorAPIView(BaseNodeAPIView):
+    """API view to evaluate model predictions based on a given metric."""
 
-    def post(self, request, *args, **kwargs):
-        # Deserialize input data using the serializer
-        serializer = TransformSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')  # Extract preprocessor (as JSON object)
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')  # Extract preprocessor path
-            try:
-                # Create a Transform instance and get the result
-                transform_instance = Transform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = transform_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+    def get_serializer_class(self):
+        return EvaluatorSerializer
 
-    def put(self, request):
-        serializer = TransformSerializer(data=request.data)
-        if serializer.is_valid():
-            # Extract validated data
-            data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
-            
-            # Create Transform instance
-            transform_instance = Transform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
-            
-            # Get node_id from query parameters
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            # Update the node using NodeUpdater
-            success, message = NodeUpdater(return_serialized)(node_id, transform_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_processor(self, validated_data):
+        return Evaluator(
+            metric=validated_data.get('metric'),
+            y_true=validated_data.get('y_true'),
+            y_pred=validated_data.get('y_pred'),
+        )
 
 
-class FitTransformAPIView(APIView, NodeQueryMixin):
-    """
-    API view for fitting and transforming data using the given preprocessor.
-    """
+class PreprocessorAPIView(BaseNodeAPIView):
+    """API view to create and update a Preprocessor instance."""
 
-    def post(self, request, *args, **kwargs):
-        # Deserialize input data using the serializer
-        serializer = FitTransformSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')  # Extract preprocessor (as JSON object or path)
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')  # Extract preprocessor path
-            try:
-                # Create a FitTransform instance and get the result
-                fit_transform_instance = FitTransform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = fit_transform_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = FitTransformSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data.get('data')
-            preprocessor = serializer.validated_data.get('preprocessor')
-            preprocessor_path = serializer.validated_data.get('preprocessor_path')
-            
-            fit_transform_instance = FitTransform(data=data, preprocessor=preprocessor, preprocessor_path=preprocessor_path)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, fit_transform_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_serializer_class(self):
+        return PreprocessorSerializer
+
+    def get_processor(self, validated_data):
+        return Preprocessor(
+            preprocessor_name=validated_data.get('preprocessor_name'),
+            preprocessor_type=validated_data.get('preprocessor_type'),
+            params=validated_data.get('params'),
+            preprocessor_path=validated_data.get('preprocessor_path'),
+        )
 
 
-class InputAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = InputSerializer(data=request.data)
-        if serializer.is_valid():
-            shape = serializer.validated_data.get('shape')
-            name = serializer.validated_data.get('name')
-            input_path = serializer.validated_data.get('input_path')
-            try:
-                input_instance = Input(shape, name, input_path)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = input_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = InputSerializer(data=request.data)
-        if serializer.is_valid():
-            shape = serializer.validated_data.get('shape')
-            name = serializer.validated_data.get('name')
-            input_path = serializer.validated_data.get('input_path')
-            input_instance = Input(shape, name, input_path)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, input_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class FitPreprocessorAPIView(BaseNodeAPIView):
+    """API view for fitting a preprocessor on the given data."""
+
+    def get_serializer_class(self):
+        return FitPreprocessorSerializer
+
+    def get_processor(self, validated_data):
+        return FitPreprocessor(
+            data=validated_data.get('data'),
+            preprocessor=validated_data.get('preprocessor'),
+            preprocessor_path=validated_data.get('preprocessor_path'),
+        )
 
 
-class DenseAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = DenseSerializer(data=request.data)
-        if serializer.is_valid():
-            units = serializer.validated_data.get('units')
-            activation = serializer.validated_data.get('activation')
-            path = serializer.validated_data.get('path')
-            name = serializer.validated_data.get('name')
-            prev_node = serializer.validated_data.get('prev_node')
-            try:
-                dense_instance = DenseLayer(prev_node, units, activation, path, name)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = dense_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = DenseSerializer(data=request.data)
-        if serializer.is_valid():
-            units = serializer.validated_data.get('units')
-            activation = serializer.validated_data.get('activation')
-            path = serializer.validated_data.get('path')
-            name = serializer.validated_data.get('name')
-            prev_node = serializer.validated_data.get('prev_node')
-            dense_instance = DenseLayer(prev_node, units, activation, path, name)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, dense_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class TransformAPIView(BaseNodeAPIView):
+    """API view for transforming data using a given preprocessor."""
+
+    def get_serializer_class(self):
+        return TransformSerializer
+
+    def get_processor(self, validated_data):
+        return Transform(
+            data=validated_data.get('data'),
+            preprocessor=validated_data.get('preprocessor'),
+            preprocessor_path=validated_data.get('preprocessor_path'),
+        )
 
 
-class FlattenAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = FlattenSerializer(data=request.data)
-        if serializer.is_valid():
-            name = serializer.validated_data.get('name')
-            path = serializer.validated_data.get('path')
-            prev_node = serializer.validated_data.get('prev_node')
-            try:
-                flatten_instance = FlattenLayer(prev_node, name, path)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = flatten_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = FlattenSerializer(data=request.data)
-        if serializer.is_valid():
-            name = serializer.validated_data.get('name')
-            path = serializer.validated_data.get('path')
-            prev_node = serializer.validated_data.get('prev_node')
-            flatten_instance = FlattenLayer(prev_node, name, path)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, flatten_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+class FitTransformAPIView(BaseNodeAPIView):
+    """API view for fitting and transforming data using a given preprocessor."""
+
+    def get_serializer_class(self):
+        return FitTransformSerializer
+
+    def get_processor(self, validated_data):
+        return FitTransform(
+            data=validated_data.get('data'),
+            preprocessor=validated_data.get('preprocessor'),
+            preprocessor_path=validated_data.get('preprocessor_path'),
+        )
 
 
-class DropoutAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = DropoutSerializer(data=request.data)
-        if serializer.is_valid():
-            rate = serializer.validated_data.get('rate')
-            path = serializer.validated_data.get('path')
-            name = serializer.validated_data.get('name')
-            prev_node = serializer.validated_data.get('prev_node')
-            try:
-                dropout_instance = DropoutLayer(prev_node, rate, path, name)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = dropout_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = DropoutSerializer(data=request.data)
-        if serializer.is_valid():
-            rate = serializer.validated_data.get('rate')
-            path = serializer.validated_data.get('path')
-            name = serializer.validated_data.get('name')
-            prev_node = serializer.validated_data.get('prev_node')
-            dropout_instance = DropoutLayer(prev_node, rate, path, name)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, dropout_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class InputAPIView(BaseNodeAPIView):
+    """API view for handling input layers."""
+
+    def get_serializer_class(self):
+        return InputSerializer
+
+    def get_processor(self, validated_data):
+        return Input(
+            shape=validated_data.get("shape"),
+            name=validated_data.get("name"),
+            input_path=validated_data.get("input_path"),
+        )
 
 
-class Conv2DAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = Conv2DSerializer(data=request.data)
-        if serializer.is_valid():
-            filters = serializer.validated_data.get('filters')
-            kernel_size = serializer.validated_data.get('kernel_size')
-            strides = serializer.validated_data.get('strides')
-            padding = serializer.validated_data.get('padding')
-            activation = serializer.validated_data.get('activation')
-            path = serializer.validated_data.get('path')
-            name = serializer.validated_data.get('name')
-            prev_node = serializer.validated_data.get('prev_node')
-            try:
-                conv2d_instance = Conv2DLayer(prev_node, filters, kernel_size, strides, padding, activation, path, name)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = conv2d_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = Conv2DSerializer(data=request.data)
-        if serializer.is_valid():
-            filters = serializer.validated_data.get('filters')
-            kernel_size = serializer.validated_data.get('kernel_size')
-            strides = serializer.validated_data.get('strides')
-            padding = serializer.validated_data.get('padding')
-            activation = serializer.validated_data.get('activation')
-            path = serializer.validated_data.get('path')
-            name = serializer.validated_data.get('name')
-            prev_node = serializer.validated_data.get('prev_node')
-            conv2d_instance = Conv2DLayer(prev_node, filters, kernel_size, strides, padding, activation, path, name)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, conv2d_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class Conv2DAPIView(BaseNodeAPIView):
+    """API view for handling Conv2D layers."""
+
+    def get_serializer_class(self):
+        return Conv2DSerializer
+
+    def get_processor(self, validated_data):
+        return Conv2DLayer(
+            prev_node=validated_data.get("prev_node"),
+            filters=validated_data.get("filters"),
+            kernel_size=validated_data.get("kernel_size"),
+            strides=validated_data.get("strides"),
+            padding=validated_data.get("padding"),
+            activation=validated_data.get("activation"),
+            path=validated_data.get("path"),
+            name=validated_data.get("name"),
+        )
 
 
-class MaxPool2DAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = MaxPool2DSerializer(data=request.data)
-        if serializer.is_valid():
-            pool_size = serializer.validated_data.get('pool_size')
-            strides = serializer.validated_data.get('strides')
-            padding = serializer.validated_data.get('padding')
-            path = serializer.validated_data.get('path')
-            name = serializer.validated_data.get('name')
-            prev_node = serializer.validated_data.get('prev_node')
-            try:
-                maxpool2d_instance = MaxPool2DLayer(prev_node, pool_size, strides, padding, path, name)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = maxpool2d_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = MaxPool2DSerializer(data=request.data)
-        if serializer.is_valid():
-            pool_size = serializer.validated_data.get('pool_size')
-            strides = serializer.validated_data.get('strides')
-            padding = serializer.validated_data.get('padding')
-            path = serializer.validated_data.get('path')
-            name = serializer.validated_data.get('name')
-            prev_node = serializer.validated_data.get('prev_node')
-            try:
-                maxpool2d_instance = MaxPool2DLayer(prev_node, pool_size, strides, padding, path, name)
-                node_id = request.query_params.get('node_id', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                success, message = NodeUpdater(return_serialized)(node_id, maxpool2d_instance())
-                if not return_serialized:
-                        del message["node_data"]
-                if success:
-                    return Response(message, status=status.HTTP_200_OK)
-                else:
-                    return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class MaxPool2DAPIView(BaseNodeAPIView):
+    """API view for handling MaxPool2D layers."""
+
+    def get_serializer_class(self):
+        return MaxPool2DSerializer
+
+    def get_processor(self, validated_data):
+        return MaxPool2DLayer(
+            prev_node=validated_data.get("prev_node"),
+            pool_size=validated_data.get("pool_size"),
+            strides=validated_data.get("strides"),
+            padding=validated_data.get("padding"),
+            path=validated_data.get("path"),
+            name=validated_data.get("name"),
+        )
 
 
-class SequentialAPIView(APIView, NodeQueryMixin):
-    def post(self, request):
-        serializer = SequentialSerializer(data=request.data)
-        if serializer.is_valid():
-            layer = serializer.validated_data.get('layer')
-            name = serializer.validated_data.get('name')
-            path = serializer.validated_data.get('path')
-            try:
-                sequential_instance = SequentialNet(layer, name, path)
-                output_channel = request.query_params.get('output', None)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                response_data = sequential_instance(output_channel, return_serialized=return_serialized)
-                return Response(response_data, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        serializer = SequentialSerializer(data=request.data)
-        if serializer.is_valid():
-            layer = serializer.validated_data.get('layer')
-            name = serializer.validated_data.get('name')
-            path = serializer.validated_data.get('path')
-            sequential_instance = SequentialNet(layer, name, path)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            success, message = NodeUpdater(return_serialized)(node_id, sequential_instance())
-            if not return_serialized:
-                    del message["node_data"]
-            if success:
-                return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class FlattenAPIView(BaseNodeAPIView):
+    """API view for handling Flatten layers."""
+
+    def get_serializer_class(self):
+        return FlattenSerializer
+
+    def get_processor(self, validated_data):
+        return FlattenLayer(
+            prev_node=validated_data.get("prev_node"),
+            name=validated_data.get("name"),
+            path=validated_data.get("path"),
+        )
+
+
+class DenseAPIView(BaseNodeAPIView):
+    """API view for handling dense layers."""
+
+    def get_serializer_class(self):
+        return DenseSerializer
+
+    def get_processor(self, validated_data):
+        return DenseLayer(
+            prev_node=validated_data.get("prev_node"),
+            units=validated_data.get("units"),
+            activation=validated_data.get("activation"),
+            path=validated_data.get("path"),
+            name=validated_data.get("name"),
+        )
+
+
+class DropoutAPIView(BaseNodeAPIView):
+    """API view for handling Dropout layers."""
+
+    def get_serializer_class(self):
+        return DropoutSerializer
+
+    def get_processor(self, validated_data):
+        return DropoutLayer(
+            prev_node=validated_data.get("prev_node"),
+            rate=validated_data.get("rate"),
+            path=validated_data.get("path"),
+            name=validated_data.get("name"),
+        )
+
+
+class SequentialAPIView(BaseNodeAPIView):
+    """API view for handling Sequential models."""
+
+    def get_serializer_class(self):
+        return SequentialSerializer
+
+    def get_processor(self, validated_data):
+        return SequentialNet(
+            layer=validated_data.get("layer"),
+            name=validated_data.get("name"),
+            path=validated_data.get("path"),
+        )
 
 
 class NodeLoaderAPIView(APIView, NodeQueryMixin):
+    def get_folder_by_task(self, task):
+        folder = "models" if task in MODELS_TASKS else (
+            "preprocessors" if task in PREPROCESSORS else (
+                "nn" if task in LAYERS else (
+                    "data" if task in DATA_NODES else "other")))
+        return folder
+
+    def get_serialized_payload(self, node_id, path, return_serialized):
+        """Loads a node, saves it, and optionally serializes it."""
+        loader = NodeLoader(from_db=False)
+        l = NodeLoader(from_db=True)
+        payload = loader(node_id=node_id, path=path)
+        node = l(node_id=node_id, path=path)
+        payload.update({"node_name":node.get("node_name")})
+        folder = self.get_folder_by_task(node.get('task'))
+        NodeSaver()(payload, path=f'core/nodes/saved/{folder}')
+
+        # Reload the node with serialization settings
+        payload = NodeLoader(return_serialized=return_serialized)(node_id=payload.get("node_id"))
+
+        if not return_serialized:
+            payload.pop("node_data", None)
+        return payload
+    
     def post(self, request):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 node_id = serializer.validated_data.get('node_id')
                 path = serializer.validated_data.get('node_path')
-                loader = NodeLoader(from_db=False)
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                payload = loader(node_id=node_id, path=path)
-                NodeSaver()(payload)
-                payload = NodeLoader(return_serialized=return_serialized)(node_id=payload.get("node_id"))
-                if not return_serialized:
-                    del payload["node_data"]
+                return_serialized = request.query_params.get("return_serialized") == "1"
+                
+                payload = self.get_serialized_payload(node_id, path, return_serialized)
                 return Response(payload, status=status.HTTP_200_OK)
+            
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
             node_id = serializer.validated_data.get('node_id')
             path = serializer.validated_data.get('node_path')
-            loader = NodeLoader(from_db=False)
-            payload = loader(node_id=node_id, path=path)
-            NodeSaver()(payload)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            payload = NodeLoader()(node_id=payload.get("node_id"))
+            return_serialized = request.query_params.get("return_serialized") == "1"
+            
+            payload = self.get_serialized_payload(node_id, path, return_serialized=return_serialized)
+            
             node_id = request.query_params.get('node_id', None)
             success, message = NodeUpdater(return_serialized)(node_id, payload)
             if not return_serialized:
-                    del message["node_data"]
+                    message.pop("node_data", None)
+                    
             if success:
                 return Response({"message": message}, status=status.HTTP_200_OK)
             else:
@@ -886,50 +454,53 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         
 
 class NodeSaveAPIView(APIView, NodeQueryMixin):
+    def process_node_save(self, request):
+        """Handles node saving logic for both POST and PUT requests."""
+        payload = request.data.get("node")
+        path = request.data.get("node_path")  # Optional path parameter
+        return_serialized = request.query_params.get("return_serialized") == "1"
+        try:
+            saver = NodeSaver()
+            node_data = NodeLoader()(node_id=payload.get("node_id")).get("node_data")
+            payload["node_data"] = node_data
+            payload["node_id"] = id(saver)
+
+            saved_response = saver(payload, path=path)
+            response = saver(saved_response)
+
+            if return_serialized:
+                node_data = NodeLoader(return_serialized=True)(node_id=response.get("node_id")).get("node_data")
+                response["node_data"] = node_data
+
+            return Response(response, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Internal error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def post(self, request):
         serializer = NodeSaverSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                payload = request.data.get("node")
-                path = request.data.get("node_path")  # Optional path parameter
-                saver = NodeSaver()
-                node_data = NodeLoader()(node_id=payload.get("node_id")).get('node_data')
-                payload['node_data'] = node_data
-                payload.update({"node_id": id(saver)})
-                return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-                res = saver(payload, path=path)
-                response = saver(res)
-                if return_serialized:
-                    node_data = NodeLoader(return_serialized=True)(node_id=response.get("node_id")).get("node_data")
-                    response["node_data"] = node_data
-                return Response(response, status=status.HTTP_200_OK)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            except Exception as e:
-                return Response({"error": f"Internal error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return self.process_node_save(request)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request):
         serializer = NodeSaverSerializer(data=request.data)
         if serializer.is_valid():
-            payload = request.data.get("node")
-            path = request.data.get("node_path")
-            saver = NodeSaver()
-            node_data = NodeLoader()(node_id=payload.get("node_id")).get('node_data')
-            payload['node_data'] = node_data
-            payload.update({"node_id": id(saver)})
-            returned_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
-            res = saver(payload, path=path)
-            response = saver(res)
-            node_id = request.query_params.get('node_id', None)
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+            response = self.process_node_save(request)
+            response_data = response.data
+            node_id = request.query_params.get("node_id")
+            return_serialized = request.query_params.get("return_serialized") == "1"
 
-            success, message = NodeUpdater(return_serialized)(node_id, response)
-            if returned_serialized:
-                    message['node_data'] = NodeLoader()(message.get('node_id'), return_serialized=True).get('node_data')
+            success, message = NodeUpdater(return_serialized)(node_id, response_data)
+
+            if return_serialized:
+                message["node_data"] = NodeLoader()(message.get("node_id"), return_serialized=True).get("node_data")
+
             if success:
                 return Response(message, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
