@@ -20,7 +20,14 @@ class SequentialNet(BaseLayer):
             return [], []
         layers_ids = [cur_id]
         while True:
-            cur_id = NodeLoader()(cur_id).get("children").get('prev_node')
+            task = NodeLoader()(cur_id).get("task")
+            if task != "neural_network":
+                return [], []
+            try:
+                cur_id = NodeLoader()(cur_id).get("children")[0]
+            except IndexError:
+                cur_id = None
+                
             if not cur_id:
                 break
             layers_ids.append(cur_id)

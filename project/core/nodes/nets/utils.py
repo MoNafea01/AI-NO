@@ -9,7 +9,7 @@ class PayloadBuilder:
             "node_name": node_name,
             "node_data": nn,
             "task":"neural_network",
-            "children": {},
+            "children": [],
             "node_type": "nn_layer"
         }
         payload.update(kwargs)

@@ -61,10 +61,7 @@ class FitTransform:
             payload_data = PayloadBuilder.build_payload("Preprocessor transformed", output, "fitter_transformer", 
                                                         node_type="fitter_transformer", task="transform")
             
-            payload['children'] = {
-                "fitted": payload_fitted["node_id"],
-                "transformed": payload_data["node_id"]
-            }
+            payload['children'] = [ payload_fitted["node_id"], payload_data["node_id"] ]
             
             NodeSaver()(payload, "core/nodes/saved/preprocessors")
             NodeSaver()(payload_data, "core/nodes/saved/data")

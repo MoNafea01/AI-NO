@@ -23,7 +23,7 @@ class PayloadBuilder:
             "node_id": id(model),
             "node_name": node_name,
             "node_data": model,
-            "children": {},
+            "children": [],
         }
         payload.update(kwargs)
         return payload

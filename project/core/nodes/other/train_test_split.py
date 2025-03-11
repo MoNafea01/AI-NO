@@ -15,10 +15,7 @@ class TrainTestSplit:
             payload1 = PayloadBuilder.build_payload("Train data", out1, "train_test_split", node_type="splitter", task="split")
             payload2 = PayloadBuilder.build_payload("Test data", out2, "train_test_split", node_type="splitter", task="split")
 
-            payload['children'] = {
-                "train_data": payload1["node_id"],
-                "test_data": payload2["node_id"]
-            }
+            payload['children'] = [payload1["node_id"], payload2["node_id"]]
             
             NodeSaver()(payload, "core/nodes/saved/data")
             NodeSaver()(payload1, "core/nodes/saved/data")

@@ -50,7 +50,7 @@ class PayloadBuilder:
             "node_name": node_name,
             "node_data": node_data,
             "task": "custom",
-            "children": {},
+            "children": [],
         }
         payload.update(kwargs)
         return payload

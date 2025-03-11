@@ -79,10 +79,8 @@ class DataLoader:
         payloadX = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: X", X, "data_loader", node_type="loader", task="load_data")
         payloady = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: y", y, "data_loader", node_type="loader", task="load_data")
         
-        payload['children'] = {
-            "X": payloadX["node_id"],
-            "y": payloady["node_id"]
-        }
+        payload['children'] = [ payloadX["node_id"], payloady["node_id"] ]
+        
         NodeSaver()(payloadX, path="core/nodes/saved/data")
         NodeSaver()(payloady, path="core/nodes/saved/data")
         NodeSaver()(payload, path="core/nodes/saved/data")

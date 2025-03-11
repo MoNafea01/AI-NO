@@ -47,17 +47,30 @@ class NodeQueryMixin:
     def get(self, request, *args, **kwargs):
         try:
             node_id = request.query_params.get("node_id")
-            channel = request.query_params.get('output')
+            output = request.query_params.get('output', "0")
             return_data = request.query_params.get('return_data', '0') == '1'
-            if channel in ['1', '2']:
-                parent_node = NodeLoader()(node_id=node_id)
-                if parent_node:
-                    children = parent_node.get("children")
-                    child_id = list(children.values())
-                    if len(child_id) > 0:
-                        node_id = str(child_id[0]) if channel == '1' else str(child_id[1]) if channel == '2' else node_id
 
-            return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
+            if output.isdigit() and int(output) > 0:
+                depth = int(output)
+                current_node = NodeLoader()(node_id=node_id)
+                children = current_node.get("children", [])
+                if len(current_node.get("children")) > 1:
+                    child_id = children[int(output) - 1] if len(children) >= int(output) else None
+                    if isinstance(child_id, int):
+                        current_node = NodeLoader()(node_id=str(child_id))
+                        node_id = str(child_id)
+
+                else:
+                    for i in range(depth):
+                        child = current_node.get("children", [])
+                        if child:
+                            child_id = child[0]
+                            current_node = NodeLoader()(node_id=str(child_id))
+                        else:
+                            break
+                        node_id = str(current_node.get("node_id", node_id))
+
+            return_serialized = request.query_params.get('return_serialized', '0') == '1'
             payload = NodeLoader(return_serialized=return_serialized)(node_id=node_id)
             if not (return_serialized or return_data):
                 payload.pop("node_data", None)
@@ -129,7 +142,6 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             node_id = request.query_params.get("node_id", None)
             return_serialized = request.query_params.get('return_serialized', '0') == '1'
             success, message = NodeUpdater(return_serialized)(node_id, processor())
-
             if not return_serialized:
                 message.pop("node_data", None)
             
