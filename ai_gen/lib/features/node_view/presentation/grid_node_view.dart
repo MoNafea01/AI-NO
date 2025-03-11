@@ -4,7 +4,7 @@ import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'cubits/grid_node_view_cubit.dart';
+import '../cubit/grid_node_view_cubit.dart';
 
 class GridNodeView extends StatefulWidget {
   const GridNodeView({super.key});
