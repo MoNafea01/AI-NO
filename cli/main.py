@@ -31,6 +31,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-{"model_name":"linear_regression","model_type":"linear_models","task":"regression"}
-1609620511232

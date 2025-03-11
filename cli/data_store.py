@@ -36,3 +36,26 @@ def reset_data_store():
         "active_workflow": None,
         "admin": [],
     }
+
+def load_backup_data():
+    data = {
+        "users": {
+            "admin": {
+                "password": "admin",
+                "projects": {
+                    "prj1": {
+                        "workflows": {
+                            "wf1": [
+
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+    "active_user": "admin",
+    "active_project": "prj1",
+    "active_workflow": "wf1",
+    "admin": ["admin"]
+    }
+    set_data_store(data)

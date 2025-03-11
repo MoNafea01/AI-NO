@@ -1,4 +1,4 @@
-from data_store import get_data_store, set_data_store
+from data_store import get_data_store, set_data_store, load_backup_data
 from save_load import save_data_to_file
 import os
 
@@ -29,10 +29,13 @@ def create_user(username, password):
     if username not in data_store["users"]:
         data_store["users"][username] = {"password": password, "projects": {}}
         data_store["active_user"] = username
+
         if len(data_store['admin']) == 0 and len(data_store['users'].keys()) == 1:
             data_store['admin'].append(username)
+
         elif len(data_store['admin']) == 0 and len(data_store['users'].keys()) == 2:
             data_store['admin'].append(list(data_store['users'].keys())[0])
+
         save_data_to_file(data_file_path)
         return f"User {username} created."
     data_store["active_user"] = username
@@ -43,6 +46,7 @@ def select_user(username, password):
     data_store = get_data_store()
     if username in data_store["users"] and data_store["users"][username]["password"] == password:
         data_store["active_user"] = username
+
         return f"User {username} selected."
     return "Invalid username or password."
 
@@ -55,8 +59,10 @@ def remove_user(username):
         del data_store["users"][username]
         if username in data_store["admin"]:
             data_store["admin"].remove(username)
+
         if len(data_store['users'].keys()) == 1:
             data_store['admin'].append(list(data_store['users'].keys())[0])
+            
         save_data_to_file(data_file_path)
         return f"User {username} removed."
     return "User does not exist."
@@ -86,8 +92,12 @@ def get_recent():
         json_data = json.load(json_file)
     active_user = json_data['active_user']
     active_project = json_data['active_project']
-    if active_project == '':
-        return "No recent projects"
+    active_workflow = json_data['active_workflow']
+    # if active_project == '':
+    #     return "No recent projects"
+    if not (active_user or active_project or active_workflow):
+        load_backup_data()
+        return "Loaded Backup Data..."
     set_data_store(json_data)
     recent_workflow = get_data_store()['active_workflow']
     return recent_workflow
