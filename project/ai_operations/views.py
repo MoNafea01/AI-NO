@@ -48,6 +48,7 @@ class NodeQueryMixin:
         try:
             node_id = request.query_params.get("node_id")
             channel = request.query_params.get('output')
+            return_data = request.query_params.get('return_data', '0') == '1'
             if channel in ['1', '2']:
                 parent_node = NodeLoader()(node_id=node_id)
                 if parent_node:
@@ -58,7 +59,7 @@ class NodeQueryMixin:
 
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             payload = NodeLoader(return_serialized=return_serialized)(node_id=node_id)
-            if not return_serialized:
+            if not (return_serialized or return_data):
                 payload.pop("node_data", None)
             return Response(payload, status=status.HTTP_200_OK)
         except Exception as e:
@@ -116,7 +117,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             
             return_serialized = request.query_params.get('return_serialized', '0') == '1'
             response_data = processor(output_channel, return_serialized=return_serialized)
-            return Response(response_data, status=status.HTTP_200_OK)
+            return Response(response_data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -518,7 +519,7 @@ class ClearNodesAPIView(APIView):
     def delete(self, request):
         try:
             response = ClearAllNodes()()
-            return Response(response, status=status.HTTP_200_OK)
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -527,7 +528,7 @@ class ClearComponentsAPIView(APIView):
     def delete(self, request):
         try:
             response = ClearAllNodes()('components')
-            return Response(response, status=status.HTTP_200_OK)
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
