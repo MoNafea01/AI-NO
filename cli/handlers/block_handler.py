@@ -32,9 +32,8 @@ def create_block(*args):
     node_name = args[0]
     if node_name not in mapper:
         return f"Block {node_name} not found."
-    
     query = mapper.get(node_name)
-    args = eval(*args[1:])
+    args = eval(''.join(args[1:]))
 
     payload = send_request_to_api(args, query)
     if not isinstance(payload, dict):
@@ -60,7 +59,7 @@ def edit_block(*args):
         return f"Block {block_id} not found."
 
     query = mapper.get(node_name)
-    args = eval(*args[2:])
+    args = eval(''.join(args[2:]))
 
     payload = send_request_to_api(args, query, method_type='put', node_id=block_id)
     if not isinstance(payload, dict):

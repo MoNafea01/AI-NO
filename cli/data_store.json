@@ -1,31 +1,20 @@
 {
     "users": {
-        "lol": {
-            "password": "101",
+        "admin": {
+            "password": "admin",
             "projects": {
                 "prj1": {
                     "workflows": {
-                        "wf1": [
-                            {
-                                "message": "Model created: linear_regression",
-                                "params": {},
-                                "node_id": 1609620812816,
-                                "node_name": "linear_regression",
-                                "children": {},
-                                "node_type": "linear_models",
-                                "task": "regression"
-                            }
-                        ]
+                        "wf1": []
                     }
                 }
             }
         }
     },
-    "active_user": null,
-    "active_project": null,
-    "active_workflow": null,
+    "active_user": "admin",
+    "active_project": "prj1",
+    "active_workflow": "wf1",
     "admin": [
-        "lol",
-        "lol"
+        "admin"
     ]
 }
