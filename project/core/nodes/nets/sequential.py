@@ -1,5 +1,5 @@
 from keras.api.models import Sequential
-from ...repositories.node_repository import NodeLoader
+from ...repositories.node_repository import NodeLoader, NodeDataExtractor
 from .base_layer import BaseLayer
 
 global model_id
@@ -7,10 +7,10 @@ model_id = 0
 
 class SequentialNet(BaseLayer):
     '''Handles sequential model creation.'''
-    def __init__(self, layer: list, name: str = None, path: str = None):
+    def __init__(self, layer: dict|int, name: str = None, path: str = None):
         '''Initializes the Sequential object.'''
         self.name, self.layer_path = self.load_args(name, path)
-        [self.layer] = self.load_args(layer, attr="node_id")
+        self.layer = self.load_args(layer, attr="node_id")
         self.layers, self.layers_names  = self.get_layers()
         self.payload = self.load_layer()
     
@@ -24,8 +24,7 @@ class SequentialNet(BaseLayer):
             if not cur_id:
                 break
             layers_ids.append(cur_id)
-
-        layers = [NodeLoader()(layer_id).get('node_data') for layer_id in layers_ids][::-1]
+        layers = [NodeDataExtractor()(layer_id) for layer_id in layers_ids][::-1]
         layers_names = list(map(lambda x: x.name, layers))
         return layers, layers_names
 

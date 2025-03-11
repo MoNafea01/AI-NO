@@ -1,7 +1,7 @@
 from ..configs.preprocessors import PREPROCESSORS as preprocessors
 from .utils import PayloadBuilder
 from ..utils import NodeNameHandler
-from ...repositories.node_repository import NodeSaver, NodeLoader
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 
 class Preprocessor:
     """Handles preprocessors creation and parameter management."""
@@ -42,7 +42,7 @@ class Preprocessor:
         
     def _create_from_path(self):
         try:
-            preprocessor = NodeLoader()(path=self.preprocessor_path).get('node_data')
+            preprocessor = NodeDataExtractor()(self.preprocessor_path)
             preprocessor_name, _ = NodeNameHandler.handle_name(self.preprocessor_path)
             preprocessor_type = self.find_preprocessor_type(preprocessor_name, preprocessors)
             return self._create_handler(preprocessor, preprocessor_name, preprocessor_type, "preprocessing")
@@ -77,7 +77,7 @@ class Preprocessor:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
             self.payload.update({"node_data": node_data})
         return self.payload
 

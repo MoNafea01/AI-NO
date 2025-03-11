@@ -1,7 +1,7 @@
 from .model import Model
 from .fit import Fit
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeLoader, NodeSaver
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 
 
 class ModelPredictor:
@@ -24,11 +24,11 @@ class Predict:
     def __init__(self, X, model=None, model_path=None):
         self.model = model
         self.model_path = model_path
-        self.X = NodeLoader()(X.get("node_id")).get('node_data') if isinstance(X, dict) else X
+        self.X = NodeDataExtractor()(X)
         self.payload = self._predict()
 
     def _predict(self):
-        if isinstance(self.model, dict):
+        if isinstance(self.model, (dict, int)):
             return self._predict_from_id()
         elif isinstance(rf"{self.model}", str):
             return self._predict_from_path()
@@ -37,14 +37,14 @@ class Predict:
 
     def _predict_from_id(self):
         try:
-            model = NodeLoader()(self.model.get("node_id")).get('node_data')  # Load model using ID from database
+            model = NodeDataExtractor()(self.model)
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by ID: {e}")
 
     def _predict_from_path(self):
         try:
-            model = NodeLoader()(path=self.model_path).get('node_data')
+            model = NodeDataExtractor()(self.model_path)
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by path: {e}")
@@ -68,7 +68,7 @@ class Predict:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
             self.payload.update({"node_data": node_data})
         return self.payload
 

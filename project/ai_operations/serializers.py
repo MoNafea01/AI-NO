@@ -3,6 +3,16 @@ from rest_framework import serializers
 from .models import Component, Node
 import base64
 
+class JSONOrIntField(serializers.Field):
+    def to_internal_value(self, data):
+        """Convert input data to a Python native datatype."""
+        if isinstance(data, (dict, list, int)):  # Allow JSON (dict/list) and int
+            return data
+        raise serializers.ValidationError("This field must be a JSON object or an integer.")
+
+    def to_representation(self, value):
+        """Convert Python object back to a JSON-serializable format."""
+        return value  # Return as-is (int or JSON)
 
 class DataLoaderSerializer(serializers.Serializer):
     dataset_name = serializers.CharField(required=False)
@@ -15,17 +25,17 @@ class DataLoaderSerializer(serializers.Serializer):
 
 
 class TrainTestSplitSerializer(serializers.Serializer):
-    data = serializers.JSONField(required=True)
+    data = JSONOrIntField(required=True)
     params = serializers.JSONField(required=False)
 
 
 class SplitterSerializer(serializers.Serializer):
-    data = serializers.JSONField(required=True)
+    data = JSONOrIntField(required=True)
 
 
 class JoinerSerializer(serializers.Serializer):
-    data_1 = serializers.JSONField(required=True)
-    data_2 = serializers.JSONField(required=True)
+    data_1 = JSONOrIntField(required=True)
+    data_2 = JSONOrIntField(required=True)
 
 
 class ModelSerializer(serializers.Serializer):
@@ -42,10 +52,10 @@ class ModelSerializer(serializers.Serializer):
 
 
 class FitModelSerializer(serializers.Serializer):
-    X = serializers.JSONField(required=True)
-    y = serializers.JSONField(required=True)
+    X = JSONOrIntField(required=True)
+    y = JSONOrIntField(required=True)
     model_path = serializers.CharField(required=False)
-    model = serializers.JSONField(required=False)
+    model = JSONOrIntField(required=False)
     def validate(self, data):
         """
         Ensure at least one of 'model' or 'model_path' is provided.
@@ -54,8 +64,8 @@ class FitModelSerializer(serializers.Serializer):
 
 
 class PredictSerializer(serializers.Serializer):
-    X = serializers.JSONField(required=True)
-    model = serializers.JSONField(required=False)
+    X = JSONOrIntField(required=True)
+    model = JSONOrIntField(required=False)
     model_path = serializers.CharField(required=False)
     def validate(self, data):
         """
@@ -66,8 +76,8 @@ class PredictSerializer(serializers.Serializer):
 
 class EvaluatorSerializer(serializers.Serializer):
     metric = serializers.CharField(required=True)
-    y_true = serializers.JSONField(required=True)
-    y_pred = serializers.JSONField(required=True)
+    y_true = JSONOrIntField(required=True)
+    y_pred = JSONOrIntField(required=True)
 
 
 class PreprocessorSerializer(serializers.Serializer):
@@ -83,8 +93,8 @@ class PreprocessorSerializer(serializers.Serializer):
 
 
 class FitPreprocessorSerializer(serializers.Serializer):
-    data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=False)
+    data = JSONOrIntField(required=True)
+    preprocessor = JSONOrIntField(required=False)
     preprocessor_path = serializers.CharField(required=False)
     def validate(self, data):
         """
@@ -94,8 +104,8 @@ class FitPreprocessorSerializer(serializers.Serializer):
 
 
 class TransformSerializer(serializers.Serializer):
-    data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=False)
+    data = JSONOrIntField(required=True)
+    preprocessor = JSONOrIntField(required=False)
     preprocessor_path = serializers.CharField(required=False)
     def validate(self, data):
         """
@@ -105,8 +115,8 @@ class TransformSerializer(serializers.Serializer):
 
 
 class FitTransformSerializer(serializers.Serializer):
-    data = serializers.JSONField(required=True)
-    preprocessor = serializers.JSONField(required=False)
+    data = JSONOrIntField(required=True)
+    preprocessor = JSONOrIntField(required=False)
     preprocessor_path = serializers.CharField(required=False)
     def validate(self, data):
         """
@@ -129,7 +139,7 @@ class InputSerializer(serializers.Serializer):
 class DenseSerializer(serializers.Serializer):
     units = serializers.IntegerField(required=False, default=1)
     activation = serializers.CharField(required=False, default='relu')
-    prev_node = serializers.JSONField(required=False)
+    prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data:dict):
@@ -140,7 +150,7 @@ class DenseSerializer(serializers.Serializer):
 
 
 class FlattenSerializer(serializers.Serializer):
-    prev_node = serializers.JSONField(required=False)
+    prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data:dict):
@@ -152,7 +162,7 @@ class FlattenSerializer(serializers.Serializer):
 
 class DropoutSerializer(serializers.Serializer):
     rate = serializers.FloatField(required=False, default=0.5)
-    prev_node = serializers.JSONField(required=False)
+    prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data:dict):
@@ -168,7 +178,7 @@ class Conv2DSerializer(serializers.Serializer):
     strides = serializers.JSONField(required=False, default=[1, 1])
     padding = serializers.CharField(required=False, default='valid')
     activation = serializers.CharField(required=False, default='relu')
-    prev_node = serializers.JSONField(required=False)
+    prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data:dict):
@@ -182,7 +192,7 @@ class MaxPool2DSerializer(serializers.Serializer):
     pool_size = serializers.JSONField(required=False, default=[2, 2])
     strides = serializers.JSONField(required=False, default=[2, 2])
     padding = serializers.CharField(required=False, default='valid')
-    prev_node = serializers.JSONField(required=False)
+    prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data:dict):
@@ -193,7 +203,7 @@ class MaxPool2DSerializer(serializers.Serializer):
 
 
 class SequentialSerializer(serializers.Serializer):
-    layer = serializers.JSONField(required=False)
+    layer = JSONOrIntField(required=False)
     name = serializers.JSONField(required=False)
     path = serializers.CharField(required=False)
     def validate(self, data:dict):
@@ -210,11 +220,11 @@ class NodeLoaderSerializer(serializers.Serializer):
         """
         Ensure at least one of 'node_name' or 'node_path' is provided.
         """
-        return validate(data, ('node_id', 'node_path'))
+        return validate(data, ("node_id", 'node_path'))
 
 
 class NodeSaverSerializer(serializers.Serializer):
-    node = serializers.JSONField(required=True)
+    node = JSONOrIntField(required=True)
     node_path = serializers.CharField(required=True)
 
 
@@ -239,16 +249,16 @@ class NodeSerializer(serializers.ModelSerializer):
         }
     def create(self, validated_data):
         """Decode Base64-encoded node_data before saving"""
-        node_data_base64 = validated_data.pop('node_data', None)
+        node_data_base64 = validated_data.pop("node_data", None)
         if node_data_base64:
-            validated_data['node_data'] = base64.b64decode(node_data_base64)
+            validated_data["node_data"] = base64.b64decode(node_data_base64)
         return super().create(validated_data)
     
     def to_representation(self, instance):
         """Customize serialization to convert binary data to Base64"""
         representation = super().to_representation(instance)
         if instance.node_data:
-            representation['node_data'] = base64.b64encode(instance.node_data).decode()
+            representation["node_data"] = base64.b64encode(instance.node_data).decode()
 
         return representation
 

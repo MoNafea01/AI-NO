@@ -1,11 +1,10 @@
 from ..utils import PayloadBuilder
 from ..configs.metrics import METRICS as metrics
-from ...repositories.node_repository import NodeLoader, NodeSaver
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 
 class Evaluator:
     def __init__(self, metric='accuracy', y_true=None, y_pred=None):
-        self.y_true = NodeLoader()(y_true.get("node_id")).get('node_data') if isinstance(y_true, dict) else y_true
-        self.y_pred = NodeLoader()(y_pred.get("node_id")).get('node_data') if isinstance(y_pred, dict) else y_pred
+        self.y_true, self.y_pred = NodeDataExtractor()(y_true, y_pred)
         self.metric = metric
         self.payload = self.evaluate(self.y_true, self.y_pred)
 
@@ -29,7 +28,7 @@ class Evaluator:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
             self.payload.update({"node_data": node_data})
         return self.payload
 

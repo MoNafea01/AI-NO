@@ -6,7 +6,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from ..nodes.utils import NodeDirectoryManager, NodeNameHandler, DirectoryManager
 import os
 
-
 """
 Saving & Loading Operation:
 ---------------------------
@@ -26,6 +25,10 @@ MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter"]
 SPECIAL_CASE_NODES = ["fitter_transformer"]
 PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer"]
 
+MODELS_TASKS = ["regression", "classification", "fit_model", "predict", "evaluate"]
+PREPROCESSORS = ["preprocessing", "fit_preprocessor", "transform", "fit_transform"]
+LAYERS = ["neural_network"]
+DATA_NODES = ["load_data", "split","join"]
 
 class NodeSaver:
     """
@@ -48,10 +51,10 @@ class NodeSaver:
             raise ValueError("Payload must be a dictionary.")
         
         message = payload.get('message', "Done")
-        node_id = payload.get('node_id')
+        node_id = payload.get("node_id")
         node_name = payload.get('node_name')
         params = payload.get('params', {})
-        node = payload.get('node_data')
+        node = payload.get("node_data")
         task = payload.get('task', "general")
         node_type = payload.get('node_type', "general")
         children = payload.get("children", {})
@@ -82,7 +85,7 @@ class NodeSaver:
             defaults={
                 'node_name': node_name,
                 'message': message,
-                'node_data': node_bytes,
+                "node_data": node_bytes,
                 'params': params,
                 'task': task,
                 'node_type': node_type,
@@ -180,7 +183,6 @@ class NodeLoader:
     def build_payload(self, node_data, name, node_id, path):
         if path:
             self.from_db = False
-            
         payload = {
                 "message": f"Node {name} Loaded.",
                 "node_name": "node_loader",
@@ -246,6 +248,7 @@ class NodeDeleter:
         if not node_id:
             raise ValueError("Node ID must be provided.")
         # make sure that node_id is integer
+        
         node_id = int(node_id) if node_id else None
         try:
             
@@ -302,6 +305,7 @@ class NodeUpdater:
     def __call__(self, node_id: int, payload: dict, ) -> tuple:
         if not node_id:
             raise ValueError("Node ID must be provided.")
+        
         node_id = int(node_id) if node_id else None
         if not isinstance(payload, dict):
             raise ValueError("Payload must be a dictionary.")
@@ -326,7 +330,7 @@ class NodeUpdater:
             
             # next section for nodes with multiple directiories
             folders = None
-            payload['node_data'] = []
+            payload["node_data"] = []
             is_multi_channel = node.node_name in MULTI_CHANNEL_NODES
             is_special_case = node.node_name in SPECIAL_CASE_NODES
             
@@ -335,7 +339,8 @@ class NodeUpdater:
             elif is_special_case:
                 folders = ['preprocessors', 'data']
             else:
-                payload['node_data'] = NodeLoader()(original_id).get('node_data')
+                
+                payload["node_data"] = NodeDataExtractor()(original_id)
 
             if folders:
                 o_ids = list(payload.get("children").values())
@@ -350,18 +355,18 @@ class NodeUpdater:
                     f_path = NodeDirectoryManager.get_nodes_dir(f)
                     tmp_id = o_ids[i]
                     new_id = new_ids[i]
-                    data = NodeLoader()(tmp_id).get('node_data')
+                    data = NodeDataExtractor()(tmp_id)
                     
                     new_payload = payload.copy()
-                    new_payload['node_id'] = new_id
-                    new_payload['node_data'] = data
+                    new_payload["node_id"] = new_id
+                    new_payload["node_data"] = data
                     new_payload.update(**configs[i])
-                    payload['node_data'].append(data)
+                    payload["node_data"].append(data)
                     NodeSaver()(new_payload, path=f_path)
                     NodeDeleter()(tmp_id)
             
             # now we assign the old node's id for the new node so it takes same identifier
-            payload['node_id'] = node_id
+            payload["node_id"] = node_id
             if payload['node_name'] not in PARENT_NODES:
                 payload['children'] = node.children
                 
@@ -373,7 +378,7 @@ class NodeUpdater:
                 delete_node_file(node.node_name, node.node_id, folder)
 
             # serialization part
-            node_data = NodeLoader(return_serialized=self.return_serialized)(node_id).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=self.return_serialized)(node_id)
             message = f"Node {node_id} updated."
             payload.update({"message": message, "node_data": node_data})
             return True, payload
@@ -406,18 +411,6 @@ class ClearAllNodes:
             return True, "All nodes cleared."
         except Exception as e:
             return False, f"Error clearing nodes: {e}"
-    
-
-
-def get_folder_by_task(task: str) -> str:
-    if task in {"regression", "classification", "fit_model"}:
-        return "models"
-    elif task in {"preprocessing", "fit_preprocessor", "fit_transform"}:
-        return "preprocessors"
-    elif task in {"neural_network"}:
-        return "nn"
-    else:
-        return "data"
 
 
 def delete_node_file(node_name, node_id, folder):
@@ -427,3 +420,43 @@ def delete_node_file(node_name, node_id, folder):
     node_path = os.path.join(NodeDirectoryManager.get_nodes_dir(folder), f"{node_name}_{node_id}.pkl")
     if os.path.exists(node_path):
         os.remove(node_path)
+
+def get_folder_by_task(task):
+    return "models" if task in MODELS_TASKS else (
+        "preprocessors" if task in PREPROCESSORS else (
+            "nn" if task in LAYERS else (
+                "data" if task in DATA_NODES else "other"
+                )
+            )
+        )
+
+
+class NodeDataExtractor:
+    def __init__(self, from_db : bool = True, return_serialized : bool = False, return_bytes : bool = False):
+        self.from_db = from_db
+        self.return_serialized = return_serialized
+        self.return_bytes = return_bytes
+
+    def __call__(self, *args):
+        return self.node_data_extract(*args)
+
+    def node_data_extract(self, *args):
+        l = []
+        for arg in args:
+            if isinstance(arg, dict):
+                data = NodeLoader(self.from_db, self.return_serialized, self.return_bytes)(arg.get("node_id")).get("node_data")
+                if data is not None:
+                    l.append(data)
+            elif isinstance(arg, int):
+                data = NodeLoader(self.from_db, self.return_serialized, self.return_bytes)(arg).get("node_data")
+                if data is not None:
+                    l.append(data)
+            elif isinstance(arg, str):
+                data = NodeLoader(from_db=False, return_serialized=self.return_serialized, return_bytes=self.return_bytes)(path=arg).get("node_data")
+                if data is not None:
+                    l.append(data)
+            else:
+                l.append(arg)
+        if len(l) == 1:
+            [l] = l
+        return l

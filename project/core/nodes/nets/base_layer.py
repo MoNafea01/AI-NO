@@ -1,4 +1,4 @@
-from ...repositories.node_repository import NodeSaver, NodeLoader
+from ...repositories.node_repository import NodeSaver, NodeLoader, NodeDataExtractor
 from .utils import PayloadBuilder
 
 
@@ -24,7 +24,7 @@ class BaseLayer:
     
     def _load_from_path(self):
         try:
-            layer = NodeLoader()(path=self.layer_path).get("node_data") # load the input from the path given
+            layer = NodeDataExtractor()(self.layer_path)
             return self.load_handler(layer)
         except Exception as e:
             raise ValueError(f"Error loading layer from path: {e}")
@@ -85,10 +85,12 @@ class BaseLayer:
         for arg in args:
             if isinstance(arg, dict):
                 data = NodeLoader()(arg.get("node_id")).get(attr)
-                if data:
+                if data is not None:
                     l.append(data)
             else:
                 l.append(arg)
+        if len(l) == 1:
+            [l] = l
         return l
     
     def __str__(self):
@@ -103,6 +105,6 @@ class BaseLayer:
         '''Returns the payload.'''
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
             self.payload.update({"node_data": node_data})
         return self.payload

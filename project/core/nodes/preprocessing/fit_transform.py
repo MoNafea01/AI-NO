@@ -1,6 +1,6 @@
 from .preprocessor import Preprocessor
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeLoader, NodeSaver, NodeDeleter
+from ...repositories.node_repository import NodeSaver, NodeDeleter, NodeDataExtractor
 
 class PreprocessorFitterTransformer:
     """Handles the fitting and transformation of preprocessors."""
@@ -23,11 +23,11 @@ class FitTransform:
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeLoader()(data.get("node_id")).get('node_data') if isinstance(data, dict) else data
+        self.data = NodeDataExtractor()(data)
         self.payload = self._fit_transform()
 
     def _fit_transform(self):
-        if isinstance(self.preprocessor, dict):
+        if isinstance(self.preprocessor, (dict, int)):
             return self._fit_transform_from_id()
         elif isinstance(rf"{self.preprocessor_path}", str):
             return self._fit_transform_from_path()
@@ -36,14 +36,14 @@ class FitTransform:
 
     def _fit_transform_from_id(self):
         try:
-            preprocessor = NodeLoader()(self.preprocessor.get("node_id")).get('node_data')  # Load preprocessor using ID from database
+            preprocessor = NodeDataExtractor()(self.preprocessor)
             return self._fit_transform_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting and transforming preprocessor by ID: {e}")
 
     def _fit_transform_from_path(self):
         try:
-            preprocessor = NodeLoader()(path=self.preprocessor_path).get('node_data')
+            preprocessor = NodeDataExtractor()(self.preprocessor_path)
             return self._fit_transform_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting and transforming preprocessor by path: {e}")
@@ -62,15 +62,15 @@ class FitTransform:
                                                         node_type="fitter_transformer", task="transform")
             
             payload['children'] = {
-                "fitted": payload_fitted['node_id'],
-                "transformed": payload_data['node_id']
+                "fitted": payload_fitted["node_id"],
+                "transformed": payload_data["node_id"]
             }
             
             NodeSaver()(payload, "core/nodes/saved/preprocessors")
             NodeSaver()(payload_data, "core/nodes/saved/data")
             NodeSaver()(payload_fitted, "core/nodes/saved/preprocessors")
-            del payload_data['node_data']
-            del payload_fitted['node_data']
+            del payload_data["node_data"]
+            del payload_fitted["node_data"]
             payload.pop("node_data", None)
             return payload, payload_fitted, payload_data
         except Exception as e:
@@ -85,15 +85,15 @@ class FitTransform:
         for arg in args:
             if arg == '1':
                 payload = self.payload[1]
-                NodeDeleter()(self.payload[2]['node_id'])
-                NodeDeleter()(self.payload[0]['node_id'])
+                NodeDeleter()(self.payload[2]["node_id"])
+                NodeDeleter()(self.payload[0]["node_id"])
             elif arg == '2':
                 payload = self.payload[2]
-                NodeDeleter()(self.payload[1]['node_id'])
-                NodeDeleter()(self.payload[0]['node_id'])
+                NodeDeleter()(self.payload[1]["node_id"])
+                NodeDeleter()(self.payload[0]["node_id"])
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(payload)
             payload.update({"node_data": node_data})
         return payload
     

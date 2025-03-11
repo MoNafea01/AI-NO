@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from ..utils import NodeNameHandler, PayloadBuilder
 from ..configs.datasets import DATASETS as datasets
-from ...repositories.node_repository import NodeLoader, NodeSaver, NodeDeleter
+from ...repositories.node_repository import NodeSaver, NodeDeleter, NodeDataExtractor
 
 
 class BaseDataLoader:
@@ -38,7 +38,7 @@ class CustomDataLoader:
                 raise FileNotFoundError(f"dataset not found: {self.dataset_path}")
             
             if self.dataset_path.endswith('.pkl'):
-                data = NodeLoader()(path=self.dataset_path).get('node_data')
+                data = NodeDataExtractor()(self.dataset_path)
                 X, y = data
                 
             elif self.dataset_path.endswith('.csv'):
@@ -80,8 +80,8 @@ class DataLoader:
         payloady = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: y", y, "data_loader", node_type="loader", task="load_data")
         
         payload['children'] = {
-            "X": payloadX['node_id'],
-            "y": payloady['node_id']
+            "X": payloadX["node_id"],
+            "y": payloady["node_id"]
         }
         NodeSaver()(payloadX, path="core/nodes/saved/data")
         NodeSaver()(payloady, path="core/nodes/saved/data")
@@ -99,15 +99,15 @@ class DataLoader:
         for arg in args:
             if arg == '1':
                 payload = self.payload[1]
-                NodeDeleter()(self.payload[2]['node_id'])
-                NodeDeleter()(self.payload[0]['node_id'])
+                NodeDeleter()(self.payload[2]["node_id"])
+                NodeDeleter()(self.payload[0]["node_id"])
             elif arg == '2':
                 payload = self.payload[2]
-                NodeDeleter()(self.payload[1]['node_id'])
-                NodeDeleter()(self.payload[0]['node_id'])
+                NodeDeleter()(self.payload[1]["node_id"])
+                NodeDeleter()(self.payload[0]["node_id"])
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(payload)
             payload.update({"node_data": node_data})
         return payload
 

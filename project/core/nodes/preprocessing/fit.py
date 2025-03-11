@@ -1,6 +1,6 @@
 from .preprocessor import Preprocessor
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeLoader
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 
 
 class PreprocessorFitter:
@@ -23,11 +23,11 @@ class Fit:
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeLoader()(data.get("node_id")).get('node_data') if isinstance(data, dict) else data
+        self.data = NodeDataExtractor()(data)
         self.payload = self._fit()
 
     def _fit(self):
-        if isinstance(self.preprocessor, dict):
+        if isinstance(self.preprocessor, (dict, int)):
             return self._fit_from_id()
         elif isinstance(rf"{self.preprocessor_path}", str):
             return self._fit_from_path()
@@ -36,14 +36,14 @@ class Fit:
 
     def _fit_from_id(self):
         try:
-            preprocessor = NodeLoader()(self.preprocessor.get("node_id")).get('node_data')  # Load preprocessor using ID from database
+            preprocessor = NodeDataExtractor()(self.preprocessor)
             return self._fit_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor by ID: {e}")
 
     def _fit_from_path(self):
         try:
-            preprocessor = NodeLoader()(path=self.preprocessor_path).get('node_data')
+            preprocessor = NodeDataExtractor()(self.preprocessor_path)
             return self._fit_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor by path: {e}")
@@ -69,7 +69,7 @@ class Fit:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
             self.payload.update({"node_data": node_data})
         return self.payload
 

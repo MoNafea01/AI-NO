@@ -1,7 +1,7 @@
 from ..configs.models import MODELS as models
 from .utils import PayloadBuilder
 from ..utils import NodeNameHandler
-from ...repositories.node_repository import NodeSaver, NodeLoader
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 from sklearn.base import BaseEstimator
 
 
@@ -57,7 +57,7 @@ class Model:
     def _create_from_path(self):
         '''Creates the model payload using the model path.'''
         try:
-            model = NodeLoader()(path=self.model_path).get("node_data") # load the model from the path given
+            model = NodeDataExtractor()(self.model_path) # load the model from the path
             model_name, _ = NodeNameHandler.handle_name(self.model_path) # get the model name from the path
             model_type, task = self.find_model_type_and_task(model_name, models) # get the model type and task
             
@@ -95,7 +95,7 @@ class Model:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
             self.payload.update({"node_data": node_data})
         return self.payload
 

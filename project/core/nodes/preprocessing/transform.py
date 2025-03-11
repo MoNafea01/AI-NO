@@ -1,7 +1,7 @@
 from .preprocessor import Preprocessor
 from .fit import Fit
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeLoader, NodeSaver
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 
 
 class PreprocessorTransformer:
@@ -24,11 +24,11 @@ class Transform:
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeLoader()(data.get("node_id")).get('node_data') if isinstance(data, dict) else data
+        self.data = NodeDataExtractor()(data)
         self.payload = self._transform()
 
     def _transform(self):
-        if isinstance(self.preprocessor, dict):
+        if isinstance(self.preprocessor, (dict, int)):
             return self._transform_from_id()
         elif isinstance(rf"{self.preprocessor}", str):
             return self._transform_from_path()
@@ -37,14 +37,14 @@ class Transform:
 
     def _transform_from_id(self):
         try:
-            prepocessor = NodeLoader()(self.preprocessor.get("node_id")).get('node_data')  # Load model using ID from database
+            prepocessor = NodeDataExtractor()(self.preprocessor)
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by ID: {e}")
 
     def _transform_from_path(self):
         try:
-            prepocessor = NodeLoader()(path=self.preprocessor_path).get('node_data')
+            prepocessor = NodeDataExtractor()(self.preprocessor_path)
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by path: {e}")
@@ -69,7 +69,7 @@ class Transform:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader(return_serialized=True)(self.payload.get("node_id")).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
             self.payload.update({"node_data": node_data})
         return self.payload
 

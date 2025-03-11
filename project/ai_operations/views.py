@@ -27,25 +27,26 @@ from core.nodes.nets.sequential import SequentialNet
 
 from core.repositories.node_repository import (
     NodeLoader, NodeSaver, 
-    NodeDeleter, NodeUpdater, ClearAllNodes)
+    NodeDeleter, NodeUpdater, ClearAllNodes,
+    get_folder_by_task, NodeDataExtractor)
 
 from .serializers import *
 import pandas as pd
 import json
 
-MODELS_TASKS = ["regression", "classification", "fit_model", "predict", "evaluate"]
-PREPROCESSORS = ["preprocessing", "fit_preprocessor", "transform", "fit_transform"]
-LAYERS = ["neural_network"]
-DATA_NODES = ["load_data", "split","join"]
+DICT_NODES = ['data', 'data_1', 'data_2', 
+              'X', 'y', 'model', 'y_true', 
+              'y_pred', 'preprocessor', 'prev_node', 
+              'layer', 'node']
 
 class NodeQueryMixin:
     """
     A mixin to handle 'get' requests for any ViewSet.
-    It extracts 'node_id' from request parameters and uses NodeLoader.
+    It extracts "node_id" from request parameters and uses NodeLoader.
     """
     def get(self, request, *args, **kwargs):
         try:
-            node_id = request.query_params.get('node_id')
+            node_id = request.query_params.get("node_id")
             channel = request.query_params.get('output')
             if channel in ['1', '2']:
                 parent_node = NodeLoader()(node_id=node_id)
@@ -58,14 +59,14 @@ class NodeQueryMixin:
             return_serialized = True if request.query_params.get('return_serialized', None) == '1' else False
             payload = NodeLoader(return_serialized=return_serialized)(node_id=node_id)
             if not return_serialized:
-                payload.pop('node_data', None)
+                payload.pop("node_data", None)
             return Response(payload, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
         try:
-            node_id = request.query_params.get('node_id')
+            node_id = request.query_params.get("node_id")
             node = NodeLoader()(node_id=node_id)
             node_name = node.get('node_name')
             is_multi_channel = node_name in ["data_loader", "train_test_split", "splitter"]
@@ -94,11 +95,23 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         """Override this method to return the processing class instance."""
         raise NotImplementedError
 
+    def extract_node_id(self, value):
+        """If value is a dictionary and contains 'node_id', return node_id; otherwise, return value itself."""
+        if isinstance(value, dict) and "node_id" in value:
+            return value["node_id"]
+        return value
+
     def post(self, request):
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            processor = self.get_processor(serializer.validated_data)
+            validated_data = serializer.validated_data
+
+            for key in DICT_NODES:
+                if key in validated_data:
+                    validated_data[key] = self.extract_node_id(validated_data[key])
+
+            processor = self.get_processor(validated_data)
             output_channel = request.query_params.get('output', None)
             
             return_serialized = request.query_params.get('return_serialized', '0') == '1'
@@ -112,7 +125,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
             processor = self.get_processor(serializer.validated_data)
-            node_id = request.query_params.get('node_id', None)
+            node_id = request.query_params.get("node_id", None)
             return_serialized = request.query_params.get('return_serialized', '0') == '1'
             success, message = NodeUpdater(return_serialized)(node_id, processor())
 
@@ -390,12 +403,6 @@ class SequentialAPIView(BaseNodeAPIView):
 
 
 class NodeLoaderAPIView(APIView, NodeQueryMixin):
-    def get_folder_by_task(self, task):
-        folder = "models" if task in MODELS_TASKS else (
-            "preprocessors" if task in PREPROCESSORS else (
-                "nn" if task in LAYERS else (
-                    "data" if task in DATA_NODES else "other")))
-        return folder
 
     def get_serialized_payload(self, node_id, path, return_serialized):
         """Loads a node, saves it, and optionally serializes it."""
@@ -404,7 +411,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         payload = loader(node_id=node_id, path=path)
         node = l(node_id=node_id, path=path)
         payload.update({"node_name":node.get("node_name")})
-        folder = self.get_folder_by_task(node.get('task'))
+        folder = get_folder_by_task(node.get('task'))
         NodeSaver()(payload, path=f'core/nodes/saved/{folder}')
 
         # Reload the node with serialization settings
@@ -418,7 +425,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                node_id = serializer.validated_data.get('node_id')
+                node_id = serializer.validated_data.get("node_id")
                 path = serializer.validated_data.get('node_path')
                 return_serialized = request.query_params.get("return_serialized") == "1"
                 
@@ -433,13 +440,13 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
     def put(self, request):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
-            node_id = serializer.validated_data.get('node_id')
+            node_id = serializer.validated_data.get("node_id")
             path = serializer.validated_data.get('node_path')
             return_serialized = request.query_params.get("return_serialized") == "1"
             
             payload = self.get_serialized_payload(node_id, path, return_serialized=return_serialized)
             
-            node_id = request.query_params.get('node_id', None)
+            node_id = request.query_params.get("node_id", None)
             success, message = NodeUpdater(return_serialized)(node_id, payload)
             if not return_serialized:
                     message.pop("node_data", None)
@@ -459,7 +466,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
         return_serialized = request.query_params.get("return_serialized") == "1"
         try:
             saver = NodeSaver()
-            node_data = NodeLoader()(node_id=payload.get("node_id")).get("node_data")
+            node_data = NodeDataExtractor()(payload)
             payload["node_data"] = node_data
             payload["node_id"] = id(saver)
 
@@ -467,7 +474,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
             response = saver(saved_response)
 
             if return_serialized:
-                node_data = NodeLoader(return_serialized=True)(node_id=response.get("node_id")).get("node_data")
+                node_data = NodeDataExtractor(return_serialized=True)(response)
                 response["node_data"] = node_data
 
             return Response(response, status=status.HTTP_200_OK)
@@ -493,7 +500,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
             success, message = NodeUpdater(return_serialized)(node_id, response_data)
 
             if return_serialized:
-                message["node_data"] = NodeLoader()(message.get("node_id"), return_serialized=True).get("node_data")
+                message["node_data"] = NodeDataExtractor(return_serialized=True)(message)
 
             if success:
                 return Response(message, status=status.HTTP_200_OK)
@@ -606,3 +613,4 @@ class NodeAPIViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+

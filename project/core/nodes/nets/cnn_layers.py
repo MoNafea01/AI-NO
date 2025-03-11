@@ -54,7 +54,7 @@ class MaxPool2DLayer(BaseLayer):
         self.pool_size, self.strides, self.padding, self.name, self.layer_path = (
             self.load_args(pool_size, strides, padding, name, path))
         
-        [self.prev_node] = self.load_args(prev_node, attr="node_id")
+        self.prev_node = self.load_args(prev_node, attr="node_id")
         self.payload = self.load_layer()
     
     @property
