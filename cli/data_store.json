@@ -21,9 +21,9 @@
             }
         }
     },
-    "active_user": "lol",
-    "active_project": "prj1",
-    "active_workflow": "wf1",
+    "active_user": null,
+    "active_project": null,
+    "active_workflow": null,
     "admin": [
         "lol",
         "lol"
