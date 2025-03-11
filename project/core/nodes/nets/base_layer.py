@@ -35,7 +35,7 @@ class BaseLayer:
             try:
                 if self.prev_node:
                     try:
-                        payload.update({'children':{"prev_node": self.prev_node}})
+                        payload.update({'children':[self.prev_node]})
                     except Exception as e:
                         raise ValueError(f"Error updating children: {e}")
 

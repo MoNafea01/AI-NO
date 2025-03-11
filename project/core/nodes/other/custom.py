@@ -53,10 +53,8 @@ class Splitter:
             payload1 = PayloadBuilder.build_payload("data_1", out1, "splitter", node_type="custom", task="split")
             payload2 = PayloadBuilder.build_payload("data_2", out2, "splitter", node_type="custom", task="split")
             
-            payload['children'] = {
-                "data_1": payload1["node_id"],
-                "data_2": payload2["node_id"]
-            }
+            payload['children'] = [payload1["node_id"], payload2["node_id"]]
+            
             NodeSaver()(payload, "core/nodes/saved/data")
             NodeSaver()(payload1, "core/nodes/saved/data")
             NodeSaver()(payload2, "core/nodes/saved/data")

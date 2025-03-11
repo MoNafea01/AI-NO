@@ -57,7 +57,7 @@ class NodeSaver:
         node = payload.get("node_data")
         task = payload.get('task', "general")
         node_type = payload.get('node_type', "general")
-        children = payload.get("children", {})
+        children = payload.get("children", [])
         
         # save to path
         if path:
@@ -190,7 +190,7 @@ class NodeLoader:
                 "params": {},
                 "task": "load_node",
                 "node_type": "loader",
-                "children": {},
+                "children": [],
             }
         
         if self.from_db: # returns node information
@@ -271,7 +271,7 @@ class NodeDeleter:
                 children = old_node.values().first().get("children")
                 if children:
                     for folder in folders:
-                        for key, value in children.items():
+                        for value in children:
                             child = Node.objects.filter(node_id = value)
                             delete_node_file(node_name, value, folder)
                             if child.exists():
@@ -343,8 +343,8 @@ class NodeUpdater:
                 payload["node_data"] = NodeDataExtractor()(original_id)
 
             if folders:
-                o_ids = list(payload.get("children").values())
-                new_ids = list(Node.objects.filter(node_id = node_id).values().first().get("children").values())
+                o_ids = payload.get("children")
+                new_ids = node.children
                 configs = []
                 for o_id in o_ids:
                     config = NodeLoader()(o_id)
