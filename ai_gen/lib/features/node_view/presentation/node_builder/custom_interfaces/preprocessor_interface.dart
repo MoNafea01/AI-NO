@@ -6,6 +6,8 @@ import 'package:ai_gen/features/node_view/presentation/node_builder/custom_inter
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+Color _interfaceColor = NodeTypes.preprocessors.color;
+
 class VSPreprocessorInputData extends VSAINOGeneralInputData {
   ///Basic List input interface
   VSPreprocessorInputData({
@@ -21,7 +23,7 @@ class VSPreprocessorInputData extends VSAINOGeneralInputData {
   List<Type> get acceptedTypes => [VSPreprocessorOutputData];
 
   @override
-  Color get interfaceColor => NodeColors.modelColor;
+  Color get interfaceColor => _interfaceColor;
 }
 
 class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
@@ -46,9 +48,12 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
   }
 
   @override
+  IconData get outputIcon => Icons.square_sharp;
+
+  @override
   Future<dynamic> Function(Map<String, dynamic> data) get outputFunction =>
       _outputFunction;
 
   @override
-  Color get interfaceColor => NodeColors.modelColor;
+  Color get interfaceColor => _interfaceColor;
 }

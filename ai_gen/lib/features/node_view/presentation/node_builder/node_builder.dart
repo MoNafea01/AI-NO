@@ -1,10 +1,8 @@
 import 'package:ai_gen/core/models/node_model/Params.dart';
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import 'custom_interfaces/aino_general_Interface.dart';
 import 'custom_interfaces/model_interface.dart';
@@ -125,70 +123,32 @@ class NodeBuilder {
   }
 
   List<VSOutputData> _buildOutputData(NodeModel node) {
-    if (node.outputDots != null && node.outputDots!.length > 1) {
+    if (node.outputDots == null || node.outputDots!.isEmpty) return [];
+
+    final String outputDot = node.outputDots![0];
+    if (node.outputDots!.length > 1) {
       return multiOutputNodes(node);
     }
-    return node.outputDots?.map(
-          (outputDot) {
-            if (node.category == "Models") {
-              return VSModelOutputData(
-                type: outputDot,
-                node: node,
-              );
-            }
-            if (outputDot == "preprocessor") {
-              return VSPreprocessorOutputData(type: outputDot, node: node);
-            }
+    if (node.category == "Models") {
+      return [VSModelOutputData(type: outputDot, node: node)];
+    }
+    if (node.category == "Preprocessors") {
+      return [VSPreprocessorOutputData(type: outputDot, node: node)];
+    }
 
-            return VSAINOGeneralOutputData(type: outputDot, node: node);
-          },
-        ).toList() ??
-        [];
+    return [VSAINOGeneralOutputData(type: outputDot, node: node)];
   }
 
-  List<VSOutputData> multiOutputNodes(NodeModel node) {
-    Map<String, dynamic>? postResponse;
-    final List<VSOutputData> outputData = [];
-
+  List<MultiOutputOutputData> multiOutputNodes(NodeModel node) {
+    Map<String, dynamic> response = {};
+    final List<MultiOutputOutputData> outputData = [];
     for (int i = 0; i < node.outputDots!.length; i++) {
-      if (i == 0) {
-        outputData.add(
-          MultiOutputOutputData(
-            type: node.outputDots![i],
-            outputFunction: (inputData) async {
-              postResponse = null;
-              final Map<String, dynamic> apiBody = {};
-              if (node.name == "data_loader") {
-                apiBody["dataset_name"] = "diabetes";
-              } else {
-                for (var input in inputData.entries) {
-                  apiBody[input.key] = await input.value;
-                }
-              }
-              final NodeServerCalls nodeServerCalls =
-                  GetIt.I.get<NodeServerCalls>();
-              postResponse = await nodeServerCalls.runNode(node, apiBody);
-
-              node.nodeId = postResponse!["node_id"];
-              return await nodeServerCalls.getNode(node, 1);
-            },
-          ),
-        );
-        continue;
-      }
       outputData.add(
         MultiOutputOutputData(
+          index: i,
+          node: node,
+          response: response,
           type: node.outputDots![i],
-          outputFunction: (inputData) async {
-            while (postResponse == null) {
-              await Future.delayed(const Duration(milliseconds: 100));
-            }
-
-            node.id = postResponse!["node_id"];
-            final NodeServerCalls nodeServerCalls =
-                GetIt.I.get<NodeServerCalls>();
-            return await nodeServerCalls.getNode(node, 2);
-          },
         ),
       );
     }

@@ -142,7 +142,13 @@ abstract class VSOutputData<T> extends VSInterfaceData {
       return interfaceIconBuilder!(context, anchor, this);
     }
 
-    return Icon(outputIcon, key: anchor, color: interfaceColor, size: 15);
+    return Icon(
+      outputIcon,
+      key: anchor,
+      color: interfaceColor,
+      size: 15,
+      shadows: const [Shadow(color: Colors.black, blurRadius: .05)],
+    );
   }
 
   ///The function this interface will execute on evaluation

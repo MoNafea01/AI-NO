@@ -1,12 +1,13 @@
-import 'package:ai_gen/local_pcakages/vs_node_view/data/standard_interfaces/vs_dynamic_interface.dart';
-import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
+import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import 'interface_colors.dart';
 
-const Color _interfaceColor = NodeColors.functionColor;
+Color _interfaceColor = NodeTypes.general.color;
 
-class MultiOutputInputInterface extends VSInputData {
+class MultiOutputInputInterface extends VSAINOGeneralInputData {
   ///Basic List input interface
   MultiOutputInputInterface({
     required super.type,
@@ -23,10 +24,47 @@ class MultiOutputInputInterface extends VSInputData {
   Color get interfaceColor => _interfaceColor;
 }
 
-class MultiOutputOutputData extends VSDynamicOutputData {
+class MultiOutputOutputData extends VSAINOGeneralOutputData {
   ///Basic List output interface
-  MultiOutputOutputData({required super.type, super.outputFunction});
+  MultiOutputOutputData({
+    required this.index,
+    required this.response,
+    required super.type,
+    required super.node,
+    super.outputFunction,
+  });
+
+  final int index;
+  Map<String, dynamic>? response;
 
   @override
   Color get interfaceColor => _interfaceColor;
+
+  @override
+  Future<Map<String, dynamic>> Function(Map<String, dynamic> p1)
+      get outputFunction {
+    return (inputData) async {
+      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      if (index == 0) {
+        response = null;
+        final Map<String, dynamic> apiBody = {};
+
+        if (node.name == "data_loader") {
+          apiBody["dataset_name"] = "diabetes";
+        } else {
+          for (var input in inputData.entries) {
+            apiBody[input.key] = await input.value;
+          }
+        }
+        response = await nodeServerCalls.runNode(node, apiBody);
+      } else {
+        while (response == null || response == {}) {
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+      }
+
+      node.id = response!["node_id"];
+      return await nodeServerCalls.getNode(node, index + 1);
+    };
+  }
 }

@@ -5,6 +5,8 @@ import 'package:get_it/get_it.dart';
 import 'aino_general_Interface.dart';
 import 'interface_colors.dart';
 
+Color _interfaceColor = NodeTypes.models.color;
+
 class VSModelInputData extends VSAINOGeneralInputData {
   ///Basic List input interface
   VSModelInputData({
@@ -23,7 +25,7 @@ class VSModelInputData extends VSAINOGeneralInputData {
   List<Type> get acceptedTypes => [VSModelOutputData];
 
   @override
-  Color get interfaceColor => NodeColors.modelColor;
+  Color get interfaceColor => _interfaceColor;
 }
 
 class VSModelOutputData extends VSAINOGeneralOutputData {
@@ -52,5 +54,5 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
       _outputFunction;
 
   @override
-  Color get interfaceColor => NodeColors.modelColor;
+  Color get interfaceColor => _interfaceColor;
 }

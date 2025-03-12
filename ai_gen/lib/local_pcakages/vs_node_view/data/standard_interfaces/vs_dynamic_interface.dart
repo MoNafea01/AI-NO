@@ -12,6 +12,8 @@ class VSDynamicInputData extends VSInputData {
     super.toolTip,
     super.initialConnection,
     super.interfaceIconBuilder,
+    super.inputIcon,
+    super.connectedInputIcon,
   });
 
   @override
@@ -34,6 +36,7 @@ class VSDynamicOutputData extends VSOutputData<dynamic> {
     super.toolTip,
     super.outputFunction,
     super.interfaceIconBuilder,
+    super.outputIcon,
   });
 
   @override

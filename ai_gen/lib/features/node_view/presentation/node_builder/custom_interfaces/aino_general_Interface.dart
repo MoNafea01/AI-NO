@@ -1,14 +1,15 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/data/standard_interfaces/vs_dynamic_interface.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'interface_colors.dart';
 
-const Color _interfaceColor = NodeColors.generalColor;
+Color _interfaceColor = NodeTypes.general.color;
 
-class VSAINOGeneralInputData extends VSInputData {
+class VSAINOGeneralInputData extends VSDynamicInputData {
   ///Basic List input interface
   VSAINOGeneralInputData({
     required super.type,
@@ -17,6 +18,7 @@ class VSAINOGeneralInputData extends VSInputData {
     super.initialConnection,
     super.inputIcon,
     super.connectedInputIcon,
+    super.interfaceIconBuilder,
   });
 
   @override
@@ -30,7 +32,7 @@ class VSAINOGeneralInputData extends VSInputData {
   Color get interfaceColor => _interfaceColor;
 }
 
-class VSAINOGeneralOutputData extends VSOutputData {
+class VSAINOGeneralOutputData extends VSDynamicOutputData {
   ///Basic List output interface
   VSAINOGeneralOutputData({
     required super.type,
@@ -62,5 +64,5 @@ class VSAINOGeneralOutputData extends VSOutputData {
       _outputFunction;
 
   @override
-  Color get interfaceColor => _interfaceColor;
+  Color get interfaceColor => node.nodeColor;
 }

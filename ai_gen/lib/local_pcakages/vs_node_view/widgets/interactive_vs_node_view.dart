@@ -12,20 +12,20 @@ class InteractiveVSNodeView extends StatefulWidget {
   ///
   ///Width and height default to their coresponding screen dimension. If one of them is omited there will be no panning on that axis
   const InteractiveVSNodeView({
-    super.key,
     required this.nodeDataProvider,
-    this.controller,
-    this.width,
-    this.height,
     this.scaleFactor = kDefaultMouseScrollToScaleFactor,
     this.maxScale = 2,
     this.minScale = 0.01,
     this.scaleEnabled = true,
     this.panEnabled = true,
-    this.baseNodeView,
     this.showGrid = true,
-    this.gridColor,
     this.gridSpacing,
+    this.gridColor,
+    this.baseNodeView,
+    this.controller,
+    this.width,
+    this.height,
+    super.key,
   });
 
   ///TransformationController used by the [InteractiveViewer] widget

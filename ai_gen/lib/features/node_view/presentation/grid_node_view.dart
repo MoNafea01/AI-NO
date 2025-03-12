@@ -32,6 +32,8 @@ class _GridNodeViewState extends State<GridNodeView> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.sizeOf(context).height;
     final double screenWidth = MediaQuery.sizeOf(context).width;
+    final GridNodeViewCubit gridNodeViewCubit =
+        context.watch<GridNodeViewCubit>();
     return Scaffold(
       appBar: _appBar(),
       body: Stack(
@@ -39,33 +41,32 @@ class _GridNodeViewState extends State<GridNodeView> {
           InteractiveVSNodeView(
             width: 5000,
             height: 5000,
-            showGrid: context.watch<GridNodeViewCubit>().showGrid,
+            showGrid: gridNodeViewCubit.showGrid,
             nodeDataProvider: nodeDataProvider,
           ),
           Positioned(
             top: 20,
             right: 20,
-            child: _outputCards(context),
+            child: _outputCards(gridNodeViewCubit),
           ),
           Positioned(
             bottom: screenHeight / 45,
             left: screenWidth / 2 - 100,
-            child: CenterActions(),
+            child: const CenterActions(),
           ),
         ],
       ),
     );
   }
 
-  Column _outputCards(BuildContext context) {
+  Column _outputCards(GridNodeViewCubit gridNodeViewCubit) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         _evaluateButton(),
-        if (context.watch<GridNodeViewCubit>().results != null)
-          ...context.watch<GridNodeViewCubit>().results!.map(
+        if (gridNodeViewCubit.results != null)
+          ...gridNodeViewCubit.results!.map(
             (scopeOutput) {
-              scopeOutput = scopeOutput.replaceAll(",", ",\n");
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),

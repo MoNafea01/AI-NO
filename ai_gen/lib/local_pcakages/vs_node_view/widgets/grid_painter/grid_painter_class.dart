@@ -6,7 +6,7 @@ class GridPainterClass extends CustomPainter {
 
   GridPainterClass({double? gridSpacing, Color? color})
       : _gridSpacing = gridSpacing ?? 30,
-        _color = color ?? Colors.grey;
+        _color = color ?? Colors.grey.withValues(alpha: 0.5);
 
   @override
   void paint(Canvas canvas, Size size) {

@@ -41,12 +41,14 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
         .toList();
 
     for (var i = 0; i < entries.length; i++) {
-      var asyncOutput = await entries[i].value;
+      dynamic asyncOutput = await entries[i].value;
       entries[i] = MapEntry(entries[i].key, asyncOutput);
     }
 
-    results = entries.map((e) => "${e.key}: ${e.value}");
+    results = entries.map(
+      (output) => "${output.key}: ${output.value}".replaceAll(",", ",\n"),
+    );
+
     emit(NodeViewSuccess());
-    // setState(() => results = entries.map((e) => "${e.key}: ${e.value}"));
   }
 }

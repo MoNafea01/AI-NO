@@ -8,8 +8,10 @@ class VSContextMenu extends StatefulWidget {
   ///Used in [VSNodeView] to create new nodes
   const VSContextMenu({
     required this.nodeBuilders,
+    this.vsNodeDataProvider,
     super.key,
   });
+  final VSNodeDataProvider? vsNodeDataProvider;
 
   ///A map of all nodeBuilders. In this format:
   ///
@@ -31,7 +33,8 @@ class _VSContextMenuState extends State<VSContextMenu> {
   @override
   void initState() {
     super.initState();
-    nodeBuilders = widget.nodeBuilders;
+    nodeBuilders =
+        widget.vsNodeDataProvider?.nodeBuildersMap ?? widget.nodeBuilders;
   }
 
   @override
@@ -50,10 +53,8 @@ class _VSContextMenuState extends State<VSContextMenu> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(entry.key),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 20,
-                ),
+                const SizedBox(width: 12),
+                const Icon(Icons.arrow_forward_ios, size: 20),
               ],
             ),
           ),
@@ -61,7 +62,8 @@ class _VSContextMenuState extends State<VSContextMenu> {
       } else {
         widgets.add(TextButton(
           onPressed: () {
-            final dataProvider = VSNodeDataProvider.of(context);
+            final dataProvider =
+                widget.vsNodeDataProvider ?? VSNodeDataProvider.of(context);
             dataProvider.createNodeFromContext(entry.value);
             dataProvider.closeContextMenu();
           },
@@ -77,8 +79,7 @@ class _VSContextMenuState extends State<VSContextMenu> {
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: 150,
+          child: IntrinsicWidth(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widgets,

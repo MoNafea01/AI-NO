@@ -100,18 +100,23 @@ class _VSNodeState extends State<VSNode> {
           child: Card(
             color: nodeProvider.selectedNodes.contains(widget.data.id)
                 ? Colors.lightBlue
-                : widget.data.nodeColor,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  widget.nodeTitleBuilder?.call(context, widget.data) ??
-                      VSNodeTitle(data: widget.data),
-                  ...interfaceWidgets,
-                ],
-              ),
+                : null,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                widget.nodeTitleBuilder?.call(context, widget.data) ??
+                    VSNodeTitle(data: widget.data),
+                // const Divider(height: 0, color: Colors.grey),
+                const SizedBox(height: 8),
+                ...interfaceWidgets.map(
+                  (widget) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: widget,
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
             ),
           ),
         ),

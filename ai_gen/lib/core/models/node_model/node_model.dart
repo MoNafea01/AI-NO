@@ -1,3 +1,4 @@
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'Params.dart';
@@ -35,19 +36,19 @@ class NodeModel {
   Color get nodeColor {
     switch (category) {
       case "Models":
-        return Colors.green;
+        return NodeTypes.models.color;
       case "Preprocessors":
-        return Colors.yellow;
+        return NodeTypes.preprocessors.color;
       case "Core":
-        return Colors.blue;
+        return NodeTypes.core.color;
       case "Custom":
-        return Colors.grey;
+        return NodeTypes.custom.color;
       case "Input":
-        return Colors.orange;
+        return NodeTypes.input.color;
       case "Output":
-        return Colors.purple;
+        return NodeTypes.output.color;
       default:
-        return Colors.lightBlue;
+        return NodeTypes.general.color;
     }
   }
 
