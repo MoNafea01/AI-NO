@@ -1,8 +1,9 @@
 from ..utils import PayloadBuilder
 from ..configs.metrics import METRICS as metrics
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ..base_node import BaseNode
 
-class Evaluator:
+class Evaluator(BaseNode):
     def __init__(self, metric='accuracy', y_true=None, y_pred=None):
         self.y_true, self.y_pred = NodeDataExtractor()(y_true, y_pred)
         self.metric = metric
@@ -21,23 +22,3 @@ class Evaluator:
             return payload
         except Exception as e:
             raise ValueError(f"Error evaluating model: {e}")
-    
-    def __str__(self):
-        return f"metric: {self.payload}"
-    
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
-            self.payload.update({"node_data": node_data})
-        return self.payload
-
-if __name__ == "__main__":
-    # Example usage
-    import numpy as np
-    y_true = np.random.randint(0, 2, 100)
-    y_pred = np.random.randint(0, 2, 100)
-
-    evaluator = Evaluator(metric='accuracy')
-    score = evaluator.evaluate(y_true, y_pred)
-    print(f"Score: {score}")
