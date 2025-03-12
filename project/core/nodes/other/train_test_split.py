@@ -46,11 +46,3 @@ class TrainTestSplit:
             node_data = NodeDataExtractor(return_serialized=True)(payload)
             payload.update({"node_data": node_data})
         return payload
-
-
-if __name__ == "__main__":
-    splitter_args = {
-        "data":[[0, 1, 0, 1, 0]]
-    }
-    splitter = TrainTestSplit(splitter_args)
-    print(splitter())

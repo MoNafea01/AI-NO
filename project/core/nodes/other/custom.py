@@ -1,7 +1,9 @@
 from ..utils import PayloadBuilder
 from ...repositories.node_repository import NodeSaver, NodeDeleter, NodeDataExtractor
+from ..base_node import BaseNode
 
-class Joiner:
+
+class Joiner(BaseNode):
     """
     This Class is responsible for joining two datasets.\n
     to get the joined data, call the instance with 'out' as an argument\n
@@ -22,16 +24,6 @@ class Joiner:
             return payload
         except Exception as e:
             raise ValueError(f"Error joining data: {e}")
-    
-    def __str__(self):
-        return f"data: {self.payload}"
-    
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
-            self.payload.update({"node_data": node_data})
-        return self.payload
 
 
 class Splitter:

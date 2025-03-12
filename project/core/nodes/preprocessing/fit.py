@@ -1,6 +1,6 @@
-from .preprocessor import Preprocessor
 from .utils import PayloadBuilder
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ..base_node import BaseNode
 
 
 class PreprocessorFitter:
@@ -18,7 +18,7 @@ class PreprocessorFitter:
         return self.preprocessor
 
 
-class Fit:
+class Fit(BaseNode):
     """Orchestrates the fitting process."""
     def __init__(self, data, preprocessor=None, preprocessor_path=None):
         self.preprocessor = preprocessor
@@ -62,29 +62,3 @@ class Fit:
             return payload
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor: {e}")
-        
-    def __str__(self):
-        return str(self.payload)
-
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
-            self.payload.update({"node_data": node_data})
-        return self.payload
-
-
-if __name__ == '__main__':
-
-    preprocessor_args = {
-        "preprocessor_name": "standard_scaler",
-        "preprocessor_type": "scaler",
-        "params": {}
-    }
-    fit_args = {
-        "data": [[1, 2], [2, 3]],
-    }
-    scaler = Preprocessor(**preprocessor_args)
-    fit = Fit(**fit_args, preprocessor=scaler)
-    print(fit)
-    
