@@ -5,78 +5,78 @@ from .utils import _requests_, _query_set_
 from django.urls import reverse
 
 
-# class PipeLineTest(APITestCase):
-#     def setUp(self):
-#         pass
-#     def test_model_loading(self, url='/api/create_model/', _requests_=_requests_['create_model']):
-#         # POST: Create a linear regression model
-#         ids = []
-#         for data in _requests_['post']:
-#             for query in _query_set_['post']:
-#                 for value in query['values']:
-#                     post_response = self.client.post(url, data, format="json", query_params={query['name']:value})
-#                     self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
-#                     self.assertEqual(post_response.data.get("node_name"), "logistic_regression")
-#                     node_id = post_response.data.get("node_id")
-#                     ids.append(node_id)
-#                     self.assertIsNotNone(node_id)
+class PipeLineTest(APITestCase):
+    def setUp(self):
+        pass
+    def test_model_loading(self, url='/api/create_model/', _requests_=_requests_['create_model']):
+        # POST: Create a linear regression model
+        ids = []
+        for data in _requests_['post']:
+            for query in _query_set_['post']:
+                for value in query['values']:
+                    post_response = self.client.post(url, data, format="json", query_params={query['name']:value})
+                    self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+                    self.assertEqual(post_response.data.get("node_name"), "logistic_regression")
+                    node_id = post_response.data.get("node_id")
+                    ids.append(node_id)
+                    self.assertIsNotNone(node_id)
 
-#         # GET: Retrieve the created model using node_id
-#         for query in _query_set_['get']:
-#             for i, value in enumerate(query['values']):
-#                 get_response = self.client.get(url, format="json", query_params={"node_id":ids[i], query['name']:value})
-#                 self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+        # GET: Retrieve the created model using node_id
+        for query in _query_set_['get']:
+            for i, value in enumerate(query['values']):
+                get_response = self.client.get(url, format="json", query_params={"node_id":ids[i], query['name']:value})
+                self.assertEqual(get_response.status_code, status.HTTP_200_OK)
 
-#         # PUT: Update the model to logistic regression
-#         for data in _requests_['put']:
-#             for query in _query_set_['put']:
-#                 for i, value in enumerate(query['values']):
-#                     put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i], query['name']:value})
-#                     self.assertEqual(put_response.status_code, status.HTTP_200_OK)
-#                     # Verify updated model details
-#                     put_response = self.client.get(f"{url}?node_id={ids[i]}", format="json")
-#                     self.assertEqual(put_response.data.get("node_name"), "linear_regression")
+        # PUT: Update the model to logistic regression
+        for data in _requests_['put']:
+            for query in _query_set_['put']:
+                for i, value in enumerate(query['values']):
+                    put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i], query['name']:value})
+                    self.assertEqual(put_response.status_code, status.HTTP_200_OK)
+                    # Verify updated model details
+                    put_response = self.client.get(url, format="json", query_params={"node_id":ids[i]})
+                    self.assertEqual(put_response.data.get("node_name"), "linear_regression")
 
-#         # DELETE: Remove the model node using node_id
-#         for node_id in ids:
-#             delete_response = self.client.delete(f"{url}?node_id={node_id}", format="json")
-#             self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        # DELETE: Remove the model node using node_id
+        for node_id in ids:
+            delete_response = self.client.delete(url, format="json", query_params={"node_id":node_id})
+            self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
 
     
 
-    # def test_Data_loader(self, url='/api/data_loader/', _requests_=_requests_['data_loader']):
-    #     # POST: Create a data loader node
-    #     ids = []
-    #     for data in _requests_['post']:
-    #         for query in _query_set_['post']:
-    #             for value in query['values']:
-    #                 post_response = self.client.post(url, data, format="json", query_params={query['name']:value})
-    #                 self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
-    #                 self.assertEqual(post_response.data.get("node_name"), "data_loader")
-    #                 node_id = post_response.data.get("node_id")
-    #                 ids.append(node_id)
-    #                 self.assertIsNotNone(node_id)
+    def test_Data_loader(self, url='/api/data_loader/', _requests_=_requests_['data_loader']):
+        # POST: Create a data loader node
+        ids = []
+        for data in _requests_['post']:
+            for query in _query_set_['post']:
+                for value in query['values']:
+                    post_response = self.client.post(url, data, format="json", query_params={query['name']:value})
+                    self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+                    self.assertEqual(post_response.data.get("node_name"), "data_loader")
+                    node_id = post_response.data.get("node_id")
+                    ids.append(node_id)
+                    self.assertIsNotNone(node_id)
 
-    #     # GET: Retrieve the created data loader using node_id
-    #     for query in _query_set_['get']:
-    #         for i, value in enumerate(query['values']):
-    #             get_response = self.client.get(url, format="json", query_params={"node_id":ids[i], query['name']:value})
-    #             self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+        # GET: Retrieve the created data loader using node_id
+        for query in _query_set_['get']:
+            for i, value in enumerate(query['values']):
+                get_response = self.client.get(url, format="json", query_params={"node_id":ids[i], query['name']:value})
+                self.assertEqual(get_response.status_code, status.HTTP_200_OK)
 
-    #     # PUT: Update the data loader to iris
-    #     for data in _requests_['put']:
-    #         for query in _query_set_['put']:
-    #             for i, value in enumerate(query['values']):
-    #                 put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i], query['name']:value})
-    #                 self.assertEqual(put_response.status_code, status.HTTP_200_OK)
-    #                 # Verify updated model details
-    #                 put_response = self.client.get(f"{url}?node_id={ids[i]}", format="json")
-    #                 self.assertEqual(put_response.data.get("node_name"), "data_loader")
+        # PUT: Update the data loader to iris
+        for data in _requests_['put']:
+            for query in _query_set_['put']:
+                for i, value in enumerate(query['values']):
+                    put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i], query['name']:value})
+                    self.assertEqual(put_response.status_code, status.HTTP_200_OK)
+                    # Verify updated model details
+                    put_response = self.client.get(f"{url}?node_id={ids[i]}", format="json")
+                    self.assertEqual(put_response.data.get("node_name"), "data_loader")
 
-    #     # DELETE: Remove the data loader node using node_id
-    #     for node_id in ids:
-    #         delete_response = self.client.delete(f"{url}?node_id={node_id}", format="json")
-    #         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        # DELETE: Remove the data loader node using node_id
+        for node_id in ids:
+            delete_response = self.client.delete(url, format="json", query_params={"node_id":node_id})
+            self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
         
 
 

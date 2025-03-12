@@ -14,7 +14,7 @@ class Conv2DLayer(BaseLayer):
         self.filters, self.kernel_size, self.strides, self.padding, self.activation, self.name, self.layer_path = (
             self.load_args(filters, kernel_size, strides, padding, activation, name, path))
         
-        [self.prev_node] = self.load_args(prev_node, attr="node_id")
+        self.prev_node = self.load_args(prev_node, attr="node_id")
         self.payload = self.load_layer()
 
     @property

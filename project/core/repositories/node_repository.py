@@ -458,5 +458,6 @@ class NodeDataExtractor:
             else:
                 l.append(arg)
         if len(l) == 1:
-            [l] = l
+            l = l.pop()
+    
         return l
