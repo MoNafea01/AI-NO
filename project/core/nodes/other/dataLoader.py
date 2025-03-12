@@ -108,13 +108,3 @@ class DataLoader:
             node_data = NodeDataExtractor(return_serialized=True)(payload)
             payload.update({"node_data": node_data})
         return payload
-
-
-if __name__ == "__main__":
-    dl_args = {
-        "dataset_name": "iris",
-    }
-    dl = DataLoader(**dl_args)
-    print(dl)
-    
-

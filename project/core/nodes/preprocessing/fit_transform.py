@@ -1,4 +1,3 @@
-from .preprocessor import Preprocessor
 from .utils import PayloadBuilder
 from ...repositories.node_repository import NodeSaver, NodeDeleter, NodeDataExtractor
 
@@ -93,17 +92,3 @@ class FitTransform:
             node_data = NodeDataExtractor(return_serialized=True)(payload)
             payload.update({"node_data": node_data})
         return payload
-    
-
-if __name__ == '__main__':
-    preprocessor_args = {
-        "preprocessor_name": "standard_scaler",
-        "preprocessor_type": "scaler",
-        "params": {}
-    }
-    fit_transform_args = {
-        "data": [[1, 2], [2, 3]],
-    }
-    scaler = Preprocessor(**preprocessor_args)
-    transformed = FitTransform(**fit_transform_args, preprocessor=scaler)()
-    print(transformed)

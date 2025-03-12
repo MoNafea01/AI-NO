@@ -8,7 +8,8 @@ class FlattenLayer(BaseLayer):
     '''Handles flatten layer creation.'''
     def __init__(self, prev_node, path: str = None, name: str = None):
         '''Initializes the Flatten object.'''
-        self.layer_path, self.name = self.load_args(path, name)
+        self.layer_path = path
+        self.name = name
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.payload = self.load_layer()
 

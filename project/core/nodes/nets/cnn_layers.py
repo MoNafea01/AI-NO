@@ -11,9 +11,14 @@ class Conv2DLayer(BaseLayer):
     '''Handles Conv2D layer creation.'''
     def __init__(self, prev_node: dict, filters: int, kernel_size: int, strides: int, padding: str, activation: str, path: str = None, name: str = None):
         '''Initializes the Conv2D object.'''
-        self.filters, self.kernel_size, self.strides, self.padding, self.activation, self.name, self.layer_path = (
-            self.load_args(filters, kernel_size, strides, padding, activation, name, path))
-        
+        self.filters = filters
+        self.kernel_size = kernel_size
+        self.strides = strides
+        self.padding = padding
+        self.activation = activation
+        self.name = name
+        self.layer_path = path
+
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.payload = self.load_layer()
 
@@ -51,8 +56,11 @@ class MaxPool2DLayer(BaseLayer):
     '''Handles MaxPooling2D layer creation.'''
     def __init__(self, prev_node, pool_size: int, strides: int, padding: str, path: str = None, name: str = None):
         '''Initializes the MaxPooling2D object.'''
-        self.pool_size, self.strides, self.padding, self.name, self.layer_path = (
-            self.load_args(pool_size, strides, padding, name, path))
+        self.pool_size = pool_size
+        self.strides = strides
+        self.padding = padding
+        self.name = name
+        self.layer_path = path
         
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.payload = self.load_layer()

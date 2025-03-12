@@ -8,7 +8,9 @@ class InputLayer(BaseLayer):
     '''Handles input layer creation.'''
     def __init__(self, shape: tuple, name: str = None, path: str = None):
         '''Initializes the Input object.'''
-        self.shape, self.name, self.layer_path = self.load_args(shape, name, path)
+        self.shape = shape
+        self.name = name
+        self.layer_path = path
         self.payload = self.load_layer()
     
     @property

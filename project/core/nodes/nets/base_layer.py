@@ -1,8 +1,9 @@
 from ...repositories.node_repository import NodeSaver, NodeLoader, NodeDataExtractor
 from .utils import PayloadBuilder
+from ..base_node import BaseNode
 
 
-class BaseLayer:
+class BaseLayer(BaseNode):
     '''Base class for all layers.'''
     def __init__(self, *args, **kwargs):
         self.payload = self.load_layer()
@@ -57,27 +58,15 @@ class BaseLayer:
         return payload
     
     def layer_name(self):
-        '''Layer name'''
-        raise NotImplementedError("layer_name method not implemented.")
-
-    def payload_configs(self):
-        '''Payload configurations'''
-        raise NotImplementedError("payload_configs method not implemented.")
+        return super().node_name()
     
     def gen_name(self):
         '''generate an id for the layer'''
         raise NotImplementedError("gen_name method not implemented.")
-    
-    def get_params(self):
-        '''Parameters that shows on payload'''
-        raise NotImplementedError("get_params method not implemented.")
 
     def layer_params(self, **kwargs):
         ''' Parameters that passed to actual layer creation'''
-        params = self.get_params()
-        if kwargs:
-            params.update(kwargs)
-        return params
+        return super().node_params(**kwargs)
 
     def load_args(self, *args, attr="node_data"):
         '''Loads node_data from the given args.'''
@@ -90,21 +79,5 @@ class BaseLayer:
             else:
                 l.append(arg)
         if len(l) == 1:
-            [l] = l
+            l = l.pop()
         return l
-    
-    def __str__(self):
-        '''Returns the payload.'''
-        return str(self.payload)
-    
-    def __repr__(self):
-        '''Returns the payload.'''
-        return str(self.payload)
-    
-    def __call__(self, *args, **kwargs):
-        '''Returns the payload.'''
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
-            self.payload.update({"node_data": node_data})
-        return self.payload

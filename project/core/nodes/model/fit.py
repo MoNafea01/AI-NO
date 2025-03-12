@@ -1,7 +1,7 @@
 import numpy as np
-from .model import Model
 from .utils import PayloadBuilder
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ..base_node import BaseNode
 
 
 class ModelFitter:
@@ -21,7 +21,7 @@ class ModelFitter:
         return self.model
 
 
-class Fit:
+class Fit(BaseNode):
     """Orchestrates the fitting process."""
     def __init__(self, X, y, model=None, model_path=None):
         self.model = model
@@ -64,31 +64,3 @@ class Fit:
             return payload
         except Exception as e:
             raise ValueError(f"Error fitting model: {e}")
-        
-    def __str__(self):
-        return str(self.payload)
-
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
-            self.payload.update({"node_data": node_data})
-        return self.payload
-
-
-if __name__ == '__main__':
-    # model = "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\backend\\core\\nodes\\saved\\models\\linear_regression_1983596293552.pkl"
-    model_args = {
-        "model_name": "logistic_regression",
-        "model_type": "linear_models",
-        "task": "classification",
-        "params": {}
-    }
-    fit_args = {
-        "X": [[1, 2], [2, 3]],
-        "y": [3, 4],
-    }
-
-    model = Model(**model_args)
-    fit = Fit(**fit_args, model=model)
-    print(fit)

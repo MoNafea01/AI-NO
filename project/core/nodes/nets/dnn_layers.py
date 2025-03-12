@@ -11,7 +11,11 @@ class DenseLayer(BaseLayer):
     '''Handles dense layer creation.'''
     def __init__(self, prev_node, units: int, activation: str, path: str = None, name: str = None):
         '''Initializes the Dense object.'''
-        self.units, self.activation, self.name, self.layer_path = self.load_args(units, activation, name, path)
+        self.units = units
+        self.activation = activation
+        self.name = name
+        self.layer_path = path
+
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.payload = self.load_layer()
 
@@ -47,7 +51,10 @@ class DropoutLayer(BaseLayer):
     '''Handles dropout layer creation.'''
     def __init__(self, prev_node, rate: float, path: str = None, name: str = None):
         '''Initializes the Dropout object.'''
-        self.rate, self.layer_path, self.name = self.load_args(rate, path, name)
+        self.rate = rate
+        self.layer_path = path
+        self.name = name
+
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.payload = self.load_layer()
     
