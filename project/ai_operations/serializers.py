@@ -18,6 +18,8 @@ class JSONOrIntField(serializers.Field):
 class DataLoaderSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False)
     dataset_path = serializers.CharField(required=False)
+    def validate(self, data):
+        return validate(data, ('params', 'dataset_path'))
 
 
 class TrainTestSplitSerializer(serializers.Serializer):
@@ -41,9 +43,6 @@ class ModelSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False)
     model_path = serializers.CharField(required=False)
     def validate(self, data:dict):
-        """
-        Ensure at least one of 'model_name' or 'model_path' is provided.
-        """
         return validate(data, (('model_name', 'model_type', 'task'), 'model_path'))
 
 
@@ -53,9 +52,6 @@ class FitModelSerializer(serializers.Serializer):
     model_path = serializers.CharField(required=False)
     model = JSONOrIntField(required=False)
     def validate(self, data):
-        """
-        Ensure at least one of 'model' or 'model_path' is provided.
-        """
         return validate(data, (('model', 'X', 'y'), 'model_path'))
 
 
@@ -64,9 +60,6 @@ class PredictSerializer(serializers.Serializer):
     model = JSONOrIntField(required=False)
     model_path = serializers.CharField(required=False)
     def validate(self, data):
-        """
-        Ensure at least one of 'model' or 'model_path' is provided.
-        """
         return validate(data, (('model', 'X'), 'model_path'))
 
 
@@ -82,9 +75,6 @@ class PreprocessorSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False)
     preprocessor_path = serializers.CharField(required=False)
     def validate(self, data):
-        """
-        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
-        """
         return validate(data, (('preprocessor_name', 'preprocessor_type'), 'preprocessor_path'))
 
 
@@ -93,9 +83,6 @@ class FitPreprocessorSerializer(serializers.Serializer):
     preprocessor = JSONOrIntField(required=False)
     preprocessor_path = serializers.CharField(required=False)
     def validate(self, data):
-        """
-        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
-        """
         return validate(data, (('preprocessor', 'data'), 'preprocessor_path'))
 
 
@@ -104,9 +91,6 @@ class TransformSerializer(serializers.Serializer):
     preprocessor = JSONOrIntField(required=False)
     preprocessor_path = serializers.CharField(required=False)
     def validate(self, data):
-        """
-        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
-        """
         return validate(data, (('preprocessor', 'data'), 'preprocessor_path'))
 
 
@@ -115,9 +99,6 @@ class FitTransformSerializer(serializers.Serializer):
     preprocessor = JSONOrIntField(required=False)
     preprocessor_path = serializers.CharField(required=False)
     def validate(self, data):
-        """
-        Ensure at least one of 'preprocessor' or 'preprocessor_path' is provided.
-        """
         return validate(data, (('preprocessor', 'data'), 'preprocessor_path'))
 
 
@@ -125,6 +106,8 @@ class InputSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False, allow_null=True)
     name = serializers.CharField(required=False, allow_null=True)
     path = serializers.CharField(required=False, allow_null=True)
+    def validate(self, data):
+        return validate(data, ('path', 'params'))
 
 
 class Conv2DSerializer(serializers.Serializer):
@@ -132,39 +115,8 @@ class Conv2DSerializer(serializers.Serializer):
     prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
-
-
-class DenseSerializer(serializers.Serializer):
-    params = serializers.JSONField(required=False, default={})
-    prev_node = JSONOrIntField(required=False, default=[])
-    name = serializers.CharField(required=False)
-    path = serializers.CharField(required=False, allow_null=True)
-
-
-class FlattenSerializer(serializers.Serializer):
-    prev_node = JSONOrIntField(required=False)
-    name = serializers.CharField(required=False)
-    path = serializers.CharField(required=False, allow_null=True)
-    def validate(self, data:dict):
-        """
-        Ensure at least one of 'name' or 'path' is provided.
-        """
-        return validate(data, ('prev_node', 'path'))
-
-
-class DropoutSerializer(serializers.Serializer):
-    params = serializers.JSONField(required=False, default={})
-    prev_node = JSONOrIntField(required=False)
-    name = serializers.CharField(required=False)
-    path = serializers.CharField(required=False, allow_null=True)
-    def validate(self, data:dict):
-        """
-        Ensure at least one of 'name' or 'path' is provided.
-        """
-        return validate(data, ('prev_node', 'path'))
-
-
-
+    def validate(self, data):
+        return validate(data, (('prev_node', 'params'), 'path'))
 
 
 class MaxPool2DSerializer(serializers.Serializer):
@@ -173,10 +125,33 @@ class MaxPool2DSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data:dict):
-        """
-        Ensure at least one of 'name' or 'path' is provided.
-        """
+        return validate(data, (('prev_node', 'params'), 'path'))
+
+
+class FlattenSerializer(serializers.Serializer):
+    prev_node = JSONOrIntField(required=False)
+    name = serializers.CharField(required=False)
+    path = serializers.CharField(required=False, allow_null=True)
+    def validate(self, data:dict):
         return validate(data, ('prev_node', 'path'))
+
+
+class DenseSerializer(serializers.Serializer):
+    params = serializers.JSONField(required=False, default={})
+    prev_node = JSONOrIntField(required=False, default=[])
+    name = serializers.CharField(required=False)
+    path = serializers.CharField(required=False, allow_null=True)
+    def validate(self, data:dict):
+        return validate(data, (('prev_node', 'params'), 'path'))
+
+
+class DropoutSerializer(serializers.Serializer):
+    params = serializers.JSONField(required=False, default={})
+    prev_node = JSONOrIntField(required=False)
+    name = serializers.CharField(required=False)
+    path = serializers.CharField(required=False, allow_null=True)
+    def validate(self, data:dict):
+        return validate(data, (('prev_node', 'params'), 'path'))
 
 
 class SequentialSerializer(serializers.Serializer):
@@ -184,9 +159,6 @@ class SequentialSerializer(serializers.Serializer):
     name = serializers.JSONField(required=False)
     path = serializers.CharField(required=False)
     def validate(self, data:dict):
-        """
-        Ensure at least one of 'name' or 'path' is provided.
-        """
         return validate(data, ('layer', 'path'))
 
 
@@ -194,9 +166,6 @@ class NodeLoaderSerializer(serializers.Serializer):
     node_id = serializers.IntegerField(required=False)
     node_path = serializers.CharField(required=False)
     def validate(self, data):
-        """
-        Ensure at least one of 'node_name' or 'node_path' is provided.
-        """
         return validate(data, ("node_id", 'node_path'))
 
 

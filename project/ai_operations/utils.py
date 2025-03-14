@@ -8,16 +8,18 @@ MODEL = {
     }
 
 DATA_LOADER = {
-    'post': [{"dataset_name":"diabetes"},
-             {"dataset_path":r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\testing\data.csv"},
+    'post': [{"params": {"dataset_name":"diabetes"}},
              {"dataset_path":r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\testing\data_loader_1464733871296.pkl"}
              ],
-    'put': [{"dataset_name":"iris"},
-            {"dataset_path":r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\testing\data.csv"},
+    'put': [{"params": {"dataset_name":"diabetes"}},
             {"dataset_path":r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\testing\data_loader_1464733871296.pkl"}
             ]
 }
 
+TR_TE_SP = {
+        'post': [{"params": {"test_size": 0.2, "random_state": 42}},],
+        'put': [{"params": {"test_size": 0.3, "random_state": 42}},],
+}
 
 
 
@@ -30,6 +32,10 @@ _requests_ = {
         'post': DATA_LOADER['post'],
         'put': DATA_LOADER['put'],
     },
+    'train_test_split': {
+        'post': TR_TE_SP['post'],
+        'put': TR_TE_SP['put'],
+    }
 }
 
 _query_set_ = {

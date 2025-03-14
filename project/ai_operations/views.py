@@ -158,7 +158,7 @@ class DataLoaderAPIView(BaseNodeAPIView):
 
     def get_processor(self, validated_data):
         return DataLoader(
-            dataset_name=validated_data.get("params").get('dataset_name', 'iris'),
+            dataset_name=validated_data.get("params", {}).get("dataset_name"),
             dataset_path=validated_data.get('dataset_path')
         )
 
@@ -244,7 +244,7 @@ class EvaluatorAPIView(BaseNodeAPIView):
 
     def get_processor(self, validated_data):
         return Evaluator(
-            metric=validated_data.get("params").get('metric'),
+            metric=validated_data.get("params", {}).get('metric', {'accuracy'}),
             y_true=validated_data.get('y_true'),
             y_pred=validated_data.get('y_pred'),
         )
@@ -315,7 +315,7 @@ class InputAPIView(BaseNodeAPIView):
 
     def get_processor(self, validated_data):
         return InputLayer(
-            shape=validated_data.get("params").get("shape", (1,)),
+            shape=validated_data.get("params", {}).get("shape", (1,)),
             name=validated_data.get("name"),
             path=validated_data.get("path"),
         )
@@ -330,11 +330,11 @@ class Conv2DAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data):
         return Conv2DLayer(
             prev_node=validated_data.get("prev_node"),
-            filters=validated_data.get("params").get("filters", 32),
-            kernel_size=validated_data.get("params").get("kernel_size", [3,3]),
-            strides=validated_data.get("params").get("strides", (1,1)),
-            padding=validated_data.get("params").get("padding", "valid"),
-            activation=validated_data.get("params").get("activation", "relu"),
+            filters=validated_data.get("params", {}).get("filters", 32),
+            kernel_size=validated_data.get("params", {}).get("kernel_size", [3,3]),
+            strides=validated_data.get("params", {}).get("strides", (1,1)),
+            padding=validated_data.get("params", {}).get("padding", "valid"),
+            activation=validated_data.get("params", {}).get("activation", "relu"),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
         )
@@ -349,9 +349,9 @@ class MaxPool2DAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data):
         return MaxPool2DLayer(
             prev_node=validated_data.get("prev_node"),
-            pool_size=validated_data.get("params").get("pool_size", [2,2]),
-            strides=validated_data.get("params").get("strides", (2,2)),
-            padding=validated_data.get("params").get("padding", "valid"),
+            pool_size=validated_data.get("params", {}).get("pool_size", [2,2]),
+            strides=validated_data.get("params", {}).get("strides", (2,2)),
+            padding=validated_data.get("params", {}).get("padding", "valid"),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
         )
@@ -380,8 +380,8 @@ class DenseAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data):
         return DenseLayer(
             prev_node=validated_data.get("prev_node"),
-            units=validated_data.get("params").get("units", 128),
-            activation=validated_data.get("params").get("activation", "relu"),
+            units=validated_data.get("params", {}).get("units", 128),
+            activation=validated_data.get("params", {}).get("activation", "relu"),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
         )
@@ -396,7 +396,7 @@ class DropoutAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data):
         return DropoutLayer(
             prev_node=validated_data.get("prev_node"),
-            rate=validated_data.get("params").get("rate", 0.5),
+            rate=validated_data.get("params", {}).get("rate", 0.5),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
         )
