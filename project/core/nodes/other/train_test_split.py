@@ -11,19 +11,20 @@ class TrainTestSplit:
     def split(self):
         try:
             out1, out2 = train_test_split(self.data,**self.params)
-            payload = PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split")
-            payload1 = PayloadBuilder.build_payload("Train data", out1, "train_test_split", node_type="splitter", task="split")
-            payload2 = PayloadBuilder.build_payload("Test data", out2, "train_test_split", node_type="splitter", task="split")
 
-            payload['children'] = [payload1["node_id"], payload2["node_id"]]
-            
-            NodeSaver()(payload, "core/nodes/saved/data")
-            NodeSaver()(payload1, "core/nodes/saved/data")
-            NodeSaver()(payload2, "core/nodes/saved/data")
-            del payload1["node_data"]
-            payload.pop("node_data", None)
-            del payload2["node_data"]
-            return payload, payload1, payload2
+            payload = []
+            payload.append(PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split"))
+
+            names = ["Train data", "Test data"]
+            for i in range(1, 3):
+                payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [out1, out2][i-1], "train_test_split", node_type="splitter", task="split"))
+
+            payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
+            for i in range(3):
+                NodeSaver()(payload[i], "core/nodes/saved/data")
+                payload[i].pop("node_data", None)
+
+            return payload
         except Exception as e:
             raise ValueError(f"Error splitting data: {e}")
 
@@ -35,12 +36,9 @@ class TrainTestSplit:
         for arg in args:
             if arg == '1':
                 payload = self.payload[1]
-                NodeDeleter()(self.payload[2]["node_id"])
-                NodeDeleter()(self.payload[0]["node_id"])
             elif arg == '2':
                 payload = self.payload[2]
-                NodeDeleter()(self.payload[1]["node_id"])
-                NodeDeleter()(self.payload[0]["node_id"])
+
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
             node_data = NodeDataExtractor(return_serialized=True)(payload)

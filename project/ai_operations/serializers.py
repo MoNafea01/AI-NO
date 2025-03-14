@@ -16,13 +16,8 @@ class JSONOrIntField(serializers.Field):
 
 
 class DataLoaderSerializer(serializers.Serializer):
-    dataset_name = serializers.CharField(required=False)
+    params = serializers.JSONField(required=False)
     dataset_path = serializers.CharField(required=False)
-    def validate(self, data):
-        """
-        Ensure at least one of 'dataset_name' or 'dataset_path' is provided.
-        """
-        return validate(data, ('dataset_name', 'dataset_path'))
 
 
 class TrainTestSplitSerializer(serializers.Serializer):
@@ -76,7 +71,7 @@ class PredictSerializer(serializers.Serializer):
 
 
 class EvaluatorSerializer(serializers.Serializer):
-    metric = serializers.CharField(required=True)
+    params = serializers.JSONField(required=True)
     y_true = JSONOrIntField(required=True)
     y_pred = JSONOrIntField(required=True)
 
@@ -127,27 +122,23 @@ class FitTransformSerializer(serializers.Serializer):
 
 
 class InputSerializer(serializers.Serializer):
-    shape = serializers.JSONField(required=False, allow_null=True)
+    params = serializers.JSONField(required=False, allow_null=True)
     name = serializers.CharField(required=False, allow_null=True)
     path = serializers.CharField(required=False, allow_null=True)
-    def validate(self, data:dict):
-        """
-        Ensure at least one of 'name' or 'input_path' is provided.
-        """
-        return validate(data, ('shape', 'path'))
 
 
-class DenseSerializer(serializers.Serializer):
-    units = serializers.IntegerField(required=False, default=1)
-    activation = serializers.CharField(required=False, default='relu')
+class Conv2DSerializer(serializers.Serializer):
+    params = serializers.JSONField(required=False, allow_null=True)
     prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
-    def validate(self, data:dict):
-        """
-        Ensure at least one of 'name' or 'path' is provided.
-        """
-        return validate(data, ('units', 'path'))
+
+
+class DenseSerializer(serializers.Serializer):
+    params = serializers.JSONField(required=False, default={})
+    prev_node = JSONOrIntField(required=False, default=[])
+    name = serializers.CharField(required=False)
+    path = serializers.CharField(required=False, allow_null=True)
 
 
 class FlattenSerializer(serializers.Serializer):
@@ -162,7 +153,7 @@ class FlattenSerializer(serializers.Serializer):
 
 
 class DropoutSerializer(serializers.Serializer):
-    rate = serializers.FloatField(required=False, default=0.5)
+    params = serializers.JSONField(required=False, default={})
     prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
@@ -170,29 +161,14 @@ class DropoutSerializer(serializers.Serializer):
         """
         Ensure at least one of 'name' or 'path' is provided.
         """
-        return validate(data, (('prev_node', 'rate'), 'path'))
+        return validate(data, ('prev_node', 'path'))
 
 
-class Conv2DSerializer(serializers.Serializer):
-    filters = serializers.IntegerField(required=False, default=32)
-    kernel_size = serializers.JSONField(required=False, default=[3, 3])
-    strides = serializers.JSONField(required=False, default=[1, 1])
-    padding = serializers.CharField(required=False, default='valid')
-    activation = serializers.CharField(required=False, default='relu')
-    prev_node = JSONOrIntField(required=False)
-    name = serializers.CharField(required=False)
-    path = serializers.CharField(required=False, allow_null=True)
-    def validate(self, data:dict):
-        """
-        Ensure at least one of 'name' or 'path' is provided.
-        """
-        return validate(data, (('filters', 'kernel_size'), 'path'))
+
 
 
 class MaxPool2DSerializer(serializers.Serializer):
-    pool_size = serializers.JSONField(required=False, default=[2, 2])
-    strides = serializers.JSONField(required=False, default=[2, 2])
-    padding = serializers.CharField(required=False, default='valid')
+    params = serializers.JSONField(required=False, allow_null=True)
     prev_node = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)

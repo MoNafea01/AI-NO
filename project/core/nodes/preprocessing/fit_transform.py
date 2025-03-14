@@ -52,23 +52,24 @@ class FitTransform:
         try:
             fitter_transformer = PreprocessorFitterTransformer(preprocessor, self.data)
             fitted_preprocessor, output = fitter_transformer.fit_transform_preprocessor()
-            payload = PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output), 
-                                                   "fitter_transformer", node_type="fitter_transformer", task="fit_transform")
+
+            payload = []
+            payload.append(PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output),
+                                                         "fitter_transformer", node_type="fitter_transformer", task="fit_transform"))
             
-            payload_fitted = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "fitter_transformer", 
-                                                          node_type="fitter_transformer", task="fit_preprocessor")
-            payload_data = PayloadBuilder.build_payload("Preprocessor transformed", output, "fitter_transformer", 
-                                                        node_type="fitter_transformer", task="transform")
+            names = ["Fitted Preprocessor", "Transformed Data"]
+            tasks = ["fit_preprocessor", "transform"]
+            directories = ["preprocessors", "preprocessors", "data"]
+            for i in range(1, 3):
+                payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [fitted_preprocessor, output][i-1], "fitter_transformer",
+                                                             node_type="fitter_transformer", task=tasks[i-1]))
             
-            payload['children'] = [ payload_fitted["node_id"], payload_data["node_id"] ]
-            
-            NodeSaver()(payload, "core/nodes/saved/preprocessors")
-            NodeSaver()(payload_data, "core/nodes/saved/data")
-            NodeSaver()(payload_fitted, "core/nodes/saved/preprocessors")
-            del payload_data["node_data"]
-            del payload_fitted["node_data"]
-            payload.pop("node_data", None)
-            return payload, payload_fitted, payload_data
+            payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
+            for i in range(3):
+                NodeSaver()(payload[i], f"core/nodes/saved/{directories[i]}")
+                payload[i].pop("node_data", None)
+
+            return payload
         except Exception as e:
             raise ValueError(f"Error fitting and transforming preprocessor: {e}")
 
@@ -81,12 +82,9 @@ class FitTransform:
         for arg in args:
             if arg == '1':
                 payload = self.payload[1]
-                NodeDeleter()(self.payload[2]["node_id"])
-                NodeDeleter()(self.payload[0]["node_id"])
             elif arg == '2':
                 payload = self.payload[2]
-                NodeDeleter()(self.payload[1]["node_id"])
-                NodeDeleter()(self.payload[0]["node_id"])
+
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
             node_data = NodeDataExtractor(return_serialized=True)(payload)

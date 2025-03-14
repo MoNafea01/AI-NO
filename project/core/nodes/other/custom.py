@@ -41,19 +41,19 @@ class Splitter:
     def split(self):
         try:
             out1, out2 = self.data
-            payload = PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split")
-            payload1 = PayloadBuilder.build_payload("data_1", out1, "splitter", node_type="custom", task="split")
-            payload2 = PayloadBuilder.build_payload("data_2", out2, "splitter", node_type="custom", task="split")
+
+            payload = []
+            payload.append(PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split"))
             
-            payload['children'] = [payload1["node_id"], payload2["node_id"]]
+            for i in range(1, 3):
+                payload.append(PayloadBuilder.build_payload(f"data_{i}", [out1, out2][i-1], "splitter", node_type="custom", task="split"))
             
-            NodeSaver()(payload, "core/nodes/saved/data")
-            NodeSaver()(payload1, "core/nodes/saved/data")
-            NodeSaver()(payload2, "core/nodes/saved/data")
-            payload.pop("node_data", None)
-            del payload1["node_data"]
-            del payload2["node_data"]
-            return payload, payload1, payload2
+            payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
+            for i in range(3):
+                NodeSaver()(payload[i], "core/nodes/saved/data")
+                payload[i].pop("node_data", None)
+            
+            return payload
         except Exception as e:
             raise ValueError(f"Error splitting data: {e}")
     
@@ -65,12 +65,9 @@ class Splitter:
         for arg in args:
             if arg == '1':
                 payload = self.payload[1]
-                NodeDeleter()(self.payload[2]["node_id"])
-                NodeDeleter()(self.payload[0]["node_id"])
             elif arg == '2':
                 payload = self.payload[2]
-                NodeDeleter()(self.payload[1]["node_id"])
-                NodeDeleter()(self.payload[0]["node_id"])
+        
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
             node_data = NodeDataExtractor(return_serialized=True)(payload)
