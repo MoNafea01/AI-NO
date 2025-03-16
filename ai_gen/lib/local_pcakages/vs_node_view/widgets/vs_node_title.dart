@@ -94,6 +94,7 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
                   );
                   break;
                 case PopupOptions.delete:
+                  widget.data.deleteNode?.call();
                   VSNodeDataProvider.of(context).removeNodes(
                     [widget.data],
                   );

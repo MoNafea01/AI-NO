@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +24,10 @@ class DataLoaderInputData extends VSInputData {
 
 class DataLoaderOutputData extends VSOutputData {
   ///Basic List output interface
-  DataLoaderOutputData({required super.type, super.outputFunction});
+  DataLoaderOutputData(
+      {required this.node, required super.type, super.outputFunction});
 
+  final NodeModel node;
   @override
-  Color get interfaceColor => _interfaceColor;
+  Color get interfaceColor => node.color;
 }

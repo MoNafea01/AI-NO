@@ -36,6 +36,7 @@ class NodeServerCalls {
 
   Future<Map<String, dynamic>> runNode(NodeModel node, dynamic apiBody) async {
     return await _apiCall(
+      node: node,
       apiCall: (dio) async {
         if (node.nodeId == null) {
           return _post(dio, node, apiBody);
@@ -58,14 +59,11 @@ class NodeServerCalls {
   }
 
   Future<Response> _put(Dio dio, NodeModel node, dynamic apiBody) async {
-    print("ELDemy:: ${node.nodeId}: ${DateTime.timestamp()}");
-
     final x = await dio.put(
       "$_baseURL/${node.apiCall}?node_id=${node.nodeId}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
-    print("ELDemy:: ${x}");
 
     return x;
   }
@@ -76,6 +74,7 @@ class NodeServerCalls {
     Map<String, dynamic>? apiBody,
   }) async {
     return _apiCall(
+      node: node,
       apiCall: (dio) async {
         return await dio.get(
           "$_baseURL/${node.apiCall!}?node_id=${node.nodeId}&output=$outputChannel",
@@ -88,6 +87,7 @@ class NodeServerCalls {
 
   Future<Map<String, dynamic>> deleteNode(NodeModel node) async {
     _apiCall(
+      node: node,
       apiCall: (dio) async {
         return await dio.delete(
           "$_baseURL/${node.apiCall!}?node_id=${node.nodeId}",
@@ -98,6 +98,7 @@ class NodeServerCalls {
   }
 
   Future<Map<String, dynamic>> _apiCall({
+    required NodeModel node,
     required Future<Response?> Function(Dio dio) apiCall,
     Function(Map<String, dynamic> mapResponse)? onResponseSuccess,
   }) async {
@@ -105,20 +106,22 @@ class NodeServerCalls {
 
     try {
       final Response? response = await apiCall(dio);
-      print("Response Status Code: ${response?.statusCode}");
+      late final Map<String, dynamic> mapResponse;
 
       if (response?.statusCode != null &&
           response!.statusCode! >= 200 &&
           response.statusCode! < 300) {
-        final Map<String, dynamic> mapResponse =
-            Map<String, dynamic>.from(response.data);
+        if (response.data == null) {
+          mapResponse = {node.name: "Server error: response data is null"};
+        } else {
+          mapResponse = Map<String, dynamic>.from(response.data);
+        }
+
         print(mapResponse);
-
         if (onResponseSuccess != null) onResponseSuccess(mapResponse);
-
         return mapResponse;
       } else {
-        throw Exception('Failed to perform the operation');
+        return {node.name: "Server error: ${response?.statusCode}"};
       }
     } on DioException catch (e) {
       print("Dio Exception: $e");
@@ -128,105 +131,9 @@ class NodeServerCalls {
       } else {
         return {"error": "Network error: ${e.message}"};
       }
+    } on Exception catch (e) {
+      print("Exception: $e");
+      return {"error": e.toString()};
     }
   }
 }
-// Future<Map<String, dynamic>> oldRunNode(
-//   NodeModel node, {
-//   required Map<String, dynamic>? apiData,
-// }) async {
-//   final dio = Dio();
-//   final Response response;
-//
-//   try {
-//     if (node.nodeId == null) {
-//       response = await dio.post(
-//         "$_baseURL/${node.apiCall}",
-//         data: apiData,
-//         options: Options(contentType: Headers.jsonContentType),
-//       );
-//     } else {
-//       response = await _put(dio, node, apiData);
-//     }
-//     if (response.statusCode == 200 || response.statusCode == 201) {
-//       final Map<String, dynamic> mapResponse =
-//           Map<String, dynamic>.from(response.data);
-//       print(mapResponse);
-//
-//       node.nodeId = mapResponse['node_id'];
-//
-//       return mapResponse;
-//     } else {
-//       throw Exception('Failed to perform the operation');
-//     }
-//   } on DioException catch (e) {
-//     print("dio exception $e");
-//     return {"error": e.response?.data ?? "Server error"};
-//     if (e.response?.data != null) {
-//       throw Exception(
-//           'Failed to perform the operation with status code ${e.response?.statusCode}');
-//     } else {
-//       throw Exception('Network error: ${e.message}');
-//     }
-//   }
-// }
-//
-// Future<Map<String, dynamic>> getAPICall(
-//   String endpoint, {
-//   Map<String, dynamic>? apiData,
-//   Map<String, dynamic> Function(Map<String, dynamic>)? processResponse,
-// }) async {
-//   final dio = Dio();
-//
-//   try {
-//     final Response response = await getNode(dio, endpoint, apiData);
-//
-//     if (response.statusCode == 200 || response.statusCode == 201) {
-//       print(response.data);
-//       final jsonResponse = Map<String, dynamic>.from(response.data);
-//
-//       // Process response if a processor function is provided
-//       if (processResponse != null) {
-//         return processResponse(jsonResponse);
-//       }
-//
-//       return jsonResponse;
-//     } else {
-//       throw Exception('Failed to perform the operation');
-//     }
-//   } on DioException catch (e) {
-//     print("dio exception $e");
-//     return {"error": e.response?.data ?? "Server error"};
-//     if (e.response?.data != null) {
-//       throw Exception(
-//           'Failed to perform the operation with status code ${e.response?.statusCode}');
-//     } else {
-//       throw Exception('Network error: ${e.message}');
-//     }
-//   }
-// }
-//
-// Future<Map<String, dynamic>> deleteNode(NodeModel node) async {
-//   final dio = Dio();
-//   try {
-//     final Response response = await delete(dio, node);
-//
-//     if (response.statusCode == 200 || response.statusCode == 201) {
-//       print(response.data);
-//       final jsonResponse = Map<String, dynamic>.from(response.data);
-//
-//       return jsonResponse;
-//     } else {
-//       throw Exception('Failed to perform the operation');
-//     }
-//   } on DioException catch (e) {
-//     print("dio exception $e");
-//     return {"error": e.response?.data ?? "Server error"};
-//     if (e.response?.data != null) {
-//       throw Exception(
-//           'Failed to perform the operation with status code ${e.response?.statusCode}');
-//     } else {
-//       throw Exception('Network error: ${e.message}');
-//     }
-//   }
-// }

@@ -54,5 +54,5 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
       _outputFunction;
 
   @override
-  Color get interfaceColor => _interfaceColor;
+  Color get interfaceColor => node.color;
 }

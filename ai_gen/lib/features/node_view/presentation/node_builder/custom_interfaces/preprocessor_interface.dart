@@ -15,12 +15,18 @@ class VSPreprocessorInputData extends VSAINOGeneralInputData {
     super.title,
     super.toolTip,
     super.initialConnection,
-    super.inputIcon,
     super.connectedInputIcon,
   });
 
   @override
   List<Type> get acceptedTypes => [VSPreprocessorOutputData];
+
+  @override
+  // TODO: implement inputIcon
+  IconData get inputIcon => Icons.square_outlined;
+
+  @override
+  IconData get connectedInputIcon => Icons.square_rounded;
 
   @override
   Color get interfaceColor => _interfaceColor;
@@ -55,5 +61,5 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
       _outputFunction;
 
   @override
-  Color get interfaceColor => _interfaceColor;
+  Color get interfaceColor => node.color;
 }

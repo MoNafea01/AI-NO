@@ -6,11 +6,11 @@ extension NodesColorsExtension on NodeTypes {
   Color get color {
     switch (this) {
       case NodeTypes.models:
-        return Colors.lightBlue;
+        return const Color(0xFF3E8E40);
       case NodeTypes.preprocessors:
-        return Colors.yellow;
+        return const Color(0xFFCC9900);
       case NodeTypes.core:
-        return Colors.blue;
+        return Colors.brown;
       case NodeTypes.custom:
         return Colors.grey;
       case NodeTypes.input:

@@ -38,7 +38,7 @@ class MultiOutputOutputData extends VSAINOGeneralOutputData {
   Map<String, dynamic>? response;
 
   @override
-  Color get interfaceColor => _interfaceColor;
+  Color get interfaceColor => node.color;
 
   @override
   Future<Map<String, dynamic>> Function(Map<String, dynamic> p1)

@@ -8,11 +8,12 @@ import 'vs_node_manager.dart';
 class VSNodeData {
   ///Holds all relevant node data
   VSNodeData({
-    String? id,
     required this.type,
     required this.widgetOffset,
     required this.inputData,
     required this.outputData,
+    this.deleteNode,
+    String? id,
     this.nodeWidth,
     this.onUpdatedConnection,
     this.nodeColor = Colors.lightBlue,
@@ -33,6 +34,8 @@ class VSNodeData {
   ///Used inside [VSNodeManager] as a key for nodes
   String get id => _id;
   String _id;
+
+  final VoidCallback? deleteNode;
 
   ///The type of this node
   ///
