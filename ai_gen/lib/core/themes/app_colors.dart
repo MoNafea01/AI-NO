@@ -5,6 +5,8 @@ abstract class AppColors {
   static const Color appBackgroundColor = Colors.white;
   static const Color nodeViewBackgroundColor = Colors.white;
   static const Color secondaryBackgroundColor = Color(0xffE6E6E6);
+  static const Color nodeViewSidebarBackgroundColor = Color(0xFFCCCCCC);
+  static const Color nodeViewSidebarDividerColor = Color(0xFF999999);
 
   static List<Color> get nodesColors => [
         Colors.blue,
@@ -27,5 +29,5 @@ abstract class AppColors {
         Colors.grey,
         Colors.blueGrey,
         Colors.black,
-  ];
+      ];
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/grid_node_view_cubit.dart';
+import 'widgets/node_selector_sidebar/node_selector_sidebar.dart';
 
 class GridNodeView extends StatefulWidget {
   const GridNodeView({super.key});
@@ -18,8 +19,8 @@ class _GridNodeViewState extends State<GridNodeView> {
 
   @override
   void initState() {
-    super.initState();
     nodeDataProvider = context.read<GridNodeViewCubit>().nodeDataProvider;
+    super.initState();
   }
 
   @override
@@ -53,6 +54,11 @@ class _GridNodeViewState extends State<GridNodeView> {
             bottom: screenHeight / 45,
             left: screenWidth / 2 - 100,
             child: const CenterActions(),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            child: NodeSelectorSidebar(vsNodeDataProvider: nodeDataProvider),
           ),
         ],
       ),

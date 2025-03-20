@@ -144,6 +144,10 @@ class VSNodeDataProvider extends ChangeNotifier {
     );
   }
 
+  void createNodeFromSidebar(VSNodeDataBuilder builder) {
+    updateOrCreateNodes([builder(const Offset(250, 250), null)]);
+  }
+
   ///Set of currently selected node ids
   Set<String> get selectedNodes => _selectedNodes;
   Set<String> _selectedNodes = {};
