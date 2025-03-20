@@ -27,7 +27,7 @@ class ServerManager {
       });
 
       _serverProcess!.stderr.listen((data) {
-        print('ELDemy Server Error: ${String.fromCharCodes(data)}');
+        print('Server Manager Error: ${String.fromCharCodes(data)}');
       });
 
       _serverProcess!.exitCode.then((exitCode) {

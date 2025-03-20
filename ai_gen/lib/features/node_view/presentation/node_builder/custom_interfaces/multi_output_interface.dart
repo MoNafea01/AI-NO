@@ -35,7 +35,7 @@ class MultiOutputOutputData extends VSAINOGeneralOutputData {
   });
 
   final int index;
-  Map<String, dynamic>? response;
+  Map<String, dynamic> response;
 
   @override
   Color get interfaceColor => node.color;
@@ -46,7 +46,7 @@ class MultiOutputOutputData extends VSAINOGeneralOutputData {
     return (inputData) async {
       final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
       if (index == 0) {
-        response = null;
+        // response = null;
         final Map<String, dynamic> apiBody = {};
 
         if (node.name == "data_loader") {
@@ -57,13 +57,13 @@ class MultiOutputOutputData extends VSAINOGeneralOutputData {
           }
         }
         response = await nodeServerCalls.runNode(node, apiBody);
+        node.nodeId = response["node_id"] ?? "Null ID";
       } else {
-        while (response == null || response == {}) {
+        while (node.nodeId == null) {
           await Future.delayed(const Duration(milliseconds: 100));
         }
       }
 
-      node.id = response!["node_id"];
       return await nodeServerCalls.getNode(node, index + 1);
     };
   }
