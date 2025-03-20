@@ -52,7 +52,7 @@ class NodeServerCalls {
 
   Future<Response> _post(Dio dio, NodeModel node, dynamic apiBody) async {
     return await dio.post(
-      "$_baseURL/${node.apiCall}",
+      "$_baseURL/${node.endPoint}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
@@ -60,7 +60,7 @@ class NodeServerCalls {
 
   Future<Response> _put(Dio dio, NodeModel node, dynamic apiBody) async {
     final x = await dio.put(
-      "$_baseURL/${node.apiCall}?node_id=${node.nodeId}",
+      "$_baseURL/${node.endPoint}?node_id=${node.nodeId}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
@@ -77,7 +77,7 @@ class NodeServerCalls {
       node: node,
       apiCall: (dio) async {
         return await dio.get(
-          "$_baseURL/${node.apiCall!}?node_id=${node.nodeId}&output=$outputChannel",
+          "$_baseURL/${node.endPoint!}?node_id=${node.nodeId}&output=$outputChannel",
           data: apiBody,
           options: Options(contentType: Headers.jsonContentType),
         );
@@ -90,7 +90,7 @@ class NodeServerCalls {
       node: node,
       apiCall: (dio) async {
         return await dio.delete(
-          "$_baseURL/${node.apiCall!}?node_id=${node.nodeId}",
+          "$_baseURL/${node.endPoint!}?node_id=${node.nodeId}",
         );
       },
     );

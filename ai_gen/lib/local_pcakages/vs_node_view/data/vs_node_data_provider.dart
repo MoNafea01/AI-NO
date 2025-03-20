@@ -144,8 +144,10 @@ class VSNodeDataProvider extends ChangeNotifier {
     );
   }
 
-  void createNodeFromSidebar(VSNodeDataBuilder builder) {
-    updateOrCreateNodes([builder(const Offset(250, 250), null)]);
+  void createNodeFromSidebar(VSNodeDataBuilder builder,
+      {Offset offset = const Offset(250, 250)}) {
+    final Offset movedOffset = applyViewPortTransfrom(offset);
+    updateOrCreateNodes([builder(movedOffset, null)]);
   }
 
   ///Set of currently selected node ids

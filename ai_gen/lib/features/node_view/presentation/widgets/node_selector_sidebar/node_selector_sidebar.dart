@@ -130,10 +130,37 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
   }
 
   Widget _buildNodeButton(dynamic entry) {
-    return TextButton(
-      onPressed: () =>
-          widget.vsNodeDataProvider.createNodeFromSidebar(entry.value),
-      child: Text(entry.key, style: const TextStyle(color: Colors.black)),
+    final VSNodeData nodeData = entry.value(Offset(0, 0), null);
+    print(nodeData.nodeColor);
+    return Draggable(
+      onDragEnd: (details) {
+        widget.vsNodeDataProvider.createNodeFromSidebar(
+          entry.value,
+          offset: details.offset,
+        );
+      },
+      feedback: Transform.scale(
+        scale: 1 / widget.vsNodeDataProvider.viewportScale,
+        child: Card(
+          // key: _anchor,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Text(
+                  entry.key,
+                ),
+                const SizedBox(width: 100)
+              ],
+            ),
+          ),
+        ),
+      ),
+      child: TextButton(
+        onPressed: () =>
+            widget.vsNodeDataProvider.createNodeFromSidebar(entry.value),
+        child: Text(entry.key, style: const TextStyle(color: Colors.black)),
+      ),
     );
   }
 }

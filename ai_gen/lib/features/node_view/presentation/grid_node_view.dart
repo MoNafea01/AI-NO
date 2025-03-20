@@ -16,6 +16,7 @@ class GridNodeView extends StatefulWidget {
 
 class _GridNodeViewState extends State<GridNodeView> {
   late final VSNodeDataProvider nodeDataProvider;
+  bool isSidebarVisible = true;
 
   @override
   void initState() {
@@ -52,12 +53,13 @@ class _GridNodeViewState extends State<GridNodeView> {
           ),
           Positioned(
             bottom: screenHeight / 45,
-            left: screenWidth / 2 - 100,
+            right: screenWidth / 100,
             child: const CenterActions(),
           ),
-          Positioned(
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 500),
             top: 0,
-            left: 0,
+            left: isSidebarVisible ? 0 : -500,
             child: NodeSelectorSidebar(vsNodeDataProvider: nodeDataProvider),
           ),
         ],
@@ -92,11 +94,19 @@ class _GridNodeViewState extends State<GridNodeView> {
       title: const Text("Project 1"),
       elevation: 1,
       shadowColor: Colors.black,
+      leading: IconButton(
+        icon: Icon(isSidebarVisible ? Icons.arrow_back : Icons.menu),
+        onPressed: () {
+          setState(() {
+            isSidebarVisible = !isSidebarVisible;
+          });
+        },
+      ),
       actions: const [
         Padding(
           padding: EdgeInsets.only(right: 32),
           child: Icon(Icons.menu),
-        )
+        ),
       ],
     );
   }

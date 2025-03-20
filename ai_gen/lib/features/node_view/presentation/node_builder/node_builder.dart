@@ -94,7 +94,8 @@ class NodeBuilder {
           if (newNode.nodeId != null) nodeServerCalls.deleteNode(newNode);
 
           scaffoldMessengerKey.currentState?.showSnackBar(
-              SnackBar(content: Text("${node.displayName} deleted")));
+            SnackBar(content: Text("${node.displayName} deleted")),
+          );
         },
       );
     };

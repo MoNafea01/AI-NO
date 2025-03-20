@@ -19,11 +19,10 @@ class CenterActions extends StatelessWidget {
         color: AppColors.secondaryBackgroundColor,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
         children: [
-          const AddNodeButton(),
           _toggleGridButton(gridNodeViewCubit),
           const AssetIconButton(iconPath: AssetsPaths.arrowSelector),
           const CustomIconButton(
@@ -42,35 +41,6 @@ class CenterActions extends StatelessWidget {
           : Icons.grid_off_rounded,
       onTap: gridNodeViewCubit.toggleGrid,
       active: gridNodeViewCubit.showGrid,
-    );
-  }
-}
-
-class AddNodeButton extends StatelessWidget {
-  const AddNodeButton({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final GridNodeViewCubit gridNodeViewCubit =
-        context.read<GridNodeViewCubit>();
-    return CustomIconButton(
-      icon: Icons.add,
-      active: false,
-      onTap: () {
-        // gridNodeViewCubit.nodeDataProvider
-        //     .openContextMenu(position: const Offset(100, 110));
-        // showDialog(
-        //   context: context,
-        //   builder: (_) {
-        //     return VSContextMenu(
-        //       nodeBuilders: gridNodeViewCubit.nodeDataProvider.nodeBuildersMap,
-        //       vsNodeDataProvider: gridNodeViewCubit.nodeDataProvider,
-        //     );
-        //   },
-        // );
-      },
     );
   }
 }

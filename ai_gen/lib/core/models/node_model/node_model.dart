@@ -16,7 +16,7 @@ class NodeModel {
   List<Params>? params;
   List<String>? inputDots;
   List<String>? outputDots;
-  String? apiCall;
+  String? endPoint;
 
   NodeModel({
     this.id,
@@ -30,7 +30,7 @@ class NodeModel {
     this.params,
     this.inputDots,
     this.outputDots,
-    this.apiCall,
+    this.endPoint,
   });
 
   NodeModel copyWith({
@@ -59,7 +59,7 @@ class NodeModel {
       params: params ?? this.params,
       inputDots: inputDots ?? this.inputDots,
       outputDots: outputDots ?? this.outputDots,
-      apiCall: apiCall ?? this.apiCall,
+      endPoint: apiCall ?? this.endPoint,
     );
   }
 
@@ -95,7 +95,7 @@ class NodeModel {
       category: category,
       type: type,
       task: task,
-      apiCall: apiCall,
+      endPoint: apiCall,
       displayName: displayName,
       description: description,
       inputDots: inputDots,
@@ -117,7 +117,7 @@ class NodeModel {
     json['params'] = params?.map((e) => e.toJson()).toList();
     json['input_channels'] = inputDots;
     json['output_channels'] = outputDots;
-    json['api_call'] = apiCall;
+    json['api_call'] = endPoint;
     return json;
   }
 
