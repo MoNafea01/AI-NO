@@ -684,16 +684,48 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
     serializer_class = NodeSerializer
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
 
+    def clear_project_nodes(self, request):
+        """Clear all nodes for a specific project"""
+        project_id = request.query_params.get('project_id')
+        if not project_id:
+            return Response({"error": "project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            # Verify project exists
+            project = Project.objects.get(id=project_id)
+            
+            # Delete all nodes for this project
+            Node.objects.filter(project_id=project_id).delete()
+            return Response({"message": f"All nodes for project {project_id} have been cleared"}, 
+                          status=status.HTTP_204_NO_CONTENT)
+        except Project.DoesNotExist:
+            return Response({"error": f"Project with id {project_id} does not exist"}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
     def create(self, request, *args, **kwargs):
         """Handle bulk creation of nodes with project assignment"""
+        project_id = request.query_params.get('project_id')
+        
+        # Get project instance if project_id is provided
+        if project_id:
+            try:
+                Project.objects.get(id=project_id)
+            except Project.DoesNotExist:
+                return Response({"error": f"Project with id {project_id} does not exist"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+
         if isinstance(request.data, list):
             # Handle bulk creation
-            serializer = self.get_serializer(data=request.data, many=True)
+            data = request.data.copy()
+            for item in data:
+                if project_id:
+                    item['project_id'] = project_id
+            serializer = self.get_serializer(data=data, many=True)
         else:
             # Handle single node creation
             data = request.data.copy()
-            # Get project_id from query params
-            project_id = request.query_params.get('project_id')
             if project_id:
                 data['project_id'] = project_id
             serializer = self.get_serializer(data=data)
@@ -707,6 +739,17 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
         if isinstance(request.data, list):
             # Handle bulk update
             updated_nodes = []
+            project_id = request.query_params.get('project_id')
+            
+            # Get project instance if project_id is provided
+            project = None
+            if project_id:
+                try:
+                    project = Project.objects.get(id=project_id)
+                except Project.DoesNotExist:
+                    return Response({"error": f"Project with id {project_id} does not exist"}, 
+                                  status=status.HTTP_400_BAD_REQUEST)
+            
             for item in request.data:
                 node_id = item.get('node_id')
                 if not node_id:
@@ -718,6 +761,11 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
                     for field, value in item.items():
                         if field != 'node_id':  # Skip node_id as it shouldn't be updated
                             setattr(instance, field, value)
+                    
+                    # Set project if provided in query params
+                    if project:
+                        instance.project = project
+                        
                     instance.save()
                     updated_nodes.append(self.get_serializer(instance).data)
                 except Node.DoesNotExist:

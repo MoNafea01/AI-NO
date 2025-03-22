@@ -18,7 +18,8 @@ urlpatterns = [
     
     path('nodes/', NodeAPIViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update', 'delete': 'destroy'}), name='node-list'),
     path('nodes/<int:pk>/', NodeAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='node-detail'),
-    
+    path('nodes/clear-project/', NodeAPIViewSet.as_view({'delete': 'clear_project_nodes'}), name='clear-project-nodes'),
+
     path('components/', ComponentAPIViewSet.as_view({'get': 'list', 'post': 'create'}), name='component-list'),
     path('components/<int:pk>/', ComponentAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='component-detail'),
     
