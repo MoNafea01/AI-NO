@@ -46,6 +46,7 @@ dependencies:
 
   #the node view package that is localized and used in this project
   vs_node_view: ^2.1.1
+  flutter_expandable_fab: ^2.4.0
 
 
 

@@ -23,7 +23,7 @@ class CustomIconButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: active ? AppColors.bluePrimaryColor : Colors.transparent,
           borderRadius: BorderRadius.circular(borderRadius),
@@ -62,7 +62,7 @@ class AssetIconButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(borderRadius),

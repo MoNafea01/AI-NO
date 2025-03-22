@@ -1,8 +1,9 @@
 import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/features/node_view/presentation/widgets/center_actions.dart';
+import 'package:ai_gen/features/node_view/presentation/widgets/menu_actions.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 import '../cubit/grid_node_view_cubit.dart';
 import 'widgets/node_selector_sidebar/node_selector_sidebar.dart';
@@ -38,6 +39,27 @@ class _GridNodeViewState extends State<GridNodeView> {
         context.watch<GridNodeViewCubit>();
     return Scaffold(
       appBar: _appBar(),
+      // floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: ExpandableFab(
+        childrenOffset: const Offset(-10, -60),
+        openButtonBuilder: RotateFloatingActionButtonBuilder(
+          child: const Icon(Icons.keyboard_arrow_up),
+          fabSize: ExpandableFabSize.small,
+          foregroundColor: Colors.black,
+          backgroundColor: AppColors.secondaryBackgroundColor,
+          shape: const CircleBorder(),
+          heroTag: "Open menu",
+        ),
+        closeButtonBuilder: DefaultFloatingActionButtonBuilder(
+          child: const Icon(Icons.keyboard_arrow_down),
+          fabSize: ExpandableFabSize.small,
+          foregroundColor: Colors.black,
+          backgroundColor: AppColors.secondaryBackgroundColor,
+          shape: const CircleBorder(),
+          heroTag: "Close menu",
+        ),
+        children: const [ExpandableMenuActions()],
+      ),
       body: Stack(
         children: [
           InteractiveVSNodeView(
@@ -54,7 +76,7 @@ class _GridNodeViewState extends State<GridNodeView> {
           Positioned(
             bottom: screenHeight / 45,
             right: screenWidth / 100,
-            child: const CenterActions(),
+            child: const ExpandableMenuActions(),
           ),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 500),
@@ -102,10 +124,14 @@ class _GridNodeViewState extends State<GridNodeView> {
           });
         },
       ),
-      actions: const [
-        Padding(
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () => context.read<GridNodeViewCubit>().clearNodes(),
+        ),
+        const Padding(
           padding: EdgeInsets.only(right: 32),
-          child: Icon(Icons.menu),
+          child: Icon(Icons.close),
         ),
       ],
     );

@@ -10,7 +10,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
       : showGrid = true,
         super(GridNodeViewInitial());
 
-  late final VSNodeDataProvider nodeDataProvider;
+  late VSNodeDataProvider nodeDataProvider;
   Iterable<String>? results;
   late bool showGrid;
 
@@ -28,6 +28,23 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
         nodeManager: VSNodeManager(nodeBuilders: nodeBuilder),
         withAppbar: true,
       );
+      emit(NodeViewSuccess());
+    } catch (e) {
+      emit(NodeViewFailure(e.toString()));
+    }
+  }
+
+  Future clearNodes() async {
+    try {
+      emit(GridNodeViewLoading());
+
+      final List<Object> nodeBuilder = await NodeBuilder().buildNodesMenu();
+
+      nodeDataProvider = VSNodeDataProvider(
+        nodeManager: VSNodeManager(nodeBuilders: nodeBuilder),
+        withAppbar: true,
+      );
+
       emit(NodeViewSuccess());
     } catch (e) {
       emit(NodeViewFailure(e.toString()));

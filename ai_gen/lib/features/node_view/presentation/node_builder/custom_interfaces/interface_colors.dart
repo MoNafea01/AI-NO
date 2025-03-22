@@ -12,9 +12,9 @@ extension NodesColorsExtension on NodeTypes {
       case NodeTypes.core:
         return Colors.brown;
       case NodeTypes.custom:
-        return Colors.grey;
+        return const Color(0xFF666666);
       case NodeTypes.input:
-        return Colors.orange;
+        return Colors.orange.shade700;
       case NodeTypes.output:
         return Colors.lightBlue;
       default:

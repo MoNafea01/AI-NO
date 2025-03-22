@@ -15,12 +15,36 @@ class NodeView extends StatelessWidget {
         builder: (context, state) {
           if (state is GridNodeViewLoading || state is GridNodeViewInitial) {
             return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           } else if (state is NodeViewSuccess) {
             return const GridNodeView();
           } else if (state is NodeViewFailure) {
-            return Scaffold(body: Center(child: Text(state.errMessage)));
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.errMessage),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 36,
+                        ),
+                      ),
+                      onPressed: () =>
+                          context.read<GridNodeViewCubit>().buildNodes(),
+                      child:
+                          const Text('Retry', style: TextStyle(fontSize: 16)),
+                    ),
+                  ],
+                ),
+              ),
+            );
           } else {
             return const Scaffold(body: SizedBox());
           }

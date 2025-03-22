@@ -62,7 +62,7 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
                 controller: titleController,
                 focusNode: focusNode,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 15),
+                style: const TextStyle(fontSize: 15, color: Colors.white),
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: widget.data.type,
@@ -82,22 +82,15 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
           ),
           PopupMenuButton<PopupOptions>(
             tooltip: "",
-            child: const Icon(
-              Icons.more_vert,
-              size: 20,
-            ),
+            child: const Icon(Icons.more_vert, size: 20, color: Colors.white),
             onSelected: (value) {
               switch (value) {
                 case PopupOptions.rename:
-                  setState(
-                    () => isRenaming = true,
-                  );
+                  setState(() => isRenaming = true);
                   break;
                 case PopupOptions.delete:
                   widget.data.deleteNode?.call();
-                  VSNodeDataProvider.of(context).removeNodes(
-                    [widget.data],
-                  );
+                  VSNodeDataProvider.of(context).removeNodes([widget.data]);
                   break;
               }
             },
