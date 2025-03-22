@@ -7,12 +7,12 @@ model_id = 0
 
 class SequentialNet(BaseLayer):
     '''Handles sequential model creation.'''
-    def __init__(self, layer: dict|int, name: str = None, path: str = None):
+    def __init__(self, layer: dict|int, name: str = None, path: str = None, project_id: int = None):
         '''Initializes the Sequential object.'''
         self.name, self.layer_path = self.load_args(name, path)
         self.layer = self.load_args(layer, attr="node_id")
         self.layers, self.layers_names  = self.get_layers()
-        self.payload = self.load_layer()
+        super().__init__(project_id=project_id)
     
     def get_layers(self):
         cur_id = self.layer

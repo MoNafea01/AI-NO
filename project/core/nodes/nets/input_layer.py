@@ -6,12 +6,12 @@ input_id = 0
 
 class InputLayer(BaseLayer):
     '''Handles input layer creation.'''
-    def __init__(self, shape: tuple, name: str = None, path: str = None):
+    def __init__(self, shape: tuple, name: str = None, path: str = None, project_id: int = None):
         '''Initializes the Input object.'''
         self.shape = shape
         self.name = name
         self.layer_path = path
-        self.payload = self.load_layer()
+        super().__init__(project_id=project_id)
     
     @property
     def layer_class(self):

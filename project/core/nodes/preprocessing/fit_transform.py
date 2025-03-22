@@ -1,5 +1,5 @@
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDeleter, NodeDataExtractor
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 
 class PreprocessorFitterTransformer:
     """Handles the fitting and transformation of preprocessors."""
@@ -19,10 +19,11 @@ class PreprocessorFitterTransformer:
 
 class FitTransform:
     """Orchestrates the fitting and transformation process."""
-    def __init__(self, data, preprocessor=None, preprocessor_path=None):
+    def __init__(self, data, preprocessor=None, preprocessor_path=None, project_id=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
         self.data = NodeDataExtractor()(data)
+        self.project_id = project_id
         self.payload = self._fit_transform()
 
     def _fit_transform(self):
@@ -55,14 +56,14 @@ class FitTransform:
 
             payload = []
             payload.append(PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output),
-                                                         "fitter_transformer", node_type="fitter_transformer", task="fit_transform"))
+                                                         "fitter_transformer", node_type="fitter_transformer", task="fit_transform", project_id=self.project_id))
             
             names = ["Fitted Preprocessor", "Transformed Data"]
             tasks = ["fit_preprocessor", "transform"]
             directories = ["preprocessors", "preprocessors", "data"]
             for i in range(1, 3):
                 payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [fitted_preprocessor, output][i-1], "fitter_transformer",
-                                                             node_type="fitter_transformer", task=tasks[i-1]))
+                                                             node_type="fitter_transformer", task=tasks[i-1], project_id=self.project_id))
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):

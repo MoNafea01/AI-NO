@@ -1,7 +1,8 @@
 # api/serializers.py
 from rest_framework import serializers
-from .models import Component, Node
+from .models import Component, Node, Project
 import base64
+import time
 
 class JSONOrIntField(serializers.Field):
     def to_internal_value(self, data):
@@ -187,26 +188,75 @@ class ComponentSerializer(serializers.ModelSerializer):
 
 class NodeSerializer(serializers.ModelSerializer):
     node_data = serializers.CharField(write_only=True, required=False)
+    project_id = serializers.IntegerField(required=False, write_only=True)
+    
     class Meta:
         model = Node
         fields = '__all__'
         extra_kwargs = {
             'params': {'allow_null': True},
+            'node_id': {'required': False}  # Make node_id read-only
         }
+    
+    
     def create(self, validated_data):
-        """Decode Base64-encoded node_data before saving"""
+        """Decode Base64-encoded node_data before saving and handle project assignment"""
+        node_data_base64 = validated_data.pop("node_data", None)
+        project_id = validated_data.pop("project_id", None)
+        
+        if node_data_base64:
+            validated_data["node_data"] = base64.b64decode(node_data_base64)
+            
+        if project_id:
+            try:
+                project = Project.objects.get(id=project_id)
+                validated_data["project"] = project
+            except Project.DoesNotExist:
+                raise serializers.ValidationError(f"Project with id {project_id} does not exist")
+        
+        # Generate a unique node_id if not provided
+        if 'node_id' not in validated_data:
+            validated_data["node_id"] = int(time.time() * 1000)
+                
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        """Handle node updates, including location and ports"""
+        
+        # Handle node_data if provided
         node_data_base64 = validated_data.pop("node_data", None)
         if node_data_base64:
             validated_data["node_data"] = base64.b64decode(node_data_base64)
-        return super().create(validated_data)
+        
+        # Handle project_id if provided
+        project_id = validated_data.pop("project_id", None)
+        if project_id:
+            try:
+                project = Project.objects.get(id=project_id)
+                validated_data["project"] = project
+            except Project.DoesNotExist:
+                raise serializers.ValidationError(f"Project with id {project_id} does not exist")
+        
+        # Update all fields except node_id
+        for attr, value in validated_data.items():
+            if attr != 'node_id':  # Skip node_id updates
+                setattr(instance, attr, value)
+        
+        instance.save()
+        return instance
     
     def to_representation(self, instance):
         """Customize serialization to convert binary data to Base64"""
         representation = super().to_representation(instance)
-        if instance.node_data:
+        if hasattr(instance, 'node_data') and instance.node_data:
             representation["node_data"] = base64.b64encode(instance.node_data).decode()
-
         return representation
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = '__all__'
 
 
 def validate(data, keys):

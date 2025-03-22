@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from ..utils import NodeNameHandler, PayloadBuilder
 from ..configs.datasets import DATASETS as datasets
-from ...repositories.node_repository import NodeSaver, NodeDeleter, NodeDataExtractor
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 
 
 class BaseDataLoader:
@@ -69,21 +69,24 @@ class DataLoaderFactory:
 
 class DataLoader:
     """Facade for loading data using different strategies."""
-    def __init__(self, dataset_name: str = None, dataset_path: str = None):
+    def __init__(self, dataset_name: str = None, dataset_path: str = None, project_id: int = None):
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
         X, y = self.loader.load()
+        self.project_id = project_id
         self.payload = self.build_payload(dataset_name, dataset_path, X, y)
+        
     
     def build_payload(self, dataset_name, dataset_path, X, y):
         if not dataset_name:
             dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
+
         
         payload = []
-        payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data"))
+        payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id))
         names = ["X", "y"]
 
         for i in range(1, 3):
-            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}: {names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data"))
+            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}: {names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id))
         
         payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
         for i in range(3):

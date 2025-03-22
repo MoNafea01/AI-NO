@@ -23,10 +23,11 @@ class ModelFitter:
 
 class Fit(BaseNode):
     """Orchestrates the fitting process."""
-    def __init__(self, X, y, model=None, model_path=None):
+    def __init__(self, X, y, model=None, model_path=None, project_id=None):
         self.model = model
         self.model_path = model_path
         self.X, self.y = NodeDataExtractor()(X, y)
+        self.project_id = project_id
         self.payload = self._fit()
 
     def _fit(self):
@@ -58,7 +59,9 @@ class Fit(BaseNode):
             fitted_model = fitter.fit_model()
 
             payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model")
-            
+            if self.project_id:
+                payload['project_id'] = self.project_id
+
             NodeSaver()(payload, "core/nodes/saved/models")
             payload.pop("node_data", None)
             return payload

@@ -6,7 +6,7 @@ from ..utils import NodeNameHandler
 class Model(BaseNode):
     '''Handles model creation and parameter management.'''
     def __init__(self, model_name: str, model_type: str, task: str, 
-                 params: dict = None, model_path: str = None) -> dict:
+                 params: dict = None, model_path: str = None, project_id: int = None) -> dict:
         '''Initializes the Model object.'''
         self.model_name = model_name
         self.model_type = model_type
@@ -15,7 +15,7 @@ class Model(BaseNode):
         default_params = self._get_default_params()
         default_params.update(params) if params else {}
         self.params = default_params
-        self.payload = self.load_node()
+        super().__init__(project_id=project_id)  # Pass project_id to BaseNode
     
     def _get_default_params(self) -> dict:
         '''Returns the default parameters for the model.'''

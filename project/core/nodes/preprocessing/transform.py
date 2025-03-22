@@ -19,10 +19,11 @@ class PreprocessorTransformer:
 
 class Transform(BaseNode):
     """Orchestrates the transformation process."""
-    def __init__(self, data, preprocessor=None, preprocessor_path=None):
+    def __init__(self, data, preprocessor=None, preprocessor_path=None, project_id=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
         self.data = NodeDataExtractor()(data)
+        self.project_id = project_id
         self.payload = self._transform()
 
     def _transform(self):
@@ -53,7 +54,7 @@ class Transform(BaseNode):
             transformer = PreprocessorTransformer(preprocessor, self.data)
             output = transformer.transform_data()
             payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', 
-                                                   node_type='transformer')
+                                                   node_type='transformer', project_id=self.project_id)
             
             NodeSaver()(payload, "core/nodes/saved/data")
             payload.pop("node_data", None)

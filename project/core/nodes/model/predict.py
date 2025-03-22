@@ -20,10 +20,11 @@ class ModelPredictor(BaseNode):
 
 class Predict(BaseNode):
     """Orchestrates the predicting process."""
-    def __init__(self, X, model=None, model_path=None):
+    def __init__(self, X, model=None, model_path=None, project_id=None):
         self.model = model
         self.model_path = model_path
         self.X = NodeDataExtractor()(X)
+        self.project_id = project_id
         self.payload = self._predict()
 
     def _predict(self):
@@ -54,7 +55,8 @@ class Predict(BaseNode):
             predictor = ModelPredictor(model, self.X)
             predictions = predictor.predict_model()
             payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict')
-            
+            if self.project_id:
+                payload['project_id'] = self.project_id
             NodeSaver()(payload, "core/nodes/saved/data")
             payload.pop("node_data", None)
             return payload

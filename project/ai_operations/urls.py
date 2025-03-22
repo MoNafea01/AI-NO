@@ -3,15 +3,24 @@ from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from rest_framework.routers import DefaultRouter
 from .views import *
+
 router = DefaultRouter()
-# router.register(r'components', ComponentAPIViewSet)
-component_list = ComponentAPIViewSet.as_view({'get': 'list', 'post': 'create'})
-component_detail = ComponentAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})
-node_list = NodeAPIViewSet.as_view({'get': 'list', 'post': 'create'})
-node_detail = NodeAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})
+router.register(r'nodes', NodeAPIViewSet, basename='node')
+router.register(r'components', ComponentAPIViewSet, basename='component')
+router.register(r'projects', ProjectViewSet, basename='project')
 
 urlpatterns = [
     path('api/', include(router.urls)),
+    
+    # Project endpoints
+    path('projects/', ProjectViewSet.as_view({'get': 'list', 'post': 'create'}), name='project-list'),
+    path('projects/<int:pk>/', ProjectViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='project-detail'),
+    
+    path('nodes/', NodeAPIViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update', 'delete': 'destroy'}), name='node-list'),
+    path('nodes/<int:pk>/', NodeAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='node-detail'),
+    
+    path('components/', ComponentAPIViewSet.as_view({'get': 'list', 'post': 'create'}), name='component-list'),
+    path('components/<int:pk>/', ComponentAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='component-detail'),
     
     path('create_model/', CreateModelView.as_view(), name='create_model'),
     path('fit_model/', FitModelAPIView.as_view(), name='fit_model'),
@@ -41,17 +50,11 @@ urlpatterns = [
     path('dropout/', DropoutAPIView.as_view(), name='dropout'),
     path('sequential/', SequentialAPIView.as_view(), name='sequential'),
     
-
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
-    path('components/', component_list, name='component-list'),
-    path('components/<int:pk>/', component_detail, name='component-detail'),
-    path('nodes/', node_list, name='node-list'),
-    path('nodes/<int:pk>/', node_detail, name='node-detail'),
 
     # Generates the raw OpenAPI schema
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     # Redoc UI (alternative)
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-
 ]

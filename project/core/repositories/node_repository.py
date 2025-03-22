@@ -58,6 +58,7 @@ class NodeSaver:
         task = payload.get('task', "general")
         node_type = payload.get('node_type', "general")
         children = payload.get("children", [])
+        project_id = payload.get('project_id')  # Get project_id from payload
         
         # save to path
         if path:
@@ -79,7 +80,7 @@ class NodeSaver:
         buffer.seek(0)              # go to the start of the buffer
         node_bytes = buffer.read()  # read buffer (convert it into binary)
 
-        # Save to database
+        # Save to database with project_id
         Node.objects.update_or_create(
             node_id=node_id,
             defaults={
@@ -89,7 +90,8 @@ class NodeSaver:
                 'params': params,
                 'task': task,
                 'node_type': node_type,
-                'children': children
+                'children': children,
+                'project_id': project_id  # Add project_id to the defaults
             }
         )
         # returns node_saver payload for preview
@@ -99,7 +101,8 @@ class NodeSaver:
                 "params": {},
                 "task": "save",
                 "node_type": "saver",
-                "children": children
+                "children": children,
+                "project_id": project_id
                 }
 
 
@@ -311,14 +314,6 @@ class NodeUpdater:
             raise ValueError("Payload must be a dictionary.")
         
         try:
-            
-            """
-            What we are doing exactly??
-            We want to update a node, so we take the node_id and create another node with 
-            the new configurations and then assign the old node's node_id to it and remove
-            the old one from db and file storage
-            """
-
             # take the <old> node (by its id)
             node = Node.objects.get(node_id=node_id)
             new_task = payload.get('task', node.task)   # get new node's task
@@ -339,7 +334,6 @@ class NodeUpdater:
             elif is_special_case:
                 folders = ['preprocessors', 'data']
             else:
-                
                 payload["node_data"] = NodeDataExtractor()(original_id)
 
             if folders:
@@ -370,7 +364,7 @@ class NodeUpdater:
             if payload['node_name'] not in PARENT_NODES:
                 payload['children'] = node.children
                 
-            NodeSaver()(payload, path=folder_path)      # ...وتوتة توتة خلصت الحدوتة الحمدلله
+            NodeSaver()(payload, path=folder_path)
             NodeDeleter(is_special_case, is_multi_channel)(original_id)
             
             # this part to delete node if its name isn't same as new one's name

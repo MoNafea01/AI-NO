@@ -6,6 +6,7 @@ from ..base_node import BaseNode
 class BaseLayer(BaseNode):
     '''Base class for all layers.'''
     def __init__(self, *args, **kwargs):
+        self.project_id = kwargs.get('project_id')
         self.payload = self.load_layer()
     
     def load_layer(self):
@@ -42,6 +43,9 @@ class BaseLayer(BaseNode):
 
             except Exception as e:
                 pass
+
+            if hasattr(self, 'project_id') and self.project_id:
+                payload['project_id'] = self.project_id
 
             NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
             payload.pop("node_data", None)

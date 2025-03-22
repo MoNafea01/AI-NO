@@ -6,6 +6,8 @@ from sklearn.metrics import (
     recall_score, 
     f1_score, 
     r2_score,
+    log_loss,
+    root_mean_squared_error,
     )
 
 
@@ -17,4 +19,6 @@ METRICS = {
     "accuracy" : accuracy_score,
     "mae" : mean_absolute_error,
     "precision" : precision_score,
+    'log_loss' : log_loss,
+    'rmse' : root_mean_squared_error,
 }

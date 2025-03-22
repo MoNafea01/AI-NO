@@ -9,7 +9,7 @@ pool_id = 0
 
 class Conv2DLayer(BaseLayer):
     '''Handles Conv2D layer creation.'''
-    def __init__(self, prev_node: dict, filters: int, kernel_size: int, strides: int, padding: str, activation: str, path: str = None, name: str = None):
+    def __init__(self, prev_node: dict, filters: int, kernel_size: int, strides: int, padding: str, activation: str, path: str = None, name: str = None, project_id: int = None):
         '''Initializes the Conv2D object.'''
         self.filters = filters
         self.kernel_size = kernel_size
@@ -18,9 +18,8 @@ class Conv2DLayer(BaseLayer):
         self.activation = activation
         self.name = name
         self.layer_path = path
-
         self.prev_node = self.load_args(prev_node, attr="node_id")
-        self.payload = self.load_layer()
+        super().__init__(project_id=project_id)
 
     @property
     def layer_class(self):
@@ -54,16 +53,15 @@ class Conv2DLayer(BaseLayer):
 
 class MaxPool2DLayer(BaseLayer):
     '''Handles MaxPooling2D layer creation.'''
-    def __init__(self, prev_node, pool_size: int, strides: int, padding: str, path: str = None, name: str = None):
+    def __init__(self, prev_node, pool_size: int, strides: int, padding: str, path: str = None, name: str = None, project_id: int = None):
         '''Initializes the MaxPooling2D object.'''
         self.pool_size = pool_size
         self.strides = strides
         self.padding = padding
         self.name = name
         self.layer_path = path
-        
         self.prev_node = self.load_args(prev_node, attr="node_id")
-        self.payload = self.load_layer()
+        super().__init__(project_id=project_id)
     
     @property
     def layer_class(self):

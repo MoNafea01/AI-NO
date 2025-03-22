@@ -1,5 +1,5 @@
 from ..utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDeleter, NodeDataExtractor
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 from ..base_node import BaseNode
 
 
@@ -10,14 +10,15 @@ class Joiner(BaseNode):
     it also accept a dictionary as an argument\n
     Note that the dictionary must have a key named "data" that has a list of two elements\n
     """
-    def __init__(self, data_1, data_2):
+    def __init__(self, data_1, data_2, project_id=None):
         self.data_1, self.data_2 = NodeDataExtractor()(data_1, data_2)
+        self.project_id = project_id
         self.payload = self.join()
     
     def join(self):
         try:
             joined_data = (self.data_1, self.data_2)
-            payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join")
+            payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join", project_id=self.project_id)
             
             NodeSaver()(payload, "core/nodes/saved/data")
             payload.pop("node_data", None)
@@ -34,7 +35,8 @@ class Splitter:
     it also accept a dictionary as an argument  
     Note that the dictionary must have a key named "data" that has a list of two elements   
     """
-    def __init__(self, data):
+    def __init__(self, data, project_id=None):
+        self.project_id = project_id
         self.data = NodeDataExtractor()(data)
         self.payload = self.split()
 
@@ -43,10 +45,10 @@ class Splitter:
             out1, out2 = self.data
 
             payload = []
-            payload.append(PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split"))
+            payload.append(PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split", project_id=self.project_id))
             
             for i in range(1, 3):
-                payload.append(PayloadBuilder.build_payload(f"data_{i}", [out1, out2][i-1], "splitter", node_type="custom", task="split"))
+                payload.append(PayloadBuilder.build_payload(f"data_{i}", [out1, out2][i-1], "splitter", node_type="custom", task="split", project_id=self.project_id))
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):

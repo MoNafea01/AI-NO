@@ -4,6 +4,7 @@ from .utils import PayloadBuilder
 class BaseNode:
     '''Base class for all nodes.'''
     def __init__(self, *args, **kwargs):
+        self.project_id = kwargs.get('project_id')  # Get project_id from kwargs
         self.payload = self.load_node()
     
     def load_node(self):
@@ -38,6 +39,10 @@ class BaseNode:
 
             except Exception as e:
                 pass
+
+            # Add project_id to payload if it exists
+            if hasattr(self, 'project_id') and self.project_id:
+                payload['project_id'] = self.project_id
 
             NodeSaver()(payload, path=f"core\\nodes\\saved\\{self.get_folder()}")
             payload.pop("node_data", None)
