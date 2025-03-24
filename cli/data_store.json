@@ -5,7 +5,35 @@
             "projects": {
                 "prj1": {
                     "workflows": {
-                        "wf1": []
+                        "wf1": [
+                            {
+                                "message": "Model linear_regression created",
+                                "params": {},
+                                "node_id": 2595642314336,
+                                "node_name": "linear_regression",
+                                "task": "regression",
+                                "children": [],
+                                "model_type": "linear_models"
+                            },
+                            {
+                                "message": "Model linear_regression created",
+                                "params": {},
+                                "node_id": 2595637566624,
+                                "node_name": "linear_regression",
+                                "task": "regression",
+                                "children": [],
+                                "model_type": "linear_models"
+                            },
+                            {
+                                "message": "Model linear_regression created",
+                                "params": {},
+                                "node_id": 1987267858880,
+                                "node_name": "linear_regression",
+                                "task": "regression",
+                                "children": [],
+                                "node_type": "linear_models"
+                            }
+                        ]
                     }
                 }
             }

@@ -35,7 +35,7 @@ class Model(BaseNode):
         return {
             "message": f"Model {self.node_name} created",
             "task": self.get_type_task()[1],
-            "model_type": self.get_type_task()[0],
+            "node_type": self.get_type_task()[0],
             "node_name": self.node_name,
         }
     

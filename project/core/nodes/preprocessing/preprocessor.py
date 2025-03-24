@@ -33,7 +33,7 @@ class Preprocessor(BaseNode):
         return {
             "message": f"Preprocessor {self.node_name} created",
             "task": "preprocessing",
-            "preprocessor_type": self.get_type,
+            "node_type": self.get_type,
             "node_name": self.node_name,
         }
 

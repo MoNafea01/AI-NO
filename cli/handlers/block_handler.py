@@ -40,7 +40,8 @@ def create_block(*args):
         return "Error creating block"
 
     workflow.append(payload)
-    return f"Block created."
+    block = explore_block(node_name, payload.get('node_id'))
+    return f"{block}"
 
 
 def edit_block(*args):
@@ -126,7 +127,7 @@ def explore_block(*args):
     args = []
 
     payload = send_request_to_api(args, query, method_type='get', node_id=block_id)
-
+    print(payload)
     if not isinstance(payload, dict):
         return "Error getting block"
     
