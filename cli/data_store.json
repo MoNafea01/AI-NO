@@ -32,6 +32,49 @@
                                 "task": "regression",
                                 "children": [],
                                 "node_type": "linear_models"
+                            },
+                            {
+                                "message": "Model linear_regression created",
+                                "params": {},
+                                "node_id": 2999333934704,
+                                "node_name": "linear_regression",
+                                "task": "regression",
+                                "children": [],
+                                "node_type": "linear_models"
+                            },
+                            {
+                                "message": "data loaded: iris",
+                                "params": {},
+                                "node_id": 2999334309760,
+                                "node_name": "data_loader",
+                                "task": "load_data",
+                                "children": [
+                                    2999334012176,
+                                    2999334012080
+                                ],
+                                "node_type": "loader",
+                                "project_id": null
+                            },
+                            {
+                                "message": "Model fitted",
+                                "params": {
+                                    "coef_": [
+                                        [
+                                            -0.11190585392686349,
+                                            -0.0400794864949342,
+                                            0.22864502724212335,
+                                            0.6092520541197894
+                                        ]
+                                    ],
+                                    "intercept_": [
+                                        0.18649524720624988
+                                    ]
+                                },
+                                "node_id": 2999311676528,
+                                "node_name": "model_fitter",
+                                "children": [],
+                                "node_type": "fitter",
+                                "task": "fit_model"
                             }
                         ]
                     }

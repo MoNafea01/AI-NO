@@ -127,7 +127,6 @@ def explore_block(*args):
     args = []
 
     payload = send_request_to_api(args, query, method_type='get', node_id=block_id)
-    print(payload)
     if not isinstance(payload, dict):
         return "Error getting block"
     
