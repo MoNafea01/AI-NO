@@ -250,6 +250,14 @@ class NodeSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         if hasattr(instance, 'node_data') and instance.node_data:
             representation["node_data"] = base64.b64encode(instance.node_data).decode()
+            
+        representation.pop('created_at', None)
+        representation.pop('updated_at', None)
+
+        return_serialized = self.context.get('return_serialized', False)
+        if not return_serialized:
+            representation.pop('node_data', None) 
+
         return representation
 
 

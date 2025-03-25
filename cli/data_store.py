@@ -5,7 +5,6 @@ _data_store = {
     "users": {},
     "active_user": None,
     "active_project": None,
-    "active_workflow": None,
     "admin": [],
 }
 
@@ -33,29 +32,25 @@ def reset_data_store():
         "users": {},
         "active_user": None,
         "active_project": None,
-        "active_workflow": None,
         "admin": [],
     }
 
 def load_backup_data():
     data = {
-        "users": {
-            "admin": {
+        "users": 
+        {
+            "admin": 
+            {
                 "password": "admin",
-                "projects": {
-                    "prj1": {
-                        "workflows": {
-                            "wf1": [
-
-                            ]
-                        }
-                    }
+                "projects": 
+                {
+                    "1": []
                 }
             }
-        },
+        }
+        ,
     "active_user": "admin",
-    "active_project": "prj1",
-    "active_workflow": "wf1",
+    "active_project": "1",
     "admin": ["admin"]
     }
     set_data_store(data)

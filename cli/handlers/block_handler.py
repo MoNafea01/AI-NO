@@ -1,7 +1,7 @@
 from data_store import get_data_store
 from handlers.mapper import mapper
 import re
-# TODO: this module needs to be edited
+
 def handle_block_command(sub_cmd, args):
 
     args = list(map(lambda x: re.sub(r'\s+', '', x),args))
@@ -20,144 +20,134 @@ def handle_block_command(sub_cmd, args):
     
     if sub_cmd in commands:
         return commands[sub_cmd](*args)
-    return f"Unknown block command: {sub_cmd}"
+    return False, f"Unknown block command: {sub_cmd}"
     
 
 def create_block(*args):
     data_store = get_data_store()
-    workflow = _get_active_workflow(data_store)
-    if workflow is None:
-        return "No workflow selected."
+    project = _get_active_project(data_store)
+    project_id = get_data_store().get("active_project")
+    if project is None:
+        return False, "No Project selected."
     
     node_name = args[0]
     if node_name not in mapper:
-        return f"Block {node_name} not found."
+        return False, f"Block {node_name} not found."
     query = mapper.get(node_name)
     args = eval(''.join(args[1:]))
 
-    payload = send_request_to_api(args, query)
+    payload = send_request_to_api(args, query, project_id=project_id)
     if not isinstance(payload, dict):
-        return "Error creating block"
+        return False, "Error creating block"
 
-    workflow.append(payload)
-    block = explore_block(node_name, payload.get('node_id'))
-    return f"{block}"
+    project.append(payload)
+    return explore_block(node_name, payload.get('node_id'), project_id=project_id)
 
 
 def edit_block(*args):
     data_store = get_data_store()
-    workflow = _get_active_workflow(data_store)
-    if workflow is None:
-        return "No workflow selected."
+    project = _get_active_project(data_store)
+    project_id = get_data_store().get("active_project")
+    if project is None:
+        return False, "No Project selected."
     
     node_name = args[0]
     block_id = args[1]
     if node_name not in mapper:
-        return f"Block {node_name} not found."
+        return False, f"Block {node_name} not found."
     
-    exp, i = find_block(block_id, workflow)
+    exp, i = find_block(block_id, project)
     if not exp:
-        return f"Block {block_id} not found."
+        return False, f"Block {block_id} not found."
 
     query = mapper.get(node_name)
     args = eval(''.join(args[2:]))
 
-    payload = send_request_to_api(args, query, method_type='put', node_id=block_id)
+    payload = send_request_to_api(args, query, method_type='put', node_id=block_id, project_id=project_id)
     if not isinstance(payload, dict):
-        return "Error updating block"
+        return False, "Error updating block"
     
-    workflow[i] = payload
-    return f"Block {block_id} updated."
+    project[i] = payload
+    return explore_block(node_name, block_id, project_id=project_id)
 
 
 def remove_block(*args):
     data_store = get_data_store()
-    workflow = _get_active_workflow(data_store)
-    if workflow is None:
-        return "No workflow selected."
+    project = _get_active_project(data_store)
+    project_id = get_data_store().get("active_project")
+    if project is None:
+        return False, "No Project selected."
     
     node_name = args[0]
     block_id = args[1]
 
     if node_name not in mapper:
-        return f"Block {node_name} not found in mapper."
+        return False, f"Block {node_name} not found in mapper."
     
-    exp, i = find_block(block_id, workflow)
+    exp, i = find_block(block_id, project)
     if not exp:
-        return f"Block {block_id} not found."
+        return False, f"Block {block_id} not found."
         
     query = mapper.get(node_name)
     args = []
     
-    payload = send_request_to_api(args, query, method_type='delete', node_id=block_id)
+    payload = send_request_to_api(args, query, method_type='delete', node_id=block_id, project_id=project_id)
     if not payload:
-        workflow.pop(i)
-        return f"Block {block_id} removed."
+        project.pop(i)
+        return True, f"Block {block_id} removed."
     if not isinstance(payload, dict):
-        return "Error removing block"
+        return False, "Error removing block"
     
-    return f"Block {block_id} does not exist."
+    return False, f"Block {block_id} does not exist."
 
 def list_blocks():
     data_store = get_data_store()
-    workflow = _get_active_workflow(data_store)
-    if workflow is None:
-        return "No workflow selected."
+    project = _get_active_project(data_store)
+    if project is None:
+        return False, "No Project selected."
+    ids = [block.get('node_id') for block in project]
+    names = [block.get('node_name') for block in project]
+    names_ids = zip(names, ids)
+    return True, f"Blocks: \n{'\n'.join(map(str, names_ids))}"
 
-    ids = [block.get('node_id') for block in workflow]
-    return f"Blocks: {', '.join(map(str, ids))}"
-
-def explore_block(*args):
+def explore_block(*args, **kwargs):
     data_store = get_data_store()
-    workflow = _get_active_workflow(data_store)
-    if workflow is None:
-        return "No workflow selected."
+    project = _get_active_project(data_store)
+    if project is None:
+        return False, "No Project selected."
     
     node_name = args[0]
     block_id = args[1]
 
     if node_name not in mapper:
-        return f"Block {node_name} not found."
+        return False, f"Block {node_name} not found."
     
-    exp, i = find_block(block_id, workflow)
+    exp, _ = find_block(block_id, project)
     if not exp:
-        return f"Block {block_id} not found."
+        return False, f"Block {block_id} not found."
     
     query = mapper.get(node_name)
     args = []
 
-    payload = send_request_to_api(args, query, method_type='get', node_id=block_id)
+    project_id = kwargs.get("project_id", None)
+    if not project_id:
+        project_id = get_data_store().get("active_project")
+    payload = send_request_to_api(args, query, method_type='get', node_id=block_id, project_id=project_id)
     if not isinstance(payload, dict):
-        return "Error getting block"
+        return False, "Error getting block"
     
-    return f"""Block {block_id}: 
-    name: {payload.get('node_name', "default")}
-    type: {payload.get('node_type', 'default')}
-    task: {payload.get('task', 'default')}
-    children: {payload.get('children', 'default')}
-    params: {payload.get('params', 'default')}."""
+    return True, payload
 
 def _get_active_project(data_store):
     """
-    Helper to retrieve the active workflow from the data store.
+    Helper to retrieve the active Project from the data store.
     """
     user = data_store.get("active_user")
-    project = data_store.get("active_project")
-    if not (user and project):
+    project_id = data_store.get("active_project")
+    if not (user and project_id):
         return None
 
-    return data_store["users"][user]["projects"][project]
-
-def _get_active_workflow(data_store):
-    """
-    Helper to retrieve the active workflow from the data store.
-    """
-    project = _get_active_project(data_store)
-    workflow = data_store.get("active_workflow")
-    if not (project and workflow):
-        return None
-
-    return project["workflows"][workflow]
+    return data_store["users"][user]["projects"][project_id]
 
 
 def send_request_to_api(args, query="create_model/", method_type="post", **kwargs):
@@ -165,9 +155,11 @@ def send_request_to_api(args, query="create_model/", method_type="post", **kwarg
     import requests
 
     node_id = kwargs.get("node_id", None)
-    
+    project_id = kwargs.get("project_id", None)
+    query = query + f"?project_id={project_id}"
+
     if node_id:
-        query = f"{query.rstrip('/')}/?node_id={node_id}"
+        query = query + f"&node_id={node_id}"
 
     method ={
         "post": requests.post,
@@ -175,13 +167,13 @@ def send_request_to_api(args, query="create_model/", method_type="post", **kwarg
         "put": requests.put,
         "delete": requests.delete
     }
-
     url = f"http://localhost:8000/api/{query}"
     headers = {
         'Content-Type': 'application/json',
         "Accept": "application/json"
     }
     response = method[method_type](url, headers=headers, json=args, timeout=10)
+    
     if response.text == "":
         return None
     try:
@@ -190,8 +182,8 @@ def send_request_to_api(args, query="create_model/", method_type="post", **kwarg
         print("Response is not JSON")
         return response
     
-def find_block(block_id, workflow):
-    for i, block in enumerate(workflow):
+def find_block(block_id, project):
+    for i, block in enumerate(project):
         if block.get('node_id') == int(block_id):
             return True, i
     return False, None

@@ -1,11 +1,9 @@
 from handlers.user_handler import handle_user_command
 from handlers.project_handler import handle_project_command
-from handlers.workflow_handler import handle_workflow_command
 from handlers.block_handler import handle_block_command
 import re
 create_user, select_user, remove_user, make_admin = handle_user_command, handle_user_command, handle_user_command, handle_user_command
-create_project, select_project, remove_project, deselect_project, list_projects = handle_project_command, handle_project_command, handle_project_command, handle_project_command, handle_project_command
-create_workflow, select_workflow, remove_workflow, deselect_workflow, list_workflows, finish_workflow = handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command, handle_workflow_command
+create_project, select_project, remove_project, deselect_project, list_projects, clear_project = handle_project_command, handle_project_command, handle_project_command, handle_project_command, handle_project_command, handle_project_command
 create_block, edit_block, remove_block, explore_block, list_blocks = handle_block_command, handle_block_command, handle_block_command, handle_block_command, handle_block_command
 get_recent = handle_user_command
 def cmd_handler(command,mode=False):
@@ -44,7 +42,8 @@ def handle_sub_command(sub_cmd, args):
     Handles the sub-command entered by the user.
     takes the sub-command and the arguments as input.
     """
-    commands = {"create_user": create_user, "mkusr": create_user,
+    commands = {
+        "create_user": create_user, "mkusr": create_user,
         "select_user": select_user, "selusr": select_user,
         "remove_user": remove_user, "rmusr": remove_user,
         "make_admin": make_admin, "mkadm": make_admin,
@@ -54,13 +53,7 @@ def handle_sub_command(sub_cmd, args):
         "deselect_project": deselect_project, "dselprj": deselect_project,
         "list_projects": list_projects, "lsprj": list_projects,
         "remove_project": remove_project, "rmprj": remove_project,
-
-        "create_workflow": create_workflow, "mkwf": create_workflow,
-        "select_workflow": select_workflow, "selwf": select_workflow,
-        "deselect_workflow": deselect_workflow, "dselwf": deselect_workflow,
-        "list_workflows": list_workflows, "lswf": list_workflows,
-        "finish_workflow": finish_workflow, "fnwf": finish_workflow,
-        "remove_workflow": remove_workflow, "rmwf": remove_workflow,
+        "clear_project": clear_project, "cls": clear_project,
 
         "make": create_block, "mkblk": create_block, 
         "edit": edit_block, "edblk": edit_block,
@@ -77,10 +70,16 @@ def handle_sub_command(sub_cmd, args):
     if len(args) == 0:
         arg = []
     else:
-        # TODO: You will need to edit this part to handle multiple arguments.
         arg = args
     if sub_cmd in commands:
-        return commands[sub_cmd](sub_cmd,arg)
+        response = commands[sub_cmd](sub_cmd,arg)
+        if isinstance(response, tuple):
+            if response[0]:
+                save()
+            return response[1]
+    
+        return response
+
     else:
         return f"Unknown sub-command: {sub_cmd}"
 
@@ -108,38 +107,21 @@ def help_commands(*args):
         
     Project commands:
 
-        create_project <project_name>
-        select_project <project_name>
-        remove_project <project_name>
+        create_project <project_id>
+        select_project <project_id>
+        remove_project <project_id>
+        clear_project  <project_id>
         deselect_project
         list_projects
 
         -- Shortcuts --
 
-        mkprj  <project_name>
-        selprj <project_name>
-        rmprj  <project_name>
+        mkprj  <project_id>
+        selprj <project_id>
+        rmprj  <project_id>
+        cls    <project_id>
         dselprj
         lsprj
-
-        
-    Workflow commands:
-
-        create_workflow <workflow_name>
-        select_workflow <workflow_name>
-        remove_workflow <workflow_name>
-        deselect_workflow
-        list_workflows
-        finish_workflow
-
-        -- Shortcuts --
-
-        mkwf  <workflow_name>
-        selwf <workflow_name>
-        rmwf  <workflow_name>
-        dselwf
-        lswf
-        fnwf
 
         
     Block commands:
@@ -168,8 +150,12 @@ def activate_mode(*args):
     return "Mode activated."
 
 def exit_aino(*args, **kwargs):
+    save()
+    return "Exiting Aino CMD Interface. Goodbye!"
+
+def save(*args, **kwargs):
     import os
     from save_load import save_data_to_file
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_store.json')
     save_data_to_file(path)
-    return "Exiting Aino CMD Interface. Goodbye!"
+    return "Data saved."

@@ -782,7 +782,14 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
         project_id = self.request.query_params.get('project_id', None)
         if project_id:
             queryset = queryset.filter(project_id=project_id)
+        
         return queryset
+
+    def get_serializer_context(self):
+        """Pass additional context to the serializer"""
+        context = super().get_serializer_context()
+        context["return_serialized"] = self.request.query_params.get("return_serialized", "0") == "1"
+        return context
 
 
 class ProjectViewSet(viewsets.ModelViewSet):

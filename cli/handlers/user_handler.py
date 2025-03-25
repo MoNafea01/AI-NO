@@ -21,7 +21,7 @@ def handle_user_command(sub_cmd, args):
 
     if sub_cmd in commands:
         return commands[sub_cmd](*args)
-    return f"Unknown user command: {sub_cmd}"
+    return False, f"Unknown user command: {sub_cmd}"
 
 
 def create_user(username, password):
@@ -37,9 +37,9 @@ def create_user(username, password):
             data_store['admin'].append(list(data_store['users'].keys())[0])
 
         save_data_to_file(data_file_path)
-        return f"User {username} created."
+        return True, f"User {username} created."
     data_store["active_user"] = username
-    return f"User {username} already exists."
+    return False, f"User {username} already exists."
 
 
 def select_user(username, password):
@@ -47,36 +47,36 @@ def select_user(username, password):
     if username in data_store["users"] and data_store["users"][username]["password"] == password:
         data_store["active_user"] = username
 
-        return f"User {username} selected."
-    return "Invalid username or password."
+        return True, f"User {username} selected."
+    return False, "Invalid username or password."
 
 
 def remove_user(username):
     data_store = get_data_store()
     if not is_sudo():
-        return "You must be an admin to remove users."
+        return False, "You must be an admin to remove users."
     if username in data_store["users"]:
         del data_store["users"][username]
         if username in data_store["admin"]:
             data_store["admin"].remove(username)
 
-        if len(data_store['users'].keys()) == 1:
+        if len(data_store['users'].keys()) == 1 and len(data_store['admin']) == 0:
             data_store['admin'].append(list(data_store['users'].keys())[0])
             
         save_data_to_file(data_file_path)
-        return f"User {username} removed."
-    return "User does not exist."
+        return True, f"User {username} removed."
+    return False, "User does not exist."
 
 
 def make_admin(username):
     data_store = get_data_store()
     if not is_sudo():
-        return "You must be an admin to make users admins."
+        return False, "You must be an admin to make other users admins."
     if username in data_store["users"]:
         data_store["admin"].append(username)
         save_data_to_file(data_file_path)
-        return f"User {username} is now an admin."
-    return "User does not exist."
+        return True, f"User {username} is now an admin."
+    return False, "User does not exist."
 
 
 def is_sudo():
@@ -92,12 +92,10 @@ def get_recent():
         json_data = json.load(json_file)
     active_user = json_data['active_user']
     active_project = json_data['active_project']
-    active_workflow = json_data['active_workflow']
-    # if active_project == '':
-    #     return "No recent projects"
-    if not (active_user or active_project or active_workflow):
+
+    if not (active_user or active_project):
         load_backup_data()
-        return "Loaded Backup Data..."
+        return True, "Loaded Backup Data..."
     set_data_store(json_data)
-    recent_workflow = get_data_store()['active_workflow']
-    return recent_workflow
+    recent_project = get_data_store()['active_project']
+    return True, recent_project

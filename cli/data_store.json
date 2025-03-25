@@ -3,88 +3,39 @@
         "admin": {
             "password": "admin",
             "projects": {
-                "prj1": {
-                    "workflows": {
-                        "wf1": [
-                            {
-                                "message": "Model linear_regression created",
-                                "params": {},
-                                "node_id": 2595642314336,
-                                "node_name": "linear_regression",
-                                "task": "regression",
-                                "children": [],
-                                "model_type": "linear_models"
-                            },
-                            {
-                                "message": "Model linear_regression created",
-                                "params": {},
-                                "node_id": 2595637566624,
-                                "node_name": "linear_regression",
-                                "task": "regression",
-                                "children": [],
-                                "model_type": "linear_models"
-                            },
-                            {
-                                "message": "Model linear_regression created",
-                                "params": {},
-                                "node_id": 1987267858880,
-                                "node_name": "linear_regression",
-                                "task": "regression",
-                                "children": [],
-                                "node_type": "linear_models"
-                            },
-                            {
-                                "message": "Model linear_regression created",
-                                "params": {},
-                                "node_id": 2999333934704,
-                                "node_name": "linear_regression",
-                                "task": "regression",
-                                "children": [],
-                                "node_type": "linear_models"
-                            },
-                            {
-                                "message": "data loaded: iris",
-                                "params": {},
-                                "node_id": 2999334309760,
-                                "node_name": "data_loader",
-                                "task": "load_data",
-                                "children": [
-                                    2999334012176,
-                                    2999334012080
-                                ],
-                                "node_type": "loader",
-                                "project_id": null
-                            },
-                            {
-                                "message": "Model fitted",
-                                "params": {
-                                    "coef_": [
-                                        [
-                                            -0.11190585392686349,
-                                            -0.0400794864949342,
-                                            0.22864502724212335,
-                                            0.6092520541197894
-                                        ]
-                                    ],
-                                    "intercept_": [
-                                        0.18649524720624988
-                                    ]
-                                },
-                                "node_id": 2999311676528,
-                                "node_name": "model_fitter",
-                                "children": [],
-                                "node_type": "fitter",
-                                "task": "fit_model"
-                            }
-                        ]
+                "1": [
+                    {
+                        "message": "Model logistic_regression created",
+                        "params": {
+                            "penalty": "l2",
+                            "C": 1.0
+                        },
+                        "node_id": 2366711024000,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "node_type": "linear_models",
+                        "project_id": "1"
+                    },
+                    {
+                        "message": "data loaded: iris",
+                        "params": {},
+                        "node_id": 2366733559104,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            2366705434416,
+                            2366705432208
+                        ],
+                        "node_type": "loader",
+                        "project_id": "1"
                     }
-                }
+                ]
             }
         }
     },
     "active_user": "admin",
-    "active_project": "prj1",
-    "active_workflow": "wf1",
+    "active_project": "1",
     "admin": [
         "admin"
     ]
