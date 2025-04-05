@@ -56,7 +56,7 @@ class Transform(BaseNode):
             payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', 
                                                    node_type='transformer', project_id=self.project_id)
             
-            NodeSaver()(payload, "core/nodes/saved/data")
+            NodeSaver()(payload, "core/nodes/saved/preprocessing")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

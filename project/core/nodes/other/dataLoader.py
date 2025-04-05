@@ -90,7 +90,7 @@ class DataLoader:
         
         payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
         for i in range(3):
-            NodeSaver()(payload[i], path="core/nodes/saved/data")
+            NodeSaver()(payload[i], path="core/nodes/saved/other")
             payload[i].pop("node_data", None)
         
         return payload

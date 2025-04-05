@@ -1,6 +1,6 @@
 import joblib
-from io import BytesIO
 import base64
+from io import BytesIO
 from ai_operations.models import Node, Component
 from django.core.exceptions import ObjectDoesNotExist
 from ..nodes.utils import NodeDirectoryManager, NodeNameHandler, DirectoryManager
@@ -21,14 +21,13 @@ Loading(from db):
 """
 
 
-MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter"]
-SPECIAL_CASE_NODES = ["fitter_transformer"]
+MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
 PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer"]
 
 MODELS_TASKS = ["regression", "classification", "fit_model", "predict", "evaluate"]
 PREPROCESSORS = ["preprocessing", "fit_preprocessor", "transform", "fit_transform"]
 LAYERS = ["neural_network"]
-DATA_NODES = ["load_data", "split","join"]
+DATA_NODES = ["load_data", "split", "join"]
 
 class NodeSaver:
     """
@@ -58,52 +57,41 @@ class NodeSaver:
         task = payload.get('task', "general")
         node_type = payload.get('node_type', "general")
         children = payload.get("children", [])
-        project_id = payload.get('project_id')  # Get project_id from payload
+        project_id = payload.get('project_id')
         
-        # save to path
+        # Save to file system and get path
+        node_path = None
         if path:
-            path = f"{path}\\{node_name}_{node_id}.pkl"
-            nodes_dir = os.path.dirname(path)
+            node_path = f"{path}/{node_name}_{node_id}.pkl"
+            nodes_dir = os.path.dirname(node_path)
             DirectoryManager.make_dirs(nodes_dir)
-            joblib.dump(node, path)
+            joblib.dump(node, node_path)
 
-        """
-        Saving(to db):  
-            Object     -> I/O Object | dump it into IO buffer using joblib
-            I/O Object -> Binary     | read buffer
-            Binary     -> DB         | save method
-        """
-
-        # Prepare node_data
-        buffer = BytesIO()          # create an object
-        joblib.dump(node, buffer)   # save data into buffer
-        buffer.seek(0)              # go to the start of the buffer
-        node_bytes = buffer.read()  # read buffer (convert it into binary)
-
-        # Save to database with project_id
+        # Save to database with file path instead of binary data
         Node.objects.update_or_create(
             node_id=node_id,
             defaults={
                 'node_name': node_name,
                 'message': message,
-                "node_data": node_bytes,
+                "node_data": node_path,  # Store the path instead of binary data
                 'params': params,
                 'task': task,
                 'node_type': node_type,
                 'children': children,
-                'project_id': project_id  # Add project_id to the defaults
+                'project_id': project_id
             }
         )
-        # returns node_saver payload for preview
-        return {"message": f"Node {node_name} saved.",
-                "node_id": node_id,
-                "node_name": "node_saver",
-                "params": {},
-                "task": "save",
-                "node_type": "saver",
-                "children": children,
-                "project_id": project_id
-                }
+        
+        return {
+            "message": f"Node {node_name} saved.",
+            "node_id": node_id,
+            "node_name": "node_saver",
+            "params": {},
+            "task": "save",
+            "node_type": "saver",
+            "children": children,
+            "project_id": project_id
+        }
 
 
 
@@ -149,37 +137,28 @@ class NodeLoader:
             raise ValueError("Either node_id or path must be provided.")
         
         try:
-
-            if isinstance(path, str):
+            # Load from path if provided
+            if path:
                 try:
-                    # Loading node from a path using joblib (We have used pkl format for nodes saving)
                     node_data = joblib.load(path)
-                    # node_data now is loaded, we need to get its name, and id to create a payload for it
-                    # payload isn't a necessary thing, but we use it to identify a node
                     node_name, node_id = NodeNameHandler.handle_name(path)
                     return self.build_payload(node_data, node_name, node_id, path)
-                
                 except Exception as e:
                     raise ValueError(f"Error loading node from path: {e}")
-                
-            """
-            Loading(from db):                
-                DB         -> Binary     | get method
-                Binary     -> I/O Object | pass it to BytesIO
-                I/O Object -> Object     | load it using joblib
-            """  
 
-            # load the node from database
+            path = None
+            # Load from database if no path provided
             node_entry = Node.objects.get(node_id=node_id)
-            node_data = node_entry.node_data    # get the binary node_data
-            buffer = BytesIO(node_data)         # return an I/O object to buffer variable
-            node_name = node_entry.node_name    # get the node_name, we will need it for payload
-            # load the object whatever it is through joblib
-            return self.build_payload(joblib.load(buffer), node_name, node_id, path)
+            node_path = node_entry.node_data  # Get the stored path
+            if node_path and os.path.exists(node_path):
+                node_data = joblib.load(node_path)
+            else:
+                raise ValueError(f"Node data file not found at path: {node_path}")
+                
+            return self.build_payload(node_data, node_entry.node_name, node_id, path)
         
         except ObjectDoesNotExist:
             raise ValueError(f"Node with node_id {node_id} does not exist.")
-        
         except Exception as e:
             raise ValueError(f"Error loading node: {e}")
     
@@ -196,24 +175,24 @@ class NodeLoader:
                 "children": [],
             }
         
-        if self.from_db: # returns node information
-            payload = Node.objects.filter(node_id = node_id).values().first()
-            payload.pop("created_at", None), payload.pop("updated_at", None) # removed them to avoid time-date serialization error occured
-            """
-            from_db must be True to return node_data as binary
-            """
-            if self.return_bytes: # retrieve binaries for node, it should be True & from_db=True
-                node_data = payload.pop("node_data")
+        if self.from_db:
+            payload = Node.objects.filter(node_id=node_id).values().first()
+            payload.pop("created_at", None)
+            payload.pop("updated_at", None)
 
         if self.return_serialized:
-            # this function makes sure that node_data is a binary data, if not then get it
-            # from database as we want to serialize it
-            if not isinstance(node_data, bytes):
-                node_data = Node.objects.filter(node_id = node_id).values().first().pop("node_data")
+            if path:
+                if os.path.exists(path):
+                    with open(path, 'rb') as f:
+                        node_data = f.read()
+            else:
+                buffer = BytesIO()
+                joblib.dump(node_data, buffer)
+                buffer.seek(0)
+                node_data = buffer.read()
             node_data = base64.b64encode(node_data).decode()
         
         payload.update({"node_data": node_data})
-
         return payload
 
 
@@ -224,23 +203,14 @@ class NodeDeleter:
     (no initialization) 
     ## Args:    
     - node_id (int) : id for node from database   
-    - is_special_case (bool) : for nodes have files in distinguished directories   
     - is_multiple_channel (bool) : for nodes haved multiple files at same directory   
     ## Description:
-    To delete a node, it's an easy task if the data is saved in database only,  
-    but our software also saves it into a backup folder organized   
-    into 3 main categories: {models, preprocessors, data},  
-    so our task is much harder we need to identify if this node saves its   
-    files into multiple directories (special_case), and identify if it saves    
-    multiple files or not (multiple_channel) 
+    To delete a node and its dependencies from the database and filesystem.
     ## Returns: 
     success message
     """
 
-    def __init__(self, is_special_case : bool = False, 
-                 is_multi_channel :bool = False):
-        
-        self.is_special_case = is_special_case
+    def __init__(self, is_multi_channel :bool = False):
         self.is_multi_channel = is_multi_channel
 
     def __call__(
@@ -250,38 +220,20 @@ class NodeDeleter:
 
         if not node_id:
             raise ValueError("Node ID must be provided.")
-        # make sure that node_id is integer
         
         node_id = int(node_id) if node_id else None
         try:
-            
             node = Node.objects.get(node_id=node_id) # get node from database
-            node_name = node.node_name               # get its name
-            
-            # define the folder that node is saved into
-            folder = get_folder_by_task(node.task)
-            # delete node from folder and db
 
-            # if we have our node files in multiple directories, then we will try to delete it
-            folders = None
             if self.is_multi_channel:
-                folders = ['data', 'data']
-            elif self.is_special_case:
-                folders = ['data', 'preprocessors']
-
-            if folders:
-                old_node = Node.objects.filter(node_id = node_id)
-                children = old_node.values().first().get("children")
+                old_node = Node.objects.get(node_id = node_id)
+                children = old_node.children
                 if children:
-                    for folder in folders:
-                        for value in children:
-                            child = Node.objects.filter(node_id = value)
-                            delete_node_file(node_name, value, folder)
-                            if child.exists():
-                                child.delete()
+                    for value in children:
+                        child = Node.objects.get(node_id = value)
+                        delete_node(child)
 
-            delete_node_file(node_name, node_id, folder)
-            node.delete()
+            delete_node(node)
 
             return True, f"Node {node_id} deleted."
         except ObjectDoesNotExist:
@@ -316,48 +268,33 @@ class NodeUpdater:
         try:
             # take the <old> node (by its id)
             node = Node.objects.get(node_id=node_id)
-            new_task = payload.get('task', node.task)   # get new node's task
-            folder = get_folder_by_task(new_task)       # determine its folder
-            
-            # get new node's path
-            folder_path = NodeDirectoryManager.get_nodes_dir(folder)
+            folder_path = os.path.dirname(node.node_data)
             original_id = payload.get("node_id") # id for new node
             
-            # next section for nodes with multiple directiories
-            folders = None
-            payload["node_data"] = []
             is_multi_channel = node.node_name in MULTI_CHANNEL_NODES
-            is_special_case = node.node_name in SPECIAL_CASE_NODES
-            
-            if is_multi_channel:
-                folders = ['data', 'data']
-            elif is_special_case:
-                folders = ['preprocessors', 'data']
-            else:
-                payload["node_data"] = NodeDataExtractor()(original_id)
+            payload["node_data"] = NodeDataExtractor()(original_id)
 
-            if folders:
+            if is_multi_channel:
+                payload["node_data"] = []
+                configs = []
+
                 o_ids = payload.get("children")
                 new_ids = node.children
-                configs = []
+
                 for o_id in o_ids:
                     config = NodeLoader()(o_id)
-                    config.pop("node_id"), config.pop("node_data")
                     configs.append(config)
 
-                for i, f in enumerate(folders):
-                    f_path = NodeDirectoryManager.get_nodes_dir(f)
+                for i in range(2):
                     tmp_id = o_ids[i]
                     new_id = new_ids[i]
                     data = NodeDataExtractor()(tmp_id)
                     
                     new_payload = payload.copy()
-                    new_payload["node_id"] = new_id
-                    new_payload["node_data"] = data
                     new_payload.update(**configs[i])
+                    new_payload.update({"node_id":new_id, "node_data": data})
                     payload["node_data"].append(data)
-                    NodeSaver()(new_payload, path=f_path)
-                    NodeDeleter()(tmp_id)
+                    NodeSaver()(new_payload, path=folder_path)
             
             # now we assign the old node's id for the new node so it takes same identifier
             payload["node_id"] = node_id
@@ -365,11 +302,13 @@ class NodeUpdater:
                 payload['children'] = node.children
                 
             NodeSaver()(payload, path=folder_path)
-            NodeDeleter(is_special_case, is_multi_channel)(original_id)
+            NodeDeleter(is_multi_channel)(original_id)
             
             # this part to delete node if its name isn't same as new one's name
             if node.node_name != payload.get("node_name"):
-                delete_node_file(node.node_name, node.node_id, folder)
+                node_path = node.node_data
+                if os.path.exists(node_path):
+                    os.remove(node_path)
 
             # serialization part
             node_data = NodeDataExtractor(return_serialized=self.return_serialized)(node_id)
@@ -407,19 +346,17 @@ class ClearAllNodes:
             return False, f"Error clearing nodes: {e}"
 
 
-def delete_node_file(node_name, node_id, folder):
-    """
-    Deletes a single node file from the folder if it exists.
-    """
-    node_path = os.path.join(NodeDirectoryManager.get_nodes_dir(folder), f"{node_name}_{node_id}.pkl")
+def delete_node(node: Node):
+    node_path = node.node_data
     if os.path.exists(node_path):
         os.remove(node_path)
+    node.delete()
 
 def get_folder_by_task(task):
-    return "models" if task in MODELS_TASKS else (
-        "preprocessors" if task in PREPROCESSORS else (
-            "nn" if task in LAYERS else (
-                "data" if task in DATA_NODES else "other"
+    return "model" if task in MODELS_TASKS else (
+        "preprocessoring" if task in PREPROCESSORS else (
+            "nets" if task in LAYERS else (
+                "other" if task in DATA_NODES else "other"
                 )
             )
         )

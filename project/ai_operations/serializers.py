@@ -248,15 +248,17 @@ class NodeSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Customize serialization to convert binary data to Base64"""
         representation = super().to_representation(instance)
-        if hasattr(instance, 'node_data') and instance.node_data:
-            representation["node_data"] = base64.b64encode(instance.node_data).decode()
+        return_serialized = self.context.get('return_serialized', False)
+        if return_serialized:
+            if hasattr(instance, 'node_data') and instance.node_data:
+                with open(instance.node_data, 'rb') as f:
+                    node_data = f.read()
+                representation["node_data"] = base64.b64encode(node_data).decode()    
+        else:
+            representation["node_data"] = instance.node_data if isinstance(instance.node_data, str) else None     
             
         representation.pop('created_at', None)
         representation.pop('updated_at', None)
-
-        return_serialized = self.context.get('return_serialized', False)
-        if not return_serialized:
-            representation.pop('node_data', None) 
 
         return representation
 

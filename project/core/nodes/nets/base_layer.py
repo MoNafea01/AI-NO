@@ -47,7 +47,7 @@ class BaseLayer(BaseNode):
             if hasattr(self, 'project_id') and self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, path=f"core\\nodes\\saved\\nn")
+            NodeSaver()(payload, path=f"core/nodes/saved/nets")
             payload.pop("node_data", None)
             return payload
         

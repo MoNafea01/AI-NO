@@ -58,7 +58,7 @@ class Fit(BaseNode):
             payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", 
                                                    node_type="fitter", task="fit_preprocessor", project_id=self.project_id)
             
-            NodeSaver()(payload, "core/nodes/saved/preprocessors")
+            NodeSaver()(payload, "core/nodes/saved/preprocessing")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

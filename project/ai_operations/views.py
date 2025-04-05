@@ -97,12 +97,11 @@ class NodeQueryMixin:
                               status=status.HTTP_400_BAD_REQUEST)
                 
             node_name = node.get('node_name')
-            is_multi_channel = node_name in ["data_loader", "train_test_split", "splitter"]
-            is_special_case = node_name in ['fitter_transformer']
+            is_multi_channel = node_name in ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
             if not node_id:
                 return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
             try:
-                success, message = NodeDeleter(is_special_case, is_multi_channel)(node_id)
+                success, message = NodeDeleter(is_multi_channel)(node_id)
                 if success:
                     return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
                 else:

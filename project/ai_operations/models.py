@@ -15,7 +15,7 @@ class Node(models.Model):
     node_id = models.BigIntegerField(primary_key=True)
     node_name = models.CharField(max_length=255)
     message = models.CharField(max_length=255, default="Done")
-    node_data = models.BinaryField(null=True, blank=True)
+    node_data = models.CharField(max_length=500, null=True, blank=True)
     params = models.JSONField(default=dict)
     task = models.CharField(max_length=255,default='general')
     node_type = models.CharField(max_length=255, default="general")

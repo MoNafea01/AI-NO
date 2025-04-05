@@ -20,7 +20,7 @@ class Evaluator(BaseNode):
             payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate")
             if self.project_id:
                 payload['project_id'] = self.project_id
-            NodeSaver()(payload, "core/nodes/saved/data")
+            NodeSaver()(payload, "core/nodes/saved/model")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

@@ -62,7 +62,7 @@ class Fit(BaseNode):
             if self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, "core/nodes/saved/models")
+            NodeSaver()(payload, "core/nodes/saved/model")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

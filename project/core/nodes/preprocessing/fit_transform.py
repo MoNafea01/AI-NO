@@ -60,14 +60,13 @@ class FitTransform:
             
             names = ["Fitted Preprocessor", "Transformed Data"]
             tasks = ["fit_preprocessor", "transform"]
-            directories = ["preprocessors", "preprocessors", "data"]
             for i in range(1, 3):
                 payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [fitted_preprocessor, output][i-1], "fitter_transformer",
                                                              node_type="fitter_transformer", task=tasks[i-1], project_id=self.project_id))
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
-                NodeSaver()(payload[i], f"core/nodes/saved/{directories[i]}")
+                NodeSaver()(payload[i], f"core/nodes/saved/preprocessing")
                 payload[i].pop("node_data", None)
 
             return payload

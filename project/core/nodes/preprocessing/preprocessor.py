@@ -47,7 +47,7 @@ class Preprocessor(BaseNode):
         return self.preprocessor_name
 
     def get_folder(self):
-        return "preprocessors"
+        return "preprocessing"
     
     @property
     def get_type(self):

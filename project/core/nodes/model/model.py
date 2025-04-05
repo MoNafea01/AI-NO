@@ -58,4 +58,4 @@ class Model(BaseNode):
         return self.model_type, self.task
 
     def get_folder(self):
-        return "models"
+        return "model"
