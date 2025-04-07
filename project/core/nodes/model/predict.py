@@ -1,7 +1,6 @@
 from .utils import PayloadBuilder
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
-from ..base_node import BaseNode
-
+from ..base_node import BaseNode, SAVING_DIR
 
 class ModelPredictor(BaseNode):
     """Handles the prediction of models."""
@@ -20,7 +19,7 @@ class ModelPredictor(BaseNode):
 
 class Predict(BaseNode):
     """Orchestrates the predicting process."""
-    def __init__(self, X, model=None, model_path=None, project_id=None):
+    def __init__(self, X, model=None, model_path=None, project_id=None, *args, **kwargs):
         self.model = model
         self.model_path = model_path
         self.X = NodeDataExtractor()(X)
@@ -57,7 +56,7 @@ class Predict(BaseNode):
             payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict')
             if self.project_id:
                 payload['project_id'] = self.project_id
-            NodeSaver()(payload, "core/nodes/saved/model")
+            NodeSaver()(payload, rf"{SAVING_DIR}\model")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

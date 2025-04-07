@@ -1,5 +1,6 @@
 from .utils import PayloadBuilder
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from core.nodes.configs.const_ import SAVING_DIR
 
 class PreprocessorFitterTransformer:
     """Handles the fitting and transformation of preprocessors."""
@@ -66,7 +67,7 @@ class FitTransform:
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
-                NodeSaver()(payload[i], f"core/nodes/saved/preprocessing")
+                NodeSaver()(payload[i], rf"{SAVING_DIR}\preprocessing")
                 payload[i].pop("node_data", None)
 
             return payload

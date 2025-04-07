@@ -1,4 +1,7 @@
 import os, re
+from ai_operations.models import Node
+from core.nodes.configs.const_ import (
+    MODELS_TASKS, PREPROCESSORS_TASKS, LAYERS, DATA_NODES, SAVING_DIR)
 
 
 class DirectoryManager:
@@ -13,16 +16,18 @@ class DirectoryManager:
 
 class NodeDirectoryManager:
     """Handles node directory paths."""
-    def __init__(self, folder_name):
-        self.folder_name = folder_name
-
     @staticmethod
-    def get_nodes_dir(folder_name=None):
-        folder = "nodes\\saved"
-        if folder_name:
-            folder = fr"nodes\saved\{folder_name}"
-        nodes_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        return os.path.join(nodes_path, folder)
+    def get_nodes_dir():
+        folder = SAVING_DIR
+        file_path = os.path.abspath(__file__)
+        nodes_path = os.path.dirname(file_path)
+        core_path = os.path.dirname(nodes_path)
+        project_path = os.path.dirname(core_path)
+        saving_path = os.path.join(project_path, folder)
+        if os.path.exists(saving_path):
+            return saving_path
+        DirectoryManager.make_dirs(saving_path)
+        return saving_path
 
 
 class NodeNameHandler:
@@ -67,3 +72,18 @@ class NodeAttributeExtractor:
                 if hasattr(atr, "tolist"):
                     attributes[attr] = atr.tolist()
         return attributes
+
+def delete_node(node: Node):
+    node_path = node.node_data
+    if os.path.exists(node_path):
+        os.remove(node_path)
+    node.delete()
+
+def get_folder_by_task(task):
+    return "model" if task in MODELS_TASKS else (
+        "preprocessoring" if task in PREPROCESSORS_TASKS else (
+            "nets" if task in LAYERS else (
+                "other" if task in DATA_NODES else "other"
+                )
+            )
+        )

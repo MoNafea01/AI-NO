@@ -3,7 +3,10 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from .utils import _requests_, _query_set_
 from django.urls import reverse
+import joblib
+import os
 
+os.environ["TESTING_ENV"] = "1"
 
 # class PipeLineTest(APITestCase):
     
@@ -254,12 +257,13 @@ class PipelineIntegrationTest(APITestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        response = self.client.get(url, query_params={"node_id":response.data.get('node_id'), "return_data":1})
+        response = self.client.get(url, query_params={"node_id":response.data.get('node_id'), "return_path":1})
         score = response.data.get('node_data')
+        score = joblib.load(score)
         self.assertIsNotNone(score)
 
         print(f"SCORE: {score*100} %") 
 
-        self.client.delete(reverse('clear_nodes'))
+        self.client.delete(reverse('clear_nodes'), query_params={"test":1})
 
-
+os.environ["TESTING_ENV"] = "0"

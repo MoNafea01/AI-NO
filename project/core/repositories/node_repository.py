@@ -4,30 +4,11 @@ from io import BytesIO
 from ai_operations.models import Node, Component
 from django.core.exceptions import ObjectDoesNotExist
 from ..nodes.utils import NodeDirectoryManager, NodeNameHandler, DirectoryManager
+from core.nodes.configs.const_ import PARENT_NODES, MULTI_CHANNEL_NODES
+from core.nodes.utils import delete_node
 import os
 
-"""
-Saving & Loading Operation:
----------------------------
-Saving(to db):  
-    Object     -> I/O Object | dump it into IO buffer using joblib
-    I/O Object -> Binary     | read buffer
-    Binary     -> DB         | save method
----------------------------                         
-Loading(from db):                
-    DB         -> Binary     | get method
-    Binary     -> I/O Object | pass it to BytesIO
-    I/O Object -> Object     | load it using joblib
-"""
 
-
-MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
-PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer"]
-
-MODELS_TASKS = ["regression", "classification", "fit_model", "predict", "evaluate"]
-PREPROCESSORS = ["preprocessing", "fit_preprocessor", "transform", "fit_transform"]
-LAYERS = ["neural_network"]
-DATA_NODES = ["load_data", "split", "join"]
 
 class NodeSaver:
     """
@@ -62,7 +43,7 @@ class NodeSaver:
         # Save to file system and get path
         node_path = None
         if path:
-            node_path = f"{path}/{node_name}_{node_id}.pkl"
+            node_path = fr"{path}\{node_name}_{node_id}.pkl"
             nodes_dir = os.path.dirname(node_path)
             DirectoryManager.make_dirs(nodes_dir)
             joblib.dump(node, node_path)
@@ -109,7 +90,7 @@ class NodeLoader:
     node payload instead) if true return node payload, else returns 
     node loader payload     
     - return_serialized (bool) : returns data as serialized version (base64)    
-    return_bytes (bool) : return node data as binary (not object)   
+    return_path (bool) : return node data as path
     ## Returns 
     Payload (dict) : with node information
     ### Example: 
@@ -121,11 +102,11 @@ class NodeLoader:
 
     def __init__(self, from_db : bool = True, 
                  return_serialized : bool = False, 
-                 return_bytes : bool = False):
+                 return_path : bool = False):
         
         self.from_db = from_db
         self.return_serialized = return_serialized
-        self.return_bytes = return_bytes
+        self.return_path = return_path
 
     def __call__(
             self, 
@@ -175,10 +156,14 @@ class NodeLoader:
                 "children": [],
             }
         
+            
         if self.from_db:
             payload = Node.objects.filter(node_id=node_id).values().first()
             payload.pop("created_at", None)
             payload.pop("updated_at", None)
+
+        if self.return_path:
+            node_data = payload.get("node_data")
 
         if self.return_serialized:
             if path:
@@ -321,6 +306,7 @@ class NodeUpdater:
             return False, f"Error updating node: {e}"
 
 
+
 class ClearAllNodes:
     """Clears all nodes from the database and filesystem."""
     def __call__(self, *args):
@@ -340,33 +326,20 @@ class ClearAllNodes:
                     file_path = os.path.join(folder_path, file)
                     if os.path.isfile(file_path):
                         os.remove(file_path)
+                os.rmdir(folder_path)
+            os.rmdir(nodes_dir)
 
             return True, "All nodes cleared."
         except Exception as e:
             return False, f"Error clearing nodes: {e}"
 
 
-def delete_node(node: Node):
-    node_path = node.node_data
-    if os.path.exists(node_path):
-        os.remove(node_path)
-    node.delete()
-
-def get_folder_by_task(task):
-    return "model" if task in MODELS_TASKS else (
-        "preprocessoring" if task in PREPROCESSORS else (
-            "nets" if task in LAYERS else (
-                "other" if task in DATA_NODES else "other"
-                )
-            )
-        )
-
 
 class NodeDataExtractor:
-    def __init__(self, from_db : bool = True, return_serialized : bool = False, return_bytes : bool = False):
+    def __init__(self, from_db : bool = True, return_serialized : bool = False, return_path : bool = False):
         self.from_db = from_db
         self.return_serialized = return_serialized
-        self.return_bytes = return_bytes
+        self.return_path = return_path
 
     def __call__(self, *args):
         return self.node_data_extract(*args)
@@ -375,15 +348,18 @@ class NodeDataExtractor:
         l = []
         for arg in args:
             if isinstance(arg, dict):
-                data = NodeLoader(self.from_db, self.return_serialized, self.return_bytes)(arg.get("node_id")).get("node_data")
+                data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg.get("node_id")).get("node_data")
                 if data is not None:
                     l.append(data)
             elif isinstance(arg, int):
-                data = NodeLoader(self.from_db, self.return_serialized, self.return_bytes)(arg).get("node_data")
+                data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg).get("node_data")
                 if data is not None:
                     l.append(data)
             elif isinstance(arg, str):
-                data = NodeLoader(from_db=False, return_serialized=self.return_serialized, return_bytes=self.return_bytes)(path=arg).get("node_data")
+                if arg.isnumeric():
+                    data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(int(arg)).get("node_data")
+                else:
+                    data = NodeLoader(from_db=False, return_serialized=self.return_serialized, return_path=self.return_path)(path=arg).get("node_data")
                 if data is not None:
                     l.append(data)
             else:

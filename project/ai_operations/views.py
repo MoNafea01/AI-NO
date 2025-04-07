@@ -4,40 +4,18 @@ from rest_framework.views import APIView, Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser
 
-from core.nodes.other.dataLoader import DataLoader
-from core.nodes.other.train_test_split import TrainTestSplit
-from core.nodes.other.custom import Joiner, Splitter
+from core.nodes import *
+from core.repositories import *
 
-from core.nodes.model.model import Model
-from core.nodes.model.fit import Fit as FitModel
-from core.nodes.model.predict import Predict
-from core.nodes.model.evaluator import Evaluator
+from core.nodes.configs.const_ import (
+    DICT_NODES, MULTI_CHANNEL_NODES
+)
 
-from core.nodes.preprocessing.preprocessor import Preprocessor
-from core.nodes.preprocessing.fit import Fit as FitPreprocessor
-from core.nodes.preprocessing.transform import Transform
-from core.nodes.preprocessing.fit_transform import FitTransform
-
-from core.nodes.nets.input_layer import InputLayer
-from core.nodes.nets.dnn_layers import DenseLayer, DropoutLayer
-from core.nodes.nets.cnn_layers import Conv2DLayer, MaxPool2DLayer
-from core.nodes.nets.flatten_layer import FlattenLayer
-from core.nodes.nets.sequential import SequentialNet
-
-
-from core.repositories.node_repository import (
-    NodeLoader, NodeSaver, 
-    NodeDeleter, NodeUpdater, ClearAllNodes,
-    get_folder_by_task, NodeDataExtractor)
+from core.nodes.utils import get_folder_by_task
 
 from .serializers import *
 import pandas as pd
 import json
-
-DICT_NODES = ['data', 'data_1', 'data_2', 
-              'X', 'y', 'model', 'y_true', 
-              'y_pred', 'preprocessor', 'prev_node', 
-              'layer', 'node']
 
 class NodeQueryMixin:
     """
@@ -48,30 +26,30 @@ class NodeQueryMixin:
         try:
             node_id = request.query_params.get("node_id")
             output = request.query_params.get('output', "0")
-            return_data = request.query_params.get('return_data', '0') == '1'
+            return_serialized = request.query_params.get('return_serialized', '0') == '1'
+            return_path = not return_serialized
             project_id = request.query_params.get('project_id')
 
             if output.isdigit() and int(output) > 0:
                 depth = int(output)
-                current_node = NodeLoader()(node_id=node_id)
+                current_node = NodeLoader(return_path=return_path)(node_id=node_id)
                 children = current_node.get("children", [])
                 if len(current_node.get("children")) > 1:
                     child_id = children[int(output) - 1] if len(children) >= int(output) else None
                     if isinstance(child_id, int):
-                        current_node = NodeLoader()(node_id=str(child_id))
+                        current_node = NodeLoader(return_path=return_path)(node_id=str(child_id))
                         node_id = str(child_id)
                 else:
                     for i in range(depth):
                         child = current_node.get("children", [])
                         if child:
                             child_id = child[0]
-                            current_node = NodeLoader()(node_id=str(child_id))
+                            current_node = NodeLoader(return_path=return_path)(node_id=str(child_id))
                         else:
                             break
                         node_id = str(current_node.get("node_id", node_id))
 
-            return_serialized = request.query_params.get('return_serialized', '0') == '1'
-            payload = NodeLoader(return_serialized=return_serialized)(node_id=node_id)
+            payload = NodeLoader(return_serialized=return_serialized, return_path=return_path)(node_id=node_id)
             
             # Filter by project_id if provided
             if project_id and payload:
@@ -79,8 +57,6 @@ class NodeQueryMixin:
                     return Response({"error": "Node does not belong to the specified project"}, 
                                   status=status.HTTP_400_BAD_REQUEST)
             
-            if not (return_serialized or return_data):
-                payload.pop("node_data", None)
             return Response(payload, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -97,7 +73,7 @@ class NodeQueryMixin:
                               status=status.HTTP_400_BAD_REQUEST)
                 
             node_name = node.get('node_name')
-            is_multi_channel = node_name in ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
+            is_multi_channel = node_name in MULTI_CHANNEL_NODES
             if not node_id:
                 return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
             try:
@@ -118,7 +94,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         """Override this method to return the appropriate serializer class."""
         raise NotImplementedError
 
-    def get_processor(self, validated_data):
+    def get_processor(self, validated_data, *args, **kwargs):
         """Override this method to return the processing class instance."""
         raise NotImplementedError
 
@@ -129,6 +105,11 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         return value
 
     def post(self, request):
+
+        output_channel = request.query_params.get('output', None)
+        return_serialized = request.query_params.get('return_serialized', '0') == '1'
+        project_id = request.query_params.get('project_id')
+
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
@@ -138,35 +119,33 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 if key in validated_data:
                     validated_data[key] = self.extract_node_id(validated_data[key])
             
-            # Add project_id from query params if available
-            project_id = request.query_params.get('project_id')
             if project_id:
                 validated_data['project_id'] = project_id
 
-            processor = self.get_processor(validated_data)
-            output_channel = request.query_params.get('output', None)
+            processor = self.get_processor(validated_data, project_id=project_id)
             
-            return_serialized = request.query_params.get('return_serialized', '0') == '1'
             response_data = processor(output_channel, return_serialized=return_serialized)
+            node_id = response_data.get("node_id")
+            response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
             return Response(response_data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
+
+        project_id = request.query_params.get('project_id')
+        node_id = request.query_params.get("node_id", None)
+        return_serialized = request.query_params.get('return_serialized', '0') == '1'
+        
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            # Add project_id from query params if available
-            project_id = request.query_params.get('project_id')
             if project_id:
                 serializer.validated_data['project_id'] = project_id
 
             processor = self.get_processor(serializer.validated_data)
-            node_id = request.query_params.get("node_id", None)
-            return_serialized = request.query_params.get('return_serialized', '0') == '1'
             success, message = NodeUpdater(return_serialized)(node_id, processor())
-            if not return_serialized:
-                message.pop("node_data", None)
+            message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
             
             status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
             return Response(message if success else {"error": message}, status=status_code)
@@ -178,12 +157,11 @@ class DataLoaderAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return DataLoaderSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return DataLoader(
             dataset_name=validated_data.get("params", {}).get("dataset_name"),
             dataset_path=validated_data.get('dataset_path'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -191,12 +169,11 @@ class TrainTestSplitAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return TrainTestSplitSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return TrainTestSplit(
             data=validated_data.get('data'),
             params=validated_data.get('params'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -204,11 +181,10 @@ class SplitterAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return SplitterSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return Splitter(
             data=validated_data.get('data'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -216,12 +192,11 @@ class JoinerAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return JoinerSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return Joiner(
             data_1=validated_data.get('data_1'), 
             data_2=validated_data.get('data_2'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -229,15 +204,14 @@ class CreateModelView(BaseNodeAPIView):
     def get_serializer_class(self):
         return ModelSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return Model(
             model_name=validated_data.get('model_name'),
             model_type=validated_data.get('model_type'),
             task=validated_data.get('task'),
             params=validated_data.get('params'),
             model_path=validated_data.get('model_path'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -245,14 +219,13 @@ class FitModelAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return FitModelSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return FitModel(
             X=validated_data.get('X'),
             y=validated_data.get('y'),
             model=validated_data.get('model'),
             model_path=validated_data.get('model_path'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -262,13 +235,12 @@ class PredictAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return PredictSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return Predict(
             X=validated_data.get('X'),
             model=validated_data.get('model'),
             model_path=validated_data.get('model_path'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -278,13 +250,12 @@ class EvaluatorAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return EvaluatorSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return Evaluator(
             metric=validated_data.get("params", {}).get('metric', {'accuracy'}),
             y_true=validated_data.get('y_true'),
             y_pred=validated_data.get('y_pred'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -294,14 +265,13 @@ class PreprocessorAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return PreprocessorSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return Preprocessor(
             preprocessor_name=validated_data.get('preprocessor_name'),
             preprocessor_type=validated_data.get('preprocessor_type'),
             params=validated_data.get('params'),
             preprocessor_path=validated_data.get('preprocessor_path'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -311,13 +281,12 @@ class FitPreprocessorAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return FitPreprocessorSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return FitPreprocessor(
             data=validated_data.get('data'),
             preprocessor=validated_data.get('preprocessor'),
             preprocessor_path=validated_data.get('preprocessor_path'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -327,13 +296,12 @@ class TransformAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return TransformSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return Transform(
             data=validated_data.get('data'),
             preprocessor=validated_data.get('preprocessor'),
             preprocessor_path=validated_data.get('preprocessor_path'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -343,13 +311,12 @@ class FitTransformAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return FitTransformSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return FitTransform(
             data=validated_data.get('data'),
             preprocessor=validated_data.get('preprocessor'),
             preprocessor_path=validated_data.get('preprocessor_path'),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -359,13 +326,12 @@ class InputAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return InputSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return InputLayer(
             shape=validated_data.get("params", {}).get("shape", (1,)),
             name=validated_data.get("name"),
             path=validated_data.get("path"),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -375,8 +341,7 @@ class Conv2DAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return Conv2DSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return Conv2DLayer(
             prev_node=validated_data.get("prev_node"),
             filters=validated_data.get("params", {}).get("filters", 32),
@@ -386,7 +351,7 @@ class Conv2DAPIView(BaseNodeAPIView):
             activation=validated_data.get("params", {}).get("activation", "relu"),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -396,8 +361,7 @@ class MaxPool2DAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return MaxPool2DSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return MaxPool2DLayer(
             prev_node=validated_data.get("prev_node"),
             pool_size=validated_data.get("params", {}).get("pool_size", [2,2]),
@@ -405,7 +369,7 @@ class MaxPool2DAPIView(BaseNodeAPIView):
             padding=validated_data.get("params", {}).get("padding", "valid"),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
-            project_id=project_id
+            *kwargs
         )
 
 
@@ -415,13 +379,12 @@ class FlattenAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return FlattenSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return FlattenLayer(
             prev_node=validated_data.get("prev_node"),
             name=validated_data.get("name"),
             path=validated_data.get("path"),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -431,15 +394,14 @@ class DenseAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return DenseSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return DenseLayer(
             prev_node=validated_data.get("prev_node"),
             units=validated_data.get("params", {}).get("units", 128),
             activation=validated_data.get("params", {}).get("activation", "relu"),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -449,14 +411,13 @@ class DropoutAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return DropoutSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return DropoutLayer(
             prev_node=validated_data.get("prev_node"),
             rate=validated_data.get("params", {}).get("rate", 0.5),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -466,13 +427,12 @@ class SequentialAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return SequentialSerializer
 
-    def get_processor(self, validated_data):
-        project_id = self.request.query_params.get('project_id')
+    def get_processor(self, validated_data, *args, **kwargs):
         return SequentialNet(
             layer=validated_data.get("layer"),
             name=validated_data.get("name"),
             path=validated_data.get("path"),
-            project_id=project_id
+            **kwargs
         )
 
 
@@ -487,13 +447,11 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         payload.update({"node_name":node.get("node_name"),
                         "project_id": project_id})
         folder = get_folder_by_task(node.get('task'))
-        NodeSaver()(payload, path=f'core/nodes/saved/{folder}')
+        NodeSaver()(payload, path=rf"{SAVING_DIR}\{folder}")
 
         # Reload the node with serialization settings
-        payload = NodeLoader(return_serialized=return_serialized)(node_id=payload.get("node_id"))
+        payload = NodeLoader(return_serialized=return_serialized, return_path= not return_serialized)(node_id=payload.get("node_id"))
 
-        if not return_serialized:
-            payload.pop("node_data", None)
         return payload
     
     def post(self, request):
@@ -524,8 +482,8 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
             
             node_id = request.query_params.get("node_id", None)
             success, message = NodeUpdater(return_serialized)(node_id, payload)
-            if not return_serialized:
-                    message.pop("node_data", None)
+
+            message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
                     
             if success:
                 return Response({"message": message}, status=status.HTTP_200_OK)
@@ -580,6 +538,8 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
 
             if return_serialized:
                 message["node_data"] = NodeDataExtractor(return_serialized=True)(message)
+            else:
+                message["node_data"] = NodeDataExtractor(return_path=True)(message)
 
             if success:
                 return Response(message, status=status.HTTP_200_OK)

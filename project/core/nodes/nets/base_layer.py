@@ -1,7 +1,6 @@
 from ...repositories.node_repository import NodeSaver, NodeLoader, NodeDataExtractor
 from .utils import PayloadBuilder
-from ..base_node import BaseNode
-
+from ..base_node import BaseNode, SAVING_DIR
 
 class BaseLayer(BaseNode):
     '''Base class for all layers.'''
@@ -47,7 +46,7 @@ class BaseLayer(BaseNode):
             if hasattr(self, 'project_id') and self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, path=f"core/nodes/saved/nets")
+            NodeSaver()(payload, path=rf"{SAVING_DIR}\nets")
             payload.pop("node_data", None)
             return payload
         

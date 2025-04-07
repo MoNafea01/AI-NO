@@ -5,7 +5,7 @@ import pandas as pd
 from ..utils import NodeNameHandler, PayloadBuilder
 from ..configs.datasets import DATASETS as datasets
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
-
+from core.nodes.configs.const_ import SAVING_DIR
 
 class BaseDataLoader:
     """Abstract base class for all data loaders."""
@@ -69,7 +69,7 @@ class DataLoaderFactory:
 
 class DataLoader:
     """Facade for loading data using different strategies."""
-    def __init__(self, dataset_name: str = None, dataset_path: str = None, project_id: int = None):
+    def __init__(self, dataset_name: str = None, dataset_path: str = None, project_id: int = None, *args, **kwargs):
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
         X, y = self.loader.load()
         self.project_id = project_id
@@ -90,7 +90,7 @@ class DataLoader:
         
         payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
         for i in range(3):
-            NodeSaver()(payload[i], path="core/nodes/saved/other")
+            NodeSaver()(payload[i], path=rf"{SAVING_DIR}\other")
             payload[i].pop("node_data", None)
         
         return payload

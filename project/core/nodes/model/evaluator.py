@@ -1,10 +1,10 @@
 from ..utils import PayloadBuilder
 from ..configs.metrics import METRICS as metrics
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
-from ..base_node import BaseNode
+from ..base_node import BaseNode, SAVING_DIR
 
 class Evaluator(BaseNode):
-    def __init__(self, metric='accuracy', y_true=None, y_pred=None, project_id=None):
+    def __init__(self, metric='accuracy', y_true=None, y_pred=None, project_id=None, *args, **kwargs):
         self.y_true, self.y_pred = NodeDataExtractor()(y_true, y_pred)
         self.metric = metric
         self.project_id=project_id
@@ -20,7 +20,7 @@ class Evaluator(BaseNode):
             payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate")
             if self.project_id:
                 payload['project_id'] = self.project_id
-            NodeSaver()(payload, "core/nodes/saved/model")
+            NodeSaver()(payload, rf"{SAVING_DIR}\model")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

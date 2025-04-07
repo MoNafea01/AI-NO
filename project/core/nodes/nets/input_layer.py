@@ -6,7 +6,7 @@ input_id = 0
 
 class InputLayer(BaseLayer):
     '''Handles input layer creation.'''
-    def __init__(self, shape: tuple, name: str = None, path: str = None, project_id: int = None):
+    def __init__(self, shape: tuple, name: str = None, path: str = None, project_id: int = None, *args, **kwargs):
         '''Initializes the Input object.'''
         self.shape = shape
         self.name = name

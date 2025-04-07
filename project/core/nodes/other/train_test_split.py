@@ -1,10 +1,10 @@
 from sklearn.model_selection import train_test_split
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 from ..utils import PayloadBuilder
-from ..base_node import BaseNode
+from ..base_node import BaseNode, SAVING_DIR
 
 class TrainTestSplit(BaseNode):
-    def __init__(self, data, params=None, project_id: int = None):
+    def __init__(self, data, params=None, project_id: int = None, *args, **kwargs):
         self.data = NodeDataExtractor()(data)
         self.params = params if params else {'test_size': 0.2, 'random_state': 42}
         self.project_id = project_id
@@ -23,7 +23,7 @@ class TrainTestSplit(BaseNode):
 
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
-                NodeSaver()(payload[i], "core/nodes/saved/other")
+                NodeSaver()(payload[i], rf"{SAVING_DIR}\other")
                 payload[i].pop("node_data", None)
 
             return payload

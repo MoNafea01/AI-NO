@@ -1,5 +1,6 @@
 from ..repositories.node_repository import NodeSaver, NodeDataExtractor
 from .utils import PayloadBuilder
+from core.nodes.configs.const_ import SAVING_DIR
 
 class BaseNode:
     '''Base class for all nodes.'''
@@ -44,7 +45,7 @@ class BaseNode:
             if hasattr(self, 'project_id') and self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, path=f"core/nodes/saved/{self.get_folder()}")
+            NodeSaver()(payload, path=rf"{SAVING_DIR}\{self.get_folder()}")
             payload.pop("node_data", None)
             return payload
         

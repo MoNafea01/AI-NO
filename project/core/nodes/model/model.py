@@ -6,7 +6,7 @@ from ..utils import NodeNameHandler
 class Model(BaseNode):
     '''Handles model creation and parameter management.'''
     def __init__(self, model_name: str, model_type: str, task: str, 
-                 params: dict = None, model_path: str = None, project_id: int = None) -> dict:
+                 params: dict = None, model_path: str = None, project_id: int = None, *args, **kwargs) -> dict:
         '''Initializes the Model object.'''
         self.model_name = model_name
         self.model_type = model_type

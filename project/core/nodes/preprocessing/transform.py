@@ -1,6 +1,6 @@
 from .utils import PayloadBuilder
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
-from ..base_node import BaseNode
+from ..base_node import BaseNode, SAVING_DIR
 
 class PreprocessorTransformer:
     """Handles the transformation of data."""
@@ -56,7 +56,7 @@ class Transform(BaseNode):
             payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', 
                                                    node_type='transformer', project_id=self.project_id)
             
-            NodeSaver()(payload, "core/nodes/saved/preprocessing")
+            NodeSaver()(payload, rf"{SAVING_DIR}\preprocessing")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

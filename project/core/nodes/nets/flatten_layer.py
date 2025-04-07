@@ -6,7 +6,7 @@ flat_id = 0
 
 class FlattenLayer(BaseLayer):
     '''Handles flatten layer creation.'''
-    def __init__(self, prev_node, path: str = None, name: str = None, project_id: int = None):
+    def __init__(self, prev_node, path: str = None, name: str = None, project_id: int = None, *args, **kwargs):
         '''Initializes the Flatten object.'''
         self.layer_path = path
         self.name = name

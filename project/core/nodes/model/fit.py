@@ -1,8 +1,7 @@
 import numpy as np
 from .utils import PayloadBuilder
 from ...repositories.node_repository import NodeSaver, NodeDataExtractor
-from ..base_node import BaseNode
-
+from ..base_node import BaseNode, SAVING_DIR
 
 class ModelFitter:
     """Handles the fitting of models."""
@@ -23,7 +22,7 @@ class ModelFitter:
 
 class Fit(BaseNode):
     """Orchestrates the fitting process."""
-    def __init__(self, X, y, model=None, model_path=None, project_id=None):
+    def __init__(self, X, y, model=None, model_path=None, project_id=None, *args, **kwargs):
         self.model = model
         self.model_path = model_path
         self.X, self.y = NodeDataExtractor()(X, y)
@@ -62,7 +61,7 @@ class Fit(BaseNode):
             if self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, "core/nodes/saved/model")
+            NodeSaver()(payload, rf"{SAVING_DIR}\model")
             payload.pop("node_data", None)
             return payload
         except Exception as e:
