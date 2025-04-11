@@ -315,19 +315,35 @@ class NodeUpdater:
 
 class ClearAllNodes:
     """Clears all nodes from the database and filesystem."""
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
+        import shutil
         try:
             for arg in args:
                 if arg == 'components':
                     Component.objects.all().delete()
                     return True, "All components cleared."
-                
+            project_id = kwargs.get("project_id")
+            if project_id:
+                project = Node.objects.filter(project_id=project_id)
+            else:
+                project = Node.objects.all()
             # deletes all objects in the Node model
-            Node.objects.all().delete()
+            nodes_paths = [node.node_data for node in project]
+            project.delete()
             nodes_dir = os.path.abspath(SAVING_DIR)
+            for node in nodes_paths:
+                abs_path = os.path.abspath(node)
+                if os.path.exists(abs_path):
+                    os.remove(abs_path)
+            
+            f_count = 0
+            for *_, files in os.walk(nodes_dir):
+                f_count += len(files)
 
-            import shutil
-            shutil.rmtree(nodes_dir, ignore_errors=True)
+            if not f_count:
+                shutil.rmtree(nodes_dir, ignore_errors=True)
+
+
 
             return True, "All nodes cleared."
         except Exception as e:

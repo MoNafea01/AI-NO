@@ -218,11 +218,11 @@ class NodeSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Decode Base64-encoded node_data before saving and handle project assignment"""
-        node_data_base64 = validated_data.pop("node_data", None)
+        node_data_base64 = validated_data["node_data"]
         project_id = validated_data.pop("project_id", None)
         
-        if node_data_base64:
-            validated_data["node_data"] = base64.b64decode(node_data_base64)
+        # if node_data_base64 :
+        #     validated_data["node_data"] = base64.b64decode(node_data_base64)
             
         if project_id:
             try:
