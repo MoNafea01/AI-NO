@@ -162,6 +162,23 @@ class SequentialSerializer(serializers.Serializer):
     def validate(self, data:dict):
         return validate(data, ('layer', 'path'))
 
+class ModelCompilerSerializer(serializers.Serializer):
+    params = serializers.JSONField(required=False, default={})
+    model = JSONOrIntField(required=False)
+    name = serializers.CharField(required=False)
+    path = serializers.CharField(required=False, allow_null=True)
+    def validate(self, data):
+        return validate(data, (('model', 'params'), 'path'))
+
+class NetModelFitterSerializer(serializers.Serializer):
+    params = serializers.JSONField(required=False, default={})
+    model = JSONOrIntField(required=False)
+    X = JSONOrIntField(required=False)
+    y = JSONOrIntField(required=False)
+    name = serializers.CharField(required=False)
+    path = serializers.CharField(required=False, allow_null=True)
+    def validate(self, data):
+        return validate(data, (('model', 'params', 'X', 'y'), 'path'))
 
 class NodeLoaderSerializer(serializers.Serializer):
     node_id = serializers.IntegerField(required=False)

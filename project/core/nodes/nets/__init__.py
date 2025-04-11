@@ -6,6 +6,8 @@ from core.nodes.nets.dnn_layers import DenseLayer, DropoutLayer
 from core.nodes.nets.cnn_layers import Conv2DLayer, MaxPool2DLayer
 from core.nodes.nets.flatten_layer import FlattenLayer
 from core.nodes.nets.sequential import SequentialNet
+from core.nodes.nets.compile import CompileModel
+from core.nodes.nets.fit import Fit as FitNet
 
 __all__ = [
     "InputLayer",
@@ -14,5 +16,7 @@ __all__ = [
     "Conv2DLayer",
     "MaxPool2DLayer",
     "FlattenLayer",
-    "SequentialNet"
+    "SequentialNet",
+    "CompileModel",
+    "FitNet"
 ]

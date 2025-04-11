@@ -50,6 +50,8 @@ urlpatterns = [
     path('maxpool2d/', MaxPool2DAPIView.as_view(), name='maxpool2d'),
     path('dropout/', DropoutAPIView.as_view(), name='dropout'),
     path('sequential/', SequentialAPIView.as_view(), name='sequential'),
+    path('compile/', ModelCompilerAPIView.as_view(), name='compile'),
+    path('fit_net/', NetModelFitterAPIView.as_view(), name='fit_net'),
     
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
 

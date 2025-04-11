@@ -3,8 +3,8 @@ import base64
 from io import BytesIO
 from ai_operations.models import Node, Component
 from django.core.exceptions import ObjectDoesNotExist
-from ..nodes.utils import NodeDirectoryManager, NodeNameHandler, DirectoryManager
-from core.nodes.configs.const_ import PARENT_NODES, MULTI_CHANNEL_NODES
+from ..nodes.utils import NodeNameHandler
+from core.nodes.configs.const_ import PARENT_NODES, MULTI_CHANNEL_NODES, SAVING_DIR
 from core.nodes.utils import delete_node
 import os
 
@@ -45,7 +45,7 @@ class NodeSaver:
         if path:
             node_path = fr"{path}\{node_name}_{node_id}.pkl"
             nodes_dir = os.path.dirname(node_path)
-            DirectoryManager.make_dirs(nodes_dir)
+            os.makedirs(nodes_dir, exist_ok=True)
             joblib.dump(node, node_path)
 
         # Save to database with file path instead of binary data
@@ -67,6 +67,7 @@ class NodeSaver:
             "message": f"Node {node_name} saved.",
             "node_id": node_id,
             "node_name": "node_saver",
+            "node_data": node_path,
             "params": {},
             "task": "save",
             "node_type": "saver",
@@ -131,10 +132,15 @@ class NodeLoader:
             # Load from database if no path provided
             node_entry = Node.objects.get(node_id=node_id)
             node_path = node_entry.node_data  # Get the stored path
-            if node_path and os.path.exists(node_path):
-                node_data = joblib.load(node_path)
-            else:
-                raise ValueError(f"Node data file not found at path: {node_path}")
+            node_data = node_path
+            try:
+                if node_path and os.path.exists(node_path):
+                    node_data = joblib.load(node_path)
+                else:
+                    print(Warning(f"Node data file not found at path: {node_path}"))
+                    
+            except Exception as e:
+                raise ValueError(f"Error loading node from path: {e}")
                 
             return self.build_payload(node_data, node_entry.node_name, node_id, path)
         
@@ -318,16 +324,10 @@ class ClearAllNodes:
                 
             # deletes all objects in the Node model
             Node.objects.all().delete()
-            nodes_dir = NodeDirectoryManager.get_nodes_dir()
+            nodes_dir = os.path.abspath(SAVING_DIR)
 
-            for folder in os.listdir(nodes_dir):
-                folder_path = os.path.join(nodes_dir, folder)
-                for file in os.listdir(folder_path):
-                    file_path = os.path.join(folder_path, file)
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                os.rmdir(folder_path)
-            os.rmdir(nodes_dir)
+            import shutil
+            shutil.rmtree(nodes_dir, ignore_errors=True)
 
             return True, "All nodes cleared."
         except Exception as e:

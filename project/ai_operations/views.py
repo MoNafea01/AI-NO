@@ -7,12 +7,6 @@ from rest_framework.parsers import MultiPartParser
 from core.nodes import *
 from core.repositories import *
 
-from core.nodes.configs.const_ import (
-    DICT_NODES, MULTI_CHANNEL_NODES
-)
-
-from core.nodes.utils import get_folder_by_task
-
 from .serializers import *
 import pandas as pd
 import json
@@ -121,7 +115,6 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             
             if project_id:
                 validated_data['project_id'] = project_id
-
             processor = self.get_processor(validated_data, project_id=project_id)
             
             response_data = processor(output_channel, return_serialized=return_serialized)
@@ -140,10 +133,11 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
+            validated_data = serializer.validated_data
             if project_id:
-                serializer.validated_data['project_id'] = project_id
+                validated_data['project_id'] = project_id
 
-            processor = self.get_processor(serializer.validated_data)
+            processor = self.get_processor(validated_data, project_id=project_id)
             success, message = NodeUpdater(return_serialized)(node_id, processor())
             message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
             
@@ -369,7 +363,7 @@ class MaxPool2DAPIView(BaseNodeAPIView):
             padding=validated_data.get("params", {}).get("padding", "valid"),
             path=validated_data.get("path"),
             name=validated_data.get("name"),
-            *kwargs
+            **kwargs
         )
 
 
@@ -435,23 +429,49 @@ class SequentialAPIView(BaseNodeAPIView):
             **kwargs
         )
 
+class ModelCompilerAPIView(BaseNodeAPIView):
+    """API view for handling model compilation."""
+
+    def get_serializer_class(self):
+        return ModelCompilerSerializer
+
+    def get_processor(self, validated_data, *args, **kwargs):
+        return CompileModel(
+            model=validated_data.get("model"),
+            optimizer=validated_data.get("params", {}).get("optimizer", "adam"),
+            loss=validated_data.get("params", {}).get("loss", "categorical_crossentropy"),
+            metrics=validated_data.get("params", {}).get("metrics", ["accuracy"]),
+            **kwargs
+        )
+
+class NetModelFitterAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return NetModelFitterSerializer
+
+    def get_processor(self, validated_data, *args, **kwargs):
+        return FitNet(
+            model=validated_data.get("model"),
+            X = validated_data.get("X"),
+            y = validated_data.get("y"),
+            batch_size = validated_data.get("params",{}).get("batch_size", 32),
+            epochs = validated_data.get("params",{}).get("epochs", 10),
+            **kwargs
+        )
 
 class NodeLoaderAPIView(APIView, NodeQueryMixin):
 
     def get_serialized_payload(self, node_id, path, return_serialized, project_id):
         """Loads a node, saves it, and optionally serializes it."""
         loader = NodeLoader(from_db=False)
-        l = NodeLoader()
         payload = loader(node_id=node_id, path=path)
-        node = l(node_id=node_id, path=path)
-        payload.update({"node_name":node.get("node_name"),
+        node_name = payload.get("message").split(" ")[1]
+        payload.update({"node_name":node_name,
                         "project_id": project_id})
-        folder = get_folder_by_task(node.get('task'))
-        NodeSaver()(payload, path=rf"{SAVING_DIR}\{folder}")
+        
+        NodeSaver()(payload, path=rf"{SAVING_DIR}\other")
 
         # Reload the node with serialization settings
         payload = NodeLoader(return_serialized=return_serialized, return_path= not return_serialized)(node_id=payload.get("node_id"))
-
         return payload
     
     def post(self, request):

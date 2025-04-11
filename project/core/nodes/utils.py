@@ -1,33 +1,7 @@
 import os, re
 from ai_operations.models import Node
 from core.nodes.configs.const_ import (
-    MODELS_TASKS, PREPROCESSORS_TASKS, LAYERS, DATA_NODES, SAVING_DIR)
-
-
-class DirectoryManager:
-    """Handles directory operations."""
-    @staticmethod
-    def make_dirs(directory):
-        try:
-            os.makedirs(directory, exist_ok=True)
-        except Exception as e:
-            print(f"Error creating directory: {e}")
-
-
-class NodeDirectoryManager:
-    """Handles node directory paths."""
-    @staticmethod
-    def get_nodes_dir():
-        folder = SAVING_DIR
-        file_path = os.path.abspath(__file__)
-        nodes_path = os.path.dirname(file_path)
-        core_path = os.path.dirname(nodes_path)
-        project_path = os.path.dirname(core_path)
-        saving_path = os.path.join(project_path, folder)
-        if os.path.exists(saving_path):
-            return saving_path
-        DirectoryManager.make_dirs(saving_path)
-        return saving_path
+    MODELS_TASKS, PREPROCESSORS_TASKS, NN_TASKS, DATA_HANDLER_TASKS, NN_NAMES, MODELS_NAMES, PREPROCESSORS_NAMES, DATA_HANDLER_NAMES)
 
 
 class NodeNameHandler:
@@ -42,6 +16,7 @@ class NodeNameHandler:
         _id = _id if _id else 0
         _name = _name.rsplit("_", 1)[0]
         return _name, int(_id)
+
 
 
 class PayloadBuilder:
@@ -61,6 +36,7 @@ class PayloadBuilder:
         return payload
 
 
+
 class NodeAttributeExtractor:
     """Extracts attributes from a node."""
     @staticmethod
@@ -73,17 +49,34 @@ class NodeAttributeExtractor:
                     attributes[attr] = atr.tolist()
         return attributes
 
+
+
+class FolderHandler:
+    """Handles folder assignment based on task or node name."""
+    @staticmethod
+    def get_folder_by_task(task):
+        return "model" if task in MODELS_TASKS else (
+            "preprocessoring" if task in PREPROCESSORS_TASKS else (
+                "nets" if task in NN_TASKS else (
+                    "other" if task in DATA_HANDLER_TASKS else "other"
+                    )
+                )
+            )
+
+    @staticmethod
+    def get_folder_by_node_name(node_name):
+        return "model" if node_name in MODELS_NAMES else (
+            "preprocessoring" if node_name in PREPROCESSORS_NAMES else (
+                "nets" if node_name in NN_NAMES else (
+                    "other" if node_name in DATA_HANDLER_NAMES else "other"
+                    )
+                )
+            )
+
+
 def delete_node(node: Node):
     node_path = node.node_data
     if os.path.exists(node_path):
         os.remove(node_path)
     node.delete()
 
-def get_folder_by_task(task):
-    return "model" if task in MODELS_TASKS else (
-        "preprocessoring" if task in PREPROCESSORS_TASKS else (
-            "nets" if task in LAYERS else (
-                "other" if task in DATA_NODES else "other"
-                )
-            )
-        )
