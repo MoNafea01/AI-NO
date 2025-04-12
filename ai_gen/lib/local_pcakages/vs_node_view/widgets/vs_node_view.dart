@@ -6,7 +6,7 @@ import '../data/vs_node_data_provider.dart';
 import 'inherited_node_data_provider.dart';
 import 'line_drawer/multi_gradiant_line_drawer.dart';
 import 'vs_context_menu.dart';
-import 'vs_node.dart';
+import 'vs_node_widget/vs_node.dart';
 import 'vs_selection_area.dart';
 
 class VSNodeView extends StatelessWidget {

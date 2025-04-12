@@ -129,9 +129,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
     });
   }
 
-  Widget _buildNodeButton(dynamic entry) {
-    final VSNodeData nodeData = entry.value(Offset(0, 0), null);
-    print(nodeData.nodeColor);
+  Widget _buildNodeButton(entry) {
     return Draggable(
       onDragEnd: (details) {
         widget.vsNodeDataProvider.createNodeFromSidebar(

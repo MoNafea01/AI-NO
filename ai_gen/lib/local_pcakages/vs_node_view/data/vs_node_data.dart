@@ -19,6 +19,7 @@ class VSNodeData {
     this.nodeColor = Colors.lightBlue,
     this.toolTip,
     String? title,
+    this.isRenaming = false,
   })  : _id = id ?? getRandomString(10),
         _title = title ?? "" {
     for (var value in inputData) {
@@ -36,6 +37,7 @@ class VSNodeData {
   String _id;
 
   final VoidCallback? deleteNode;
+  bool isRenaming = false;
 
   ///The type of this node
   ///

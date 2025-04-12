@@ -3,9 +3,9 @@ import 'package:ai_gen/features/node_view/presentation/widgets/menu_actions.dart
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 import '../cubit/grid_node_view_cubit.dart';
+import 'widgets/node_properties_widget/node_properties_card.dart';
 import 'widgets/node_selector_sidebar/node_selector_sidebar.dart';
 
 class GridNodeView extends StatefulWidget {
@@ -39,27 +39,6 @@ class _GridNodeViewState extends State<GridNodeView> {
         context.watch<GridNodeViewCubit>();
     return Scaffold(
       appBar: _appBar(),
-      // floatingActionButtonLocation: ExpandableFab.location,
-      floatingActionButton: ExpandableFab(
-        childrenOffset: const Offset(-10, -60),
-        openButtonBuilder: RotateFloatingActionButtonBuilder(
-          child: const Icon(Icons.keyboard_arrow_up),
-          fabSize: ExpandableFabSize.small,
-          foregroundColor: Colors.black,
-          backgroundColor: AppColors.secondaryBackgroundColor,
-          shape: const CircleBorder(),
-          heroTag: "Open menu",
-        ),
-        closeButtonBuilder: DefaultFloatingActionButtonBuilder(
-          child: const Icon(Icons.keyboard_arrow_down),
-          fabSize: ExpandableFabSize.small,
-          foregroundColor: Colors.black,
-          backgroundColor: AppColors.secondaryBackgroundColor,
-          shape: const CircleBorder(),
-          heroTag: "Close menu",
-        ),
-        children: const [ExpandableMenuActions()],
-      ),
       body: Stack(
         children: [
           InteractiveVSNodeView(
@@ -71,7 +50,12 @@ class _GridNodeViewState extends State<GridNodeView> {
           Positioned(
             top: 20,
             right: 20,
-            child: _outputCards(gridNodeViewCubit),
+            child: _run(gridNodeViewCubit),
+          ),
+          const Positioned(
+            top: 100,
+            right: 20,
+            child: NodeProperties(),
           ),
           Positioned(
             bottom: screenHeight / 45,
@@ -89,11 +73,11 @@ class _GridNodeViewState extends State<GridNodeView> {
     );
   }
 
-  Column _outputCards(GridNodeViewCubit gridNodeViewCubit) {
+  Column _run(GridNodeViewCubit gridNodeViewCubit) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        _evaluateButton(),
+        _runButton(),
         if (gridNodeViewCubit.results != null)
           ...gridNodeViewCubit.results!.map(
             (scopeOutput) {
@@ -137,7 +121,7 @@ class _GridNodeViewState extends State<GridNodeView> {
     );
   }
 
-  ElevatedButton _evaluateButton() {
+  ElevatedButton _runButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF4CAF4F),

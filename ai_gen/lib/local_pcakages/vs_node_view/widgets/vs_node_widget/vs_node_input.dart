@@ -1,10 +1,10 @@
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:flutter/material.dart';
 
-import '../common.dart';
-import '../data/vs_interface.dart';
-import '../data/vs_node_data_provider.dart';
-import '../special_nodes/vs_list_node.dart';
+import '../../common.dart';
+import '../../data/vs_interface.dart';
+import '../../data/vs_node_data_provider.dart';
+import '../../special_nodes/vs_list_node.dart';
 
 class VSNodeInput extends StatefulWidget {
   ///Base node input widget
@@ -12,10 +12,7 @@ class VSNodeInput extends StatefulWidget {
   ///Used in [VSNode]
   ///
   ///Uses [DragTarget] to accept [VSOutputData]
-  const VSNodeInput({
-    required this.data,
-    super.key,
-  });
+  const VSNodeInput({required this.data, super.key});
 
   final VSInputData data;
 
@@ -30,7 +27,6 @@ class _VSNodeInputState extends State<VSNodeInput> {
   @override
   void initState() {
     super.initState();
-
     updateRenderBox();
   }
 
@@ -94,9 +90,11 @@ class _VSNodeInputState extends State<VSNodeInput> {
         ),
         if (widget.data is! VsTextInputData)
           Padding(
-            // to ensure a space between the text and the input icon.
-            padding: const EdgeInsets.only(left: 24),
-            child: Text(widget.data.title),
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Text(
+              widget.data.title,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
       ],
     );

@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'standard_interfaces/vs_dynamic_interface.dart';
@@ -84,7 +85,7 @@ abstract class VSInputData extends VSInterfaceData {
     return Icon(
       icon,
       key: anchor,
-      color: interfaceColor,
+      color: AppColors.nodeInterfaceIconColor,
       size: 15,
     );
   }
@@ -145,7 +146,7 @@ abstract class VSOutputData<T> extends VSInterfaceData {
     return Icon(
       outputIcon,
       key: anchor,
-      color: interfaceColor,
+      color: AppColors.nodeInterfaceIconColor,
       size: 15,
       shadows: const [Shadow(color: Colors.black, blurRadius: .05)],
     );

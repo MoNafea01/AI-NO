@@ -14,41 +14,54 @@ class NodeView extends StatelessWidget {
       child: BlocBuilder<GridNodeViewCubit, GridNodeViewState>(
         builder: (context, state) {
           if (state is GridNodeViewLoading || state is GridNodeViewInitial) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
+            return const LoadingScreen();
+          } else if (state is NodeViewFailure) {
+            return _FailureScreen(state.errMessage);
           } else if (state is NodeViewSuccess) {
             return const GridNodeView();
-          } else if (state is NodeViewFailure) {
-            return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(state.errMessage),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 36,
-                        ),
-                      ),
-                      onPressed: () =>
-                          context.read<GridNodeViewCubit>().buildNodes(),
-                      child:
-                          const Text('Retry', style: TextStyle(fontSize: 16)),
-                    ),
-                  ],
-                ),
-              ),
-            );
           } else {
             return const Scaffold(body: SizedBox());
           }
         },
+      ),
+    );
+  }
+}
+
+class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+  }
+}
+
+class _FailureScreen extends StatelessWidget {
+  const _FailureScreen(this.errorMessage);
+
+  final String errorMessage;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(errorMessage),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 36,
+                ),
+              ),
+              onPressed: () => context.read<GridNodeViewCubit>().buildNodes(),
+              child: const Text('Retry', style: TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
       ),
     );
   }

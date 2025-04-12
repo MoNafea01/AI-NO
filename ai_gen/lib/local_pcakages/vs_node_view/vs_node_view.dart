@@ -28,5 +28,5 @@ export 'widgets/inherited_node_data_provider.dart'
     show InheritedNodeDataProvider;
 //Widgets
 export 'widgets/interactive_vs_node_view.dart' show InteractiveVSNodeView;
-export 'widgets/vs_node.dart' show VSNode;
 export 'widgets/vs_node_view.dart' show VSNodeView;
+export 'widgets/vs_node_widget/vs_node.dart' show VSNode;

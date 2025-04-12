@@ -1,9 +1,9 @@
+import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'core/di/getit_intialize.dart';
 import 'core/network/server_manager/server_manager.dart';
-import 'features/node_view/presentation/node_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,9 +87,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       scaffoldMessengerKey: scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
       title: 'AI Gen',
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-      ),
+      theme: ThemeData(scaffoldBackgroundColor: Colors.white),
       home: const NodeView(),
     );
   }
