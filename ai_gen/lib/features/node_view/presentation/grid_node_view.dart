@@ -55,7 +55,7 @@ class _GridNodeViewState extends State<GridNodeView> {
           const Positioned(
             top: 100,
             right: 20,
-            child: NodeProperties(),
+            child: ParametersWidget(),
           ),
           Positioned(
             bottom: screenHeight / 45,
