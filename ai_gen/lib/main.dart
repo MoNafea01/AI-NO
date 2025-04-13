@@ -1,4 +1,5 @@
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
+import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:window_manager/window_manager.dart';
@@ -88,7 +89,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       debugShowCheckedModeBanner: false,
       title: 'AI Gen',
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      home: const NodeView(),
+      home: const ProjectsDashboard(),
     );
   }
 }
