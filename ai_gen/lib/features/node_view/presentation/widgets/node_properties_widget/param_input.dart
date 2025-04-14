@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/models/node_model/parameter_model.dart';
 import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/node_properties_widget/param_num_input.dart';
@@ -7,36 +8,21 @@ import 'param_dropdown_menu.dart';
 import 'param_text_field.dart';
 
 class ParamInput extends StatefulWidget {
-  const ParamInput({
-    required this.paramTitle,
-    required this.defaultParamValue,
-    this.type = 0,
-    super.key,
-  });
+  const ParamInput({required this.parameter, super.key});
+  final ParameterModel parameter;
 
-  final int type;
-  final String paramTitle;
-  final dynamic defaultParamValue;
   @override
   State<ParamInput> createState() => _ParamInputState();
 }
 
 class _ParamInputState extends State<ParamInput> {
-  late dynamic defaultValue;
-
-  @override
-  void initState() {
-    defaultValue = widget.defaultParamValue;
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return IntrinsicWidth(
       child: ConstrainedBox(
         constraints: const BoxConstraints(minWidth: 200),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -61,12 +47,12 @@ class _ParamInputState extends State<ParamInput> {
   }
 
   Widget _selectParamWidget() {
-    if (widget.type == 1) {
-      return ParamDropDownMenu(value: defaultValue);
-    } else if (widget.type == 2) {
-      return ParamNumInput(value: defaultValue);
+    if (widget.parameter.type == ParameterType.string) {
+      return ParamDropDownMenu(parameter: widget.parameter);
+    } else if (widget.parameter.type == ParameterType.number) {
+      return ParamNumInput(parameter: widget.parameter);
     } else {
-      return ParamTextField(paramValue: defaultValue);
+      return ParamTextField(parameter: widget.parameter);
     }
   }
 
@@ -74,14 +60,15 @@ class _ParamInputState extends State<ParamInput> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(widget.paramTitle, style: AppTextStyles.black14w400),
+        Text(widget.parameter.name, style: AppTextStyles.black14w400),
         IconButton(
+          splashRadius: 16,
           icon: const Icon(Icons.refresh, size: 18),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {
             setState(() {
-              defaultValue = widget.defaultParamValue;
+              widget.parameter.value = widget.parameter.defaultValue;
             });
           },
         ),

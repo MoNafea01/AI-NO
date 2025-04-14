@@ -1,3 +1,5 @@
+import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/core/models/node_model/parameter_model.dart';
 import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/menu_actions.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
@@ -48,17 +50,44 @@ class _GridNodeViewState extends State<GridNodeView> {
             nodeDataProvider: nodeDataProvider,
           ),
           Positioned(
-            top: 20,
-            right: 20,
+            top: 32,
+            right: screenWidth / 100,
             child: _run(gridNodeViewCubit),
           ),
-          const Positioned(
-            top: 100,
-            right: 20,
-            child: ParametersWidget(),
+          Positioned(
+            top: 112,
+            right: screenWidth / 100,
+            child: NodePropertiesCard(
+              node: NodeModel(
+                id: 1,
+                name: 'Logistic Regression',
+                displayName: 'Logistic Regression',
+                description: 'Logistic Regression',
+                category: 'Classification',
+                type: 'Classifier',
+                task: 'Classification',
+                outputDots: [
+                  "model",
+                  "model",
+                  "model",
+                  "model",
+                ],
+                inputDots: [
+                  "model",
+                  "model",
+                  "model",
+                  "model",
+                ],
+                params: [
+                  ParameterModel(
+                      name: 'penalty', type: "str", defaultValue: 'l2'),
+                  ParameterModel(name: 'C', type: "float", defaultValue: 1.0),
+                ],
+              ),
+            ),
           ),
           Positioned(
-            bottom: screenHeight / 45,
+            bottom: screenHeight / 50,
             right: screenWidth / 100,
             child: const ExpandableMenuActions(),
           ),

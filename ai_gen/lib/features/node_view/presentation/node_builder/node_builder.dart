@@ -1,5 +1,5 @@
-import 'package:ai_gen/core/models/node_model/Params.dart';
 import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/core/models/node_model/parameter_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
@@ -120,7 +120,7 @@ class NodeBuilder {
     return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
   }
 
-  VSInputData _paramInput(Params param) {
+  VSInputData _paramInput(ParameterModel param) {
     final controller = TextEditingController(text: param.value.toString());
     controller.addListener(() => param.value = controller.text);
 
