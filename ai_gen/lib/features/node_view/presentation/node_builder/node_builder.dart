@@ -81,6 +81,7 @@ class NodeBuilder {
     return (Offset offset, VSOutputData? ref) {
       NodeModel newNode = node.copyWith();
       return VSNodeData(
+        node: newNode,
         type: newNode.name,
         title: newNode.displayName,
         nodeColor: newNode.color,
@@ -103,7 +104,7 @@ class NodeBuilder {
 
   List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      ...node.params?.map(_paramInput) ?? [],
+      // ...node.params?.map(_paramInput) ?? [],
       ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
           [],
     ];

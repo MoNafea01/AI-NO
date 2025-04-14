@@ -42,11 +42,13 @@ dependencies:
   get_it: ^8.0.3
   #for windows apps
   window_manager: ^0.4.3
+  #for loading svg assets
+  flutter_svg: ^2.0.17
 
 
   #the node view package that is localized and used in this project
   vs_node_view: ^2.1.1
-  flutter_expandable_fab: ^2.4.0
+
 
 
 

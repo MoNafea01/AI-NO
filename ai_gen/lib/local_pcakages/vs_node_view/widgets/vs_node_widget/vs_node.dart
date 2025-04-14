@@ -1,4 +1,6 @@
+import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/vs_node_data.dart';
 import '../../data/vs_node_data_provider.dart';
@@ -72,22 +74,9 @@ class _VSNodeState extends State<VSNode> {
   GestureDetector _node(BuildContext context, VSNodeDataProvider nodeProvider) {
     return GestureDetector(
       onDoubleTap: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              alignment: Alignment.centerRight,
-              title: const Text("Node"),
-              content: const Text("Node"),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Close"),
-                ),
-              ],
-            );
-          },
-        );
+        context
+            .read<GridNodeViewCubit>()
+            .updateActiveNodePropertiesCard(widget.data.node);
       },
       onSecondaryTapUp: (details) {
         showMenu(

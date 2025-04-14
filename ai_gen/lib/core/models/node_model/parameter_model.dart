@@ -2,6 +2,7 @@ enum ParameterType {
   string,
   number,
   boolean,
+  dropDownList,
 }
 
 class ParameterModel {
