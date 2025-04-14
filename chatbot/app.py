@@ -6,24 +6,20 @@ from cli.call_cli import call_script
 import gradio as gr
 
 def generate_cli(user_input, to_db, model):
-    rag_output, query, ref_keywords, mapping, data_mapping = run_pipeline(user_input, model)
+    rag_output, _, ref_keywords, mapping, data_mapping = run_pipeline(user_input, model)
     parsed_output = parse_command_list(rag_output)
     extracted_names = extract_keywords_hybrid(user_input, ref_keywords, len(parsed_output))
     extracted_args = args_extractor(extracted_names, mapping, data_mapping)
     command_list = replace_args(parsed_output, extracted_args, extracted_names, mapping)
     out = []
     for command in command_list:
+        cmd = command
         if to_db:
-            script_output = call_script(command)
-            if isinstance(script_output, dict):
-                out.append(script_output)
-            else:
-                out.append({"error": "Failed to decode JSON", "raw": script_output})
-        else:
-            out.append(command)
+            cmd = call_script(command)
 
+        out.append(cmd)
     return out
-    
+
 
 def run_app():
     with gr.Blocks(title="CLI Generator Assistant") as app:

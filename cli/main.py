@@ -10,20 +10,21 @@ def main(*args):
     # Load data
     load_data_from_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_store.json'))
     
-    if len(sys.argv) > 1:
-        # Process command-line arguments
+    if len(sys.argv) > 1:        # Process command-line arguments
         command_str = " ".join(sys.argv[1:])
         mode = True
         
         cmd_handler("recent" ,mode)
         result = cmd_handler(command_str, mode)
+        # Print result as JSON
+        response = json.dumps(result)
+        print(response)     # DON'T REMOVE this line as it's used with a subprocess
         if result:
-            # Print result as JSON
-            response = json.dumps(result)
             file_path = chatbot_path + "/logs.txt"
             with open(file_path, "a") as f:
                 f.write(response)
                 f.write('\n')
+        
         if result == "Exiting Aino CMD Interface. Goodbye!":
             return
     else:

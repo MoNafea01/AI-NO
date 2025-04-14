@@ -1,7 +1,1 @@
-"Project 5354 created."
-"Node 15234 not found."
-"Project 5354 created."
-"Error: invalid syntax (<string>, line 1)"
-"Error creating Node"
-"Error: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/projects/?project_id=123 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FC59F8FA10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"
-"Error: invalid syntax (<string>, line 1)"
+"Project 1 selected."
