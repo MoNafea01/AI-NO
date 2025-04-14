@@ -63,6 +63,7 @@ class _VSNodeState extends State<VSNode> {
       scale: 1 / nodeProvider.viewportScale,
       child: Material(
         key: key2,
+        borderRadius: BorderRadius.circular(12),
         child: _buildNodeContent(context),
       ),
     );

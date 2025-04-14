@@ -61,7 +61,7 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
 
   @override
   Widget build(BuildContext context) {
-    final firstItem = widget.data.nodeData is VSWidgetNode
+    final outputTitle = widget.data.nodeData is VSWidgetNode
         ? (widget.data.nodeData as VSWidgetNode).child
         : Text(
             widget.data.title,
@@ -71,41 +71,41 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        firstItem,
+        outputTitle,
         const SizedBox(width: 3),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: CustomPaint(
-            foregroundPainter: _buildGradientLinePainter(),
-            child: Draggable<VSOutputData>(
-              data: widget.data,
-              onDragUpdate: (details) =>
-                  updateLinePosition(details.localPosition),
-              onDragEnd: (details) => setState(() {
-                dragPos = null;
-              }),
-              onDraggableCanceled: (velocity, offset) {
-                VSNodeDataProvider.of(context).openContextMenu(
-                  position: offset,
-                  outputData: widget.data,
-                );
-              },
-              feedback: Icon(
-                widget.data.outputIcon,
-                color: widget.data.interfaceColor,
-                size: 15,
-              ),
-              child: wrapWithToolTip(
-                toolTip: widget.data.toolTip,
-                child: widget.data.getInterfaceIcon(
-                  context: context,
-                  anchor: _anchor,
-                ),
-              ),
-            ),
+        outputIcon(context),
+      ],
+    );
+  }
+
+  CustomPaint outputIcon(BuildContext context) {
+    return CustomPaint(
+      foregroundPainter: _buildGradientLinePainter(),
+      child: Draggable<VSOutputData>(
+        data: widget.data,
+        onDragUpdate: (details) => updateLinePosition(details.localPosition),
+        onDragEnd: (details) => setState(() {
+          dragPos = null;
+        }),
+        onDraggableCanceled: (velocity, offset) {
+          VSNodeDataProvider.of(context).openContextMenu(
+            position: offset,
+            outputData: widget.data,
+          );
+        },
+        feedback: Icon(
+          widget.data.outputIcon,
+          color: widget.data.interfaceColor,
+          size: 15,
+        ),
+        child: wrapWithToolTip(
+          toolTip: widget.data.toolTip,
+          child: widget.data.getInterfaceIcon(
+            context: context,
+            anchor: _anchor,
           ),
         ),
-      ],
+      ),
     );
   }
 

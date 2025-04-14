@@ -29,7 +29,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height,
-      color: AppColors.nodeViewSidebarBackgroundColor,
+      color: AppColors.grey200,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: IntrinsicWidth(
@@ -78,8 +78,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
     );
   }
 
-  Divider _divider() =>
-      const Divider(color: AppColors.nodeViewSidebarDividerColor);
+  Divider _divider() => const Divider(color: AppColors.darkGrey);
 
   void _navigateBack() {
     setState(() {
