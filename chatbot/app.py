@@ -1,6 +1,6 @@
 import os, sys
 import warnings
-os.environ['GOOGLE_API_KEY'] = "AIzaSyBCKHQ7UoeoSvlxboxUR-x4iA_nf4057YQ"
+os.environ['GOOGLE_API_KEY'] = "AIz..."
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 warnings.filterwarnings('ignore', category=DeprecationWarning)
