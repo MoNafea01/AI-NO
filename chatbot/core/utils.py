@@ -57,15 +57,8 @@ def replace_args(commands:list[str], args, names, mapper):
     c = 0
     for i, command in enumerate(commands):
         if "<args>" in command:
-            print(names)
-            print(args)
-            print(command)
             if names[c] in list(mapper.keys()):
                 commands[i] = command.replace("<args>", args[c])
                 c += 1
-            else:
-                continue
-        else:
-            continue
 
     return commands

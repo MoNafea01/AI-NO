@@ -11,7 +11,6 @@ def call_script(command, *args, **kwargs):
             capture_output=True,
             text=True,
             check=True,
-
         )
         print("Subprocess completed successfully.")
 
