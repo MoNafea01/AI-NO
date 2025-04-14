@@ -23,7 +23,7 @@ class _ExpandableMenuActionsState extends State<ExpandableMenuActions> {
       duration: const Duration(milliseconds: 200),
       padding: EdgeInsets.all(isExpanded ? 8 : 0),
       decoration: BoxDecoration(
-        color: AppColors.secondaryBackgroundColor,
+        color: AppColors.grey100,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
