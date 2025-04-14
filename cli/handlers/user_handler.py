@@ -8,14 +8,12 @@ data_file_path = path + 'data_store.json'
 def handle_user_command(sub_cmd, args):
 
     commands = {
-        "create_user": create_user,
-        "mkusr": create_user,
-        "select_user": select_user,
-        "selusr": select_user,
-        "remove_user": remove_user,
-        "rmusr": remove_user,
-        "make_admin": make_admin,
-        "mkadm": make_admin,
+        "register": create_user,        # <username> <password>
+        "login": select_user,           # <username> <password>
+        "remove_user": remove_user,     # <username>
+        "rmusr": remove_user,           # <username>
+        "make_admin": make_admin,       # <username>
+        "mkadm": make_admin,            # <username>
         'recent': get_recent
     }
 

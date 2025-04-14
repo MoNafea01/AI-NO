@@ -39,7 +39,5 @@ _requests_ = {
 }
 
 _query_set_ = {
-    'post': [{"name":"return_serialized", "values":[0, 1, 2]}],
-    'get' : [{"name":"return_serialized", "values":[0, 1, 2]}, {"name":"output", "values":[0, 1, 2]}],
-    'put' : [{"name":"return_serialized", "values":[0, 1, 2]},],
+    'get' : [{"name":"output", "values":[0, 1, 2]}]
 }

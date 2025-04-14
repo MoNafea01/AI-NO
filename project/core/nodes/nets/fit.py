@@ -41,7 +41,7 @@ class Fit(BaseNode):
         try:
             model.fit(self.X, self.y, batch_size=self.batch_size, epochs=self.epochs)
 
-            payload = PayloadBuilder.build_payload("NN_Model fitted", model, "nn_model_fitter", node_type="fitter", task="fit_model")
+            payload = PayloadBuilder.build_payload("NN fitted", model, "nn_fitter", node_type="fitter", task="fit_model")
             if self.project_id:
                 payload['project_id'] = self.project_id
 

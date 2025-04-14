@@ -162,6 +162,7 @@ class SequentialSerializer(serializers.Serializer):
     def validate(self, data:dict):
         return validate(data, ('layer', 'path'))
 
+
 class ModelCompilerSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False, default={})
     model = JSONOrIntField(required=False)
@@ -169,6 +170,7 @@ class ModelCompilerSerializer(serializers.Serializer):
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data):
         return validate(data, (('model', 'params'), 'path'))
+
 
 class NetModelFitterSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False, default={})
@@ -179,6 +181,7 @@ class NetModelFitterSerializer(serializers.Serializer):
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data):
         return validate(data, (('model', 'params', 'X', 'y'), 'path'))
+
 
 class NodeLoaderSerializer(serializers.Serializer):
     node_id = serializers.IntegerField(required=False)
@@ -218,12 +221,11 @@ class NodeSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Decode Base64-encoded node_data before saving and handle project assignment"""
-        node_data_base64 = validated_data["node_data"]
-        project_id = validated_data.pop("project_id", None)
-        
+        # node_data_base64 = validated_data.pop("node_data", None)
         # if node_data_base64 :
         #     validated_data["node_data"] = base64.b64decode(node_data_base64)
-            
+
+        project_id = validated_data.pop("project_id", None)
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
@@ -241,9 +243,9 @@ class NodeSerializer(serializers.ModelSerializer):
         """Handle node updates, including location and ports"""
         
         # Handle node_data if provided
-        node_data_base64 = validated_data.pop("node_data", None)
-        if node_data_base64:
-            validated_data["node_data"] = base64.b64decode(node_data_base64)
+        # node_data_base64 = validated_data.pop("node_data", None)
+        # if node_data_base64:
+        #     validated_data["node_data"] = base64.b64decode(node_data_base64)
         
         # Handle project_id if provided
         project_id = validated_data.pop("project_id", None)

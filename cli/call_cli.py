@@ -1,21 +1,20 @@
-import json
+import json, os
 import subprocess
-
-def call_script(command, parameters, *args):
+main_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "main.py")
+def call_script(command, parameters, *args, **kwargs):
     # Format the command string
-    command_str = f"{command} {json.dumps(parameters)}"
+    command_str = f"{command} {parameters}"
     # Here, you might call your script. For example:
     try:
         result = subprocess.run(
-            ["python", "./cli/main.py", command_str],
+            ["python", main_path, command_str],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+
         )
         print("Subprocess completed successfully.")
-        # print(result)
-        # print("STDOUT:", result.stdout)
-        # print("STDERR:", result.stderr)
+
     except subprocess.CalledProcessError as e:
         print("Subprocess failed.")
         print("Return code:", e.returncode)
@@ -32,15 +31,20 @@ def call_script(command, parameters, *args):
         response = {"error": "Failed to decode JSON", "raw": result.stdout}
     return response
 
-# Example usage:
-model_response = call_script("make model", {
-    "model_name": "logistic_regression",
-    "model_type": "linear_models",
-    "task": "classification"
-}, *["aino mode", "selusr admin admin", "selprj 1"])
-print("Model created:", model_response)
-
-data_response = call_script("make data_loader", {
-    "params":{"dataset_name": "iris"}
-})
-print("Data loaded:", data_response)
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 1:
+        command = sys.argv[1]
+        try:
+            parameters = sys.argv[2]
+        except:
+            parameters = ""
+        
+        args = ""
+        if len(sys.argv) > 3:
+            args = sys.argv[3:]
+        # print(command, parameters, args)
+        response = call_script(command, parameters, args)
+        print("Response:", response)
+    else:
+        print("No command provided.")

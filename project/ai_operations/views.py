@@ -715,16 +715,17 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
                 node_id = item.get('node_id')
                 if not node_id:
                     continue
-                    
+                
                 try:
                     instance = Node.objects.get(node_id=node_id)
                     # Update fields directly
                     for field, value in item.items():
-                        if field != 'node_id':  # Skip node_id as it shouldn't be updated
+                        if field not in ['node_id', 'project']:  # Skip node_id as it shouldn't be updated
                             setattr(instance, field, value)
                     
                     # Set project if provided in query params
-                    if project:
+                    
+                    if project and not project_id:
                         instance.project = project
                         
                     instance.save()

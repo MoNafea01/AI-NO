@@ -3,8 +3,10 @@ from save_load import load_data_from_file
 import os
 import sys
 import json
+cli_path = os.path.dirname(os.path.abspath(__file__))
 
-def main():
+chatbot_path = os.path.join(os.path.dirname(cli_path), 'chatbot')
+def main(*args):
     # Load data
     load_data_from_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_store.json'))
     
@@ -12,11 +14,17 @@ def main():
         # Process command-line arguments
         command_str = " ".join(sys.argv[1:])
         mode = True
+        
         cmd_handler("recent" ,mode)
         result = cmd_handler(command_str, mode)
         if result:
             # Print result as JSON
-            print(json.dumps(result))
+            response = json.dumps(result)
+            print(response)
+            file_path = chatbot_path + "/response.txt"
+            with open(file_path, "a") as f:
+                f.write(response)
+                f.write('\n')
         if result == "Exiting Aino CMD Interface. Goodbye!":
             return
     else:

@@ -2,10 +2,11 @@ from handlers.user_handler import handle_user_command
 from handlers.project_handler import handle_project_command
 from handlers.block_handler import handle_block_command
 import re
-create_user, select_user, remove_user, make_admin = handle_user_command, handle_user_command, handle_user_command, handle_user_command
-create_project, select_project, remove_project, deselect_project, list_projects, clear_project = handle_project_command, handle_project_command, handle_project_command, handle_project_command, handle_project_command, handle_project_command
-create_block, edit_block, remove_block, explore_block, list_blocks = handle_block_command, handle_block_command, handle_block_command, handle_block_command, handle_block_command
-get_recent = handle_user_command
+create_user, select_user, remove_user, make_admin, get_recent = (handle_user_command,) * 5
+(create_project, select_project, remove_project, deselect_project, 
+ list_projects, clear_project, get_project, load_project) = (handle_project_command,) * 8
+create_block, edit_block, remove_block, explore_block, list_blocks = (handle_block_command,) * 5
+
 def cmd_handler(command,mode=False):
     """
     Handles the command entered by the user.
@@ -43,8 +44,8 @@ def handle_sub_command(sub_cmd, args):
     takes the sub-command and the arguments as input.
     """
     commands = {
-        "create_user": create_user, "mkusr": create_user,
-        "select_user": select_user, "selusr": select_user,
+        "register": create_user,
+        "login": select_user,
         "remove_user": remove_user, "rmusr": remove_user,
         "make_admin": make_admin, "mkadm": make_admin,
 
@@ -54,12 +55,14 @@ def handle_sub_command(sub_cmd, args):
         "list_projects": list_projects, "lsprj": list_projects,
         "remove_project": remove_project, "rmprj": remove_project,
         "clear_project": clear_project, "cls": clear_project,
+        "get_project": get_project,
+        "load_project": load_project,
 
-        "make": create_block, "mkblk": create_block, 
-        "edit": edit_block, "edblk": edit_block,
-        "remove": remove_block, "rmblk": remove_block,
-        "list_blocks": list_blocks, "lsblk": list_blocks,
-        "explore": explore_block, "exblk": explore_block,
+        "make": create_block,
+        "edit": edit_block,
+        "remove": remove_block,
+        "list": list_blocks, "ls": list_blocks,
+        "show": explore_block,
 
         "recent": get_recent,
         
@@ -90,60 +93,51 @@ def help_commands(*args):
     return """
     Available commands:
 
-    User commands:
+User commands:
+	register    <user_name> <password>	// Register a new user
+	login 	    <user_name> <password>	// Login to a user 
+	remove_user <user_name>			// remove a user (you have to be admin to do that)
+	make_admin  <user_name>			// make a user as an admin (you have to be admin to do that)
 
-        create_user <user_name> <password>
-        select_user <user_name> <password>
-        remove_user <user_name>
-        make_admin  <user_name>
+	----- Shortcuts -----
 
-        -- Shortcuts --
+	rmusr  <user_name>
+	mkadm  <user_name>
 
-        mkusr  <user_name> <password>
-        selusr <user_name> <password>
-        rmusr  <user_name>
-        mkadm  <user_name>
+Project commands:
+	create_project <project_id>		// create a project
+	select_project <project_id>		// select a project
+	remove_project <project_id>		// remove a project
+	deselect_project			// deselect a project
+	list_projects				// list all projects
+	clear_project  <project_id>		// clear all nodes in a project
+    load_project   <project_id>     // loads a poject from database
+	get_project    <project_id>		// get all nodes in a project
 
-        
-    Project commands:
+	----- Shortcuts -----
 
-        create_project <project_id>
-        select_project <project_id>
-        remove_project <project_id>
-        clear_project  <project_id>
-        deselect_project
-        list_projects
-
-        -- Shortcuts --
-
-        mkprj  <project_id>
-        selprj <project_id>
-        rmprj  <project_id>
-        cls    <project_id>
-        dselprj
-        lsprj
-
-        
-    Block commands:
-
-        make    <block_name> <args>
-        edit    <block_name> <block_id> <args>
-        remove  <block_name> <block_id>
-        explore <block_name> <block_id>
-        list_blocks
-        
-        -- Shortcuts --
-
-        mkblk <block_name> <args>
-        edblk <block_name> <block_id> <args>
-        rmblk <block_name> <block_id>
-        exblk <block_name> <block_id>
-        lsblk
-        
-
-    General commands:
-        recent
-        help
+	mkprj  <project_id>
+	selprj <project_id>
+	rmprj  <project_id>
+	dselprj
+	lsprj
+	cls    <project_id>
+    
+node commands:
+	make    <node_name> <args>		// create a node
+	edit    <node_name> <node_id> <args>	// update an existing node
+	remove  <node_name> <node_id>		// remove an existing node
+	show	<node_name> <node_id>		// get a node
+	list  					// list all nodes
+    
+	----- Shortcuts -----
+	
+	ls
+    
+General commands:
+	recent					// get recent project with recent user automatically
+	help					// list all possible commands
+	exit | quit				// exit the program
     """
 
 def activate_mode(*args):

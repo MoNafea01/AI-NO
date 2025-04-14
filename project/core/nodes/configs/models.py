@@ -80,18 +80,18 @@ MODELS = {
     },
     'tree':{
         'regression':{
-                'br':{'node': BaggingRegressor,'params': {}},
-                'adr':{'node': AdaBoostRegressor,'params': {}},
-                'gbr':{'node': GradientBoostingRegressor,'params': {}},
-                'dtr':{'node': DecisionTreeRegressor,'params': {'max_depth': None,}},
-                'rfr':{'node': RandomForestRegressor,'params': {'n_estimators': 100,'max_depth': None,}},
+                'bagging_regressor':{'node': BaggingRegressor,'params': {}},
+                'adaboost_regressor':{'node': AdaBoostRegressor,'params': {}},
+                'gradient_boosting_regressor':{'node': GradientBoostingRegressor,'params': {}},
+                'decision_tree_regressor':{'node': DecisionTreeRegressor,'params': {'max_depth': None,}},
+                'random_forest_regressor':{'node': RandomForestRegressor,'params': {'n_estimators': 100,'max_depth': None,}},
             },
         'classification':{
-                'bc':{'node': BaggingClassifier,'params': {}},
-                'adc':{'node': AdaBoostClassifier,'params': {}},
-                'gbc':{'node': GradientBoostingClassifier,'params': {}},
-                'dtc':{'node': DecisionTreeClassifier,'params': {'max_depth': None,}},
-                'rfc':{'node': RandomForestClassifier,'params': {'n_estimators': 100,'max_depth': None,}},
+                'bagging_classifier':{'node': BaggingClassifier,'params': {}},
+                'adaboost_classifier':{'node': AdaBoostClassifier,'params': {}},
+                'gradient_boosting_classifier':{'node': GradientBoostingClassifier,'params': {}},
+                'decision_tree_classifier':{'node': DecisionTreeClassifier,'params': {'max_depth': None,}},
+                'random_forest_classifier':{'node': RandomForestClassifier,'params': {'n_estimators': 100,'max_depth': None,}},
             },
     },
     'naive_bayes':{
@@ -105,10 +105,10 @@ MODELS = {
     },
     'knn':{
         'regression':{
-            'knnr':{'node': KNeighborsRegressor,'params': {'n_neighbors': 5,}},
+            'knn_regressor':{'node': KNeighborsRegressor,'params': {'n_neighbors': 5,}},
             },
         'classification':{
-            'knnc':{'node': KNeighborsClassifier,'params': {'n_neighbors': 5,}},
+            'knn_classifier':{'node': KNeighborsClassifier,'params': {'n_neighbors': 5,}},
             }
     },
 }

@@ -47,8 +47,10 @@ class NodeSaver:
             nodes_dir = os.path.dirname(node_path)
             os.makedirs(nodes_dir, exist_ok=True)
             joblib.dump(node, node_path)
-
         # Save to database with file path instead of binary data
+        if node_path:
+            node_path = os.path.abspath(node_path)
+            
         Node.objects.update_or_create(
             node_id=node_id,
             defaults={

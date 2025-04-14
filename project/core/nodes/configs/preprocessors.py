@@ -36,10 +36,10 @@ PREPROCESSORS = {
         'label_binarizer':{'node': LabelBinarizer, 'params':{}},
     },
     'imputer':{
-        'knn_imputer':{'node': KNNImputer, 'params':{}},
-        'simple_imputer':{'node': SimpleImputer, 'params':{}},
+        'knn_imputer':{'node': KNNImputer, 'params':{'n_neighbors': 5}},
+        'simple_imputer':{'node': SimpleImputer, 'params':{'strategy': 'mean'}},
     },
     'binarizer':{
-        'binarizer':{'node': Binarizer, 'params':{}},
+        'binarizer':{'node': Binarizer, 'params':{'threshold': 0.5}},
     }
 }

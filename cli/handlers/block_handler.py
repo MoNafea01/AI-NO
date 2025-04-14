@@ -6,21 +6,19 @@ def handle_block_command(sub_cmd, args):
 
     args = list(map(lambda x: re.sub(r'\s+', '', x),args))
     
-    commands = {"make": create_block,       # block_name, args
-        "mkblk": create_block,              # block_name, args
+    commands = {
+        "make": create_block,               # block_name, args
         "edit": edit_block,                 # block_name, block_id, args
-        "edblk": edit_block,                # block_name, block_id, args
         "remove": remove_block,             # block_name, block_id
-        "rmblk": remove_block,              # block_name, block_id
         "explore": explore_block,           # block_name, block_id
-        "exblk": explore_block,             # block_name, block_id
-        "list_blocks": list_blocks,         # None
-        "lsblk": list_blocks,               # None
+        "show": explore_block,              # block_name, block_id
+        "list": list_blocks,                # None
+        "ls": list_blocks,                  # None
     }
     
     if sub_cmd in commands:
         return commands[sub_cmd](*args)
-    return False, f"Unknown block command: {sub_cmd}"
+    return False, f"Unknown node command: {sub_cmd}"
     
 
 def create_block(*args):
@@ -32,13 +30,13 @@ def create_block(*args):
     
     node_name = args[0]
     if node_name not in mapper:
-        return False, f"Block {node_name} not found."
+        return False, f"Node {node_name} not found in the mapper."
     query = mapper.get(node_name)
     args = eval(''.join(args[1:]))
 
     payload = send_request_to_api(args, query, project_id=project_id)
     if not isinstance(payload, dict):
-        return False, "Error creating block"
+        return False, "Error creating Node"
 
     project.append(payload)
     return explore_block(node_name, payload.get('node_id'), project_id=project_id)
@@ -54,18 +52,18 @@ def edit_block(*args):
     node_name = args[0]
     block_id = args[1]
     if node_name not in mapper:
-        return False, f"Block {node_name} not found."
+        return False, f"Node {node_name} not found in the mapper."
     
     exp, i = find_block(block_id, project)
     if not exp:
-        return False, f"Block {block_id} not found."
+        return False, f"Node {block_id} not found."
 
     query = mapper.get(node_name)
     args = eval(''.join(args[2:]))
 
     payload = send_request_to_api(args, query, method_type='put', node_id=block_id, project_id=project_id)
     if not isinstance(payload, dict):
-        return False, "Error updating block"
+        return False, "Error Updating Node"
     
     project[i] = payload
     return explore_block(node_name, block_id, project_id=project_id)
@@ -82,11 +80,11 @@ def remove_block(*args):
     block_id = args[1]
 
     if node_name not in mapper:
-        return False, f"Block {node_name} not found in mapper."
+        return False, f"Node {node_name} not found in mapper."
     
     exp, i = find_block(block_id, project)
     if not exp:
-        return False, f"Block {block_id} not found."
+        return False, f"Node {block_id} not found."
         
     query = mapper.get(node_name)
     args = []
@@ -94,11 +92,11 @@ def remove_block(*args):
     payload = send_request_to_api(args, query, method_type='delete', node_id=block_id, project_id=project_id)
     if not payload:
         project.pop(i)
-        return True, f"Block {block_id} removed."
+        return True, f"Node {block_id} removed."
     if not isinstance(payload, dict):
-        return False, "Error removing block"
+        return False, "Error Removing Node"
     
-    return False, f"Block {block_id} does not exist."
+    return False, f"Node {block_id} does not exist."
 
 def list_blocks():
     data_store = get_data_store()
@@ -108,7 +106,7 @@ def list_blocks():
     ids = [block.get('node_id') for block in project]
     names = [block.get('node_name') for block in project]
     names_ids = zip(names, ids)
-    return True, f"Blocks: \n{'\n'.join(map(str, names_ids))}"
+    return True, f"Nodes: \n{'\n'.join(map(str, names_ids))}"
 
 def explore_block(*args, **kwargs):
     data_store = get_data_store()
@@ -120,11 +118,11 @@ def explore_block(*args, **kwargs):
     block_id = args[1]
 
     if node_name not in mapper:
-        return False, f"Block {node_name} not found."
+        return False, f"Node {node_name} not found in the mapper."
     
     exp, _ = find_block(block_id, project)
     if not exp:
-        return False, f"Block {block_id} not found."
+        return False, f"Node {block_id} not found."
     
     query = mapper.get(node_name)
     args = []
@@ -134,7 +132,7 @@ def explore_block(*args, **kwargs):
         project_id = get_data_store().get("active_project")
     payload = send_request_to_api(args, query, method_type='get', node_id=block_id, project_id=project_id)
     if not isinstance(payload, dict):
-        return False, "Error getting block"
+        return False, "Error getting Node"
     
     return True, payload
 
