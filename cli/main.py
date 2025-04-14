@@ -20,8 +20,7 @@ def main(*args):
         if result:
             # Print result as JSON
             response = json.dumps(result)
-            print(response)
-            file_path = chatbot_path + "/response.txt"
+            file_path = chatbot_path + "/logs.txt"
             with open(file_path, "a") as f:
                 f.write(response)
                 f.write('\n')
