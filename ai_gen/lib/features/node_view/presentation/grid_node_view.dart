@@ -1,8 +1,11 @@
+import 'package:ai_gen/core/reusable_widgets/custom_button.dart';
 import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/themes/asset_paths.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/menu_actions.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../cubit/grid_node_view_cubit.dart';
 import 'widgets/node_properties_widget/node_properties_card.dart';
@@ -81,23 +84,29 @@ class _GridNodeViewState extends State<GridNodeView> {
       title: const Text("Project 1"),
       elevation: 1,
       shadowColor: Colors.black,
-      leading: IconButton(
-        icon: Icon(isSidebarVisible ? Icons.arrow_back : Icons.menu),
-        onPressed: () {
-          setState(() {
-            isSidebarVisible = !isSidebarVisible;
-          });
+      leading: CustomButton(
+        radius: 8,
+        child: Icon(isSidebarVisible ? Icons.arrow_back : Icons.menu),
+        onTap: () {
+          setState(() => isSidebarVisible = !isSidebarVisible);
         },
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.refresh),
-          onPressed: () => context.read<GridNodeViewCubit>().clearNodes(),
-        ),
-        const Padding(
-          padding: EdgeInsets.only(right: 32),
-          child: Icon(Icons.close),
-        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 8,
+          children: [
+            CustomButton(
+              onTap: () => context.read<GridNodeViewCubit>().clearNodes(),
+              child: SvgPicture.asset(AssetsPaths.refreshIcon, height: 18),
+            ),
+            CustomButton(
+              onTap: () => Navigator.of(context).pop(),
+              child: const Icon(Icons.close),
+            ),
+            const SizedBox(),
+          ],
+        )
       ],
     );
   }
