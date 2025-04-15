@@ -1,7 +1,9 @@
-import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
+
 import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
+import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'core/di/getit_intialize.dart';
@@ -33,7 +35,8 @@ void main() async {
     await serverManager.startServer();
   }
 
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => AuthProvider(), child: const MyApp()));
 }
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -85,15 +88,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        scaffoldMessengerKey: scaffoldMessengerKey,
-        debugShowCheckedModeBanner: false,
-        title: 'AI Gen',
-        theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-        home:SignUpScreen(),
-        
-       //  const DashboardScreen()
+      scaffoldMessengerKey: scaffoldMessengerKey,
+      debugShowCheckedModeBanner: false,
+      title: 'AI Gen',
+      theme: ThemeData(scaffoldBackgroundColor: Colors.white),
+      home: const SignupScreen(),
 
-        //const SplashScreen(),
-        );
+      //  const DashboardScreen()
+
+      //const SplashScreen(),
+    );
   }
 }

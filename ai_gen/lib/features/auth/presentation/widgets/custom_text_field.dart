@@ -1,40 +1,60 @@
+import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget {
-  final String label;
-  final TextEditingController controller;
-  final bool obscureText;
+class CustomTextField extends StatefulWidget {
+  final String hintText;
+  final IconData? suffixIcon;
+  final bool isPassword;
+  final Function(String) onChanged;
   final TextInputType keyboardType;
-  final IconData? prefixIcon;
 
   const CustomTextField({
+    required this.hintText,
+    required this.onChanged,
+    this.suffixIcon,
     super.key,
-    required this.label,
-    required this.controller,
-    this.obscureText = false,
+    this.isPassword = false,
     this.keyboardType = TextInputType.text,
-    this.prefixIcon,
   });
+
+  @override
+  State<CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white),
+      obscureText: widget.isPassword && _obscureText,
+      keyboardType: widget.keyboardType,
       decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.grey),
-        prefixIcon:
-            prefixIcon != null ? Icon(prefixIcon, color: Colors.white) : null,
-        filled: true,
-        fillColor: const Color(0xFF2D2D2D),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.bluePrimaryColor),
         ),
+        border: const OutlineInputBorder(),
+        hintText: widget.hintText,
+        suffixIcon: widget.isPassword
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: AppColors.nodeViewSidebarDividerColor,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              )
+            : widget.suffixIcon != null
+                ? Icon(
+                    widget.suffixIcon,
+                    color: AppColors.nodeViewSidebarDividerColor,
+                  )
+                : null,
       ),
+      onChanged: widget.onChanged,
     );
   }
 }
