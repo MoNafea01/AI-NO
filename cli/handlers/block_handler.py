@@ -1,6 +1,6 @@
 from data_store import get_data_store
 from handlers.mapper import mapper
-import re
+import re, json
 
 def handle_block_command(sub_cmd, args):
 
@@ -154,7 +154,9 @@ def send_request_to_api(args, query="create_model/", method_type="post", **kwarg
 
     node_id = kwargs.get("node_id", None)
     project_id = kwargs.get("project_id", None)
-    query = query + f"?project_id={project_id}"
+
+    if project_id:
+        query = query + f"?project_id={project_id}"
 
     if node_id:
         query = query + f"&node_id={node_id}"

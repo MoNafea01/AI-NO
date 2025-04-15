@@ -1,5 +1,5 @@
 from data_store import get_data_store
-from .block_handler import send_request_to_api, list_blocks
+from .block_handler import send_request_to_api
 
 def handle_project_command(sub_cmd, args):
     commands = {
@@ -31,10 +31,12 @@ def create_project(project_id):
     if not active_user:
         return False, "No user selected."
     data_store["users"][active_user]["projects"][project_id] = {}
-    data_store["active_project"] = project_id
+    if not data_store['active_project']:
+        data_store["active_project"] = project_id
+        
     response = send_request_to_api({"project_name":f"{project_id}",
                                     "project_description": f"Project number {project_id}"
-                                    }, "projects/", method_type="post", project_id=project_id)
+                                    }, "projects/", method_type="post")
     return True, f"Project {project_id} created."
 
 

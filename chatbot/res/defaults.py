@@ -1,7 +1,7 @@
 import json
 
 
-nodes = [ 'ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net', 'sgd_classifier', 
+nodes = ['ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net', 'sgd_classifier', 
  'ridge_classifier', 'logistic_regression', 'rbf_svr', 'linear_svr', 'poly_svr', 'sigmoid_svr', 
  'rbf_svc', 'linear_svc', 'poly_svc', 'sigmoid_svc', 'bagging_regressor', 'adaboost_regressor', 
  'gradient_boosting_regressor', 'decision_tree_regressor', 'random_forest_regressor', 'bagging_classifier', 
@@ -21,48 +21,17 @@ nodes = [ 'ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net'
  'input_layer', 'conv2d_layer', 'maxpool2d_layer', 'flatten_layer', 'dense_layer', 
  'dropout_layer', 'sequential_model', 'nn_model_fitter','model_compiler', 
  ]
-names = [
-    'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 
-    'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 
-    'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 'model', 
-    'model', 
-    "model_fitter", "predictor", "evaluator",
-    "preprocessor", "preprocessor", "preprocessor", "preprocessor", "preprocessor", "preprocessor", 
-    "preprocessor", "preprocessor", "preprocessor", "preprocessor", "preprocessor", "preprocessor", 
-    "preprocessor_fitter", "transformer", "fit_transformer",
-    "data_loader", "splitter", "joiner", "train_test_split",
-    "input_layer", "conv2d", "maxpool2d", "flatten", "dense", "dropout", "sequential", "fit_net", "compile_net"
+editable = [
+    'alpha', 'penalty', 'C', 'kernel', 'l1_ratio', 'n_neighbors', 'n_estimators',
+    'feature_range', 'quantile_range', 'with_mean', 'with_std', 'norm',
+    'strategy', 'threshold', 'batch_size', 'epochs', 'filters', 'kernel_size',
+    'activation', 'pool_size', 'units', 'rate', 'optimizer', 'loss',
+    'metrics', 'shape', 'test_size', 'random_state', 'dataset_name',
+    'data', 'data_1', 'data_2', 'prev_node', 'layer', 'model',
+    'X', 'y', 'y_true', 'y_pred', 'metric', 'preprocessor', "<user_name>", "<password>",
+    "<project_id>", "<node_name>", "<node_id>", "<args>"
 ]
 
-mapp = dict(zip(nodes, names))
-json.dumps(mapp, indent=4)
-with open('mapping.json', 'w') as f:
-    json.dump(mapp, f, indent=4)
-
-####################################################################################################
-
-####################################################################################################
-
-nodes = ['ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net', 'sgd_classifier', 
- 'ridge_classifier', 'logistic_regression', 'rbf_svr', 'linear_svr', 'poly_svr', 'sigmoid_svr', 
- 'rbf_svc', 'linear_svc', 'poly_svc', 'sigmoid_svc', 'bagging_regressor', 'adaboost_regressor', 
- 'gradient_boosting_regressor', 'decision_tree_regressor', 'random_forest_regressor', 'bagging_classifier', 
- 'adaboost_classifier', 'gradient_boosting_classifier', 'decision_tree_classifier', 'random_forest_classifier', 
- 'gaussian_nb', 'bernoulli_nb', 'multinomial_nb', 'knn_regressor', 'knn_classifier',
-
- 'model_fitter', 'predictor', 'evaluator', 
-
- 'maxabs_scaler', 'normalizer', 'minmax_scaler', 'robust_scaler', 
- 'standard_scaler', 'label_encoder', 'onehot_encoder', 'ordinal_encoder', 
- 'label_binarizer', 'knn_imputer', 'simple_imputer', 'binarizer',
-
- 'preprocessor_fitter', 'transformer', 'fitter_transformer', 
-
- "data_loader", "splitter", "joiner", "train_test_split",
-
- 'input_layer', 'conv2d_layer', 'maxpool2d_layer', 'flatten_layer', 'dense_layer', 
- 'dropout_layer', 'sequential_model', 'nn_fitter','model_compiler', 
- ]
 params = [
     {'model_name': 'ridge', 'task': 'regression', 'model_type': 'linear_models', 'params': {'alpha': 1.0,}},
     {'model_name': 'lasso', 'task': 'regression', 'model_type': 'linear_models', 'params': {'alpha': 1.0,}},

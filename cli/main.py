@@ -1,14 +1,10 @@
 from cmd_handler import cmd_handler
 from save_load import load_data_from_file
-import os
-import sys
-import json
-cli_path = os.path.dirname(os.path.abspath(__file__))
+from __init__ import *
 
-chatbot_path = os.path.join(os.path.dirname(cli_path), 'chatbot')
 def main(*args):
     # Load data
-    load_data_from_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_store.json'))
+    load_data_from_file(os.path.join(cli_path, 'data_store.json'))
     
     if len(sys.argv) > 1:        # Process command-line arguments
         command_str = " ".join(sys.argv[1:])

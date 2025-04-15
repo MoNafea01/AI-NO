@@ -6,6 +6,7 @@ from fuzzywuzzy import fuzz
 nlp = spacy.load("en_core_web_sm")
 name_extractor = SentenceTransformer('all-MiniLM-L6-v2')
 
+
 def extract_keywords_hybrid(user_input: str, reference_keywords, top_n, transformer_thresh=0.7, fuzzy_thresh=80):
     keyword_embeddings = name_extractor.encode(reference_keywords, convert_to_tensor=True)
     doc = nlp(user_input.lower())
@@ -33,32 +34,23 @@ def extract_keywords_hybrid(user_input: str, reference_keywords, top_n, transfor
     matched_keywords = list(filter(lambda x: x in best_match, matched_keywords))
     return matched_keywords
 
-def parse_command_list(output: str):
-    pattern = r"\[(.*?)\]"
-    matches = re.findall(pattern, output, re.DOTALL)
-    if matches:
-        output = f"[{matches[0]}]"
-    try:
-        command_list = ast.literal_eval(output.strip())
-        return command_list if isinstance(command_list, list) else [command_list]
-    except Exception as e:
-        return [f"Failed to parse list: {e}"]
 
-def args_extractor(names, mapping, data_mapping):
+def args_extractor(names, reference_keywords, data_mapping):
     result = []
     for name in names:
-        if name in mapping and name in data_mapping:
+        if name in reference_keywords and name in data_mapping:
             # node_type = mapping[name]
             args_str = json.dumps(data_mapping[name], separators=(',', ':'))
             result.append(args_str)
     return result
 
-def replace_args(commands:list[str], args, names, mapper):
+def replace_args(commands, replacements, names, reference_keywords):
+
     c = 0
     for i, command in enumerate(commands):
         if "<args>" in command:
-            if names[c] in list(mapper.keys()):
-                commands[i] = command.replace("<args>", args[c])
+            if names[c] in reference_keywords:
+                commands[i] = command.replace("<args>", replacements[c])
                 c += 1
 
     return commands

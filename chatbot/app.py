@@ -1,16 +1,18 @@
 from __init__ import *
 
 from core.rag_pipeline import run_pipeline
-from core.utils import extract_keywords_hybrid, parse_command_list, args_extractor, replace_args
+from core.utils import extract_keywords_hybrid, args_extractor, replace_args
 from cli.call_cli import call_script
 import gradio as gr
 
 def generate_cli(user_input, to_db, model):
-    rag_output, _, ref_keywords, mapping, data_mapping = run_pipeline(user_input, model)
-    parsed_output = parse_command_list(rag_output)
-    extracted_names = extract_keywords_hybrid(user_input, ref_keywords, len(parsed_output))
-    extracted_args = args_extractor(extracted_names, mapping, data_mapping)
-    command_list = replace_args(parsed_output, extracted_args, extracted_names, mapping)
+    print("User Input:   ", user_input.strip(), end='\n\n')
+    rag_output, _, ref_keywords, data_mapping = run_pipeline(user_input, model)
+    print("RAG Output:   ", rag_output, end='\n\n')
+    extracted_names = extract_keywords_hybrid(user_input, ref_keywords, len(rag_output))
+    extracted_args = args_extractor(extracted_names, ref_keywords, data_mapping)
+    command_list = replace_args(rag_output, extracted_args, extracted_names, ref_keywords)
+    print("Filled Output:", command_list, end='\n\n')
     out = []
     for command in command_list:
         cmd = command
@@ -18,6 +20,7 @@ def generate_cli(user_input, to_db, model):
             cmd = call_script(command)
 
         out.append(cmd)
+    print("Final Output: ", out)
     return out
 
 
