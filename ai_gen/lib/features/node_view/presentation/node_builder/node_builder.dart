@@ -1,4 +1,3 @@
-import 'package:ai_gen/core/models/node_model/Params.dart';
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
@@ -11,7 +10,6 @@ import 'custom_interfaces/aino_general_Interface.dart';
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
 import 'custom_interfaces/preprocessor_interface.dart';
-import 'custom_interfaces/vs_text_input_data.dart';
 
 class NodeBuilder {
   Future<List<Object>> buildNodesMenu() async {
@@ -21,7 +19,7 @@ class NodeBuilder {
     return [
       // output node
       (Offset offset, VSOutputData? ref) => VSOutputNode(
-            type: "Scope",
+            type: "Run",
             widgetOffset: offset,
             ref: ref,
           ),
@@ -81,6 +79,7 @@ class NodeBuilder {
     return (Offset offset, VSOutputData? ref) {
       NodeModel newNode = node.copyWith();
       return VSNodeData(
+        node: newNode,
         type: newNode.name,
         title: newNode.displayName,
         nodeColor: newNode.color,
@@ -103,7 +102,6 @@ class NodeBuilder {
 
   List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      ...node.params?.map(_paramInput) ?? [],
       ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
           [],
     ];
@@ -118,13 +116,6 @@ class NodeBuilder {
       return VSPreprocessorInputData(type: inputDot, initialConnection: ref);
     }
     return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
-  }
-
-  VSInputData _paramInput(Params param) {
-    final controller = TextEditingController(text: param.value.toString());
-    controller.addListener(() => param.value = controller.text);
-
-    return VsTextInputData(type: param.name, controller: controller);
   }
 
   List<VSOutputData> _buildOutputData(NodeModel node) {

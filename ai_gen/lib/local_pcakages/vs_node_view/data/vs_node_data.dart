@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:flutter/material.dart';
 
 import '../common.dart';
@@ -12,6 +13,7 @@ class VSNodeData {
     required this.widgetOffset,
     required this.inputData,
     required this.outputData,
+    this.node,
     this.deleteNode,
     String? id,
     this.nodeWidth,
@@ -29,6 +31,8 @@ class VSNodeData {
       value.nodeData = this;
     }
   }
+
+  final NodeModel? node;
 
   ///The nodes ID
   ///

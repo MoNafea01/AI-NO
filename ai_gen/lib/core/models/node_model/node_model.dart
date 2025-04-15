@@ -1,7 +1,7 @@
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
 
-import 'Params.dart';
+import 'parameter_model.dart';
 
 class NodeModel {
   num? id;
@@ -13,7 +13,7 @@ class NodeModel {
   String category;
   String type;
   String task;
-  List<Params>? params;
+  List<ParameterModel>? params;
   List<String>? inputDots;
   List<String>? outputDots;
   String? endPoint;
@@ -42,7 +42,7 @@ class NodeModel {
     String? category,
     String? type,
     String? task,
-    List<Params>? params,
+    List<ParameterModel>? params,
     List<String>? inputDots,
     List<String>? outputDots,
     String? apiCall,
@@ -73,10 +73,10 @@ class NodeModel {
     String displayName = json['displayed_name'] ?? name;
     String description = json['description'];
 
-    List<Params> params = [];
+    List<ParameterModel> params = [];
     if (json['params'] != null) {
       params = (json['params'] as List)
-          .map((e) => Params.fromJson(e as Map<String, dynamic>))
+          .map((e) => ParameterModel.fromJson(e as Map<String, dynamic>))
           .toList();
     }
 

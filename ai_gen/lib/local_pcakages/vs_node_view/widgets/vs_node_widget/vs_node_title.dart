@@ -2,40 +2,43 @@ import 'package:flutter/material.dart';
 
 import '../../common.dart';
 import '../../data/vs_node_data.dart';
-import '../../data/vs_node_data_provider.dart';
 
 enum PopupOptions { rename, delete }
 
 class VSNodeTitle extends StatefulWidget {
-  ///Base node title widget
-  ///
-  ///Used in [VSNode] to build the title
-  const VSNodeTitle({required this.data, super.key});
+  const VSNodeTitle({required this.data, this.onTitleChange, super.key});
 
   final VSNodeData data;
-
+  final VoidCallback? onTitleChange;
   @override
   State<VSNodeTitle> createState() => _VSNodeTitleState();
 }
 
 class _VSNodeTitleState extends State<VSNodeTitle> {
-  final titleController = TextEditingController();
-  final focusNode = FocusNode();
+  late final TextEditingController titleController;
+  late final FocusNode focusNode;
 
   @override
   void initState() {
     super.initState();
-    titleController.text = widget.data.title;
+    titleController = TextEditingController(text: widget.data.title);
+    focusNode = FocusNode();
+  }
+
+  @override
+  void didUpdateWidget(covariant VSNodeTitle oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.data.isRenaming) {
+        focusNode.requestFocus();
+      } else {
+        focusNode.unfocus();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.data.isRenaming) {
-      focusNode.requestFocus();
-    } else {
-      focusNode.unfocus();
-    }
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -45,21 +48,7 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
             child: GestureDetector(
               onDoubleTap: () => setState(() => widget.data.isRenaming = true),
               child: TextField(
-                contextMenuBuilder: (_, editableTextState) {
-                  return AdaptiveTextSelectionToolbar.buttonItems(
-                    anchors: editableTextState.contextMenuAnchors,
-                    buttonItems: [
-                      ContextMenuButtonItem(
-                        onPressed: () => setState(() {
-                          widget.data.isRenaming = true;
-                          editableTextState.hideToolbar();
-                        }),
-                        label: 'Rename',
-                      ),
-                      // ...editableTextState.contextMenuButtonItems,
-                    ],
-                  );
-                },
+                contextMenuBuilder: _textFieldMenuBuilder,
                 readOnly: !widget.data.isRenaming,
                 controller: titleController,
                 focusNode: focusNode,
@@ -72,44 +61,41 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
                 ),
-                onTapOutside: (event) => setState(() {
+                onChanged: (input) {
+                  widget.onTitleChange?.call();
+                },
+                onTapOutside: (event) {
                   widget.data.isRenaming = false;
                   titleController.text = widget.data.title;
-                }),
-                onSubmitted: (input) => widget.data.title = input,
+                  widget.onTitleChange?.call();
+                  setState(() {});
+                },
+                onSubmitted: (input) {
+                  widget.data.isRenaming = false;
+                  widget.data.title = input;
+                  widget.data.node?.displayName = input;
+                  widget.onTitleChange?.call();
+
+                  setState(() {});
+                },
               ),
             ),
           ),
         ),
-
-        // _buildPopupMenuButton(context),
       ],
     );
   }
 
-  PopupMenuButton<PopupOptions> _buildPopupMenuButton(BuildContext context) {
-    return PopupMenuButton<PopupOptions>(
-      tooltip: "",
-      child: const Icon(Icons.more_vert, size: 20, color: Colors.white),
-      onSelected: (value) {
-        switch (value) {
-          case PopupOptions.rename:
-            setState(() => widget.data.isRenaming = true);
-            break;
-          case PopupOptions.delete:
-            widget.data.deleteNode?.call();
-            VSNodeDataProvider.of(context).removeNodes([widget.data]);
-            break;
-        }
-      },
-      itemBuilder: (BuildContext context) => [
-        const PopupMenuItem<PopupOptions>(
-          value: PopupOptions.rename,
-          child: Text("Rename"),
-        ),
-        const PopupMenuItem<PopupOptions>(
-          value: PopupOptions.delete,
-          child: Text("Delete"),
+  Widget _textFieldMenuBuilder(_, editableTextState) {
+    return AdaptiveTextSelectionToolbar.buttonItems(
+      anchors: editableTextState.contextMenuAnchors,
+      buttonItems: [
+        ContextMenuButtonItem(
+          onPressed: () => setState(() {
+            widget.data.isRenaming = true;
+            editableTextState.hideToolbar();
+          }),
+          label: 'Rename',
         ),
       ],
     );

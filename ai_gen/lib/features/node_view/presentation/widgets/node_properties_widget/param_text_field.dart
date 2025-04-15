@@ -1,9 +1,10 @@
+import 'package:ai_gen/core/models/node_model/parameter_model.dart';
 import 'package:flutter/material.dart';
 
 class ParamTextField extends StatefulWidget {
-  ParamTextField({required this.paramValue, super.key});
+  const ParamTextField({required this.parameter, super.key});
 
-  String paramValue;
+  final ParameterModel parameter;
   @override
   State<ParamTextField> createState() => _ParamTextFieldState();
 }
@@ -12,24 +13,29 @@ class _ParamTextFieldState extends State<ParamTextField> {
   late final TextEditingController controller;
   @override
   void initState() {
-    // TODO: implement initState
-    controller = TextEditingController(text: widget.paramValue);
+    controller = TextEditingController(text: widget.parameter.value.toString());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-        isDense: true,
-        contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 32),
+      child: Center(
+        child: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          ),
+          onChanged: (value) {
+            setState(() {
+              widget.parameter.value = value;
+            });
+          },
+        ),
       ),
-      onChanged: (value) {
-        setState(() {
-          widget.paramValue = value;
-        });
-      },
     );
   }
 }
