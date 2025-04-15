@@ -26,8 +26,8 @@ class ParametersWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Parameters', style: AppTextStyles.titleGrey16Bold),
-            SizedBox(height: 4),
+            const Text('Parameters', style: AppTextStyles.textSecondary),
+            const SizedBox(height: 4),
             // ParamInput(paramTitle: 'penalty', defaultParamValue: 'l2', type: 1),
             ParamDropDownMenu(paramValue: 'l2'),
             // SizedBox(height: 10),

@@ -68,8 +68,8 @@ class _GridNodeViewState extends State<GridNodeView> {
 
   AppBar _appBar() {
     return AppBar(
-      backgroundColor: AppColors.nodeViewBackgroundColor,
-      surfaceTintColor: AppColors.nodeViewBackgroundColor,
+      backgroundColor: AppColors.grey50,
+      surfaceTintColor: AppColors.grey50,
       title: const Text("Project 1"),
       elevation: 1,
       shadowColor: Colors.black,
