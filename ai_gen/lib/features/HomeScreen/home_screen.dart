@@ -1,405 +1,585 @@
 import 'package:flutter/material.dart';
 
-class ProjectsDashboard extends StatefulWidget {
-  const ProjectsDashboard({super.key});
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
 
   @override
-  State<ProjectsDashboard> createState() => _ProjectsDashboardState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _ProjectsDashboardState extends State<ProjectsDashboard> {
-  bool _isExpanded = false; // Controls sidebar state
+class _DashboardScreenState extends State<DashboardScreen> {
+  bool isExpanded = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff2f2f2),
       body: Row(
         children: [
-          // Sidebar (Collapsible Drawer)
-          MouseRegion(
-            onEnter: (_) => setState(() => _isExpanded = true),
-            onExit: (_) => setState(() => _isExpanded = false),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: _isExpanded ? 250 : 80, // Expand width dynamically
-              decoration: const BoxDecoration(
-                color: Color(0xfff2f2f2),
-                border: Border(
-                  right: BorderSide(color: Colors.black, width: 0.7),
-                  left: BorderSide(color: Colors.black, width: 1),
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      const SidebarIconApp(
-                          iconPath: "assets/images/ProjectLogo.png"),
-                      const SizedBox(height: 20),
-                      _isExpanded
-                          ? const Text("Collapse",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold))
-                          : SidebarItem(
-                              iconPath: "assets/images/Icon.png",
-                              label: "Models",
-                              expanded: _isExpanded),
-                      const SizedBox(height: 20),
-
-                      // SidebarItem(
-                      //     iconPath: "assets/images/Schema.png",
-                      //     label: "Architectures",
-                      //     expanded: _isExpanded),
-
-                      SidebarItem(
-                          iconPath: "assets/images/network_nodes.png",
-                          label: "Models",
-                          expanded: _isExpanded),
-
-                      SidebarItem(
-                          iconPath: "assets/images/data_sets.png",
-                          label: "Datasets",
-                          expanded: _isExpanded),
-                      SidebarItem(
-                          iconPath: "assets/images/school.png",
-                          label: "Learn",
-                          expanded: _isExpanded),
-
-                      SidebarItem(
-                          iconPath: "assets/images/docs.png",
-                          label: "Docs",
-                          expanded: _isExpanded),
-                      SidebarItem(
-                          iconPath: "assets/images/settings.png",
-                          label: "Settings",
-                          expanded: _isExpanded),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      const Text("Profile",
-                          style: TextStyle(
-                              color: Color(0xff64748B), fontSize: 16)),
-                      const SizedBox(height: 10),
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundImage:
-                            AssetImage("assets/images/profileImage.png"),
-                      ),
-                      const SizedBox(height: 10),
-                      IconButton(
-                        icon: const Icon(Icons.logout, color: Colors.redAccent),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          // Left Sidebar
+          Container(
+            width: isExpanded ? 200 : 90,
+            color: Colors.blue.shade100,
+            child: Column(
+              children: [
+                _buildSidebar(),
+              ],
             ),
           ),
-
           // Main Content
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 20),
+            child: ProjectsScreen(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebar() {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.analytics, color: Colors.blue),
+                if (isExpanded) const SizedBox(width: 8),
+                if (isExpanded)
+                  const Text(
+                    'Model Craft',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                // const Spacer(),
+                IconButton(
+                  icon: Icon(
+                      isExpanded ? Icons.chevron_left : Icons.chevron_right),
+                  onPressed: () {
+                    setState(() {
+                      isExpanded = !isExpanded;
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _sidebarItem(Icons.explore, 'Explore', true),
+            _sidebarItem(Icons.architecture, 'Architectures', false),
+            _sidebarItem(Icons.model_training, 'Models', false),
+            _sidebarItem(Icons.dataset, 'Datasets', false),
+            _sidebarItem(Icons.school, 'Learn', false),
+            _sidebarItem(Icons.description, 'Docs', false),
+            _sidebarItem(Icons.settings, 'Settings', false),
+            const Spacer(),
+            const ProfileWidget(),
+            const SizedBox(height: 10),
+            _logoutButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sidebarItem(IconData icon, String label, bool isActive) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      decoration: BoxDecoration(
+        color: isActive ? Colors.blue : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: isActive ? Colors.white : Colors.black87),
+        title: isExpanded
+            ? Text(
+                label,
+                style: TextStyle(
+                  color: isActive ? Colors.white : Colors.black87,
+                ),
+              )
+            : null,
+        minLeadingWidth: 20,
+        dense: true,
+        onTap: () {},
+      ),
+    );
+  }
+
+  Widget _logoutButton() {
+    return InkWell(
+      onTap: () {},
+      child: Row(
+        children: [
+          const Icon(Icons.logout, color: Colors.red),
+          if (isExpanded) const SizedBox(width: 8),
+          if (isExpanded)
+            const Text(
+              'Log out',
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfileWidget extends StatelessWidget {
+  const ProfileWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 8.0),
+          child: Text("profile"),
+        ),
+        Row(
+          children: [
+            const CircleAvatar(
+              backgroundColor: Colors.blue,
+              radius: 16,
+              child: Text('JW',
+                  style: TextStyle(fontSize: 12, color: Colors.white)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Projects",
+                    'Jenny Wilson',
                     style: TextStyle(
-                        fontSize: 40,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    'jen.wilson@example.com',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade700,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class ProjectsScreen extends StatelessWidget {
+  ProjectsScreen({super.key});
+
+  final List<ProjectItem> projects = [
+    ProjectItem(
+      name: 'Content curating app',
+      projectDescription: 'Project description',
+      modelName: 'Model name',
+      modelDescription: 'Model description',
+      type: 'Content curating app',
+      typeDescription: 'Dataset description',
+      dateCreated: DateTime(2025, 1, 4),
+    ),
+    ProjectItem(
+      name: 'Design software',
+      projectDescription: 'Project description',
+      modelName: 'Model name',
+      modelDescription: 'Model description',
+      type: 'Design software',
+      typeDescription: 'Dataset description',
+      dateCreated: DateTime(2025, 1, 4),
+    ),
+    ProjectItem(
+      name: 'Data prediction',
+      projectDescription: 'Project description',
+      modelName: 'Model name',
+      modelDescription: 'Model description',
+      type: 'Data prediction',
+      typeDescription: 'Dataset description',
+      dateCreated: DateTime(2025, 1, 4),
+    ),
+    ProjectItem(
+      name: 'Productivity app',
+      projectDescription: 'Project description',
+      modelName: 'Model name',
+      modelDescription: 'Model description',
+      type: 'Productivity app',
+      typeDescription: 'Dataset description',
+      dateCreated: DateTime(2025, 1, 4),
+    ),
+    ProjectItem(
+      name: 'Web app integrations',
+      projectDescription: 'Project description',
+      modelName: 'Model name',
+      modelDescription: 'Model description',
+      type: 'Web app integrations',
+      typeDescription: 'Dataset description',
+      dateCreated: DateTime(2025, 1, 4),
+    ),
+    ProjectItem(
+      name: 'Sales CRM',
+      projectDescription: 'Project description',
+      modelName: 'Model name',
+      modelDescription: 'Model description',
+      type: 'Sales CRM',
+      typeDescription: 'Dataset description',
+      dateCreated: DateTime(2025, 1, 4),
+    ),
+    ProjectItem(
+      name: 'Automation and workflow',
+      projectDescription: 'Project description',
+      modelName: 'Model name',
+      modelDescription: 'Model description',
+      type: 'Automation and workflow',
+      typeDescription: 'Dataset description',
+      dateCreated: DateTime(2025, 1, 4),
+    ),
+    ProjectItem(
+      name: 'Automation and workflow',
+      projectDescription: 'Project description',
+      modelName: 'Model name',
+      modelDescription: 'Model description',
+      type: 'Automation and workflow',
+      typeDescription: 'Dataset description',
+      dateCreated: DateTime(2025, 1, 4),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Projects',
+                      style: TextStyle(
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 14, 14, 14)),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text("View all your projects.",
-                      style: TextStyle(fontSize: 16, color: Colors.black)),
-                  const SizedBox(height: 20),
-
-                  // Search & Actions Row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            enabledBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black),
-                            ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black),
-                            ),
-                            hintText: "Search for projects",
-                            hintStyle: const TextStyle(color: Colors.black),
-                            prefixIcon:
-                                const Icon(Icons.search, color: Colors.black),
-                            filled: true,
-                            fillColor: const Color(0x00666666),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
                       ),
-                      const SizedBox(width: 10),
-                      // CustomIconTextButton(
-                      //   text: "Import",
-                      //   icon: Icons.upload,
-                      //   backgroundColor: const Color(0xfff2f2f2),
-                      //   textColor: Colors.black,
-                      //   iconColor: Colors.black,
-                      //   onTap: () {},
-                      // ),
-                      // const SizedBox(width: 10),
-                      // CustomIconTextButton(
-                      //   text: "Export",
-                      //   icon: Icons.download,
-                      //   backgroundColor: const Color(0xfff2f2f2),
-                      //   textColor: Colors.black,
-                      //   iconColor: Colors.black,
-                      //   onTap: () {},
-                      // ),
-                      // const SizedBox(width: 10),
-                      // CustomIconTextButton(
-                      //   text: "New Project",
-                      //   icon: Icons.add,
-                      //   backgroundColor: Colors.blue,
-                      //   textColor: Colors.white,
-                      //   iconColor: Colors.white,
-                      //   onTap: () {
-                      //     Navigator.push(
-                      //         context,
-                      //         MaterialPageRoute(
-                      //             builder: (context) => const GridLoader()));
-                      //   },
-                      // ),
-                    ],
+                    ),
+                    Text(
+                      'View all your projects',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.upload),
+                      label: const Text('Upload'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.add),
+                      label: const Text('New Project'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 40, // Making search field smaller
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Find a project',
+                        prefixIcon: const Icon(Icons.search, size: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 20),
-
-                  // Projects Table
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.filter_list, size: 20),
+                    onPressed: () {},
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Row(
+                children: [
                   Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(color: Colors.white),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                    minWidth: constraints.maxWidth),
-                                child: DataTable(
-                                  columnSpacing: 20,
-                                  dataRowMinHeight: 50,
-                                  dataRowMaxHeight: 60,
-                                  headingRowColor: WidgetStateColor.resolveWith(
-                                    (states) => const Color(
-                                        0xFFE9EAEB), // Your desired background color
-                                  ),
-                                  columns: const [
-                                    DataColumn(
-                                        label: Expanded(
-                                            child: Text("Name",
-                                                textAlign: TextAlign.center))),
-                                    DataColumn(
-                                        label: Expanded(
-                                            child: Text("Model",
-                                                textAlign: TextAlign.center))),
-                                    DataColumn(
-                                        label: Expanded(
-                                            child: Text("Dataset",
-                                                textAlign: TextAlign.center))),
-                                    DataColumn(
-                                        label: Expanded(
-                                            child: Text("Created",
-                                                textAlign: TextAlign.center))),
-                                  ],
-                                  rows: projects.map((project) {
-                                    return DataRow(cells: [
-                                      DataCell(
-                                          Center(child: Text(project.name))),
-                                      DataCell(
-                                          Center(child: Text(project.model))),
-                                      DataCell(
-                                          Center(child: Text(project.dataset))),
-                                      DataCell(Center(
-                                          child: Text(project.createdDate))),
-                                    ]);
-                                  }).toList(),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                    flex: 2,
+                    child: Text(
+                      'Name',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Model',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Model',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      'Created',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.right,
                     ),
                   ),
                 ],
               ),
             ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: projects.length,
+                itemBuilder: (context, index) {
+                  return ProjectListItem(project: projects[index]);
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Previous'),
+                ),
+                Row(
+                  children: [
+                    _pageButton('1', true),
+                    _pageButton('2', false),
+                    _pageButton('3', false),
+                    const Text('...'),
+                    _pageButton('8', false),
+                    _pageButton('9', false),
+                    _pageButton('10', false),
+                  ],
+                ),
+                OutlinedButton(
+                  onPressed: () {},
+                  child: const Row(
+                    children: [
+                      Text('Next'),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _pageButton(String text, bool isActive) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      child: CircleAvatar(
+        radius: 16,
+        backgroundColor: isActive ? Colors.blue : Colors.transparent,
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.black,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ProjectListItem extends StatelessWidget {
+  final ProjectItem project;
+
+  const ProjectListItem({super.key, required this.project});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade200),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Project name',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                Text(
+                  'description',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  project.modelName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                Text(
+                  project.modelDescription,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  project.type,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                Text(
+                  project.typeDescription,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Text(
+              _formatDate(project.dateCreated),
+              style: TextStyle(
+                color: Colors.grey.shade700,
+              ),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),
     );
   }
-}
 
-// Sidebar Icon Item
-class SidebarItem extends StatelessWidget {
-  final String iconPath;
-  final String label;
-  final bool expanded;
-  final bool isLogout;
-
-  const SidebarItem({
-    super.key,
-    required this.iconPath,
-    required this.label,
-    required this.expanded,
-    this.isLogout = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(iconPath, height: 24, width: 24),
-          if (expanded) ...[
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isLogout ? Colors.redAccent : Colors.black,
-              ),
-            ),
-          ]
-        ],
-      ),
-    );
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }
 
-// Sidebar Icon with Image (Used for the App Logo)
-class SidebarIconApp extends StatelessWidget {
-  final String iconPath;
-
-  const SidebarIconApp({super.key, required this.iconPath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ClipRRect(
-        child: Image.asset(
-          iconPath,
-          height: 40,
-          width: 40,
-          fit: BoxFit.contain,
-        ),
-      ),
-    );
-  }
-}
-
-class Project {
+class ProjectItem {
   final String name;
-  final String model;
-  final String dataset;
-  final String createdDate;
+  final String projectDescription;
+  final String modelName;
+  final String modelDescription;
+  final String type;
+  final String typeDescription;
+  final DateTime dateCreated;
 
-  Project({
+  ProjectItem({
     required this.name,
-    required this.model,
-    required this.dataset,
-    required this.createdDate,
+    required this.projectDescription,
+    required this.modelName,
+    required this.modelDescription,
+    required this.type,
+    required this.typeDescription,
+    required this.dateCreated,
   });
 }
-
-List<Project> projects = List.generate(
-  50,
-  (index) => Project(
-    name: "Project $index",
-    model: "BERT v3.$index",
-    dataset: "Customer Reviews Dataset v2.0",
-    createdDate: "Oct 20, 2024",
-  ),
-);
-
-/*
-
-class SidebarItem extends StatelessWidget {
-  final String iconPath;
-  final String label;
-  final bool expanded;
-  final bool isLogout;
-
-  const SidebarItem({
-    super.key,
-    required this.iconPath,
-    required this.label,
-    required this.expanded,
-    this.isLogout = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(iconPath, height: 24, width: 24),
-          if (expanded) ...[
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                color: isLogout ? Colors.redAccent : Colors.black,
-              ),
-            ),
-          ]
-        ],
-      ),
-    );
-  }
-}
-
-// Sidebar Icon with Image (For App Logo)
-class SidebarIconApp extends StatelessWidget {
-  final String iconPath;
-
-  const SidebarIconApp({super.key, required this.iconPath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ClipRRect(
-        child: Image.asset(
-          iconPath,
-          height: 40,
-          width: 40,
-          fit: BoxFit.contain,
-        ),
-      ),
-    );
-  }
-}
-
-
-*/

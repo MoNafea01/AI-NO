@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
         // Check if the widget is still mounted
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const ProjectsDashboard()), // will go to signup screen
+          MaterialPageRoute(builder: (context) => const DashboardScreen()), // will go to signup screen
         );
         // ignore: avoid_print
         print("Navigating to GridLoader...");
