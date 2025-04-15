@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class AppColors {
+  static const Color primaryColor = Color(0xFF0169CB);
   static const Color bluePrimaryColor = Color(0xFF349CFE);
   static const Color appBackgroundColor = Colors.white;
   static const Color nodeViewBackgroundColor = Color(0xFFF2F2F2);
