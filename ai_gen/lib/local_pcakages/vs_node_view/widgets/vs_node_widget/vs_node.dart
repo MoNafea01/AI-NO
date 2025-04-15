@@ -1,9 +1,8 @@
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/vs_node_data.dart';
-import '../../data/vs_node_data_provider.dart';
 import 'node_content.dart';
 
 class VSNode extends StatefulWidget {
@@ -31,10 +30,9 @@ class _VSNodeState extends State<VSNode> {
 
   @override
   void initState() {
-    nodeProvider = VSNodeDataProvider.of(context);
     _anchor = GlobalKey();
     _key2 = GlobalKey();
-
+    nodeProvider = VSNodeDataProvider.of(context);
     super.initState();
   }
 
@@ -63,10 +61,13 @@ class _VSNodeState extends State<VSNode> {
       child: Material(
         key: _key2,
         borderRadius: BorderRadius.circular(12),
-        child: NodeContent(
-          nodeProvider: nodeProvider,
-          data: widget.data,
-          anchor: _anchor,
+        child: InheritedNodeDataProvider(
+          provider: nodeProvider,
+          child: NodeContent(
+            nodeProvider: nodeProvider,
+            data: widget.data,
+            anchor: _anchor,
+          ),
         ),
       ),
     );

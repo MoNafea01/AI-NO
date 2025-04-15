@@ -8,15 +8,15 @@ import '../../special_nodes/vs_widget_node.dart';
 import '../line_drawer/gradiant_line_drawer.dart';
 
 class VSNodeOutput extends StatefulWidget {
-  const VSNodeOutput({required this.data, super.key});
+  const VSNodeOutput({required this.data, Key? key}) : super(key: key);
 
   final VSOutputData data;
 
   @override
-  State<VSNodeOutput> createState() => _VSNodeOutputState();
+  State<VSNodeOutput> createState() => VSNodeOutputState();
 }
 
-class _VSNodeOutputState extends State<VSNodeOutput> {
+class VSNodeOutputState extends State<VSNodeOutput> {
   Offset? dragPos;
   RenderBox? renderBox;
   late final GlobalKey _anchor;
@@ -25,12 +25,6 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
   void initState() {
     _anchor = GlobalKey();
     super.initState();
-    updateRenderBox();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
     updateRenderBox();
   }
 
@@ -62,21 +56,23 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
 
   @override
   Widget build(BuildContext context) {
-    final outputTitle = widget.data.nodeData is VSWidgetNode
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 16,
+      children: [
+        outputTitle(),
+        outputIcon(context),
+      ],
+    );
+  }
+
+  Widget outputTitle() {
+    return widget.data.nodeData is VSWidgetNode
         ? (widget.data.nodeData as VSWidgetNode).child
         : Text(
             widget.data.title,
             style: const TextStyle(color: Colors.white, fontSize: 12),
           );
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        outputTitle,
-        const SizedBox(width: 3),
-        outputIcon(context),
-      ],
-    );
   }
 
   CustomPaint outputIcon(BuildContext context) {

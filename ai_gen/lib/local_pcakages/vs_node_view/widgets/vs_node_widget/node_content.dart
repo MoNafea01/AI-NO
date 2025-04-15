@@ -17,11 +17,13 @@ class NodeContent extends StatefulWidget {
   final VSNodeData data;
   final GlobalKey anchor;
   final VSNodeDataProvider nodeProvider;
+
   @override
   State<NodeContent> createState() => _NodeContentState();
 }
 
 class _NodeContentState extends State<NodeContent> {
+  final List<GlobalKey<VSNodeOutputState>> _outputKeys = [];
   final List<Widget> inputWidgets = [];
   final List<Widget> outputWidgets = [];
 
@@ -30,11 +32,18 @@ class _NodeContentState extends State<NodeContent> {
     for (final value in widget.data.inputData) {
       inputWidgets.add(VSNodeInput(data: value));
     }
-
     for (final value in widget.data.outputData) {
-      outputWidgets.add(VSNodeOutput(data: value));
+      final GlobalKey<VSNodeOutputState> key = GlobalKey<VSNodeOutputState>();
+      _outputKeys.add(key);
+      outputWidgets.add(VSNodeOutput(data: value, key: key));
     }
     super.initState();
+  }
+
+  void _updateOutputs() {
+    for (final key in _outputKeys) {
+      key.currentState?.updateRenderBox();
+    }
   }
 
   @override
@@ -45,22 +54,13 @@ class _NodeContentState extends State<NodeContent> {
       decoration: _nodeDecoration(),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
+        spacing: 8,
         children: [
-          _interfaceWidget(inputWidgets),
-          const SizedBox(width: 8),
-          VSNodeTitle(data: widget.data),
-          const SizedBox(width: 8),
-          _interfaceWidget(outputWidgets),
+          _InterfaceWidget(inputWidgets),
+          VSNodeTitle(data: widget.data, onTitleChange: _updateOutputs),
+          _InterfaceWidget(outputWidgets),
         ],
       ),
-    );
-  }
-
-  Widget _interfaceWidget(List<Widget> widgets) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: widgets,
     );
   }
 
@@ -78,6 +78,21 @@ class _NodeContentState extends State<NodeContent> {
       color: widget.nodeProvider.selectedNodes.contains(widget.data.id)
           ? Colors.lightBlue
           : widget.data.nodeColor,
+    );
+  }
+}
+
+class _InterfaceWidget extends StatelessWidget {
+  const _InterfaceWidget(this.children);
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
     );
   }
 }
