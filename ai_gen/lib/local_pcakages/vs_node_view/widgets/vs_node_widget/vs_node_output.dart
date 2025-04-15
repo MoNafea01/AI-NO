@@ -8,9 +8,6 @@ import '../../special_nodes/vs_widget_node.dart';
 import '../line_drawer/gradiant_line_drawer.dart';
 
 class VSNodeOutput extends StatefulWidget {
-  /// Base node output widget
-  /// Used in [VSNode]
-  /// Uses [Draggable] to make a connection with [VSInputData]
   const VSNodeOutput({required this.data, super.key});
 
   final VSOutputData data;
@@ -22,10 +19,11 @@ class VSNodeOutput extends StatefulWidget {
 class _VSNodeOutputState extends State<VSNodeOutput> {
   Offset? dragPos;
   RenderBox? renderBox;
-  final GlobalKey _anchor = GlobalKey();
+  late final GlobalKey _anchor;
 
   @override
   void initState() {
+    _anchor = GlobalKey();
     super.initState();
     updateRenderBox();
   }
@@ -39,7 +37,10 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
   @override
   void didUpdateWidget(covariant VSNodeOutput oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (widget.data.widgetOffset == null ||
+        widget.data.widgetOffset != oldWidget.data.widgetOffset ||
+        widget.data.title != oldWidget.data.title ||
         widget.data.nodeData is VSListNode) {
       updateRenderBox();
     }
