@@ -35,8 +35,10 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.0
+  flutter_secure_storage: ^9.2.4
   get_it: ^8.0.3
   http: ^1.3.0
+  provider: ^6.1.2
   vs_node_view: ^2.1.1
   window_manager: ^0.4.3
 
