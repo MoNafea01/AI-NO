@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:flutter/material.dart';
 
@@ -90,11 +91,9 @@ class _VSNodeInputState extends State<VSNodeInput> {
         ),
         if (widget.data is! VsTextInputData)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            child: Text(
-              widget.data.title,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: Text(widget.data.title,
+                style: AppTextStyles.nodeInterfaceTextStyle),
           ),
       ],
     );

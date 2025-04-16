@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:flutter/material.dart';
 
 import '../../common.dart';
@@ -58,7 +59,7 @@ class VSNodeOutputState extends State<VSNodeOutput> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: 16,
+      spacing: 4,
       children: [
         outputTitle(),
         outputIcon(context),
@@ -71,7 +72,7 @@ class VSNodeOutputState extends State<VSNodeOutput> {
         ? (widget.data.nodeData as VSWidgetNode).child
         : Text(
             widget.data.title,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+            style: AppTextStyles.nodeInterfaceTextStyle,
           );
   }
 

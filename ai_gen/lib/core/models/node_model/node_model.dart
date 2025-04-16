@@ -130,12 +130,12 @@ class NodeModel {
   }
 
   Color get color {
-    if (name == "model_fitter") {
-      return NodeTypes.models.color;
-    }
-    if (name == "preprocessor_fitter") {
-      return NodeTypes.preprocessors.color;
-    }
+    // if (name == "model_fitter") {
+    //   return NodeTypes.models.color;
+    // }
+    // if (name == "preprocessor_fitter") {
+    //   return NodeTypes.preprocessors.color;
+    // }
 
     switch (category) {
       case "Models":
@@ -150,6 +150,8 @@ class NodeModel {
         return NodeTypes.input.color;
       case "Output":
         return NodeTypes.output.color;
+      case "Network":
+        return NodeTypes.network.color;
       default:
         return NodeTypes.general.color;
     }
