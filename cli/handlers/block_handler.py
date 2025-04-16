@@ -1,6 +1,6 @@
 from data_store import get_data_store
 from handlers.mapper import mapper
-import re, json
+import re, json, requests
 
 def handle_block_command(sub_cmd, args):
 
@@ -116,6 +116,9 @@ def explore_block(*args, **kwargs):
     
     node_name = args[0]
     block_id = args[1]
+    out = '0'
+    if len(args) > 2:
+        out = args[2]
 
     if node_name not in mapper:
         return False, f"Node {node_name} not found in the mapper."
@@ -130,7 +133,7 @@ def explore_block(*args, **kwargs):
     project_id = kwargs.get("project_id", None)
     if not project_id:
         project_id = get_data_store().get("active_project")
-    payload = send_request_to_api(args, query, method_type='get', node_id=block_id, project_id=project_id)
+    payload = send_request_to_api(args, query, method_type='get', node_id=block_id, project_id=project_id, output=out)
     if not isinstance(payload, dict):
         return False, "Error getting Node"
     
@@ -149,17 +152,10 @@ def _get_active_project(data_store):
 
 
 def send_request_to_api(args, query="create_model/", method_type="post", **kwargs):
-    import json
-    import requests
 
     node_id = kwargs.get("node_id", None)
     project_id = kwargs.get("project_id", None)
-
-    if project_id:
-        query = query + f"?project_id={project_id}"
-
-    if node_id:
-        query = query + f"&node_id={node_id}"
+    output = kwargs.get("output", None)
 
     method ={
         "post": requests.post,
@@ -172,7 +168,8 @@ def send_request_to_api(args, query="create_model/", method_type="post", **kwarg
         'Content-Type': 'application/json',
         "Accept": "application/json"
     }
-    response = method[method_type](url, headers=headers, json=args, timeout=10)
+    response = method[method_type](url, headers=headers, json=args, params={"project_id": project_id, "node_id": node_id,
+                                                                            "output": output}, timeout=10)
     
     if response.text == "":
         return None

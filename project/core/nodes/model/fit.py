@@ -13,7 +13,7 @@ class ModelFitter:
     def fit_model(self):
         """Fits the model with the provided data."""
         try:
-            self.y = np.array(self.y).reshape(-1, 1)
+            self.y = np.array(self.y).ravel()
             self.model.fit(self.X, self.y)
         except Exception as e:
             raise ValueError(f"Error fitting model: {e}")

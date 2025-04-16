@@ -171,6 +171,34 @@
                         "output_ports": [],
                         "project": 1,
                         "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\nets\\nn_model_fitter_2889707639328.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "params": {
+                            "penalty": "l2",
+                            "C": 1.0
+                        },
+                        "node_id": 1271562260544,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "node_type": "linear_models",
+                        "project_id": "1",
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\model\\logistic_regression_1271562260544.pkl"
+                    },
+                    {
+                        "message": "data loaded: iris",
+                        "params": {},
+                        "node_id": 1809865576512,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            1809864492208,
+                            1809864493648
+                        ],
+                        "node_type": "loader",
+                        "project_id": "1",
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\other\\data_loader_1809865576512.pkl"
                     }
                 ]
             }

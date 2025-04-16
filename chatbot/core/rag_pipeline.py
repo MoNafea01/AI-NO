@@ -1,32 +1,12 @@
-import json, os, re, ast
+import os, re, ast
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.document_loaders import PyPDFLoader
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.schema import Document
 from langchain_core.output_parsers import StrOutputParser
-import os
-parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-res_path = os.path.join(parent_path, "res")
+from core.templates import get_template
 
-pdf_file = rf"{res_path}\\Cli script guidebook.pdf"
-loader = PyPDFLoader(pdf_file)
-pdf_docs = loader.load_and_split()
-
-with open(rf"{res_path}\\data_mapping.json", "r") as f:
-    data_mapping = json.load(f)
-
-REFERENCE_KEYWORDS = list(data_mapping.keys())
-
-data_mapping_doc = Document(page_content='Default Arguments for each node:\n'+ json.dumps(data_mapping))
-
-all_docs = pdf_docs + [data_mapping_doc]
-
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-vectorstore = FAISS.from_documents(documents=all_docs, embedding=embeddings)
-retriever = vectorstore.as_retriever()
 
 def get_llm(model_name="gemini-1.5-pro"):
     return ChatGoogleGenerativeAI(
@@ -39,12 +19,13 @@ def get_llm(model_name="gemini-1.5-pro"):
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
-def combine_inputs(input_dict, retriever):
+def combine_inputs(input_dict, retriever, cur_iter=0):
     question = input_dict["question"]
     retrieved_docs = retriever.invoke(question)
     return {
         "context": format_docs(retrieved_docs),
-        "question": question
+        "question": question,
+        "cur_iter": cur_iter
     }
 
 def parse_command_list(output: str):
@@ -61,49 +42,24 @@ def parse_command_list(output: str):
         return [f"Failed to parse: {e}"]
 
 
-template = """You are an expert assistant trained to extract exact command-line instructions from a user guide.
-
-You are given the folliwing information:
-- A user guide that contains command-line instructions for a CLI tool.
-- all possible values for node_name
-- mapping of node names to their default arguments.
-
-Reference Information:
-{context}
-
-User Query:
-{question}
-
-Instructions:
-- Carefully read the Reference Information, node names, and default arguments for each node.
-- Return the CLI command(s) that are relevant to the user's query.
-- Format your response as a raw Python list: ['command1', 'command2', ...]
-- Do NOT include any explanations, comments, or formatting outside the list.
-- If no command matches the query, return an empty list: []
-- The output MUST be ordered in the same order as the input.
-
-Example Query:
-I want to make a logistic regression model and make a project with id 3.
-
-Expected Response:
-[
-    'make logistic_regression <args>',
-    'create_project 3'
-]
-"""
-
-prompt = ChatPromptTemplate.from_template(template)
-def create_rag_chain(model_name, retriever):
+def create_rag_chain(docs, cur_iter, model_name, selected_mode):
     """Creates a RAG chain with the specified model_name."""
+    model = get_llm(model_name=model_name)
+    template = get_template(selected_mode)
+    prompt = ChatPromptTemplate.from_template(template)
+
+    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    retriever = FAISS.from_documents(documents=docs, embedding=embeddings).as_retriever()
+
     return (
     RunnablePassthrough()
-    | (lambda x: combine_inputs(x, retriever))
+    | (lambda x: combine_inputs(x, retriever, cur_iter))
     | prompt
-    | get_llm(model_name=model_name)
+    | model
     | StrOutputParser()
-    | parse_command_list
 )
 
-def run_pipeline(user_query: str, model_name):
-    rag_chain = create_rag_chain(model_name, retriever)
-    return rag_chain.invoke({"question": user_query}), user_query, REFERENCE_KEYWORDS, data_mapping
+def run_pipeline(docs, question: str, model_name, selected_mode, cur_iter=0):
+
+    rag_chain = create_rag_chain(docs, cur_iter, model_name, selected_mode)
+    return rag_chain.invoke({"question": question, "cur_iter": cur_iter})
