@@ -1,0 +1,433 @@
+{
+    "ridge": {
+        "model_name": "ridge",
+        "task": "regression",
+        "model_type": "linear_models",
+        "params": {
+            "alpha": 1.0
+        }
+    },
+    "lasso": {
+        "model_name": "lasso",
+        "task": "regression",
+        "model_type": "linear_models",
+        "params": {
+            "alpha": 1.0
+        }
+    },
+    "linear_regression": {
+        "model_name": "linear_regression",
+        "task": "regression",
+        "model_type": "linear_models",
+        "params": {}
+    },
+    "sgd_regression": {
+        "model_name": "sgd_regression",
+        "task": "regression",
+        "model_type": "linear_models",
+        "params": {
+            "penalty": "l2"
+        }
+    },
+    "elastic_net": {
+        "model_name": "elastic_net",
+        "task": "regression",
+        "model_type": "linear_models",
+        "params": {
+            "alpha": 1.0,
+            "l1_ratio": 0.5
+        }
+    },
+    "sgd_classifier": {
+        "model_name": "sgd_classifier",
+        "task": "classification",
+        "model_type": "linear_models",
+        "params": {
+            "penalty": "l2"
+        }
+    },
+    "ridge_classifier": {
+        "model_name": "ridge_classifier",
+        "task": "classification",
+        "model_type": "linear_models",
+        "params": {
+            "alpha": 1.0
+        }
+    },
+    "logistic_regression": {
+        "model_name": "logistic_regression",
+        "task": "classification",
+        "model_type": "linear_models",
+        "params": {
+            "penalty": "l2",
+            "C": 1.0
+        }
+    },
+    "rbf_svr": {
+        "model_name": "rbf_svr",
+        "task": "regression",
+        "model_type": "svm",
+        "params": {
+            "C": 1.0
+        }
+    },
+    "linear_svr": {
+        "model_name": "linear_svr",
+        "task": "regression",
+        "model_type": "svm",
+        "params": {
+            "C": 1.0
+        }
+    },
+    "poly_svr": {
+        "model_name": "poly_svr",
+        "task": "regression",
+        "model_type": "svm",
+        "params": {
+            "kernel": "poly",
+            "C": 1.0
+        }
+    },
+    "sigmoid_svr": {
+        "model_name": "sigmoid_svr",
+        "task": "regression",
+        "model_type": "svm",
+        "params": {
+            "kernel": "sigmoid",
+            "C": 1.0
+        }
+    },
+    "rbf_svc": {
+        "model_name": "rbf_svc",
+        "task": "classification",
+        "model_type": "svm",
+        "params": {
+            "C": 1.0
+        }
+    },
+    "linear_svc": {
+        "model_name": "linear_svc",
+        "task": "classification",
+        "model_type": "svm",
+        "params": {
+            "C": 1.0
+        }
+    },
+    "poly_svc": {
+        "model_name": "poly_svc",
+        "task": "classification",
+        "model_type": "svm",
+        "params": {
+            "kernel": "poly",
+            "C": 1.0
+        }
+    },
+    "sigmoid_svc": {
+        "model_name": "sigmoid_svc",
+        "task": "classification",
+        "model_type": "svm",
+        "params": {
+            "kernel": "sigmoid",
+            "C": 1.0
+        }
+    },
+    "bagging_regressor": {
+        "model_name": "bagging_regressor",
+        "task": "regression",
+        "model_type": "tree",
+        "params": {}
+    },
+    "adaboost_regressor": {
+        "model_name": "adaboost_regressor",
+        "task": "regression",
+        "model_type": "tree",
+        "params": {}
+    },
+    "gradient_boosting_regressor": {
+        "model_name": "gradient_boosting_regressor",
+        "task": "regression",
+        "model_type": "tree",
+        "params": {}
+    },
+    "decision_tree_regressor": {
+        "model_name": "decision_tree_regressor",
+        "task": "regression",
+        "model_type": "tree",
+        "params": {
+            "n_estimators": 100
+        }
+    },
+    "random_forest_regressor": {
+        "model_name": "random_forest_regressor",
+        "task": "regression",
+        "model_type": "tree",
+        "params": {
+            "n_estimators": 100
+        }
+    },
+    "bagging_classifier": {
+        "model_name": "bagging_classifier",
+        "task": "classification",
+        "model_type": "tree",
+        "params": {}
+    },
+    "adaboost_classifier": {
+        "model_name": "adaboost_classifier",
+        "task": "classification",
+        "model_type": "tree",
+        "params": {}
+    },
+    "gradient_boosting_classifier": {
+        "model_name": "gradient_boosting_classifier",
+        "task": "classification",
+        "model_type": "tree",
+        "params": {}
+    },
+    "decision_tree_classifier": {
+        "model_name": "decision_tree_classifier",
+        "task": "classification",
+        "model_type": "tree",
+        "params": {
+            "n_estimators": 100
+        }
+    },
+    "random_forest_classifier": {
+        "model_name": "random_forest_classifier",
+        "task": "classification",
+        "model_type": "tree",
+        "params": {
+            "n_estimators": 100
+        }
+    },
+    "gaussian_nb": {
+        "model_name": "gaussian_nb",
+        "task": "classification",
+        "model_type": "naive_bayes",
+        "params": {}
+    },
+    "bernoulli_nb": {
+        "model_name": "bernoulli_nb",
+        "task": "classification",
+        "model_type": "naive_bayes",
+        "params": {}
+    },
+    "multinomial_nb": {
+        "model_name": "multinomial_nb",
+        "task": "classification",
+        "model_type": "naive_bayes",
+        "params": {}
+    },
+    "knn_regressor": {
+        "model_name": "knn_regressor",
+        "task": "regression",
+        "model_type": "knn",
+        "params": {
+            "n_neighbors": 5
+        }
+    },
+    "knn_classifier": {
+        "model_name": "knn_classifier",
+        "task": "classification",
+        "model_type": "knn",
+        "params": {
+            "n_neighbors": 5
+        }
+    },
+    "model_fitter": {
+        "model": 1,
+        "X": 2,
+        "y": 3
+    },
+    "predictor": {
+        "model": 1,
+        "X": 2
+    },
+    "evaluator": {
+        "y_true": 1,
+        "y_pred": 2,
+        "params": {
+            "metric": "mse"
+        }
+    },
+    "maxabs_scaler": {
+        "preprocessor_name": "maxabs_scaler",
+        "preprocessor_type": "scaler",
+        "params": {}
+    },
+    "normalizer": {
+        "preprocessor_name": "normalizer",
+        "preprocessor_type": "scaler",
+        "params": {
+            "norm": "l2"
+        }
+    },
+    "minmax_scaler": {
+        "preprocessor_name": "minmax_scaler",
+        "preprocessor_type": "scaler",
+        "params": {
+            "feature_range": [
+                0,
+                1
+            ]
+        }
+    },
+    "robust_scaler": {
+        "preprocessor_name": "robust_scaler",
+        "preprocessor_type": "scaler",
+        "params": {
+            "quantile_range": [
+                25.0,
+                75.0
+            ]
+        }
+    },
+    "standard_scaler": {
+        "preprocessor_name": "standard_scaler",
+        "preprocessor_type": "scaler",
+        "params": {
+            "with_mean": true,
+            "with_std": true
+        }
+    },
+    "label_encoder": {
+        "preprocessor_name": "label_encoder",
+        "preprocessor_type": "encoder",
+        "params": {}
+    },
+    "onehot_encoder": {
+        "preprocessor_name": "onehot_encoder",
+        "preprocessor_type": "encoder",
+        "params": {}
+    },
+    "ordinal_encoder": {
+        "preprocessor_name": "ordinal_encoder",
+        "preprocessor_type": "encoder",
+        "params": {}
+    },
+    "label_binarizer": {
+        "preprocessor_name": "label_binarizer",
+        "preprocessor_type": "encoder",
+        "params": {}
+    },
+    "knn_imputer": {
+        "preprocessor_name": "knn_imputer",
+        "preprocessor_type": "imputer",
+        "params": {
+            "n_neighbors": 5
+        }
+    },
+    "simple_imputer": {
+        "preprocessor_name": "simple_imputer",
+        "preprocessor_type": "imputer",
+        "params": {
+            "strategy": "mean"
+        }
+    },
+    "binarizer": {
+        "preprocessor_name": "binarizer",
+        "preprocessor_type": "binarizer",
+        "params": {
+            "threshold": 0.0
+        }
+    },
+    "preprocessor_fitter": {
+        "preprocessor": 1,
+        "data": 2
+    },
+    "transformer": {
+        "preprocessor": 1,
+        "data": 2
+    },
+    "fitter_transformer": {
+        "preprocessor": 1,
+        "data": 2
+    },
+    "data_loader": {
+        "params": {
+            "dataset_name": "iris"
+        }
+    },
+    "splitter": {
+        "data": 1
+    },
+    "joiner": {
+        "data_1": 1,
+        "data_2": 2
+    },
+    "train_test_split": {
+        "data": 1,
+        "params": {
+            "test_size": 0.2,
+            "random_state": 42
+        }
+    },
+    "input_layer": {
+        "params": {
+            "shape": [
+                28,
+                28,
+                1
+            ]
+        }
+    },
+    "conv2d_layer": {
+        "params": {
+            "filters": 32,
+            "kernel_size": [
+                3,
+                3
+            ],
+            "activation": "relu"
+        },
+        "prev_node": 1
+    },
+    "maxpool2d_layer": {
+        "params": {
+            "pool_size": [
+                2,
+                2
+            ]
+        },
+        "prev_node": 1
+    },
+    "flatten_layer": {
+        "params": {},
+        "prev_node": 1
+    },
+    "dense_layer": {
+        "params": {
+            "units": 128,
+            "activation": "relu"
+        },
+        "prev_node": 1
+    },
+    "dropout_layer": {
+        "params": {
+            "rate": 0.5
+        },
+        "prev_node": 1
+    },
+    "sequential_model": {
+        "params": {},
+        "layer": 1
+    },
+    "nn_fitter": {
+        "params": {
+            "batch_size": 20,
+            "epochs": 10
+        },
+        "model": 1,
+        "X": 2,
+        "y": 3
+    },
+    "model_compiler": {
+        "params": {
+            "optimizer": "sgd",
+            "loss": "categorical_crossentropy",
+            "metrics": [
+                "accuracy"
+            ]
+        },
+        "model": 1
+    }
+}

@@ -1,27 +1,32 @@
 from sklearn.model_selection import train_test_split
-from ...repositories.node_repository import NodeSaver, NodeLoader, NodeDeleter
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
 from ..utils import PayloadBuilder
+from ..base_node import BaseNode, SAVING_DIR
 
-class TrainTestSplit:
-    def __init__(self, data, params=None):
-        self.data = NodeLoader()(data.get("node_id")).get('node_data') if isinstance(data, dict) else data
+class TrainTestSplit(BaseNode):
+    def __init__(self, data, params=None, project_id: int = None, *args, **kwargs):
+        self.data = NodeDataExtractor()(data)
         self.params = params if params else {'test_size': 0.2, 'random_state': 42}
+        self.project_id = project_id
         self.payload = self.split()
 
     def split(self):
         try:
             out1, out2 = train_test_split(self.data,**self.params)
-            payload = PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split")
-            n_id = payload['node_id']
-            payload1 = PayloadBuilder.build_payload("Train data", out1, "train_test_split", node_type="splitter", task="split", node_id=n_id+1)
-            payload2 = PayloadBuilder.build_payload("Test data", out2, "train_test_split", node_type="splitter", task="split", node_id=n_id+2)
-            NodeSaver()(payload, "core/nodes/saved/data")
-            NodeSaver()(payload1, "core/nodes/saved/data")
-            NodeSaver()(payload2, "core/nodes/saved/data")
-            del payload1['node_data']
-            del payload['node_data']
-            del payload2['node_data']
-            return payload, payload1, payload2
+
+            payload = []
+            payload.append(PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split", project_id=self.project_id))
+
+            names = ["Train data", "Test data"]
+            for i in range(1, 3):
+                payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [out1, out2][i-1], "train_test_split", node_type="splitter", task="split", project_id=self.project_id))
+
+            payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
+            for i in range(3):
+                NodeSaver()(payload[i], rf"{SAVING_DIR}\other")
+                payload[i].pop("node_data", None)
+
+            return payload
         except Exception as e:
             raise ValueError(f"Error splitting data: {e}")
 
@@ -33,22 +38,11 @@ class TrainTestSplit:
         for arg in args:
             if arg == '1':
                 payload = self.payload[1]
-                NodeDeleter()(self.payload[2]['node_id'])
-                NodeDeleter()(self.payload[0]['node_id'])
             elif arg == '2':
                 payload = self.payload[2]
-                NodeDeleter()(self.payload[1]['node_id'])
-                NodeDeleter()(self.payload[0]['node_id'])
+
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(payload.get("node_id"), from_db=True, return_serialized=True).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(payload)
             payload.update({"node_data": node_data})
         return payload
-
-
-if __name__ == "__main__":
-    splitter_args = {
-        "data":[[0, 1, 0, 1, 0]]
-    }
-    splitter = TrainTestSplit(splitter_args)
-    print(splitter())

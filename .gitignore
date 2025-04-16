@@ -12,3 +12,5 @@ db.sqlite3
 
 #Ignore saved nodes
 project/core/nodes/saved/*
+project/core/saved/*
+chatbot/credentials/*

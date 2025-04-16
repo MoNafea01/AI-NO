@@ -4,8 +4,8 @@ import os
 import pandas as pd
 from ..utils import NodeNameHandler, PayloadBuilder
 from ..configs.datasets import DATASETS as datasets
-from ...repositories.node_repository import NodeLoader, NodeSaver, NodeDeleter
-
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from core.nodes.configs.const_ import SAVING_DIR
 
 class BaseDataLoader:
     """Abstract base class for all data loaders."""
@@ -38,7 +38,7 @@ class CustomDataLoader:
                 raise FileNotFoundError(f"dataset not found: {self.dataset_path}")
             
             if self.dataset_path.endswith('.pkl'):
-                data = NodeLoader()(path=self.dataset_path).get('node_data')
+                data = NodeDataExtractor()(self.dataset_path)
                 X, y = data
                 
             elif self.dataset_path.endswith('.csv'):
@@ -69,22 +69,31 @@ class DataLoaderFactory:
 
 class DataLoader:
     """Facade for loading data using different strategies."""
-    def __init__(self, dataset_name: str = None, dataset_path: str = None):
+    def __init__(self, dataset_name: str = None, dataset_path: str = None, project_id: int = None, *args, **kwargs):
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
         X, y = self.loader.load()
+        self.project_id = project_id
+        self.payload = self.build_payload(dataset_name, dataset_path, X, y)
+        
+    
+    def build_payload(self, dataset_name, dataset_path, X, y):
         if not dataset_name:
             dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
-        payload = PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data")
-        n_id = payload['node_id']
-        payloadX = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: X", X, "data_loader", node_type="loader", task="load_data", node_id=n_id+1)
-        payloady = PayloadBuilder.build_payload(f"data loaded: {dataset_name}: y", y, "data_loader", node_type="loader", task="load_data", node_id =n_id+2)
-        NodeSaver()(payloadX, path="core/nodes/saved/data")
-        NodeSaver()(payloady, path="core/nodes/saved/data")
-        NodeSaver()(payload, path="core/nodes/saved/data")
-        del payloadX['node_data']
-        del payloady['node_data']
-        del payload['node_data']
-        self.payload = payload, payloadX, payloady
+
+        
+        payload = []
+        payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id))
+        names = ["X", "y"]
+
+        for i in range(1, 3):
+            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}: {names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id))
+        
+        payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
+        for i in range(3):
+            NodeSaver()(payload[i], path=rf"{SAVING_DIR}\other")
+            payload[i].pop("node_data", None)
+        
+        return payload
 
     def __str__(self):
         return str(self.payload)
@@ -94,24 +103,11 @@ class DataLoader:
         for arg in args:
             if arg == '1':
                 payload = self.payload[1]
-                NodeDeleter()(self.payload[2]['node_id'])
-                NodeDeleter()(self.payload[0]['node_id'])
             elif arg == '2':
                 payload = self.payload[2]
-                NodeDeleter()(self.payload[1]['node_id'])
-                NodeDeleter()(self.payload[0]['node_id'])
+
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeLoader()(payload.get("node_id"), return_serialized=True, from_db=True).get('node_data')
+            node_data = NodeDataExtractor(return_serialized=True)(payload)
             payload.update({"node_data": node_data})
         return payload
-
-
-if __name__ == "__main__":
-    dl_args = {
-        "dataset_name": "iris",
-    }
-    dl = DataLoader(**dl_args)
-    print(dl)
-    
-

@@ -1,8 +1,6 @@
-from .preprocessor import Preprocessor
-from .fit import Fit
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeLoader, NodeSaver
-
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ..base_node import BaseNode, SAVING_DIR
 
 class PreprocessorTransformer:
     """Handles the transformation of data."""
@@ -19,16 +17,17 @@ class PreprocessorTransformer:
         return output
 
 
-class Transform:
+class Transform(BaseNode):
     """Orchestrates the transformation process."""
-    def __init__(self, data, preprocessor=None, preprocessor_path=None):
+    def __init__(self, data, preprocessor=None, preprocessor_path=None, project_id=None):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeLoader()(data.get("node_id")).get('node_data') if isinstance(data, dict) else data
+        self.data = NodeDataExtractor()(data)
+        self.project_id = project_id
         self.payload = self._transform()
 
     def _transform(self):
-        if isinstance(self.preprocessor, dict):
+        if isinstance(self.preprocessor, (dict, int)):
             return self._transform_from_id()
         elif isinstance(rf"{self.preprocessor}", str):
             return self._transform_from_path()
@@ -37,14 +36,14 @@ class Transform:
 
     def _transform_from_id(self):
         try:
-            prepocessor = NodeLoader()(self.preprocessor.get("node_id")).get('node_data')  # Load model using ID from database
+            prepocessor = NodeDataExtractor()(self.preprocessor)
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by ID: {e}")
 
     def _transform_from_path(self):
         try:
-            prepocessor = NodeLoader()(path=self.preprocessor_path).get('node_data')
+            prepocessor = NodeDataExtractor()(self.preprocessor_path)
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by path: {e}")
@@ -54,36 +53,11 @@ class Transform:
         try:
             transformer = PreprocessorTransformer(preprocessor, self.data)
             output = transformer.transform_data()
-            payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', node_type='transformer')
-            NodeSaver()(payload, "core/nodes/saved/data")
-            del payload['node_data']
+            payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', 
+                                                   node_type='transformer', project_id=self.project_id)
+            
+            NodeSaver()(payload, rf"{SAVING_DIR}\preprocessing")
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error transformation of data: {e}")
-        
-    def __str__(self):
-        return str(self.payload)
-
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
-            self.payload.update({"node_data": node_data})
-        return self.payload
-
-if __name__ == '__main__':
-    preprocessor_args = {
-        "preprocessor_name": "standard_scaler",
-        "preprocessor_type": "scaler",
-        "params": {}
-    }
-    fit_args = {
-        "data": [[1, 2], [2, 3]],
-    }
-    transform_args = {
-        "data": [[1, 2], [2, 3]],
-    }
-    scaler = Preprocessor(**preprocessor_args)
-    fit = Fit(**fit_args, preprocessor=scaler)
-    transformed = Transform(**transform_args, preprocessor=fit)()
-    print(transformed)

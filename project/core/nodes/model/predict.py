@@ -1,10 +1,8 @@
-from .model import Model
-from .fit import Fit
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeLoader, NodeSaver
+from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ..base_node import BaseNode, SAVING_DIR
 
-
-class ModelPredictor:
+class ModelPredictor(BaseNode):
     """Handles the prediction of models."""
     def __init__(self, model, X):
         self.model = model
@@ -19,16 +17,17 @@ class ModelPredictor:
         return predictions
 
 
-class Predict:
+class Predict(BaseNode):
     """Orchestrates the predicting process."""
-    def __init__(self, X, model=None, model_path=None):
+    def __init__(self, X, model=None, model_path=None, project_id=None, *args, **kwargs):
         self.model = model
         self.model_path = model_path
-        self.X = NodeLoader()(X.get("node_id")).get('node_data') if isinstance(X, dict) else X
+        self.X = NodeDataExtractor()(X)
+        self.project_id = project_id
         self.payload = self._predict()
 
     def _predict(self):
-        if isinstance(self.model, dict):
+        if isinstance(self.model, (dict, int)):
             return self._predict_from_id()
         elif isinstance(rf"{self.model}", str):
             return self._predict_from_path()
@@ -37,14 +36,14 @@ class Predict:
 
     def _predict_from_id(self):
         try:
-            model = NodeLoader()(self.model.get("node_id")).get('node_data')  # Load model using ID from database
+            model = NodeDataExtractor()(self.model)
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by ID: {e}")
 
     def _predict_from_path(self):
         try:
-            model = NodeLoader()(path=self.model_path).get('node_data')
+            model = NodeDataExtractor()(self.model_path)
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by path: {e}")
@@ -55,42 +54,10 @@ class Predict:
             predictor = ModelPredictor(model, self.X)
             predictions = predictor.predict_model()
             payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict')
-            NodeSaver()(payload, "core/nodes/saved/data")
-            del payload['node_data']
+            if self.project_id:
+                payload['project_id'] = self.project_id
+            NodeSaver()(payload, rf"{SAVING_DIR}\model")
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
             raise ValueError(f"Error Predicting model: {e}")
-        
-    def __str__(self):
-        return str(self.payload)
-
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
-            self.payload.update({"node_data": node_data})
-        return self.payload
-
-
-if __name__ == '__main__':
-    
-    model_args = {
-        "name": "logistic_regression",
-        "type": "linear_models",
-        "task": "classification",
-        "params": {
-            "penalty": "l2",
-            "C": 0.5,
-        }
-    }
-    fit_args = {
-        "data": [[1, 2], [2, 3]],
-    }
-    pred_args = {
-        "X": [[3, 4], [4, 5]],
-    }
-
-    model = Model(**model_args)
-    fit = Fit(**fit_args, model=model)
-    pred = Predict(**pred_args, model=fit)
-    print(pred)
