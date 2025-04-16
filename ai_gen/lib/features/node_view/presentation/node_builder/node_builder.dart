@@ -2,10 +2,10 @@ import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
-import 'package:ai_gen/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../../main.dart';
 import 'custom_interfaces/aino_general_Interface.dart';
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
@@ -92,8 +92,12 @@ class NodeBuilder {
               GetIt.I.get<NodeServerCalls>();
           if (newNode.nodeId != null) nodeServerCalls.deleteNode(newNode);
 
+          scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
           scaffoldMessengerKey.currentState?.showSnackBar(
-            SnackBar(content: Text("${node.displayName} deleted")),
+            SnackBar(
+              content: Text("${node.displayName} deleted"),
+              duration: const Duration(seconds: 1),
+            ),
           );
         },
       );
