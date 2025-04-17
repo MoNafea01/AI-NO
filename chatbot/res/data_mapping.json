@@ -216,7 +216,7 @@
     },
     "model_compiler": {
         "params": {
-            "optimizer": "sgd",
+            "optimizer": "adam",
             "loss": "categorical_crossentropy",
             "metrics": [
                 "accuracy"
