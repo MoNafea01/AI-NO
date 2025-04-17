@@ -30,7 +30,7 @@ def create_project(project_id):
     active_user = data_store["active_user"]
     if not active_user:
         return False, "No user selected."
-    data_store["users"][active_user]["projects"][project_id] = {}
+    data_store["users"][active_user]["projects"][project_id] = []
     if not data_store['active_project']:
         data_store["active_project"] = project_id
         

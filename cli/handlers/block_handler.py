@@ -1,5 +1,6 @@
 from data_store import get_data_store
-from handlers.mapper import mapper
+from utils.mapper import mapper
+from utils.defaults import default_data, Models, Preprocessors
 import re, json, requests
 
 def handle_block_command(sub_cmd, args):
@@ -20,6 +21,47 @@ def handle_block_command(sub_cmd, args):
         return commands[sub_cmd](*args)
     return False, f"Unknown node command: {sub_cmd}"
     
+def extract_model_info(model_name, args):
+    model_params = {}
+
+    if len(args) >= 1:
+        model_params = eval(''.join(args))
+    
+    model_info = None
+    for i, param in enumerate(default_data):
+        if model_name == param.get("model_name"):
+            model_info = default_data[i]
+            break
+    model_info['params'].update(model_params) if model_params else {}
+    return model_info
+
+def extract_preprocess_info(preprecessor_name, args):
+    preprocessor_params = {}
+
+    if len(args) >= 1:
+        preprocessor_params = eval(''.join(args))
+    
+    preprocessor_info = None
+
+    for i,param in enumerate(default_data):
+        if preprecessor_name == param.get('preprocessor_name'):
+            preprocessor_info = default_data[i]
+            break
+    preprocessor_info['params'].update(preprocessor_params) if preprocessor_params else {}
+    return preprocessor_info
+
+def extract_node_info(node_name, args):
+    if node_name in Models:
+        args = extract_model_info(node_name, args)
+    elif node_name in Preprocessors:
+        args = extract_preprocess_info(node_name, args)
+    else:
+        if len(args) > 1:
+            args = eval(''.join(args[1:]))
+        else:
+            args = {}
+    return args
+
 
 def create_block(*args):
     data_store = get_data_store()
@@ -31,8 +73,9 @@ def create_block(*args):
     node_name = args[0]
     if node_name not in mapper:
         return False, f"Node {node_name} not found in the mapper."
+    
+    args = extract_node_info(node_name, args[1:])
     query = mapper.get(node_name)
-    args = eval(''.join(args[1:]))
 
     payload = send_request_to_api(args, query, project_id=project_id)
     if not isinstance(payload, dict):
@@ -59,7 +102,7 @@ def edit_block(*args):
         return False, f"Node {block_id} not found."
 
     query = mapper.get(node_name)
-    args = eval(''.join(args[2:]))
+    args = extract_node_info(node_name, args[2:])
 
     payload = send_request_to_api(args, query, method_type='put', node_id=block_id, project_id=project_id)
     if not isinstance(payload, dict):
