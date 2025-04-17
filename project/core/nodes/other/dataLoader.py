@@ -86,7 +86,7 @@ class DataLoader:
         names = ["X", "y"]
 
         for i in range(1, 3):
-            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}: {names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id))
+            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}_{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id))
         
         payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
         for i in range(3):
