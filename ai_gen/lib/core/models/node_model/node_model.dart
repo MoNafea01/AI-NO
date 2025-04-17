@@ -1,4 +1,7 @@
-import 'Params.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
+import 'package:flutter/material.dart';
+
+import 'parameter_model.dart';
 
 class NodeModel {
   num? id;
@@ -10,10 +13,10 @@ class NodeModel {
   String category;
   String type;
   String task;
-  List<Params>? params;
+  List<ParameterModel>? params;
   List<String>? inputDots;
   List<String>? outputDots;
-  String? apiCall;
+  String? endPoint;
 
   NodeModel({
     this.id,
@@ -27,7 +30,7 @@ class NodeModel {
     this.params,
     this.inputDots,
     this.outputDots,
-    this.apiCall,
+    this.endPoint,
   });
 
   NodeModel copyWith({
@@ -39,7 +42,7 @@ class NodeModel {
     String? category,
     String? type,
     String? task,
-    List<Params>? params,
+    List<ParameterModel>? params,
     List<String>? inputDots,
     List<String>? outputDots,
     String? apiCall,
@@ -56,34 +59,49 @@ class NodeModel {
       params: params ?? this.params,
       inputDots: inputDots ?? this.inputDots,
       outputDots: outputDots ?? this.outputDots,
-      apiCall: apiCall ?? this.apiCall,
+      endPoint: apiCall ?? this.endPoint,
     );
   }
 
-  NodeModel.fromJson(dynamic json)
-      : name = json['node_name'] ?? "Node",
-        category = json['category'] ?? "cat ${json['id']}",
-        type = json['node_type'] ?? "type ${json['id']}",
-        task = json['task'] ?? "task ${json['id']}" {
-    if (json['id'] != null) id = num.parse(json['id'].toString());
-    if (json['idx'] != null) index = int.parse(json['idx'].toString());
+  factory NodeModel.fromJson(dynamic json) {
+    String name = json['node_name'] ?? "Node";
+    String category = json['category'] ?? "cat ${json['id']}";
+    String type = json['node_type'] ?? "type ${json['id']}";
+    String task = json['task'] ?? "task ${json['id']}";
+    num id = num.parse(json['id'].toString());
+    int index = json['idx'] != null ? int.parse(json['idx'].toString()) : 5;
+    String displayName = json['displayed_name'] ?? name;
+    String description = json['description'];
 
-    displayName = json['displayed_name'] ?? name;
-    description = json['description'];
-
+    List<ParameterModel> params = [];
     if (json['params'] != null) {
       params = (json['params'] as List)
-          .map((e) => Params.fromJson(e as Map<String, dynamic>))
+          .map((e) => ParameterModel.fromJson(e as Map<String, dynamic>))
           .toList();
     }
 
-    inputDots = json['input_channels'] != null
+    List<String>? inputDots = json['input_channels'] != null
         ? json['input_channels'].cast<String>()
         : [];
-    outputDots = json['output_channels'] != null
+    List<String> outputDots = json['output_channels'] != null
         ? json['output_channels'].cast<String>()
         : [];
-    apiCall = json['api_call'];
+    String? apiCall = json['api_call'];
+
+    return NodeModel(
+      id: id,
+      index: index,
+      name: name,
+      category: category,
+      type: type,
+      task: task,
+      endPoint: apiCall,
+      displayName: displayName,
+      description: description,
+      inputDots: inputDots,
+      outputDots: outputDots,
+      params: params,
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -99,7 +117,7 @@ class NodeModel {
     json['params'] = params?.map((e) => e.toJson()).toList();
     json['input_channels'] = inputDots;
     json['output_channels'] = outputDots;
-    json['api_call'] = apiCall;
+    json['api_call'] = endPoint;
     return json;
   }
 
@@ -109,5 +127,33 @@ class NodeModel {
     params?.forEach((param) => paramsMap[param.name] = param.value);
 
     return paramsMap;
+  }
+
+  Color get color {
+    // if (name == "model_fitter") {
+    //   return NodeTypes.models.color;
+    // }
+    // if (name == "preprocessor_fitter") {
+    //   return NodeTypes.preprocessors.color;
+    // }
+
+    switch (category) {
+      case "Models":
+        return NodeTypes.models.color;
+      case "Preprocessors":
+        return NodeTypes.preprocessors.color;
+      case "Core":
+        return NodeTypes.core.color;
+      case "Custom":
+        return NodeTypes.custom.color;
+      case "Input":
+        return NodeTypes.input.color;
+      case "Output":
+        return NodeTypes.output.color;
+      case "Network":
+        return NodeTypes.network.color;
+      default:
+        return NodeTypes.general.color;
+    }
   }
 }

@@ -1,6 +1,5 @@
+import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../node_package/vs_node_view.dart';
 
 class Legend extends StatelessWidget {
   const Legend({super.key});

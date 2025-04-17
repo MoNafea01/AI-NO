@@ -1,25 +1,33 @@
+import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/features/screens/splashScreen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import 'core/di/getit_intialize.dart';
+import 'core/di/get_it_initialize.dart';
+import 'core/helper/my_windows_manager.dart';
 import 'core/network/server_manager/server_manager.dart';
-import 'features/node_view/presentation/grid_loader.dart';
 
 void main() async {
-  // Create ServerManager
+  WidgetsFlutterBinding.ensureInitialized();
   initializeGetIt();
-  ServerManager serverManager = GetIt.I.get<ServerManager>();
+  await initializeWindowsManager();
+
+  // Create ServerManager
+  // ServerManager serverManager = GetIt.I.get<ServerManager>();
 
   // Stop any existing servers
-  await serverManager.stopServer();
+  // await serverManager.stopServer();
 
   // Start server and wait for it to be fully operational
-  if (true) {
-    await serverManager.startServer();
-  }
+  // if (true) {
+  //   await serverManager.startServer();
+  // }
 
   runApp(const MyApp());
 }
+
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -67,12 +75,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
-      title: 'AI Gen',
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(255, 46, 46, 46),
-      ),
-      home: const Scaffold(backgroundColor: Colors.white, body: GridLoader()),
+      title: "AI Gen",
+      theme: ThemeData(scaffoldBackgroundColor: AppColors.appBackgroundColor),
+      home: const SplashScreen(),
     );
   }
 }

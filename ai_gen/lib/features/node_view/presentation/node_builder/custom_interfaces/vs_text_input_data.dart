@@ -1,13 +1,14 @@
+import 'package:ai_gen/local_pcakages/vs_node_view/data/standard_interfaces/vs_int_interface.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/data/standard_interfaces/vs_num_interface.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../../node_package/vs_node_view.dart';
 
 class VsTextInputData extends VSInputData {
   ///Basic int input interface
   VsTextInputData({
     required super.type,
-    super.toolTip,
     super.interfaceIconBuilder,
+    super.title = "xx",
     required this.controller,
     super.initialConnection,
   }) {
@@ -22,7 +23,6 @@ class VsTextInputData extends VSInputData {
         ),
       );
     };
-    super.title = "";
   }
   final TextEditingController controller;
   @override

@@ -42,3 +42,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Ignore compiled Python files
+__pycache__/
+
+#ignore android build
+*.cc
+*cmake

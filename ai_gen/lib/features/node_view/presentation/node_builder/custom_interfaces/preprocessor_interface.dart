@@ -6,6 +6,8 @@ import 'package:ai_gen/features/node_view/presentation/node_builder/custom_inter
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+Color _interfaceColor = NodeTypes.preprocessors.color;
+
 class VSPreprocessorInputData extends VSAINOGeneralInputData {
   ///Basic List input interface
   VSPreprocessorInputData({
@@ -13,14 +15,21 @@ class VSPreprocessorInputData extends VSAINOGeneralInputData {
     super.title,
     super.toolTip,
     super.initialConnection,
-    super.interfaceIconBuilder,
+    super.connectedInputIcon,
   });
 
   @override
   List<Type> get acceptedTypes => [VSPreprocessorOutputData];
 
   @override
-  Color get interfaceColor => NodeColors.modelColor;
+  // TODO: implement inputIcon
+  IconData get inputIcon => Icons.square_outlined;
+
+  @override
+  IconData get connectedInputIcon => Icons.square_rounded;
+
+  @override
+  Color get interfaceColor => _interfaceColor;
 }
 
 class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
@@ -38,15 +47,19 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
         "preprocessor_type": node.type,
         "params": node.paramsToJson,
       };
+
       final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
       return await nodeServerCalls.runNode(node, apiBody);
     };
   }
 
   @override
+  IconData get outputIcon => Icons.square_sharp;
+
+  @override
   Future<dynamic> Function(Map<String, dynamic> data) get outputFunction =>
       _outputFunction;
 
   @override
-  Color get interfaceColor => NodeColors.modelColor;
+  Color get interfaceColor => node.color;
 }

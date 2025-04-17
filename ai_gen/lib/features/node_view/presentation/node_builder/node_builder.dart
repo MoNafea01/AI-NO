@@ -1,16 +1,15 @@
-import 'package:ai_gen/core/models/node_model/Params.dart';
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/preprocessor_interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
-import 'package:ai_gen/node_package/vs_node_view.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../../main.dart';
+import 'custom_interfaces/aino_general_Interface.dart';
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
+import 'custom_interfaces/preprocessor_interface.dart';
 
 class NodeBuilder {
   Future<List<Object>> buildNodesMenu() async {
@@ -20,7 +19,7 @@ class NodeBuilder {
     return [
       // output node
       (Offset offset, VSOutputData? ref) => VSOutputNode(
-            type: "Scope",
+            type: "Run",
             widgetOffset: offset,
             ref: ref,
           ),
@@ -80,18 +79,26 @@ class NodeBuilder {
     return (Offset offset, VSOutputData? ref) {
       NodeModel newNode = node.copyWith();
       return VSNodeData(
+        node: newNode,
         type: newNode.name,
         title: newNode.displayName,
+        nodeColor: newNode.color,
         toolTip: newNode.description,
-        menuToolTip: "",
         widgetOffset: offset,
         inputData: _buildInputData(newNode, ref),
         outputData: _buildOutputData(newNode),
-        deleteAction: () {
-          print("${newNode.name} Deleted");
+        deleteNode: () {
           final NodeServerCalls nodeServerCalls =
               GetIt.I.get<NodeServerCalls>();
           if (newNode.nodeId != null) nodeServerCalls.deleteNode(newNode);
+
+          scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(
+              content: Text("${node.displayName} deleted"),
+              duration: const Duration(seconds: 1),
+            ),
+          );
         },
       );
     };
@@ -99,7 +106,6 @@ class NodeBuilder {
 
   List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      ...node.params?.map(_paramInput) ?? [],
       ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
           [],
     ];
@@ -107,84 +113,50 @@ class NodeBuilder {
 
   VSInputData _inputDots(
       NodeModel node, String inputDot, VSOutputData<dynamic>? ref) {
-    if (inputDot == "model" || inputDot == "fittedModel") {
+    if (inputDot == "model" || inputDot == "fitted_model") {
       return VSModelInputData(type: inputDot, initialConnection: ref);
     }
-    if (inputDot == "preprocessor") {
+    if (inputDot == "preprocessor" || inputDot == "fitted_preprocessor") {
       return VSPreprocessorInputData(type: inputDot, initialConnection: ref);
     }
     return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
   }
 
-  VSInputData _paramInput(Params param) {
-    final controller = TextEditingController(text: param.value.toString());
-    controller.addListener(() => param.value = controller.text);
-
-    return VsTextInputData(type: param.name, controller: controller);
-  }
-
   List<VSOutputData> _buildOutputData(NodeModel node) {
-    if (node.outputDots != null && node.outputDots!.length > 1) {
+    if (node.outputDots == null || node.outputDots!.isEmpty) return [];
+
+    final String outputDot = node.outputDots![0];
+    if (node.outputDots!.length > 1) {
       return multiOutputNodes(node);
     }
-    return node.outputDots?.map(
-          (outputDot) {
-            if (node.category == "Models") {
-              return VSModelOutputData(type: outputDot, node: node);
-            }
-            if (outputDot == "preprocessor") {
-              return VSPreprocessorOutputData(type: outputDot, node: node);
-            }
-
-            return VSAINOGeneralOutputData(type: outputDot, node: node);
-          },
-        ).toList() ??
-        [];
+    if (node.category == "Models") {
+      return [VSModelOutputData(type: outputDot, node: node)];
+    }
+    if (node.category == "Preprocessors") {
+      return [VSPreprocessorOutputData(type: outputDot, node: node)];
+    }
+    if (node.name == "model_fitter" || node.name == "preprocessor_fitter") {
+      return [
+        VSAINOGeneralOutputData(
+          type: outputDot,
+          node: node,
+          outputIcon: Icons.square_sharp,
+        )
+      ];
+    }
+    return [VSAINOGeneralOutputData(type: outputDot, node: node)];
   }
 
-  List<VSOutputData> multiOutputNodes(NodeModel node) {
-    Map<String, dynamic>? postResponse;
-    final List<VSOutputData> outputData = [];
-
+  List<MultiOutputOutputData> multiOutputNodes(NodeModel node) {
+    Map<String, dynamic> response = {};
+    final List<MultiOutputOutputData> outputData = [];
     for (int i = 0; i < node.outputDots!.length; i++) {
-      if (i == 0) {
-        outputData.add(
-          MultiOutputOutputData(
-            type: node.outputDots![i],
-            outputFunction: (inputData) async {
-              postResponse = null;
-              final Map<String, dynamic> apiBody = {};
-              if (node.name == "data_loader") {
-                apiBody["dataset_name"] = "diabetes";
-              } else {
-                for (var input in inputData.entries) {
-                  apiBody[input.key] = await input.value;
-                }
-              }
-              final NodeServerCalls nodeServerCalls =
-                  GetIt.I.get<NodeServerCalls>();
-              postResponse = await nodeServerCalls.runNode(node, apiBody);
-
-              node.nodeId = postResponse!["node_id"];
-              return await nodeServerCalls.getNode(node, 1);
-            },
-          ),
-        );
-        continue;
-      }
       outputData.add(
         MultiOutputOutputData(
+          index: i,
+          node: node,
+          response: response,
           type: node.outputDots![i],
-          outputFunction: (inputData) async {
-            while (postResponse == null) {
-              await Future.delayed(const Duration(milliseconds: 100));
-            }
-
-            node.id = postResponse!["node_id"];
-            final NodeServerCalls nodeServerCalls =
-                GetIt.I.get<NodeServerCalls>();
-            return await nodeServerCalls.getNode(node, 2);
-          },
         ),
       );
     }

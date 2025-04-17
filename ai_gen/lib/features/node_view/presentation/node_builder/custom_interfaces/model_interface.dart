@@ -1,10 +1,11 @@
-import 'dart:async';
-
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+
+import 'aino_general_Interface.dart';
+import 'interface_colors.dart';
+
+Color _interfaceColor = NodeTypes.models.color;
 
 class VSModelInputData extends VSAINOGeneralInputData {
   ///Basic List input interface
@@ -13,19 +14,26 @@ class VSModelInputData extends VSAINOGeneralInputData {
     super.title,
     super.toolTip,
     super.initialConnection,
-    super.interfaceIconBuilder,
   });
+
+  @override
+  IconData get connectedInputIcon => Icons.square_rounded;
+  @override
+  IconData get inputIcon => Icons.square_outlined;
 
   @override
   List<Type> get acceptedTypes => [VSModelOutputData];
 
   @override
-  Color get interfaceColor => NodeColors.modelColor;
+  Color get interfaceColor => _interfaceColor;
 }
 
 class VSModelOutputData extends VSAINOGeneralOutputData {
   ///Basic List output interface
   VSModelOutputData({required super.type, required super.node});
+
+  @override
+  IconData get outputIcon => Icons.square_rounded;
 
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {
@@ -46,5 +54,5 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
       _outputFunction;
 
   @override
-  Color get interfaceColor => NodeColors.modelColor;
+  Color get interfaceColor => node.color;
 }

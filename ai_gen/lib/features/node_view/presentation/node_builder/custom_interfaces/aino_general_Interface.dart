@@ -1,13 +1,13 @@
-import 'dart:async';
-
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
-import 'package:ai_gen/node_package/data/vs_interface.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-const Color _interfaceColor = NodeColors.generalColor;
+import 'interface_colors.dart';
+import 'multi_output_interface.dart';
+
+Color _interfaceColor = NodeTypes.general.color;
 
 class VSAINOGeneralInputData extends VSInputData {
   ///Basic List input interface
@@ -16,15 +16,14 @@ class VSAINOGeneralInputData extends VSInputData {
     super.title,
     super.toolTip,
     super.initialConnection,
+    super.inputIcon,
+    super.connectedInputIcon,
     super.interfaceIconBuilder,
   });
 
   @override
-  List<Type> get acceptedTypes => [];
-
-  // to accept all types (like the evaluate node)
-  @override
-  bool acceptInput(VSOutputData? data) => true;
+  List<Type> get acceptedTypes =>
+      [VSAINOGeneralOutputData, MultiOutputOutputData];
 
   @override
   Color get interfaceColor => _interfaceColor;
@@ -32,8 +31,13 @@ class VSAINOGeneralInputData extends VSInputData {
 
 class VSAINOGeneralOutputData extends VSOutputData {
   ///Basic List output interface
-  VSAINOGeneralOutputData(
-      {required super.type, required this.node, super.outputFunction});
+  VSAINOGeneralOutputData({
+    required super.type,
+    required this.node,
+    super.outputFunction,
+    super.interfaceIconBuilder,
+    super.outputIcon,
+  });
 
   final NodeModel node;
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
@@ -57,5 +61,5 @@ class VSAINOGeneralOutputData extends VSOutputData {
       _outputFunction;
 
   @override
-  Color get interfaceColor => _interfaceColor;
+  Color get interfaceColor => node.color;
 }
