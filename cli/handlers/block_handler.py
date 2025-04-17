@@ -50,18 +50,29 @@ def extract_preprocess_info(preprecessor_name, args):
     preprocessor_info['params'].update(preprocessor_params) if preprocessor_params else {}
     return preprocessor_info
 
+def other_node_info(node_name, args):
+    node_params = {}
+
+    if len(args) > 0 :
+        node_params = eval(''.join(args))
+    
+    node_info = None
+
+    for i, param in enumerate(default_data):
+        if node_name == param.get("node_name"):
+            node_info = default_data[i]
+            break
+    node_info.pop('node_name', None)
+    node_info.update(node_params) if node_params else {}
+    return node_info
+
 def extract_node_info(node_name, args):
     if node_name in Models:
-        args = extract_model_info(node_name, args)
+        return extract_model_info(node_name, args)
     elif node_name in Preprocessors:
-        args = extract_preprocess_info(node_name, args)
+        return extract_preprocess_info(node_name, args)
     else:
-        if len(args) > 1:
-            args = eval(''.join(args[1:]))
-        else:
-            args = {}
-    return args
-
+        return other_node_info(node_name, args)
 
 def create_block(*args):
     data_store = get_data_store()

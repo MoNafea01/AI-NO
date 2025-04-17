@@ -13,22 +13,22 @@ default_data = [
     {'model_name': 'sigmoid_svr', 'task': 'regression', 'model_type': 'svm', 'params': {'kernel': 'sigmoid', 'C': 1.0}},
     {'model_name': 'rbf_svc', 'task': 'classification', 'model_type': 'svm', 'params': {'C': 1.0}},
     {'model_name': 'linear_svc', 'task':'classification','model_type':'svm','params' :{'C': 1.0}},
-    {'model_name':'poly_svc','task':'classification','model_type':'svm','params' :{'kernel':'poly', 'C': 1.0}},
-    {'model_name':'sigmoid_svc','task':'classification','model_type':'svm','params' :{'kernel':'sigmoid', 'C': 1.0}},
-    {'model_name':'bagging_regressor','task':'regression','model_type':'tree','params' :{}},
-    {'model_name':'adaboost_regressor','task':'regression','model_type':'tree','params' :{}},
-    {'model_name':'gradient_boosting_regressor','task':'regression','model_type':'tree','params' :{}},
-    {'model_name':'decision_tree_regressor','task':'regression','model_type':'tree','params' :{'n_estimators' : 100}},
-    {'model_name':'random_forest_regressor','task':'regression','model_type':'tree','params' :{'n_estimators' : 100}},
-    {'model_name':'bagging_classifier','task':'classification','model_type':'tree','params' :{}},
-    {'model_name':'adaboost_classifier','task':'classification','model_type':'tree','params' :{}},
-    {'model_name':'gradient_boosting_classifier','task':'classification','model_type':'tree','params' :{}},
-    {'model_name':'decision_tree_classifier','task':'classification','model_type':'tree','params' :{'n_estimators' : 100}},
-    {'model_name':'random_forest_classifier','task':'classification','model_type':'tree','params' :{'n_estimators' : 100}},
-    {'model_name':'gaussian_nb','task':'classification','model_type':'naive_bayes','params' :{}},
-    {'model_name':'bernoulli_nb','task':'classification','model_type':'naive_bayes','params' :{}},
-    {'model_name':'multinomial_nb','task':'classification','model_type':'naive_bayes','params' :{}},
-    {'model_name':'knn_regressor', 'task': 'regression', 'model_type': 'knn', 'params': {'n_neighbors': 5,}},
+    {'model_name': 'poly_svc','task':'classification','model_type':'svm','params' :{'kernel':'poly', 'C': 1.0}},
+    {'model_name': 'sigmoid_svc','task':'classification','model_type':'svm','params' :{'kernel':'sigmoid', 'C': 1.0}},
+    {'model_name': 'bagging_regressor','task':'regression','model_type':'tree','params' :{}},
+    {'model_name': 'adaboost_regressor','task':'regression','model_type':'tree','params' :{}},
+    {'model_name': 'gradient_boosting_regressor','task':'regression','model_type':'tree','params' :{}},
+    {'model_name': 'decision_tree_regressor','task':'regression','model_type':'tree','params' :{'n_estimators' : 100}},
+    {'model_name': 'random_forest_regressor','task':'regression','model_type':'tree','params' :{'n_estimators' : 100}},
+    {'model_name': 'bagging_classifier','task':'classification','model_type':'tree','params' :{}},
+    {'model_name': 'adaboost_classifier','task':'classification','model_type':'tree','params' :{}},
+    {'model_name': 'gradient_boosting_classifier','task':'classification','model_type':'tree','params' :{}},
+    {'model_name': 'decision_tree_classifier','task':'classification','model_type':'tree','params' :{'n_estimators' : 100}},
+    {'model_name': 'random_forest_classifier','task':'classification','model_type':'tree','params' :{'n_estimators' : 100}},
+    {'model_name': 'gaussian_nb','task':'classification','model_type':'naive_bayes','params' :{}},
+    {'model_name': 'bernoulli_nb','task':'classification','model_type':'naive_bayes','params' :{}},
+    {'model_name': 'multinomial_nb','task':'classification','model_type':'naive_bayes','params' :{}},
+    {'model_name': 'knn_regressor', 'task': 'regression', 'model_type': 'knn', 'params': {'n_neighbors': 5,}},
     {'model_name': 'knn_classifier', 'task': 'classification', 'model_type': 'knn', 'params': {'n_neighbors': 5,}},
 
     {"preprocessor_name": "maxabs_scaler", "preprocessor_type": "scaler", "params": {}},
@@ -43,6 +43,31 @@ default_data = [
     {"preprocessor_name": "knn_imputer",  "preprocessor_type": "imputer", "params": {'n_neighbors': 5}},
     {"preprocessor_name": "simple_imputer", "preprocessor_type": "imputer", "params": {'strategy': 'mean'}},
     {"preprocessor_name": "binarizer", "preprocessor_type": "binarizer", "params": {'threshold': 0.0}},
+
+    {"node_name": "data_loader", "params": {"dataset_name":"iris"}},
+    {"node_name": "splitter", "params": {}},
+    {"node_name": "joiner", "params": {}},
+    {"node_name": "train_test_split", "params": {"test_size": 0.2, "random_state": 42}},
+
+
+    {"node_name": "model_fitter", "params":{}},
+    {"node_name": "evaluator", "params": {"metric": "accuracy"}},
+    {"node_name": "predictor", "params":{}},
+
+    {"node_name": "preprocessor_fitter", "params":{}},
+    {"node_name": "transformer", "params":{}},
+    {"node_name": "fitter_transformer", "params":{}},
+
+    {"node_name": "input_layer", "params": {"shape": [28, 28, 1]}},
+    {"node_name": "conv2d_layer", "params": {"filters": 32,"kernel_size": [3,3],"activation": "relu"}},
+    {"node_name": "maxpooling2d_layer", "params": {"pool_size": [2,2]}},
+    {"node_name": "flatten_layer", "params": {}}, 
+    {"node_name": "dense_layer", "params": {"units": 128,"activation": "relu"}},
+    {"node_name": "dropout_layer", "params": {"rate": 0.5}},
+    {"node_name": "sequential_model", "params":{}},
+    {"node_name": "model_compiler", "params": {"optimizer":"adam","loss":"sparse_categorical_crossentropy","metrics":["accuracy"]}},
+    {"node_name": "nn_model_fitter", "params": {"epochs": 10,"batch_size": 32,"validation_split": 0.2}},
+
 ]
 
 
@@ -56,3 +81,5 @@ Models = ['ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net'
 Preprocessors = ['maxabs_scaler', 'normalizer', 'minmax_scaler', 'robust_scaler', 
                  'standard_scaler', 'label_encoder', 'onehot_encoder', 'ordinal_encoder', 
                  'label_binarizer', 'knn_imputer', 'simple_imputer', 'binarizer']
+
+dict_nodes = ['data', 'data_1', 'data_2', 'X', 'y', 'model', 'y_true', 'y_pred', 'preprocessor', 'prev_node', 'layer', 'node']
