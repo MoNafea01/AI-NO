@@ -1,5 +1,6 @@
 from data_store import get_data_store, set_data_store, load_backup_data
 from save_load import save_data_to_file
+from handlers.block_handler import send_request_to_api
 import os
 
 path = os.path.dirname(os.path.abspath(__file__)) + '/../'
@@ -92,8 +93,13 @@ def get_recent():
     active_project = json_data['active_project']
 
     if not (active_user or active_project):
-        load_backup_data()
-        return True, "Loaded Backup Data..."
+        json_data = load_backup_data()
+        api_response = send_request_to_api([], "nodes/", method_type="get", project_id="1")
+        if api_response:
+            active_user = json_data['active_user']
+            active_project = json_data['active_project']
+            json_data['users'][active_user]['projects'][active_project] = api_response
+    
     set_data_store(json_data)
     recent_project = get_data_store()['active_project']
     return True, recent_project

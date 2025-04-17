@@ -2,7 +2,7 @@ import os, re
 from ai_operations.models import Node
 from core.nodes.configs.const_ import (
     MODELS_TASKS, PREPROCESSORS_TASKS, NN_TASKS, DATA_HANDLER_TASKS, NN_NAMES, MODELS_NAMES, PREPROCESSORS_NAMES, DATA_HANDLER_NAMES)
-
+from .configs.const_ import MODELS_NAMES, PREPROCESSORS_NAMES
 
 class NodeNameHandler:
     """Handles naming and ID extraction from paths."""
@@ -25,13 +25,19 @@ class PayloadBuilder:
     def build_payload(message, node_data, node_name, **kwargs):
         payload = {
             "message": message,
-            "params": NodeAttributeExtractor.get_attributes(node_data),
             "node_id": id(node_data),
             "node_name": node_name,
             "node_data": node_data,
             "task": "custom",
             "children": [],
         }
+        if node_name in MODELS_NAMES:
+            payload["params"] = ModelAttributeExtractor.get_attributes(node_data)
+        elif node_name in PREPROCESSORS_NAMES:
+            payload["params"] = PreprocessorAttributeExtractor.get_attributes(node_data)
+        else:
+            payload["params"] = NodeAttributeExtractor.get_attributes(node_data)
+            
         payload.update(kwargs)
         return payload
 
@@ -45,6 +51,46 @@ class NodeAttributeExtractor:
         for attr in dir(node):
             if attr.endswith("_") and not attr.startswith("_"):
                 atr = getattr(node, attr)
+                if hasattr(atr, "tolist"):
+                    attributes[attr] = atr.tolist()
+        return attributes
+
+
+
+class ModelAttributeExtractor:
+    """Extracts attributes from a model."""
+    @staticmethod
+    def get_attributes(model):
+        fitted_params = {}
+        attributes = ['coef_', 'intercept_', 'classes_', 
+                      'support_vectors_', 'feature_importances_',
+                      'tree_', 'n_iter_']
+        for attr in attributes:
+            if hasattr(model, attr):
+                atr = getattr(model, attr)
+                if hasattr(atr, 'tolist'):
+                    fitted_params[attr] = atr.tolist()
+        return fitted_params
+
+
+
+class PreprocessorAttributeExtractor:
+    """Extracts attributes from a preprocessors."""
+    @staticmethod
+    def get_attributes(preprocessor):
+
+        excluded_attributes = {
+            "n_samples_seen_",
+            "n_features_in_",
+            "feature_names_in_",
+            "dtype_",
+            "sparse_input_"
+        }
+        
+        attributes = {}
+        for attr in dir(preprocessor):
+            if attr.endswith("_") and not attr.startswith("_") and attr not in excluded_attributes:
+                atr = getattr(preprocessor, attr)
                 if hasattr(atr, "tolist"):
                     attributes[attr] = atr.tolist()
         return attributes

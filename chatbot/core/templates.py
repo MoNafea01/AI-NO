@@ -13,7 +13,6 @@ User Query:
 
 Instructions:
 - Carefully read the Reference Information, node names, and default arguments for each node.
-- If user didn't provide any value for the arguments, use the default values from the mapping using this.
 - Return the CLI command(s) that are relevant to the user's query.
 - Format your response as a raw Python list: ['command1', 'command2', ...]
 - Do NOT include any explanations, comments, or formatting outside the list.
@@ -22,11 +21,11 @@ Instructions:
 - The output MUST be ordered in the same order as the input.
 
 Example Query:
-I want to make a logistic regression model and make a project with id 3.
+I want to make a logistic regression model with C value of 0.5 and make a project with id 3.
 
 Expected Response:
 [
-    'make logistic_regression {{"model_name":"logistic_regression","model_type":"linear_models","task":"classification"}}',
+    'make logistic_regression {{'C':0.5}}',
     'create_project 3'
 ]
 """
@@ -56,11 +55,10 @@ Instructions:
 - Carefully read the Reference Information, user query.
 - Follow the steps that is given to you in the reference information one by one.
 - take the response from API (which is also stored in your corpus) to fill in the values that needs to be filled e.g. <model_id>.
-- If user didn't provide any value for the arguments, use the default values from the mapping using this.
 - Return the CLI command(s) that are relevant to the user's query.
 - Show only the current command. You can know that by the current iteration number.
 - Format the output as string.
-- Do NOT include any explanations, comments, or formatting outside the string.
+- Do NOT include any explanations, comments, or formatting.
 - Monitor the message of the api response and determine whether there is an error or not.
 
 Note The Following: 
@@ -72,7 +70,7 @@ I want to fit knn on diabetes dataset
 
 Expected Response:
 [
-    'make knn_classifier {{"model_name":"knn_classifier","task":"classification","model_type":"knn","params":{{"n_neighbors": 5}}}}',
+    'make knn_classifier {{"n_neighbors": 5}}',
     'make data_loader {{"params":{{"dataset_name": "iris"}}}}',
     'show data_loader data_loader_id 1',
     'show data_loader data_loader_id 2',
