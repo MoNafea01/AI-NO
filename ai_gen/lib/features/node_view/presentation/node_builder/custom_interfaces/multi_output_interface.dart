@@ -50,12 +50,13 @@ class MultiOutputOutputData extends VSAINOGeneralOutputData {
         final Map<String, dynamic> apiBody = {};
 
         if (node.name == "data_loader") {
-          apiBody["params"] = {"dataset_name": "diabetes"};
+          apiBody["params"] = node.paramsToJson;
         } else {
           for (var input in inputData.entries) {
             apiBody[input.key] = await input.value;
           }
         }
+
         response = await nodeServerCalls.runNode(node, apiBody);
         node.nodeId = response["node_id"] ?? "Null ID";
       } else {

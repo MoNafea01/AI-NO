@@ -10,9 +10,11 @@ class ParameterModel {
   String? _type;
   dynamic value;
   dynamic _defaultValue;
+  final List? choices;
 
   ParameterModel({
     this.name = 'param_name',
+    this.choices = const [],
     String? type,
     dynamic defaultValue,
   })  : _type = type,
@@ -21,13 +23,21 @@ class ParameterModel {
 
   get defaultValue => _defaultValue;
 
-  ParameterModel.fromJson(dynamic json) : name = json['name'] ?? 'param_name' {
-    _type = json['type'];
-    _defaultValue = json['default'];
-    value = json['default'];
+  factory ParameterModel.fromJson(dynamic json) {
+    print(json['choices']);
+    return ParameterModel(
+      name: json['name'] ?? 'Parameter',
+      type: json['type'],
+      defaultValue: json['default'],
+      choices: json['choices'] as List? ?? [],
+    );
   }
 
   get type {
+    if (choices != null && choices!.isNotEmpty) {
+      return ParameterType.dropDownList;
+    }
+
     switch (_type) {
       case 'str':
         return ParameterType.string;

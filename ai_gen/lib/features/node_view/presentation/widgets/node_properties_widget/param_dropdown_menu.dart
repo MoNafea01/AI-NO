@@ -18,18 +18,18 @@ class _ParamDropDownMenuState extends State<ParamDropDownMenu> {
         child: DropdownButton<String>(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           isDense: true,
-          value: widget.parameter.value,
+          value: widget.parameter.value.toString(),
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down),
-          items: ['l1', 'l2', 'elasticnet', 'none'].map((String value) {
+          items: widget.parameter.choices?.map((value) {
             return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
+              value: value.toString(),
+              child: Text(value.toString()),
             );
           }).toList(),
           onChanged: (String? newValue) {
             setState(() {
-              widget.parameter.value = newValue!;
+              widget.parameter.value = newValue ?? widget.parameter.value;
             });
           },
         ),
