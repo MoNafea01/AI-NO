@@ -1,17 +1,4 @@
-class ModelAttributeExtractor:
-    """Extracts attributes from a model."""
-    @staticmethod
-    def get_attributes(model):
-        fitted_params = {}
-        attributes = ['coef_', 'intercept_', 'classes_', 
-                      'support_vectors_', 'feature_importances_',
-                      'tree_', 'n_iter_']
-        for attr in attributes:
-            if hasattr(model, attr):
-                atr = getattr(model, attr)
-                if hasattr(atr, 'tolist'):
-                    fitted_params[attr] = atr.tolist()
-        return fitted_params
+from ..utils import ModelAttributeExtractor
 
 class PayloadBuilder:
     """Constructs payloads for saving and response."""

@@ -304,9 +304,9 @@ class NodeUpdater:
                     os.remove(node_path)
 
             # serialization part
-            node_data = NodeDataExtractor(return_serialized=self.return_serialized)(node_id)
-            message = f"Node {node_id} updated."
-            payload.update({"message": message, "node_data": node_data})
+            out_node = NodeLoader(return_serialized=self.return_serialized)(node_id)
+            message = f"Node {out_node.get('node_name')} with id {node_id} updated."
+            payload.update({"message": message, "node_data": out_node.get('node_data')})
             return True, payload
         except ObjectDoesNotExist:
             return False, f"Node {node_id} does not exist."

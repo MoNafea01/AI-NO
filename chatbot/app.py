@@ -26,7 +26,7 @@ def manual_mode(docs, question, model, to_db):
     rag_output = run_pipeline(docs, question, model, selected_mode="1", cur_iter=0)
     rag_output = parse_command_list(rag_output)
 
-    print(f"RAG Output : \n"+str(rag_output))
+    print(f"RAG Output : \n"+str(rag_output), end='\n\n')
     out = []
     for i, output in enumerate(rag_output):
         cmd = output
@@ -34,8 +34,9 @@ def manual_mode(docs, question, model, to_db):
             cmd = call_script(output)
         out.append(cmd)
 
-        print(f"API Output {i}: \n"+str(cmd))
-        print('-'*50)
+        print(f"\nAPI Output {i+1}: \n"+str(cmd), end='\n')
+
+    print('-'*50)
     return out
 
 def auto_mode(question, model, to_db):
@@ -48,11 +49,11 @@ def auto_mode(question, model, to_db):
         cur_iter += 1
         rag_output= run_pipeline(docs, question, model, selected_mode="2", cur_iter=cur_iter)
         rag_output = rag_output.strip().strip("'").strip('"')
-        print(f"RAG Output {cur_iter}: ",rag_output)
+        print(f"RAG Output {cur_iter}: \n",rag_output, end='\n\n')
 
         api_response = extract_id_message(call_script(rag_output))
         docs[-1].page_content += '\n' + str(api_response)
-        print(f"\nAPI Response {cur_iter}: ",api_response)
+        print(f"API Response {cur_iter}: ",api_response)
         print('-'*50)
 
     return rag_output

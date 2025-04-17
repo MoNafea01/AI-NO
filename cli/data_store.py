@@ -54,3 +54,4 @@ def load_backup_data():
     "admin": ["admin"]
     }
     set_data_store(data)
+    return data
