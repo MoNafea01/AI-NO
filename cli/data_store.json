@@ -3,61 +3,7 @@
         "admin": {
             "password": "admin",
             "projects": {
-                "1": [
-                    {
-                        "message": "Model lasso created",
-                        "node_id": 2460540951616,
-                        "node_name": "lasso",
-                        "task": "regression",
-                        "children": [],
-                        "params": {
-                            "alpha": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "project_id": "1",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\model\\lasso_2460540951616.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2460540951712,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "project_id": "1",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\model\\logistic_regression_2460540951712.pkl"
-                    },
-                    {
-                        "message": "Preprocessor maxabs_scaler created",
-                        "node_id": 2460540957760,
-                        "node_name": "maxabs_scaler",
-                        "task": "preprocessing",
-                        "children": [],
-                        "params": {},
-                        "node_type": "scaler",
-                        "project_id": "1",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\preprocessing\\maxabs_scaler_2460540957760.pkl"
-                    },
-                    {
-                        "non_field_errors": [
-                            "You must provide params - or - dataset_path."
-                        ]
-                    },
-                    {
-                        "non_field_errors": [
-                            "You must provide params - or - dataset_path."
-                        ]
-                    },
-                    {
-                        "non_field_errors": [
-                            "You must provide params - or - dataset_path."
-                        ]
-                    }
-                ]
+                "1": []
             }
         }
     },
