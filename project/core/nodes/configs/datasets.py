@@ -1,14 +1,16 @@
 from sklearn.datasets import (
-    load_iris, load_diabetes, 
-    load_digits, make_regression, 
-    make_classification
+    make_classification,
+    make_regression, 
+    load_diabetes, 
+    load_digits, 
+    load_iris, 
     )
 
 
 DATASETS = {
     "iris" : load_iris,
-    "diabetes" : load_diabetes,
     "digits" : load_digits,
+    "diabetes" : load_diabetes,
     "make_regression" : make_regression,
     "make_classification" : make_classification
 }

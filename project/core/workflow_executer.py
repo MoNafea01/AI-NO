@@ -3,7 +3,7 @@
 from .nodes.other.dataLoader import DataLoader
 from .nodes.preprocessing.preprocessor import Preprocessor
 from .nodes.model.model import Model
-from .nodes.other.evaluator import Evaluator
+from .nodes.model.evaluator import Evaluator
 
 class WorkflowExecutor:
     def __init__(self, workflow):

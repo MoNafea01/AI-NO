@@ -124,16 +124,19 @@ class NodeServerCalls {
         return {node.name: "Server error: ${response?.statusCode}"};
       }
     } on DioException catch (e) {
-      print("Dio Exception: $e");
+      print("Dio Exception ELDemy: $e");
 
-      if (e.response?.data != null) {
-        return {"error": e.response?.data ?? "Server error"};
+      if (e.response != null) {
+        return {
+          "error": e.response?.statusMessage,
+          "status code": e.response?.statusCode,
+        };
       } else {
-        return {"error": "Network error: ${e.message}"};
+        return {"error": "Unknown Internal Server Error"};
       }
     } on Exception catch (e) {
       print("Exception: $e");
-      return {"error": e.toString()};
+      return {"error": "Unknown Internal Server Error"};
     }
   }
 }

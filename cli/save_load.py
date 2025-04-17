@@ -19,7 +19,7 @@ def load_data_from_file(filepath="data_store.json"):
     try:
         with open(filepath, "r") as f:
             loaded_data = json.load(f)
-            actives = ['active_user', 'active_project', 'active_workflow']
+            actives = ['active_user', 'active_project']
             for active in actives:
                 loaded_data[active] = None
             set_data_store(loaded_data)
