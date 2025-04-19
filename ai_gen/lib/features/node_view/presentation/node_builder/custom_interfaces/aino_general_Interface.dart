@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 
 import 'interface_colors.dart';
 import 'multi_output_interface.dart';
+import 'network_interface.dart';
 
 Color _interfaceColor = NodeTypes.general.color;
 
@@ -23,7 +24,7 @@ class VSAINOGeneralInputData extends VSInputData {
 
   @override
   List<Type> get acceptedTypes =>
-      [VSAINOGeneralOutputData, MultiOutputOutputData];
+      [VSAINOGeneralOutputData, MultiOutputOutputData, VSNetworkOutputData];
 
   @override
   Color get interfaceColor => _interfaceColor;
