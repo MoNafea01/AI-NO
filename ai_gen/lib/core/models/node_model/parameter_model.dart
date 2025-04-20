@@ -23,6 +23,20 @@ class ParameterModel {
 
   get defaultValue => _defaultValue;
 
+  ParameterModel copyWith({
+    String? name,
+    String? type,
+    dynamic defaultValue,
+    List? choices,
+  }) {
+    return ParameterModel(
+      name: name ?? this.name,
+      type: type ?? _type,
+      defaultValue: defaultValue ?? _defaultValue,
+      choices: choices ?? this.choices,
+    );
+  }
+
   factory ParameterModel.fromJson(dynamic json) {
     print(json['choices']);
     return ParameterModel(

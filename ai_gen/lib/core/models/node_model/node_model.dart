@@ -56,7 +56,8 @@ class NodeModel {
       category: category ?? this.category,
       type: type ?? this.type,
       task: task ?? this.task,
-      params: params ?? this.params,
+      params: params ??
+          this.params?.map((parameter) => parameter.copyWith()).toList(),
       inputDots: inputDots ?? this.inputDots,
       outputDots: outputDots ?? this.outputDots,
       endPoint: apiCall ?? this.endPoint,
