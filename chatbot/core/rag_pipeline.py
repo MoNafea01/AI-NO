@@ -1,4 +1,5 @@
-import os, re, ast
+#chatbot/core/rag_pipeline.py
+import os
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
@@ -28,18 +29,18 @@ def combine_inputs(input_dict, retriever, cur_iter=0):
         "cur_iter": cur_iter
     }
 
-def parse_command_list(output: str):
-    pattern = r"\[(.*?)\]"
-    matches = re.findall(pattern, output, re.DOTALL)
+retriever_cache = {}
 
-    if matches:
-        output = f"[{matches[0]}]"
-
-    try:
-        command_list = ast.literal_eval(output.strip())
-        return command_list if isinstance(command_list, list) else [command_list]
-    except Exception as e:
-        return [f"Failed to parse: {e}"]
+def get_retriever(docs, key="default"):
+    if key in retriever_cache:
+        return retriever_cache[key]
+    
+    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    vectorstore = FAISS.from_documents(documents=docs, embedding=embeddings)
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+    retriever_cache[key] = retriever
+    
+    return retriever
 
 
 def create_rag_chain(docs, cur_iter, model_name, selected_mode):
@@ -48,8 +49,7 @@ def create_rag_chain(docs, cur_iter, model_name, selected_mode):
     template = get_template(selected_mode)
     prompt = ChatPromptTemplate.from_template(template)
 
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    retriever = FAISS.from_documents(documents=docs, embedding=embeddings).as_retriever()
+    retriever = get_retriever(docs, key=selected_mode)
 
     return (
     RunnablePassthrough()

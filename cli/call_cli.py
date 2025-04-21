@@ -2,8 +2,6 @@ import json, os
 import subprocess
 main_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "main.py")
 def call_script(command, *args, **kwargs):
-    # Format the command string
-    # command_str = f"{command}"
 
     # Here, you might call your script. For example:
     try:

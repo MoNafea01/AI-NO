@@ -84,6 +84,7 @@ class NodeQueryMixin:
 
 
 class BaseNodeAPIView(APIView, NodeQueryMixin):
+    cur_id = 0
     def get_serializer_class(self):
         """Override this method to return the appropriate serializer class."""
         raise NotImplementedError
@@ -115,8 +116,9 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             
             if project_id:
                 validated_data['project_id'] = project_id
-            processor = self.get_processor(validated_data, project_id=project_id)
-            
+            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id)
+            BaseNodeAPIView.cur_id += 1
+
             response_data = processor(output_channel, return_serialized=return_serialized)
             node_id = response_data.get("node_id")
             response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
@@ -137,7 +139,9 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             if project_id:
                 validated_data['project_id'] = project_id
 
-            processor = self.get_processor(validated_data, project_id=project_id)
+            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id)
+            BaseNodeAPIView.cur_id += 1
+            
             success, message = NodeUpdater(return_serialized)(node_id, processor())
             message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
             
