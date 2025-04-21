@@ -70,7 +70,7 @@ class NodeModel {
     String type = json['node_type'] ?? "type ${json['id']}";
     String task = json['task'] ?? "task ${json['id']}";
     num id = num.parse(json['id'].toString());
-    int index = json['idx'] != null ? int.parse(json['idx'].toString()) : 5;
+    int index = json['idx'] != null ? int.parse(json['idx'].toString()) : 6;
     String displayName = json['displayed_name'] ?? name;
     String description = json['description'];
 
@@ -125,7 +125,7 @@ class NodeModel {
   // to be used in the API call as the api data
   Map<String, dynamic> get paramsToJson {
     Map<String, dynamic> paramsMap = {};
-    params?.forEach((param) => paramsMap[param.name] = param.value);
+    params?.forEach((param) => paramsMap.addAll(param.toJson()));
 
     return paramsMap;
   }

@@ -72,6 +72,11 @@ class _GridNodeViewState extends State<GridNodeView> {
             left: isSidebarVisible ? 0 : -500,
             child: NodeSelectorSidebar(vsNodeDataProvider: nodeDataProvider),
           ),
+          const Positioned(
+            bottom: 10,
+            left: 10,
+            child: Text("V0.6.1+2"),
+          ),
         ],
       ),
     );
@@ -102,7 +107,7 @@ class _GridNodeViewState extends State<GridNodeView> {
             ),
             CustomButton(
               onTap: () => Navigator.of(context).pop(),
-              child: const Icon(Icons.close),
+              child: const Icon(Icons.home),
             ),
             const SizedBox(),
           ],

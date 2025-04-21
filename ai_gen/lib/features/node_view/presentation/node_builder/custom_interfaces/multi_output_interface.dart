@@ -46,15 +46,12 @@ class MultiOutputOutputData extends VSAINOGeneralOutputData {
     return (inputData) async {
       final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
       if (index == 0) {
-        // response = null;
         final Map<String, dynamic> apiBody = {};
 
-        if (node.name == "data_loader") {
-          apiBody["params"] = node.paramsToJson;
-        } else {
-          for (var input in inputData.entries) {
-            apiBody[input.key] = await input.value;
-          }
+        apiBody["params"] = node.paramsToJson;
+
+        for (var input in inputData.entries) {
+          apiBody[input.key] = await input.value;
         }
 
         response = await nodeServerCalls.runNode(node, apiBody);

@@ -23,7 +23,11 @@ class RunButton extends StatelessWidget {
     );
   }
 
-  Card outputCard(BuildContext context, String scopeOutput) {
+  Widget outputCard(BuildContext context, String? scopeOutput) {
+    if (scopeOutput == null) {
+      return const SizedBox.shrink();
+    }
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),

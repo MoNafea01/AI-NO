@@ -18,16 +18,30 @@ class _ParamTextFieldState extends State<ParamTextField> {
   }
 
   @override
+  void didUpdateWidget(covariant ParamTextField oldWidget) {
+    controller.text = widget.parameter.value.toString();
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 32),
       child: Center(
         child: TextField(
           controller: controller,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             border: InputBorder.none,
             isDense: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            suffixIcon: _suffixIcon(),
           ),
           onChanged: (value) {
             setState(() {
@@ -37,5 +51,15 @@ class _ParamTextFieldState extends State<ParamTextField> {
         ),
       ),
     );
+  }
+
+  Widget? _suffixIcon() {
+    if (widget.parameter.type == ParameterType.directory) {
+      return GestureDetector(
+        onTap: () {},
+        child: const Icon(Icons.close),
+      );
+    }
+    return null;
   }
 }

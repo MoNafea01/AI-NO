@@ -44,8 +44,8 @@ class VSAINOGeneralOutputData extends VSOutputData {
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {
     return (data) async {
-      print("\nNode name: ${node.name}");
       final Map<String, dynamic> apiBody = {};
+      apiBody["params"] = node.paramsToJson;
       for (var input in data.entries) {
         apiBody[input.key] = await input.value;
       }

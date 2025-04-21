@@ -21,8 +21,7 @@ class _ParamNumInputState extends State<ParamNumInput> {
 
   @override
   void didUpdateWidget(covariant ParamNumInput oldWidget) {
-    controller =
-        TextEditingController(text: widget.parameter.value.toStringAsFixed(1));
+    controller.text = widget.parameter.value.toStringAsFixed(1);
     super.didUpdateWidget(oldWidget);
   }
 

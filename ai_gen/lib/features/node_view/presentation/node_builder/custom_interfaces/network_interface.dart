@@ -44,15 +44,15 @@ class VSNetworkOutputData extends VSOutputData {
   Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get _outputFunction {
     return (data) async {
-      print("\nNode name: ${node.name}");
       final Map<String, dynamic> apiBody = {};
+      apiBody["params"] = node.paramsToJson;
       for (var input in data.entries) {
         apiBody[input.key] = await input.value;
       }
 
       final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
       Map<String, dynamic> response =
-          await nodeServerCalls.runNode(node, {"params": apiBody});
+          await nodeServerCalls.runNode(node, apiBody);
       return response;
     };
   }

@@ -12,7 +12,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
         super(GridNodeViewInitial());
 
   late VSNodeDataProvider nodeDataProvider;
-  Iterable<String>? results;
+  Iterable<String?>? results;
   late bool showGrid;
 
   NodeModel? activePropertiesNode;
@@ -66,7 +66,11 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     }
 
     results = entries.map(
-      (output) => "${output.key}: ${output.value}".replaceAll(",", ",\n"),
+      (output) {
+        if (output.value != null) {
+          return "${output.key}: ${output.value}".replaceAll(",", ",\n");
+        }
+      },
     );
 
     emit(NodeViewSuccess());

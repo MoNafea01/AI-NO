@@ -35,6 +35,8 @@ class NodeServerCalls {
   }
 
   Future<Map<String, dynamic>> runNode(NodeModel node, dynamic apiBody) async {
+    print("Node ${node.displayName} :$apiBody");
+    print(node.paramsToJson);
     return await _apiCall(
       node: node,
       apiCall: (dio) async {

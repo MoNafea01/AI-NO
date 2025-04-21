@@ -1,14 +1,18 @@
+import 'package:ai_gen/core/helper/helper.dart';
+
 enum ParameterType {
   string,
   number,
+  list,
   boolean,
   dropDownList,
+  directory,
 }
 
 class ParameterModel {
   String name;
   String? _type;
-  dynamic value;
+  dynamic _value;
   dynamic _defaultValue;
   final List? choices;
 
@@ -19,7 +23,7 @@ class ParameterModel {
     dynamic defaultValue,
   })  : _type = type,
         _defaultValue = defaultValue,
-        value = defaultValue;
+        _value = defaultValue;
 
   get defaultValue => _defaultValue;
 
@@ -38,7 +42,6 @@ class ParameterModel {
   }
 
   factory ParameterModel.fromJson(dynamic json) {
-    print(json['choices']);
     return ParameterModel(
       name: json['name'] ?? 'Parameter',
       type: json['type'],
@@ -57,6 +60,8 @@ class ParameterModel {
         return ParameterType.string;
       case 'float':
         return ParameterType.number;
+      case 'list':
+        return ParameterType.list;
       case 'bool':
         return ParameterType.boolean;
       default:
@@ -64,13 +69,17 @@ class ParameterModel {
     }
   }
 
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['name'] = name;
-    map['type'] = _type;
-    map['default'] = value;
-    return map;
+  get value => _value;
+
+  set value(dynamic newValue) {
+    if (type == ParameterType.list) {
+      _value = Helper.parseList(newValue);
+    } else {
+      _value = newValue;
+    }
   }
+
+  Map<String, dynamic> toJson() => {name: _value};
 
   @override
   String toString() {
