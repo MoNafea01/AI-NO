@@ -180,7 +180,7 @@ class NetModelFitterSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data):
-        return validate(data, (('model', 'params', 'X', 'y'), 'path'))
+        return validate(data, (('compiled_model', 'params', 'X', 'y'), 'path'))
 
 
 class NodeLoaderSerializer(serializers.Serializer):
