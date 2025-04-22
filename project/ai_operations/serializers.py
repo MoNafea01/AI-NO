@@ -165,11 +165,11 @@ class SequentialSerializer(serializers.Serializer):
 
 class ModelCompilerSerializer(serializers.Serializer):
     params = serializers.JSONField(required=False, default={})
-    nn_model = JSONOrIntField(required=False)
+    compiled_model = JSONOrIntField(required=False)
     name = serializers.CharField(required=False)
     path = serializers.CharField(required=False, allow_null=True)
     def validate(self, data):
-        return validate(data, (('nn_model', 'params'), 'path'))
+        return validate(data, (('compiled_model', 'params'), 'path'))
 
 
 class NetModelFitterSerializer(serializers.Serializer):
