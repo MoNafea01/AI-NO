@@ -5,7 +5,8 @@ from ..utils import NodeNameHandler
 
 class Preprocessor(BaseNode):
     """Handles preprocessors creation and parameter management."""
-    def __init__(self, preprocessor_name: str, preprocessor_type: str, params: dict = None, preprocessor_path: str = None, project_id: int = None) -> dict:
+    def __init__(self, preprocessor_name: str, preprocessor_type: str, params: dict = None, preprocessor_path: str = None, 
+                 project_id: int = None, *args, **kwargs) -> dict:
         self.preprocessor_name = preprocessor_name
         self.preprocessor_type = preprocessor_type
         self.task = "preprocessing"

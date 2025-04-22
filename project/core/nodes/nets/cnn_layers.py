@@ -1,16 +1,10 @@
 from .base_layer import BaseLayer
 from keras.api.layers import Conv2D, MaxPooling2D
 
-global conv2d_id
-global pool_id
-
-conv2d_id = 0
-pool_id = 0
-
 class Conv2DLayer(BaseLayer):
     '''Handles Conv2D layer creation.'''
     def __init__(self, prev_node: dict, filters: int, kernel_size: int, strides: int, padding: str, 
-                 activation: str, path: str = None, name: str = None, project_id: int = None, *args, **kwargs):
+                 activation: str, path: str = None, name: str = None, project_id: int = None, cur_id=None, *args, **kwargs):
         '''Initializes the Conv2D object.'''
         self.filters = filters
         self.kernel_size = kernel_size
@@ -20,6 +14,7 @@ class Conv2DLayer(BaseLayer):
         self.name = name
         self.layer_path = path
         self.prev_node = self.load_args(prev_node, attr="node_id")
+        self.cur_id = cur_id
         super().__init__(project_id=project_id)
 
     @property
@@ -31,10 +26,7 @@ class Conv2DLayer(BaseLayer):
         return self.gen_name()
     
     def gen_name(self):
-        '''Generates an id for the layer.'''
-        global conv2d_id
-        conv2d_id += 1
-        return f"conv2d_{conv2d_id}"
+        return f"conv2d_{self.cur_id}"
         
     def get_params(self):
         return {"filters": self.filters, 
@@ -55,7 +47,7 @@ class Conv2DLayer(BaseLayer):
 class MaxPool2DLayer(BaseLayer):
     '''Handles MaxPooling2D layer creation.'''
     def __init__(self, prev_node, pool_size: int, strides: int, padding: str, path: str = None, 
-                 name: str = None, project_id: int = None, *args, **kwargs):
+                 name: str = None, project_id: int = None, cur_id = None, *args, **kwargs):
         '''Initializes the MaxPooling2D object.'''
         self.pool_size = pool_size
         self.strides = strides
@@ -63,6 +55,7 @@ class MaxPool2DLayer(BaseLayer):
         self.name = name
         self.layer_path = path
         self.prev_node = self.load_args(prev_node, attr="node_id")
+        self.cur_id = cur_id
         super().__init__(project_id=project_id)
     
     @property
@@ -74,10 +67,7 @@ class MaxPool2DLayer(BaseLayer):
         return self.gen_name()
     
     def gen_name(self):
-        '''Generates an id for the layer.'''
-        global pool_id
-        pool_id += 1
-        return f"maxpool2d_{pool_id}"
+        return f"maxpool2d_{self.cur_id}"
     
     def get_params(self):
         return {"pool_size": self.pool_size, 

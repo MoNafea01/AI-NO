@@ -8,33 +8,33 @@ class CompileModel(BaseNode):
     Compile layer for Keras models.
     """
 
-    def __init__(self, loss, optimizer, metrics, model = None, model_path = None , project_id=None, *args, **kwargs):
+    def __init__(self, loss, optimizer, metrics, nn_model = None, model_path = None , project_id=None, *args, **kwargs):
         self.loss = loss
         self.optimizer = optimizer
         self.metrics = metrics
-        self.model = model
-        self.model_path = model_path
+        self.nn_model = nn_model
+        self.nn_model_path = model_path
         self.project_id = project_id
         self.payload = self._compile()
     
     def _compile(self):
-        if isinstance(self.model, (dict, int)):
-            return self._compile_from_dict()
+        if isinstance(self.nn_model, (dict, int)):
+            return self._compile_from_dict(self.nn_model)
         elif isinstance(rf"{self.model_path}", str):
-            return self._compile_from_path()
+            return self._compile_from_path(self.nn_model_path)
         else:
             raise ValueError("Invalid model or path provided.")
 
-    def _compile_from_dict(self):
+    def _compile_from_dict(self, model_id):
         try:
-            model = NodeDataExtractor()(self.model)
+            model = NodeDataExtractor()(model_id)
             return self._compile_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by ID: {e}")
 
-    def _compile_from_path(self):
+    def _compile_from_path(self, nn_model_path):
         try:
-            model = NodeDataExtractor()(path=self.model_path)
+            model = NodeDataExtractor()(path=nn_model_path)
             return self._compile_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model from path: {e}")

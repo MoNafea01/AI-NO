@@ -17,7 +17,7 @@ def main(*args):
         response = json.dumps(result)
         print(response)     # DON'T REMOVE this line as it's used with a subprocess
         if result:
-            file_path = chatbot_path + "/logs.txt"
+            file_path = chatbot_path + "/cli_logs.txt"
             with open(file_path, "a") as f:
                 f.write(response)
                 f.write('\n')

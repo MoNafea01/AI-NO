@@ -1,16 +1,15 @@
 from .base_layer import BaseLayer
 from keras.api.layers import Flatten
 
-global flat_id
-flat_id = 0
 
 class FlattenLayer(BaseLayer):
     '''Handles flatten layer creation.'''
-    def __init__(self, prev_node, path: str = None, name: str = None, project_id: int = None, *args, **kwargs):
+    def __init__(self, prev_node, path: str = None, name: str = None, project_id: int = None, cur_id = None, *args, **kwargs):
         '''Initializes the Flatten object.'''
         self.layer_path = path
         self.name = name
         self.prev_node = self.load_args(prev_node, attr="node_id")
+        self.cur_id = cur_id 
         super().__init__(project_id=project_id)
 
     @property
@@ -22,10 +21,7 @@ class FlattenLayer(BaseLayer):
         return self.gen_name()
     
     def gen_name(self):
-        '''Generates an id for the layer.'''
-        global flat_id
-        flat_id += 1
-        return f"flatten_{flat_id}"
+        return f"flatten_{self.cur_id}"
     
     def get_params(self):
         return {"name": self.name}

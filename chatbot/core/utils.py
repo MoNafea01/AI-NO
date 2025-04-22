@@ -1,70 +1,84 @@
-# import json
-# import spacy
-# from sentence_transformers import SentenceTransformer, util
-# from fuzzywuzzy import fuzz
+#chatbot/core/utils.py
 
-# nlp = spacy.load("en_core_web_sm")
-# name_extractor = SentenceTransformer('all-MiniLM-L6-v2')
+import re
+import os
+import ast
+import json
+import logging
+import logging.handlers
+from cli.call_cli import call_script
+
+MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
+
+def init_logger(name, path):
+    log_file = path
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+    handler = logging.handlers.RotatingFileHandler(log_file, mode='a', maxBytes=5*1024*1024, backupCount=50)
+    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    logger.addHandler(handler)
+
+    return logger
+
+# Configure logging
+parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+log_file = os.path.join(parent_path, "aino_logs.log")
+logger = init_logger(__name__, log_file)
 
 
 def extract_id_message(json_str):
+    logger.info("Extracting ID and message from JSON")
+    out = []
     try:
-        json_obj = eval(json_str)
+        if isinstance(json_str, str):
+            logger.debug("Parsing JSON string")
+            json_obj = json.loads(json_str)
+        elif isinstance(json_str, dict):
+            json_obj = json_str
+            logger.debug("Processing JSON dictionary")
+
         message = json_obj.get("message")
         node_id = json_obj.get("node_id")
-        json_obj = {"message": message, "node_id": node_id}
-        return f'{json_obj}'
-    except:
+        logger.debug(f"Extracted message: {message}, node_id: {node_id}")
+
+        if json_obj.get("node_name") in MULTI_CHANNEL_NODES:
+            logger.info(f"Processing multi-channel node: {json_obj.get('node_name')}")
+            for i in range(len(json_obj.get("children", []))):
+                logger.debug(f"Processing child {i+1}")
+                child = call_script(f"show {json_obj.get("node_name")} {node_id} {i+1}")
+                try:
+                    child_message = child.get("message")
+                    child_node_id = child.get("node_id")
+                    if child_message:
+                        out.append({"message": child_message, "node_id": child_node_id})
+                        logger.debug(f"Added child message: {child_message}")
+                except Exception as e:
+                    logger.error(f"Error processing child node {i+1}: {str(e)}")
+                    continue
+
+        out.append({"message":message, "node_id": node_id})
+        logger.info("Extraction completed successfully")
+        return f'{out}'
+    
+    except Exception as e:
+        logger.info(f"Skipped Extraction: {str(e)}")
         return json_str
 
+    
 
+def parse_command_list(output: str):
+    logger.info("Parsing command list")
+    pattern = r"\[(.*?)\]"
+    matches = re.findall(pattern, output, re.DOTALL)
 
-# def extract_keywords_hybrid(user_input: str, reference_keywords, top_n, transformer_thresh=0.7, fuzzy_thresh=80):
-#     keyword_embeddings = name_extractor.encode(reference_keywords, convert_to_tensor=True)
-#     doc = nlp(user_input.lower())
-#     phrases = [chunk.text for chunk in doc.noun_chunks]
-#     matched_keywords = []
+    if matches:
+        output = f"[{matches[0]}]"
+        logger.debug(f"Extracted command list: {output}")
 
-#     for phrase in phrases:
-#         phrase_embedding = name_extractor.encode(phrase, convert_to_tensor=True)
-#         cosine_scores = util.cos_sim(phrase_embedding, keyword_embeddings)[0]
-
-#         for idx, score in enumerate(cosine_scores):
-#             if score >= transformer_thresh:
-#                 if reference_keywords[idx] not in matched_keywords:
-#                     matched_keywords.append(reference_keywords[idx])
-
-#         # === Fuzzy matching fallback ===
-#         for keyword in reference_keywords:
-#             if fuzz.ratio(phrase, keyword.replace("_", " ")) >= fuzzy_thresh:
-#                 if keyword not in matched_keywords:
-#                     matched_keywords.append(keyword)
-#     top_n = min(top_n, len(matched_keywords))
-#     best_match = matched_keywords.copy()
-#     if len(matched_keywords) > top_n:
-#         best_match = sorted(matched_keywords, key=lambda x: fuzz.ratio(user_input, x), reverse=True)[:top_n]
-#     matched_keywords = list(filter(lambda x: x in best_match, matched_keywords))
-#     return matched_keywords
-
-
-# def args_extractor(names, reference_keywords, data_mapping):
-#     result = []
-#     for name in names:
-#         if name in reference_keywords and name in data_mapping:
-#             # node_type = mapping[name]
-#             args_str = json.dumps(data_mapping[name], separators=(',', ':'))
-#             result.append(args_str)
-#     return result
-
-# def replace_args(commands, replacements, names, reference_keywords):
-
-#     c = 0
-#     for i, command in enumerate(commands):
-#         if "<args>" in command:
-#             if names[c] in reference_keywords:
-#                 commands[i] = command.replace("<args>", replacements[c])
-#                 c += 1
-
-#     return commands
-
-
+    try:
+        command_list = ast.literal_eval(output.strip())
+        logger.info("Command list parsed successfully")
+        return command_list if isinstance(command_list, list) else [command_list]
+    except Exception as e:
+        logger.error(f"Failed to parse command list: {str(e)}. Raw output: {output}")
+        return [f"Failed to parse command list. Error: {e}. Raw output: {output}"]

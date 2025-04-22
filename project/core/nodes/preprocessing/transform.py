@@ -19,7 +19,7 @@ class PreprocessorTransformer:
 
 class Transform(BaseNode):
     """Orchestrates the transformation process."""
-    def __init__(self, data, preprocessor=None, preprocessor_path=None, project_id=None):
+    def __init__(self, data, preprocessor=None, preprocessor_path=None, project_id=None, *args, **kwargs):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
         self.data = NodeDataExtractor()(data)

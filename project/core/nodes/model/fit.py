@@ -31,22 +31,22 @@ class Fit(BaseNode):
 
     def _fit(self):
         if isinstance(self.model, (dict, int)):
-            return self._fit_from_dict()
+            return self._fit_from_dict(self.model)
         elif isinstance(rf"{self.model_path}", str):
-            return self._fit_from_path()
+            return self._fit_from_path(self.model_path)
         else:
             raise ValueError("Invalid model or path provided.")
 
-    def _fit_from_dict(self):
+    def _fit_from_dict(self, model_id):
         try:
-            model = NodeDataExtractor()(self.model)
+            model = NodeDataExtractor()(model_id)
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by ID: {e}")
 
-    def _fit_from_path(self):
+    def _fit_from_path(self, model_path):
         try:
-            model = NodeDataExtractor()(self.model_path)
+            model = NodeDataExtractor()(model_path)
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by path: {e}")
