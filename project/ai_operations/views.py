@@ -441,7 +441,7 @@ class ModelCompilerAPIView(BaseNodeAPIView):
 
     def get_processor(self, validated_data, *args, **kwargs):
         return CompileModel(
-            nn_model=validated_data.get("compiled_model"),
+            nn_model=validated_data.get("nn_model"),
             optimizer=validated_data.get("params", {}).get("optimizer", "adam"),
             loss=validated_data.get("params", {}).get("loss", "categorical_crossentropy"),
             metrics=validated_data.get("params", {}).get("metrics", ["accuracy"]),
@@ -454,7 +454,7 @@ class NetModelFitterAPIView(BaseNodeAPIView):
 
     def get_processor(self, validated_data, *args, **kwargs):
         return FitNet(
-            model=validated_data.get("model"),
+            model=validated_data.get("compiled_model"),
             X = validated_data.get("X"),
             y = validated_data.get("y"),
             batch_size = validated_data.get("params",{}).get("batch_size", 32),
