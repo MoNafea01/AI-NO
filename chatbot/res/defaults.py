@@ -25,7 +25,7 @@ editable = [
     'strategy', 'threshold', 'batch_size', 'epochs', 'filters', 'kernel_size',
     'activation', 'pool_size', 'units', 'rate', 'optimizer', 'loss',
     'metrics', 'shape', 'test_size', 'random_state', 'dataset_name',
-    'data', 'data_1', 'data_2', 'prev_node', 'layer', 'nn_model', 'model',
+    'data', 'data_1', 'data_2', 'prev_node', 'layer', 'nn_model', 'model', 'compiled_model',
     'X', 'y', 'y_true', 'y_pred', 'metric', 'preprocessor', "<user_name>", "<password>",
     "<project_id>", "<node_name>", "<node_id>", "<args>"
 ]
@@ -96,7 +96,7 @@ params = [{'alpha': 1.0,},
     {"params": {"units": 128, "activation": "relu"}, "prev_node": 1},
     {"params": {"rate": 0.5}, "prev_node": 1},
     {"params": {}, "layer": 1},
-    {"params": {"batch_size":20, "epochs":10}, "nn_model": 1, "X": 2, "y": 3},
+    {"params": {"batch_size":20, "epochs":10}, "compiled_model": 1, "X": 2, "y": 3},
     {"params": {"optimizer": "sgd","loss": "categorical_crossentropy","metrics": ["accuracy"]}, "model": 1},
 ]
 
