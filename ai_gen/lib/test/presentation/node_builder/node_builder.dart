@@ -1,6 +1,6 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/models/node_model/parameter_model.dart';
-import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
+import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';

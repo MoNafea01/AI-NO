@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
+import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/network_interface.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';

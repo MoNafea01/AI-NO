@@ -4,7 +4,8 @@ enum ParameterType {
   string,
   int,
   double,
-  list,
+  listInt,
+  listString,
   boolean,
   dropDownList,
   directory,
@@ -17,6 +18,7 @@ class ParameterModel {
   dynamic _defaultValue;
   final List? choices;
 
+  static Map<String, int> typesMap = {};
   ParameterModel({
     this.name = 'param_name',
     this.choices = const [],
@@ -51,6 +53,20 @@ class ParameterModel {
     );
   }
 
+  /// This method is used to print the types of parameters
+  /// call this in the constructor
+  /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
+  void _printNodeTypes() {
+    if (type != null) {
+      if (typesMap.containsKey(type)) {
+        typesMap[type] = typesMap[type]! + 1;
+      } else {
+        typesMap[type] = 1;
+      }
+      print(typesMap);
+    }
+  }
+
   get type {
     if (choices != null && choices!.isNotEmpty) {
       return ParameterType.dropDownList;
@@ -63,8 +79,10 @@ class ParameterModel {
         return ParameterType.int;
       case 'float':
         return ParameterType.double;
-      case 'list':
-        return ParameterType.list;
+      case 'list_int':
+        return ParameterType.listInt;
+      case 'list_str':
+        return ParameterType.listString;
       case 'bool':
         return ParameterType.boolean;
       default:
@@ -92,7 +110,7 @@ class ParameterModel {
           _value = 0.0;
         }
         break;
-      case ParameterType.list:
+      case ParameterType.listInt:
         _value = Helper.parseList(newValue);
         break;
       case ParameterType.boolean:

@@ -1,6 +1,7 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:get_it/get_it.dart';
+
+import '../api_services/node_server_calls.dart';
 
 class NodeSerializer {
   Future<Map<String, Map<String, Map<String, List<NodeModel>>>>>
