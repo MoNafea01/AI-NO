@@ -210,7 +210,7 @@
             "batch_size": 20,
             "epochs": 10
         },
-        "model": "model_id",
+        "compiled_model": "model_id",
         "X": "X_id",
         "y": "y_id"
     },
@@ -222,6 +222,6 @@
                 "accuracy"
             ]
         },
-        "nn_model": "model_id"
+        "compiled_model": "model_id"
     }
 }
