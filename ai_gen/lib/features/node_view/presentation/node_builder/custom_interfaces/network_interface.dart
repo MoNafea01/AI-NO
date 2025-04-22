@@ -1,18 +1,18 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
+import 'package:ai_gen/test/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'interface_colors.dart';
 import 'multi_output_interface.dart';
-import 'network_interface.dart';
 
 Color _interfaceColor = NodeTypes.general.color;
 
-class VSAINOGeneralInputData extends VSInputData {
+class VSNetworkInputData extends VSInputData {
   ///Basic List input interface
-  VSAINOGeneralInputData({
+  VSNetworkInputData({
     required super.type,
     super.title,
     super.toolTip,
@@ -24,15 +24,15 @@ class VSAINOGeneralInputData extends VSInputData {
 
   @override
   List<Type> get acceptedTypes =>
-      [VSAINOGeneralOutputData, MultiOutputOutputData, VSNetworkOutputData];
+      [VSAINOGeneralOutputData, VSNetworkOutputData, MultiOutputOutputData];
 
   @override
   Color get interfaceColor => _interfaceColor;
 }
 
-class VSAINOGeneralOutputData extends VSOutputData {
+class VSNetworkOutputData extends VSOutputData {
   ///Basic List output interface
-  VSAINOGeneralOutputData({
+  VSNetworkOutputData({
     required super.type,
     required this.node,
     super.outputFunction,

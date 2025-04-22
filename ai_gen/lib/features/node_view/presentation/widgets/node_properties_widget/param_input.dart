@@ -46,12 +46,14 @@ class _ParamInputState extends State<ParamInput> {
   }
 
   Widget _selectParamWidget() {
-    if (widget.parameter.type == ParameterType.dropDownList) {
-      return ParamDropDownMenu(parameter: widget.parameter);
-    } else if (widget.parameter.type == ParameterType.number) {
-      return ParamNumInput(parameter: widget.parameter);
-    } else {
-      return ParamTextField(parameter: widget.parameter);
+    switch (widget.parameter.type) {
+      case ParameterType.int:
+      case ParameterType.double:
+        return ParamNumInput(parameter: widget.parameter);
+      case ParameterType.dropDownList:
+        return ParamDropDownMenu(parameter: widget.parameter);
+      default:
+        return ParamTextField(parameter: widget.parameter);
     }
   }
 
