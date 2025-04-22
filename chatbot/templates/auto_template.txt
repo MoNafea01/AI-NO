@@ -33,9 +33,9 @@ I want to fit knn on diabetes dataset
 
 Expected Response:
 [
-    'make knn_classifier {{"n_neighbors": 5}}',
     'make data_loader {{"params":{{"dataset_name": "iris"}}}}',
-    'make model_fitter {{'model': model_id, 'X': X_id, 'y': y_id}}'
+    'make knn_classifier {{"n_neighbors": 5}}',
+    'make model_fitter {{'model': <model_id>, 'X': <X_id>, 'y': <y_id>}}'
 ]
 
 - when you achieve last step, send only 'done' as response.

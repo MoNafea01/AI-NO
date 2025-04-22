@@ -3,7 +3,8 @@
         "admin": {
             "password": "admin",
             "projects": {
-                "1": []
+                "1": [
+                ]
             }
         }
     },
