@@ -2,7 +2,8 @@ import 'package:ai_gen/core/helper/helper.dart';
 
 enum ParameterType {
   string,
-  number,
+  int,
+  double,
   list,
   boolean,
   dropDownList,
@@ -58,8 +59,10 @@ class ParameterModel {
     switch (_type) {
       case 'str':
         return ParameterType.string;
+      case 'int':
+        return ParameterType.int;
       case 'float':
-        return ParameterType.number;
+        return ParameterType.double;
       case 'list':
         return ParameterType.list;
       case 'bool':
@@ -72,10 +75,31 @@ class ParameterModel {
   get value => _value;
 
   set value(dynamic newValue) {
-    if (type == ParameterType.list) {
-      _value = Helper.parseList(newValue);
-    } else {
-      _value = newValue;
+    switch (type) {
+      case ParameterType.string:
+        _value = newValue.toString();
+        break;
+      case ParameterType.int:
+        _value = int.tryParse(newValue.toString()) ?? 0;
+        break;
+      case ParameterType.double:
+        if (newValue is String) {
+          _value = double.tryParse(newValue)?.toStringAsFixed(2) ?? 0.0;
+          _value = double.parse(_value);
+        } else if (newValue is double) {
+          _value = double.parse(newValue.toStringAsFixed(2));
+        } else {
+          _value = 0.0;
+        }
+        break;
+      case ParameterType.list:
+        _value = Helper.parseList(newValue);
+        break;
+      case ParameterType.boolean:
+        _value = newValue == 'true' || newValue == true;
+        break;
+      default:
+        _value = newValue;
     }
   }
 

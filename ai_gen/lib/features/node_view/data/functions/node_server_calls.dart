@@ -36,7 +36,12 @@ class NodeServerCalls {
 
   Future<Map<String, dynamic>> runNode(NodeModel node, dynamic apiBody) async {
     print("Node ${node.displayName} :$apiBody");
-    print(node.paramsToJson);
+    node.paramsToJson.forEach(
+      (key, value) {
+        print("$key : ${value}(${value.runtimeType})");
+      },
+    );
+
     return await _apiCall(
       node: node,
       apiCall: (dio) async {

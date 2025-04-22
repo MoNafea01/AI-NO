@@ -75,7 +75,7 @@ class _GridNodeViewState extends State<GridNodeView> {
           const Positioned(
             bottom: 10,
             left: 10,
-            child: Text("V0.6.1+2"),
+            child: Text("V0.6.2"),
           ),
         ],
       ),

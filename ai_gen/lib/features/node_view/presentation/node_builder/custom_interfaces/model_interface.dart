@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 
 import 'aino_general_Interface.dart';
 import 'interface_colors.dart';
+import 'network_interface.dart';
 
 Color _interfaceColor = NodeTypes.models.color;
 
@@ -22,7 +23,7 @@ class VSModelInputData extends VSAINOGeneralInputData {
   IconData get inputIcon => Icons.square_outlined;
 
   @override
-  List<Type> get acceptedTypes => [VSModelOutputData];
+  List<Type> get acceptedTypes => [VSModelOutputData, VSNetworkOutputData];
 
   @override
   Color get interfaceColor => _interfaceColor;

@@ -14,14 +14,13 @@ class _ParamNumInputState extends State<ParamNumInput> {
   late TextEditingController controller;
   @override
   void initState() {
-    controller =
-        TextEditingController(text: widget.parameter.value.toStringAsFixed(1));
+    controller = TextEditingController(text: widget.parameter.value.toString());
     super.initState();
   }
 
   @override
   void didUpdateWidget(covariant ParamNumInput oldWidget) {
-    controller.text = widget.parameter.value.toStringAsFixed(1);
+    controller.text = widget.parameter.value.toString();
     super.didUpdateWidget(oldWidget);
   }
 
@@ -31,14 +30,24 @@ class _ParamNumInputState extends State<ParamNumInput> {
       children: [
         _customButton(
           icon: Icons.add,
-          onTap: () => widget.parameter.value += 0.1,
+          onTap: () {
+            if (widget.parameter.type == ParameterType.int) {
+              widget.parameter.value += 1;
+            } else if (widget.parameter.type == ParameterType.double) {
+              widget.parameter.value += 0.1;
+            }
+          },
         ),
         _textField(),
         _customButton(
           icon: Icons.remove,
           onTap: () {
             if (widget.parameter.value > 0.1) {
-              widget.parameter.value -= 0.1;
+              if (widget.parameter.type == ParameterType.int) {
+                widget.parameter.value = widget.parameter.value - 1;
+              } else if (widget.parameter.type == ParameterType.double) {
+                widget.parameter.value = widget.parameter.value - 0.1;
+              }
             }
           },
         ),
@@ -58,12 +67,9 @@ class _ParamNumInputState extends State<ParamNumInput> {
           isDense: true,
         ),
         onChanged: (value) {
-          final parsedValue = double.tryParse(value);
-          if (parsedValue != null) {
-            setState(() {
-              widget.parameter.value = parsedValue;
-            });
-          }
+          setState(() {
+            widget.parameter.value = value;
+          });
         },
       ),
     );
@@ -74,7 +80,7 @@ class _ParamNumInputState extends State<ParamNumInput> {
       onTap: () {
         setState(() {
           onTap?.call();
-          controller.text = widget.parameter.value.toStringAsFixed(1);
+          controller.text = widget.parameter.value.toString();
         });
       },
       child: Container(
