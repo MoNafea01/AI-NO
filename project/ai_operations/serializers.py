@@ -304,3 +304,18 @@ def validate(data, keys):
     key1 = ' and '.join(keys[0]) if isinstance(keys[0], tuple) else keys[0]
     key2 = ' and '.join(keys[1]) if isinstance(keys[1], tuple) else keys[1]
     raise serializers.ValidationError(f"You must provide {key1} - or - {key2}.")
+
+
+class ExportProjectSerializer(serializers.Serializer):
+    path = serializers.CharField(required=False, allow_blank=True, help_text="File path to save the exported file")
+    encrypt = serializers.BooleanField(required=False, help_text="Whether to encrypt the AINOPRJ file")
+    format = serializers.ChoiceField(required=False, choices=['json', 'ainoprj'], help_text="Export format (json or ainoprj)")
+    file_name = serializers.CharField(required=False, allow_blank=True, help_text="File name for the exported file")
+    password = serializers.CharField(required=False, allow_blank=True, help_text="Password for encrypted AINOPRJ files")    
+
+class ImportProjectSerializer(serializers.Serializer):
+    path = serializers.CharField(required=True, help_text="File path to the project file to import")
+    format = serializers.ChoiceField(required=False, default='auto', choices=['auto', 'json', 'ainoprj'], 
+                                   help_text="Format of the import file (auto will detect based on extension)")
+    password = serializers.CharField(required=False, allow_blank=True, 
+                                   help_text="Password for encrypted AINOPRJ files", default="aino_secret_key")
