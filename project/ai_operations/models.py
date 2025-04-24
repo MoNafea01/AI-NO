@@ -33,7 +33,7 @@ class Node(models.Model):
 
 
 class Component(models.Model):
-    uid = models.BigIntegerField(primary_key=True, default=0)
+    uid = models.BigIntegerField(primary_key=True)
     displayed_name = models.CharField(max_length=255, default="")
     description = models.CharField(max_length=255, default="")
     idx = models.IntegerField(default=0) 
