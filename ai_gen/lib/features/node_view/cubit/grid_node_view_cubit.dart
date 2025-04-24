@@ -39,6 +39,8 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   Future clearNodes() async {
     try {
       emit(GridNodeViewLoading());
+      _closeActiveNodePropertiesCard();
+      _closeRunMenu();
 
       final List<Object> nodeBuilder = await NodeBuilder().buildNodesMenu();
 
@@ -55,14 +57,17 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
 
   void runNodes() async {
     _closeActiveNodePropertiesCard();
-    List<MapEntry<String, dynamic>> entries = nodeDataProvider
-        .nodeManager.getOutputNodes
-        .map((e) => e.evaluate())
-        .toList();
+    closeRunMenu();
 
-    for (var i = 0; i < entries.length; i++) {
-      dynamic asyncOutput = await entries[i].value;
-      entries[i] = MapEntry(entries[i].key, asyncOutput);
+    List<MapEntry<String, dynamic>> entries = [];
+
+    for (VSOutputNode vsOutputNode
+        in nodeDataProvider.nodeManager.getOutputNodes) {
+      MapEntry<String, dynamic> nodeOutput = vsOutputNode.evaluate();
+      dynamic asyncOutput = await nodeOutput.value;
+      Future.delayed(Duration.zero);
+      nodeOutput = MapEntry(nodeOutput.key, asyncOutput);
+      entries.add(nodeOutput);
     }
 
     results = entries.map(
@@ -70,6 +75,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
         if (output.value != null) {
           return "${output.key}: ${output.value}".replaceAll(",", ",\n");
         }
+        return null;
       },
     );
 

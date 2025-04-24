@@ -55,7 +55,7 @@ class MultiOutputOutputData extends VSAINOGeneralOutputData {
         }
 
         response = await nodeServerCalls.runNode(node, apiBody);
-        node.nodeId = response["node_id"] ?? "Null ID";
+        node.nodeId = response["node_id"] ?? node.nodeId ?? "Null ID";
       } else {
         while (node.nodeId == null) {
           await Future.delayed(const Duration(milliseconds: 100));
