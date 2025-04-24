@@ -6,7 +6,7 @@ import 'parameter_model.dart';
 class NodeModel {
   num? id;
   dynamic nodeId;
-  String? projectId;
+  int? projectId;
   int? index;
   String name;
   String? displayName;
@@ -37,9 +37,9 @@ class NodeModel {
   });
 
   NodeModel copyWith({
+    required int projectId,
     num? id,
     dynamic nodeId,
-    String? projectId,
     int? index,
     String? name,
     String? displayName,
@@ -54,7 +54,7 @@ class NodeModel {
     return NodeModel(
       id: id ?? this.id,
       nodeId: nodeId ?? this.nodeId,
-      projectId: projectId ?? this.projectId,
+      projectId: projectId,
       index: index ?? this.index,
       name: name ?? this.name,
       displayName: displayName ?? this.displayName,

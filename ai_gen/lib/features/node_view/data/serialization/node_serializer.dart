@@ -9,7 +9,7 @@ class NodeSerializer {
     try {
       NodeServerCalls serverCalls = GetIt.I.get<NodeServerCalls>();
       // read the nodes from the server
-      List<NodeModel> nodes = await serverCalls.loadAllNodes();
+      List<NodeModel> nodes = await serverCalls.loadNodesComponents();
 
       // categorize nodes by category, type, and task and return them in a 3 level map
       return _categorizeNodes(nodes);

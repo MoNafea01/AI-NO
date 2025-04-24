@@ -13,6 +13,8 @@ import 'custom_interfaces/multi_output_interface.dart';
 import 'custom_interfaces/preprocessor_interface.dart';
 
 class NodeBuilder {
+  NodeBuilder({required this.projectId});
+  final int projectId;
   Future<List<Object>> buildNodesMenu() async {
     final Map<String, Map<String, Map<String, List<NodeModel>>>> allNodes =
         await NodeSerializer().categorizeNodes();
@@ -78,7 +80,7 @@ class NodeBuilder {
   //build the node itself
   Function(Offset, VSOutputData?) _buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
-      NodeModel newNode = node.copyWith();
+      NodeModel newNode = node.copyWith(projectId: projectId);
       return VSNodeData(
         node: newNode,
         type: newNode.name,

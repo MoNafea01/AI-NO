@@ -1,21 +1,93 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/network/network_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
 class NodeServerCalls {
   final String _baseURL = NetworkConstants.baseURL;
-  final String _allComponentsEndPoint = NetworkConstants.allComponentsApi;
+  final String _allComponentsEndPoint = NetworkConstants.allComponentsEndPoint;
+  final String _projectEndPoint = NetworkConstants.projectEndPoint;
+  final String _nodesEndPoint = NetworkConstants.nodesEndPoint;
 
   final Dio _dio = GetIt.I.get<Dio>();
 
-  Future<List<NodeModel>> loadAllNodes() async {
+  Future<ProjectModel> createProject(
+    String projectName,
+    String projectDescription,
+  ) async {
+    try {
+      final Response response = await _dio.post(
+        "$_baseURL/$_projectEndPoint",
+        data: {
+          "project_name": projectName,
+          "project_description": projectDescription,
+        },
+      );
+
+      if (response.statusCode != null && response.statusCode! < 300 ||
+          response.statusCode! >= 200) {
+        return ProjectModel.fromJson(response.data);
+      } else {
+        throw Exception("server error: error code ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Server Error: $e");
+    }
+  }
+
+  Future<ProjectModel> getProject(int projectId) async {
+    try {
+      final Response response = await _dio.get(
+        "$_baseURL/$_projectEndPoint/$projectId",
+      );
+
+      if (response.statusCode != null && response.statusCode! < 300 ||
+          response.statusCode! >= 200) {
+        return ProjectModel.fromJson(response.data);
+      } else {
+        throw Exception("server error: error code ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Server Error: $e");
+    }
+  }
+
+  Future<List<NodeModel>> getProjectNodes(int projectId) async {
+    // try {
+    final Response response = await _dio.get(
+      "$_baseURL/$_nodesEndPoint/?$projectId",
+    );
+
+    if (response.statusCode != null && response.statusCode! < 300 ||
+        response.statusCode! >= 200) {
+      List<NodeModel> nodes = [];
+      if (response.data != null || response.data.isNotEmpty) {
+        response.data.forEach((nodeData) {
+          NodeModel node = NodeModel.fromJson(nodeData);
+          nodes.add(node);
+        });
+
+        return nodes;
+      } else {
+        throw Exception('server error: response data is null');
+      }
+    } else {
+      throw Exception("server error: error code ${response.statusCode}");
+    }
+    // } catch (e) {
+    //   throw Exception("Server Error: $e");
+    // }
+  }
+
+  Future<List<NodeModel>> loadNodesComponents() async {
     try {
       final Response response =
           await _dio.get("$_baseURL/$_allComponentsEndPoint");
       List<NodeModel> nodes = [];
 
-      if (response.statusCode == 200) {
+      if (response.statusCode != null && response.statusCode! < 300 ||
+          response.statusCode! >= 200) {
         if (response.data != null) {
           response.data.forEach((nodeData) {
             NodeModel node = NodeModel.fromJson(nodeData);
@@ -38,7 +110,7 @@ class NodeServerCalls {
     print("Node ${node.displayName} :$apiBody");
     node.paramsToJson.forEach(
       (key, value) {
-        print("$key : ${value}(${value.runtimeType})");
+        print("$key : $value(${value.runtimeType})");
       },
     );
 
@@ -46,9 +118,9 @@ class NodeServerCalls {
       node: node,
       apiCall: (dio) async {
         if (node.nodeId == null) {
-          return _post(Dio(), node, apiBody);
+          return _postNode(_dio, node, apiBody);
         } else {
-          return _put(Dio(), node, apiBody);
+          return _putNode(_dio, node, apiBody);
         }
       },
       onResponseSuccess: (Map<String, dynamic> mapResponse) {
@@ -57,17 +129,17 @@ class NodeServerCalls {
     );
   }
 
-  Future<Response> _post(Dio dio, NodeModel node, dynamic apiBody) async {
+  Future<Response> _postNode(Dio dio, NodeModel node, dynamic apiBody) async {
     return await dio.post(
-      "$_baseURL/${node.endPoint}?project_id=",
+      "$_baseURL/${node.endPoint}?project_id=${node.projectId}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
   }
 
-  Future<Response> _put(Dio dio, NodeModel node, dynamic apiBody) async {
+  Future<Response> _putNode(Dio dio, NodeModel node, dynamic apiBody) async {
     final x = await dio.put(
-      "$_baseURL/${node.endPoint}?node_id=${node.nodeId}",
+      "$_baseURL/${node.endPoint}?node_id=${node.nodeId}&project_id=${node.projectId}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
@@ -84,7 +156,7 @@ class NodeServerCalls {
       node: node,
       apiCall: (dio) async {
         return await dio.get(
-          "$_baseURL/${node.endPoint!}?node_id=${node.nodeId}&output=$outputChannel",
+          "$_baseURL/${node.endPoint!}?node_id=${node.nodeId}&output=$outputChannel&project_id=${node.projectId}",
           data: apiBody,
           options: Options(contentType: Headers.jsonContentType),
         );
@@ -97,7 +169,7 @@ class NodeServerCalls {
       node: node,
       apiCall: (dio) async {
         return await dio.delete(
-          "$_baseURL/${node.endPoint!}?node_id=${node.nodeId}",
+          "$_baseURL/${node.endPoint!}?node_id=${node.nodeId}&project_id=${node.projectId}",
         );
       },
     );

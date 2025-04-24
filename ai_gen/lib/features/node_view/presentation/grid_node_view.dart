@@ -42,7 +42,7 @@ class _GridNodeViewState extends State<GridNodeView> {
     final GridNodeViewCubit gridNodeViewCubit =
         context.watch<GridNodeViewCubit>();
     return Scaffold(
-      appBar: _appBar(),
+      appBar: _appBar(gridNodeViewCubit),
       body: Stack(
         children: [
           InteractiveVSNodeView(
@@ -75,18 +75,18 @@ class _GridNodeViewState extends State<GridNodeView> {
           const Positioned(
             bottom: 10,
             left: 10,
-            child: Text("V0.6.2"),
+            child: Text("V0.6.5"),
           ),
         ],
       ),
     );
   }
 
-  AppBar _appBar() {
+  AppBar _appBar(GridNodeViewCubit gridNodeViewCubit) {
     return AppBar(
       backgroundColor: AppColors.grey50,
       surfaceTintColor: AppColors.grey50,
-      title: const Text("Project 1"),
+      title: Text(gridNodeViewCubit.projectModel?.name ?? "Project Name"),
       elevation: 1,
       shadowColor: Colors.black,
       leading: CustomButton(
