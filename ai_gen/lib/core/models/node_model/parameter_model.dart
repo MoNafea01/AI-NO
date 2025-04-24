@@ -22,13 +22,11 @@ class ParameterModel {
     this.name = 'param_name',
     this.choices = const [],
     String? type,
-    dynamic defaultValue,
+    defaultValue,
   })  : _type = type,
         _defaultValue = defaultValue,
         _value = defaultValue {
-    if (defaultValue is List) {
-      _value = defaultValue.map((e) => e).toList();
-    }
+    if (defaultValue is List) _value = [...defaultValue];
   }
 
   get defaultValue => _defaultValue;
@@ -36,7 +34,7 @@ class ParameterModel {
   ParameterModel copyWith({
     String? name,
     String? type,
-    dynamic defaultValue,
+    defaultValue,
     List? choices,
   }) {
     return ParameterModel(
@@ -47,7 +45,7 @@ class ParameterModel {
     );
   }
 
-  factory ParameterModel.fromJson(dynamic json) {
+  factory ParameterModel.fromJson(json) {
     return ParameterModel(
       name: json['name'] ?? 'Parameter',
       type: json['type'],
@@ -55,21 +53,6 @@ class ParameterModel {
       choices: json['choices'] as List? ?? [],
     );
   }
-
-  /// This method is used to print the types of parameters
-  /// call this in the constructor
-  /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
-  // static final Map<String, int> _typesMap = {};
-  // void _printNodeTypes() {
-  //   if (type != null) {
-  //     if (_typesMap.containsKey(type)) {
-  //       _typesMap[type] = _typesMap[type]! + 1;
-  //     } else {
-  //       _typesMap[type] = 1;
-  //     }
-  //     print(_typesMap);
-  //   }
-  // }
 
   get type {
     switch (_type) {
@@ -104,6 +87,12 @@ class ParameterModel {
       case ParameterType.int:
         _value = int.tryParse(newValue.toString()) ?? 0;
         break;
+      case ParameterType.listInt:
+        _value = Helper.parseIntList(newValue);
+        break;
+      case ParameterType.boolean:
+        _value = newValue == 'true' || newValue == true;
+        break;
       case ParameterType.double:
         if (newValue is String) {
           _value = double.tryParse(newValue)?.toStringAsFixed(2) ?? 0.0;
@@ -114,12 +103,6 @@ class ParameterModel {
           _value = 0.0;
         }
         break;
-      case ParameterType.listInt:
-        _value = Helper.parseIntList(newValue);
-        break;
-      case ParameterType.boolean:
-        _value = newValue == 'true' || newValue == true;
-        break;
       default:
         _value = newValue;
     }
@@ -127,7 +110,7 @@ class ParameterModel {
 
   void resetValue() {
     if (_defaultValue is List) {
-      _value = _value = _defaultValue.map((e) => e).toList();
+      _value = _value = [..._defaultValue];
     } else {
       _value = _defaultValue;
     }
@@ -139,4 +122,19 @@ class ParameterModel {
   String toString() {
     return '{$name: $value ($_type)}';
   }
+
+  /// This method is used to print the types of parameters
+  /// call this in the constructor
+  /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
+// static final Map<String, int> _typesMap = {};
+// void _printNodeTypes() {
+//   if (type != null) {
+//     if (_typesMap.containsKey(type)) {
+//       _typesMap[type] = _typesMap[type]! + 1;
+//     } else {
+//       _typesMap[type] = 1;
+//     }
+//     print(_typesMap);
+//   }
+// }
 }

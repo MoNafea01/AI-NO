@@ -6,6 +6,7 @@ import 'parameter_model.dart';
 class NodeModel {
   num? id;
   dynamic nodeId;
+  String? projectId;
   int? index;
   String name;
   String? displayName;
@@ -17,7 +18,6 @@ class NodeModel {
   List<String>? inputDots;
   List<String>? outputDots;
   String? endPoint;
-  String? projectId;
 
   NodeModel({
     this.id,
@@ -39,6 +39,7 @@ class NodeModel {
   NodeModel copyWith({
     num? id,
     dynamic nodeId,
+    String? projectId,
     int? index,
     String? name,
     String? displayName,
@@ -48,10 +49,12 @@ class NodeModel {
     List<ParameterModel>? params,
     List<String>? inputDots,
     List<String>? outputDots,
-    String? apiCall,
+    String? endPoint,
   }) {
     return NodeModel(
       id: id ?? this.id,
+      nodeId: nodeId ?? this.nodeId,
+      projectId: projectId ?? this.projectId,
       index: index ?? this.index,
       name: name ?? this.name,
       displayName: displayName ?? this.displayName,
@@ -63,17 +66,12 @@ class NodeModel {
           this.params?.map((parameter) => parameter.copyWith()).toList(),
       inputDots: inputDots ?? this.inputDots,
       outputDots: outputDots ?? this.outputDots,
-      endPoint: apiCall ?? this.endPoint,
+      endPoint: endPoint ?? this.endPoint,
     );
   }
 
-  factory NodeModel.fromJson(dynamic json) {
+  factory NodeModel.fromJson(json) {
     String name = json['node_name'] ?? "Node";
-    String category = json['category'] ?? "cat ${json['id']}";
-    String type = json['node_type'] ?? "type ${json['id']}";
-    String task = json['task'] ?? "task ${json['id']}";
-    num id = num.parse(json['id'].toString());
-    int index = json['idx'] != null ? int.parse(json['idx'].toString()) : 6;
 
     List<ParameterModel> params = [];
     if (json['params'] != null) {
@@ -85,20 +83,20 @@ class NodeModel {
     List<String>? inputDots = json['input_channels'] != null
         ? json['input_channels'].cast<String>()
         : [];
-    List<String> outputDots = json['output_channels'] != null
+    List<String>? outputDots = json['output_channels'] != null
         ? json['output_channels'].cast<String>()
         : [];
 
     return NodeModel(
-      id: id,
-      index: index,
+      id: num.parse(json['id'].toString()),
+      index: json['idx'] != null ? int.parse(json['idx'].toString()) : 6,
       name: name,
-      category: category,
-      type: type,
-      task: task,
-      endPoint: json['api_call'],
       displayName: json['displayed_name'] ?? name,
       description: json['description'],
+      category: json['category'] ?? "cat ${json['id']}",
+      type: json['node_type'] ?? "type ${json['id']}",
+      task: json['task'] ?? "task ${json['id']}",
+      endPoint: json['api_call'],
       inputDots: inputDots,
       outputDots: outputDots,
       params: params,
@@ -115,7 +113,7 @@ class NodeModel {
     json['category'] = category;
     json['node_type'] = type;
     json['task'] = task;
-    json['params'] = params?.map((e) => e.toJson()).toList();
+    json['params'] = params?.map((param) => param.toJson()).toList();
     json['input_channels'] = inputDots;
     json['output_channels'] = outputDots;
     json['api_call'] = endPoint;
@@ -131,13 +129,6 @@ class NodeModel {
   }
 
   Color get color {
-    // if (name == "model_fitter") {
-    //   return NodeTypes.models.color;
-    // }
-    // if (name == "preprocessor_fitter") {
-    //   return NodeTypes.preprocessors.color;
-    // }
-
     switch (category) {
       case "Models":
         return NodeTypes.models.color;
