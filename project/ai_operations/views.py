@@ -7,6 +7,8 @@ from rest_framework.parsers import MultiPartParser
 from core.nodes import *
 from core.repositories import *
 
+import datetime, os, tempfile, subprocess, sys, random
+from django.http import HttpResponse
 from .serializers import *
 import pandas as pd
 import json
@@ -23,6 +25,11 @@ class NodeQueryMixin:
             return_serialized = request.query_params.get('return_serialized', '0') == '1'
             return_path = not return_serialized
             project_id = request.query_params.get('project_id')
+            retrun_data = request.query_params.get('return_data', '0') == '1'
+
+            node_name = Node.objects.get(node_id=node_id).node_name
+            if node_name not in DATA_NODES:
+                retrun_data = False
 
             if output.isdigit() and int(output) > 0:
                 depth = int(output)
@@ -43,7 +50,7 @@ class NodeQueryMixin:
                             break
                         node_id = str(current_node.get("node_id", node_id))
 
-            payload = NodeLoader(return_serialized=return_serialized, return_path=return_path)(node_id=node_id)
+            payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=retrun_data)(node_id=node_id)
             
             # Filter by project_id if provided
             if project_id and payload:
@@ -756,6 +763,335 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
         context = super().get_serializer_context()
         context["return_serialized"] = self.request.query_params.get("return_serialized", "0") == "1"
         return context
+
+
+class ExportProjectAPIView(APIView):
+    """API view for exporting project nodes as JSON or AINOPRJ format via POST request."""
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            # Validate request body using serializer
+            serializer = ExportProjectSerializer(data=request.data)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Extract validated data
+            default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'exports')
+            save_path = serializer.validated_data.get('path', default_path)
+            file_name = serializer.validated_data.get('file_name', 'exported_project')
+            format_type = serializer.validated_data.get('format', 'ainoprj').lower()
+            save_path = os.path.join(save_path, f'{file_name}.{format_type}')
+            encrypt = serializer.validated_data.get('encrypt', False)
+            password = serializer.validated_data.get('password', '')
+            
+            # Get project_id from query parameters
+            project_id = request.query_params.get('project_id')
+            if not project_id:
+                return Response({"error": "Project ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+                
+            # Check if project exists
+            try:
+                project = Project.objects.get(id=project_id)
+            except Project.DoesNotExist:
+                return Response({"error": f"Project with ID {project_id} does not exist"}, 
+                              status=status.HTTP_404_NOT_FOUND)
+                
+            # Get all nodes for the project
+            nodes = Node.objects.filter(project_id=project_id)
+            serializer = NodeSerializer(nodes, many=True)
+            
+            # Create export data with project info and nodes
+            export_data = {
+                "project_id": project_id,
+                "project_name": project.project_name,
+                "project_description": project.project_description,
+                "export_date": datetime.datetime.now().isoformat(),
+                "nodes": serializer.data
+            }
+            # Convert to JSON 
+            json_data = json.dumps(export_data, indent=4)
+            
+            # Generate base filename for exports
+            base_filename = f"{project.project_name.replace(' ', '_')}_export_{datetime.datetime.now().strftime('%Y%m%d')}"
+            
+            # Handle JSON format
+            if format_type == 'json':
+                if save_path:
+                    try:
+                        # Ensure directory exists
+                        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+                        
+                        # Save to file
+                        with open(save_path, 'w') as f:
+                            f.write(json_data)
+                        
+                        return Response({
+                            "success": True,
+                            "message": f"Project exported successfully to {save_path}",
+                            "path": save_path,
+                            "format": "JSON",
+                            
+                        }, status=status.HTTP_200_OK)
+                        
+                    except Exception as e:
+                        return Response({
+                            "error": f"Failed to save file: {str(e)}",
+                            "path": save_path
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    # Create file response for download
+                    response = HttpResponse(json_data, content_type='application/json')
+                    response['Content-Disposition'] = f'attachment; filename="{base_filename}.json"'
+                    return response
+                    
+            # Handle AINOPRJ format conversion
+            elif format_type == 'ainoprj':
+                # Create temporary JSON file
+                with tempfile.NamedTemporaryFile(suffix='.json', delete=False, mode='w') as temp_json:
+                    temp_json.write(json_data)
+                    temp_json_path = temp_json.name
+                
+                # Define output path for AINOPRJ
+                if save_path:
+                    output_path = save_path
+                else:
+                    # Create temporary output file for download
+                    temp_ainoprj = tempfile.NamedTemporaryFile(suffix='.ainoprj', delete=False)
+                    output_path = temp_ainoprj.name
+                    temp_ainoprj.close()
+                
+                try:
+                    # Get path to converter script (relative to this file)
+                    converter_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'jsonAinoConverter.py')
+                    if not os.path.exists(converter_path):
+                        return Response({
+                            "error": f"Converter script not found at path: {converter_path}"
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    
+                    python_executable = sys.executable
+                    # Run converter script
+                    result = subprocess.run([
+                        python_executable, 
+                        converter_path,
+                        'json', 
+                        'ainoprj', 
+                        temp_json_path, 
+                        output_path, 
+                        'True' if encrypt else 'False',
+                        password
+                    ], check=True, capture_output=True, text=True)
+
+                    print(f"Converter stdout: {result.stdout}")
+                    print(f"Converter stderr: {result.stderr}")
+                    
+                    # Clean up temporary JSON file
+                    os.unlink(temp_json_path)
+                    
+                    if save_path:
+                        return Response({
+                            "success": True,
+                            "message": f"Project exported successfully to {save_path}",
+                            "path": save_path,
+                            "format": "AINOPRJ",
+                            "encrypted": encrypt
+                        }, status=status.HTTP_200_OK)
+                    else:
+                        # Return the file for download
+                        with open(output_path, 'rb') as f:
+                            content = f.read()
+                        
+                        # Clean up temporary AINOPRJ file
+                        os.unlink(output_path)
+                        
+                        response = HttpResponse(content, content_type='application/octet-stream')
+                        response['Content-Disposition'] = f'attachment; filename="{base_filename}.ainoprj"'
+                        return response
+                        
+                except subprocess.CalledProcessError as e:
+                    # Clean up temporary files
+                    if os.path.exists(temp_json_path):
+                        os.unlink(temp_json_path)
+                    if not save_path and os.path.exists(output_path):
+                        os.unlink(output_path)
+                    
+                    return Response({
+                        "error": f"Converter script failed: {e.stderr}"
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                except Exception as e:
+                    # Clean up temporary files
+                    if os.path.exists(temp_json_path):
+                        os.unlink(temp_json_path)
+                    if not save_path and os.path.exists(output_path):
+                        os.unlink(output_path)
+                    
+                    return Response({
+                        "error": f"Failed to convert to AINOPRJ format: {str(e)}"
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                return Response({
+                    "error": f"Invalid format: {format_type}. Supported formats: json, ainoprj"
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+# Add to views.py
+class ImportProjectAPIView(APIView):
+    """API view for importing project nodes from JSON or AINOPRJ format."""
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            # Validate request body using serializer
+            serializer = ImportProjectSerializer(data=request.data)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Extract validated data
+            file_path = serializer.validated_data['path']
+            format_type = serializer.validated_data.get('format', 'auto')
+            password = serializer.validated_data.get('password', '')
+            encrypt = "1" if password else "0"
+            
+            # Get project_id from query parameters
+            project_id = request.query_params.get('project_id')
+            if not project_id:
+                project_id = Project.objects.create(project_name="Imported Project").id
+                
+            # Check if project exists
+            try:
+                project = Project.objects.get(id=project_id)
+            except Project.DoesNotExist:
+                # Project doesn't exist, create a new one
+                project = Project.objects.create(project_name="Imported Project")
+                project_id = project.id
+                
+            
+            # Verify file exists
+            if not os.path.exists(file_path):
+                return Response({"error": f"File not found: {file_path}"}, 
+                              status=status.HTTP_404_NOT_FOUND)
+                
+            # Auto-detect format if not specified
+            if format_type == 'auto':
+                _, ext = os.path.splitext(file_path.lower())
+                if ext == '.json':
+                    format_type = 'json'
+                elif ext == '.ainoprj':
+                    format_type = 'ainoprj'
+                else:
+                    return Response({"error": f"Cannot auto-detect format for extension: {ext}"}, 
+                                  status=status.HTTP_400_BAD_REQUEST)
+            
+            json_data = None
+            
+            # Process based on format
+            if format_type == 'json':
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        json_data = json.load(f)
+                        if isinstance(json_data, dict):
+                            json_data = json_data.get('nodes', [])
+
+                except json.JSONDecodeError as e:
+                    return Response({"error": f"Invalid JSON format: {str(e)}"}, 
+                                  status=status.HTTP_400_BAD_REQUEST)
+                    
+            elif format_type == 'ainoprj':
+                try:
+                    # Create a temporary file for the JSON output
+                    with tempfile.NamedTemporaryFile(suffix='.json', delete=False, mode='w') as temp_json:
+                        temp_json_path = temp_json.name
+                    
+                    # Get path to converter script
+                    converter_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'jsonAinoConverter.py')
+                    if not os.path.exists(converter_path):
+                        return Response({
+                            "error": f"Converter script not found at path: {converter_path}"
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    
+                    # Run converter script to convert AINOPRJ to JSON
+                    python_executable = sys.executable
+                    cmd = [
+                        python_executable,
+                        converter_path,
+                        'ainoprj',
+                        'json',
+                        file_path,
+                        temp_json_path,
+                        encrypt,
+                    ]
+                    
+                    # Add password if provided
+                    if password:
+                        cmd.append(password)
+                        
+                    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                    
+                    # Load the converted JSON
+                    with open(temp_json_path, 'r', encoding='utf-8') as f:
+                        json_data = json.load(f)
+                        
+                    # Clean up temporary file
+                    os.unlink(temp_json_path)
+                    
+                except subprocess.CalledProcessError as e:
+                    if os.path.exists(temp_json_path):
+                        os.unlink(temp_json_path)
+                    error_msg = e.stderr if e.stderr else str(e)
+                    return Response({
+                        "error": f"Converter script failed: {error_msg}"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                except Exception as e:
+                    if os.path.exists(temp_json_path):
+                        os.unlink(temp_json_path)
+                    return Response({
+                        "error": f"Failed to convert AINOPRJ file: {str(e)}"
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            # Process the imported data
+            if not json_data:
+                return Response({"error": "No valid data found in the import file"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            # Extract nodes from the JSON data
+            nodes_data = json_data
+            if not nodes_data:
+                return Response({"error": "No nodes found in the import file"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            # Prepare nodes for import by setting the project_id
+            for node in nodes_data:
+                # Remove any existing IDs from the imported data
+                node.pop('id', None)
+                # Add the current project ID
+                node['project_id'] = project_id
+                
+                # Generate new node_id if needed to avoid conflicts
+                if 'node_id' in node:
+                    # Use timestamp-based node_id to avoid conflicts
+                    node['node_id'] = int(time.time() * 1000) + random.randint(1, 999)
+            
+            # Create the nodes in the database
+            node_serializer = NodeSerializer(data=nodes_data, many=True)
+            if node_serializer.is_valid():
+                created_nodes = node_serializer.save()
+                return Response({
+                    "success": True,
+                    "message": f"Successfully imported {len(created_nodes)} nodes into project '{project.project_name}'",
+                    "imported_nodes_count": len(created_nodes),
+                    "project_id": project_id,
+                    "project_name": project.project_name
+                }, status=status.HTTP_201_CREATED)
+            else:
+                return Response({
+                    "error": "Failed to import nodes",
+                    "validation_errors": node_serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):

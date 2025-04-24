@@ -38,6 +38,8 @@ NN_TASKS = ["neural_network"]
 DATA_HANDLER_NAMES = ["data_loader", "train_test_split", "splitter", "joiner"]
 DATA_HANDLER_TASKS = ["load_data", "split", "join"]
 
+DATA_NODES = ["data_loader", "train_test_split", "splitter", "joiner",
+              "predictor", "evaluator", "transformer"]
 
 if os.getenv("TESTING_ENV", "0") == "1":
     SAVING_DIR = r"core\test_saved"

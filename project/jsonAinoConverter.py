@@ -6,26 +6,32 @@ import os
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
-os.environ["AESC_KEY"] = "aino_secret_key"
-
 class AinoprjConverter:
     types = {
         "node_id": "int", "node_name": "str", "node_type": "str", 
         "task": "str", "message": "str", "node_data": "str",
         "params": "dict", "x_loc": "int", "y_loc": "int",
-        "input_nodes": "list", "output_nodes": "list"
+        "input_ports": "list", "output_ports": "list",
+        "children": "list", "project": "int", "location_x": "int",
+        "location_y": "int", "created_at": "str", "updated_at": "str",
     }
 
-    def __init__(self, in_format, out_format, source_path, destination_path, encrypt):
+    def __init__(self, in_format, out_format, source_path, destination_path, encrypt, password=None):
         self.in_format = in_format
         self.out_format = out_format
         self.source_path = source_path
         self.destination_path = destination_path
         self.encrypt = encrypt
+        self.password = password
         self.SECRET_KEY = self.get_secret_key()
 
     def get_secret_key(self):
         """Retrieve the encryption key from an environment variable."""
+        if self.password:
+            os.environ["AESC_KEY"] = self.password
+        else:
+            os.environ["AESC_KEY"] = "aino_secret_key"
+
         key = os.getenv("AESC_KEY")
         if not key:
             raise ValueError("Encryption key not set! Use: export AESC_KEY='your_key'")
@@ -51,6 +57,9 @@ class AinoprjConverter:
                 data = json.load(f)
             
             ainoprj_data = "AINOPRJ_START\n"
+            if isinstance(data, dict):
+                if "nodes" in data:
+                    data = data["nodes"]
             for node in data:
                 ainoprj_data += "\tNODE_START\n"
                 for key, value in node.items():
@@ -75,7 +84,7 @@ class AinoprjConverter:
                 if len(encrypted_data.split('\n')) == 1:
                     self.encrypt = True  # If data is a single line, assume it's encrypted
                 decrypted_data = self.decrypt_data(encrypted_data)
-
+            
             nodes = []
             for line in decrypted_data.split('\n'):
                 line = line.lstrip()
@@ -115,20 +124,42 @@ class AinoprjConverter:
             sys.exit(1)
 
 
-def main():
-    if len(sys.argv) != 6:
-        print("Usage: python json_ainoprj_converter.py <in_format> <out_format> <source_path> <destination_path> <encrypt_enabled>")
+
+def main(*args):
+    if not (6 <= len(sys.argv) <=7) :
+        print("Usage: python json_ainoprj_converter.py <in_format> <out_format> <source_path> <destination_path> <encrypt_enabled> <password[optional]>")
+    elif not (5 <= len(args) <= 6) :
+        print("Error: Incorrect number of arguments.")
         sys.exit(1)
     
-    in_format, out_format, source_path, destination_path, encrypt_enabled = sys.argv[1:]
+    password = None
+    if len(sys.argv) == 6:
+        in_format, out_format, source_path, destination_path, encrypt_enabled = sys.argv[1:]
+    elif len(sys.argv) == 7:
+        in_format, out_format, source_path, destination_path, encrypt_enabled, password = sys.argv[1:]
+
+    elif len(args) == 5:
+        in_format, out_format, source_path, destination_path, encrypt_enabled = args
+    elif len(args) == 6:
+        in_format, out_format, source_path, destination_path, encrypt_enabled, password = args
+    else:
+        print("Error: Incorrect number of arguments.")
+        sys.exit(1)
     
     if in_format not in ["json", "ainoprj"] or out_format not in ["json", "ainoprj"]:
         print("Error: Formats must be 'json' or 'ainoprj'.")
         sys.exit(1)
     
     encrypt = encrypt_enabled.lower() in ["true", "yes", "True", "Yes", "1"]
-    converter = AinoprjConverter(in_format, out_format, source_path, destination_path, encrypt)
+    converter = AinoprjConverter(in_format, out_format, source_path, destination_path, encrypt, password)
     converter.convert()
 
 if __name__ == "__main__":
-    main()
+    main(
+        'ainoprj', 
+        'json', 
+        'C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/data.ainoprj', 
+        'C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/data.json', 
+        'True',
+        'aino_secret_key')
+

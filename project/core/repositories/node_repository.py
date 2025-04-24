@@ -105,11 +105,13 @@ class NodeLoader:
 
     def __init__(self, from_db : bool = True, 
                  return_serialized : bool = False, 
-                 return_path : bool = False):
+                 return_path : bool = False,
+                 return_data : bool = False):
         
         self.from_db = from_db
         self.return_serialized = return_serialized
         self.return_path = return_path
+        self.return_data = return_data
 
     def __call__(
             self, 
@@ -184,6 +186,13 @@ class NodeLoader:
                 buffer.seek(0)
                 node_data = buffer.read()
             node_data = base64.b64encode(node_data).decode()
+        
+        if self.return_data:
+            node_data = payload.get("node_data")
+            if node_data and os.path.exists(node_data):
+                node_data = joblib.load(node_data)
+            else:
+                node_data = None
         
         payload.update({"node_data": node_data})
         return payload
