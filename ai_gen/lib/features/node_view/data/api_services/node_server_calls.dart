@@ -46,9 +46,9 @@ class NodeServerCalls {
       node: node,
       apiCall: (dio) async {
         if (node.nodeId == null) {
-          return _post(dio, node, apiBody);
+          return _post(Dio(), node, apiBody);
         } else {
-          return _put(dio, node, apiBody);
+          return _put(Dio(), node, apiBody);
         }
       },
       onResponseSuccess: (Map<String, dynamic> mapResponse) {

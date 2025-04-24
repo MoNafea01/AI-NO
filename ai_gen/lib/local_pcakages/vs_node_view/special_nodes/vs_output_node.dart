@@ -39,12 +39,12 @@ class VSOutputNode extends VSNodeData {
   ///Evalutes the tree from this node and returns the result
   ///
   ///Supply an onError function to be called when an error occures inside the evaluation
-  MapEntry<String, dynamic> evaluate({
+  Future<MapEntry<String, dynamic>> evaluate({
     Function(Object e, StackTrace s)? onError,
-  }) {
+  }) async {
     try {
       Map<String, Map<String, dynamic>> nodeInputValues = {};
-      _traverseInputNodes(nodeInputValues, this);
+      await _traverseInputNodes(nodeInputValues, this);
 
       return MapEntry(title, nodeInputValues[id]!.values.first);
     } catch (e, s) {
@@ -56,10 +56,10 @@ class VSOutputNode extends VSNodeData {
   ///Traverses input nodes
   ///
   ///Used by evalTree to recursivly move through the nodes
-  void _traverseInputNodes(
+  Future<void> _traverseInputNodes(
     Map<String, Map<String, dynamic>> nodeInputValues,
     VSNodeData data,
-  ) {
+  ) async {
     Map<String, dynamic> inputValues = {};
 
     final inputs = data is VSListNode ? data.getCleanInputs() : data.inputData;
@@ -68,14 +68,14 @@ class VSOutputNode extends VSNodeData {
       final connectedNode = input.connectedInterface;
       if (connectedNode != null) {
         if (!nodeInputValues.containsKey(connectedNode.nodeData!.id)) {
-          _traverseInputNodes(
+          await _traverseInputNodes(
             nodeInputValues,
             connectedNode.nodeData!,
           );
         }
 
         try {
-          inputValues[input.type] = connectedNode.outputFunction?.call(
+          inputValues[input.type] = await connectedNode.outputFunction?.call(
             nodeInputValues[connectedNode.nodeData!.id]!,
           );
         } catch (e) {

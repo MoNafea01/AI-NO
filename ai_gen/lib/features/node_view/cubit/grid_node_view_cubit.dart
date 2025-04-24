@@ -63,9 +63,10 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
 
     for (VSOutputNode vsOutputNode
         in nodeDataProvider.nodeManager.getOutputNodes) {
-      MapEntry<String, dynamic> nodeOutput = vsOutputNode.evaluate();
+      print("vsOutputNode $vsOutputNode");
+
+      MapEntry<String, dynamic> nodeOutput = await vsOutputNode.evaluate();
       dynamic asyncOutput = await nodeOutput.value;
-      Future.delayed(Duration.zero);
       nodeOutput = MapEntry(nodeOutput.key, asyncOutput);
       entries.add(nodeOutput);
     }
