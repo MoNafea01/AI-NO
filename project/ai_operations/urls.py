@@ -54,6 +54,9 @@ urlpatterns = [
     path('fit_net/', NetModelFitterAPIView.as_view(), name='fit_net'),
     
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
+    path('export-project/', ExportProjectAPIView.as_view(), name='export-project'),
+    path('import-project/', ImportProjectAPIView.as_view(), name='import-project'),
+
 
     # Generates the raw OpenAPI schema
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
