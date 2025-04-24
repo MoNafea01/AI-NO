@@ -46,8 +46,13 @@ dependencies:
   flutter_svg: ^2.1.0
   #toast messages
   fluttertoast: ^8.2.12
+  #for the Dropdown menus and combo boxes
+  dropdown_button2: ^2.3.9
   #the node view package that is localized and used in this project
   vs_node_view: ^2.1.1
+
+
+
 
 
 

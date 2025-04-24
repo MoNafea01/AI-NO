@@ -17,6 +17,7 @@ class NodeModel {
   List<String>? inputDots;
   List<String>? outputDots;
   String? endPoint;
+  String? projectId;
 
   NodeModel({
     this.id,
@@ -31,6 +32,8 @@ class NodeModel {
     this.inputDots,
     this.outputDots,
     this.endPoint,
+    this.projectId,
+    this.nodeId,
   });
 
   NodeModel copyWith({
@@ -71,8 +74,6 @@ class NodeModel {
     String task = json['task'] ?? "task ${json['id']}";
     num id = num.parse(json['id'].toString());
     int index = json['idx'] != null ? int.parse(json['idx'].toString()) : 6;
-    String displayName = json['displayed_name'] ?? name;
-    String description = json['description'];
 
     List<ParameterModel> params = [];
     if (json['params'] != null) {
@@ -87,7 +88,6 @@ class NodeModel {
     List<String> outputDots = json['output_channels'] != null
         ? json['output_channels'].cast<String>()
         : [];
-    String? apiCall = json['api_call'];
 
     return NodeModel(
       id: id,
@@ -96,9 +96,9 @@ class NodeModel {
       category: category,
       type: type,
       task: task,
-      endPoint: apiCall,
-      displayName: displayName,
-      description: description,
+      endPoint: json['api_call'],
+      displayName: json['displayed_name'] ?? name,
+      description: json['description'],
       inputDots: inputDots,
       outputDots: outputDots,
       params: params,

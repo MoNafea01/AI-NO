@@ -59,7 +59,7 @@ class NodeServerCalls {
 
   Future<Response> _post(Dio dio, NodeModel node, dynamic apiBody) async {
     return await dio.post(
-      "$_baseURL/${node.endPoint}",
+      "$_baseURL/${node.endPoint}?project_id=",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );

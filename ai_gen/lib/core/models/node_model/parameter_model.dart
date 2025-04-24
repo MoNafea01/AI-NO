@@ -15,10 +15,9 @@ class ParameterModel {
   String name;
   String? _type;
   dynamic _value;
-  dynamic _defaultValue;
+  final dynamic _defaultValue;
   final List? choices;
 
-  static Map<String, int> typesMap = {};
   ParameterModel({
     this.name = 'param_name',
     this.choices = const [],
@@ -26,7 +25,11 @@ class ParameterModel {
     dynamic defaultValue,
   })  : _type = type,
         _defaultValue = defaultValue,
-        _value = defaultValue;
+        _value = defaultValue {
+    if (defaultValue is List) {
+      _value = defaultValue.map((e) => e).toList();
+    }
+  }
 
   get defaultValue => _defaultValue;
 
@@ -56,25 +59,25 @@ class ParameterModel {
   /// This method is used to print the types of parameters
   /// call this in the constructor
   /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
-  void _printNodeTypes() {
-    if (type != null) {
-      if (typesMap.containsKey(type)) {
-        typesMap[type] = typesMap[type]! + 1;
-      } else {
-        typesMap[type] = 1;
-      }
-      print(typesMap);
-    }
-  }
+  // static final Map<String, int> _typesMap = {};
+  // void _printNodeTypes() {
+  //   if (type != null) {
+  //     if (_typesMap.containsKey(type)) {
+  //       _typesMap[type] = _typesMap[type]! + 1;
+  //     } else {
+  //       _typesMap[type] = 1;
+  //     }
+  //     print(_typesMap);
+  //   }
+  // }
 
   get type {
-    if (choices != null && choices!.isNotEmpty) {
-      return ParameterType.dropDownList;
-    }
-
     switch (_type) {
       case 'str':
-        return ParameterType.string;
+        return (choices != null || choices!.isNotEmpty)
+            ? ParameterType.dropDownList
+            : ParameterType.string;
+
       case 'int':
         return ParameterType.int;
       case 'float':
@@ -93,6 +96,7 @@ class ParameterModel {
   get value => _value;
 
   set value(dynamic newValue) {
+    print('set value: $newValue of type ${newValue.runtimeType}');
     switch (type) {
       case ParameterType.string:
         _value = newValue.toString();
@@ -111,13 +115,21 @@ class ParameterModel {
         }
         break;
       case ParameterType.listInt:
-        _value = Helper.parseList(newValue);
+        _value = Helper.parseIntList(newValue);
         break;
       case ParameterType.boolean:
         _value = newValue == 'true' || newValue == true;
         break;
       default:
         _value = newValue;
+    }
+  }
+
+  void resetValue() {
+    if (_defaultValue is List) {
+      _value = _value = _defaultValue.map((e) => e).toList();
+    } else {
+      _value = _defaultValue;
     }
   }
 
