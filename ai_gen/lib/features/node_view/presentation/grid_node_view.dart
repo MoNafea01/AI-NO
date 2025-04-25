@@ -2,6 +2,7 @@ import 'package:ai_gen/core/reusable_widgets/custom_button.dart';
 import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/core/themes/asset_paths.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/menu_actions.dart';
+import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -86,7 +87,7 @@ class _GridNodeViewState extends State<GridNodeView> {
     return AppBar(
       backgroundColor: AppColors.grey50,
       surfaceTintColor: AppColors.grey50,
-      title: Text(gridNodeViewCubit.projectModel?.name ?? "Project Name"),
+      title: Text(gridNodeViewCubit.projectModel.name ?? "Project Name"),
       elevation: 1,
       shadowColor: Colors.black,
       leading: CustomButton(
@@ -106,7 +107,10 @@ class _GridNodeViewState extends State<GridNodeView> {
               child: SvgPicture.asset(AssetsPaths.refreshIcon, height: 18),
             ),
             CustomButton(
-              onTap: () => Navigator.of(context).pop(),
+              onTap: () =>
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              )),
               child: const Icon(Icons.home),
             ),
             const SizedBox(),

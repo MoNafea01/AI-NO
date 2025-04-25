@@ -16,22 +16,25 @@ class NodeServerCalls {
     String projectName,
     String projectDescription,
   ) async {
+    print("Creating $_baseURL/$_projectEndPoint/");
     try {
       final Response response = await _dio.post(
-        "$_baseURL/$_projectEndPoint",
+        "$_baseURL/$_projectEndPoint/",
         data: {
           "project_name": projectName,
           "project_description": projectDescription,
         },
       );
 
-      if (response.statusCode != null && response.statusCode! < 300 ||
+      if (response.statusCode != null &&
+          response.statusCode! < 300 &&
           response.statusCode! >= 200) {
         return ProjectModel.fromJson(response.data);
       } else {
         throw Exception("server error: error code ${response.statusCode}");
       }
     } catch (e) {
+      print(e);
       throw Exception("Server Error: $e");
     }
   }
@@ -39,7 +42,7 @@ class NodeServerCalls {
   Future<ProjectModel> getProject(int projectId) async {
     try {
       final Response response = await _dio.get(
-        "$_baseURL/$_projectEndPoint/$projectId",
+        "$_baseURL/$_projectEndPoint/$projectId/",
       );
 
       if (response.statusCode != null && response.statusCode! < 300 ||
@@ -54,30 +57,57 @@ class NodeServerCalls {
   }
 
   Future<List<NodeModel>> getProjectNodes(int projectId) async {
-    // try {
-    final Response response = await _dio.get(
-      "$_baseURL/$_nodesEndPoint/?$projectId",
-    );
+    try {
+      final Response response = await _dio.get(
+        "$_baseURL/$_nodesEndPoint/?$projectId/",
+      );
 
-    if (response.statusCode != null && response.statusCode! < 300 ||
-        response.statusCode! >= 200) {
-      List<NodeModel> nodes = [];
-      if (response.data != null || response.data.isNotEmpty) {
-        response.data.forEach((nodeData) {
-          NodeModel node = NodeModel.fromJson(nodeData);
-          nodes.add(node);
-        });
+      if (response.statusCode != null && response.statusCode! < 300 ||
+          response.statusCode! >= 200) {
+        List<NodeModel> nodes = [];
+        if (response.data != null || response.data.isNotEmpty) {
+          response.data.forEach((nodeData) {
+            NodeModel node = NodeModel.fromJson(nodeData);
+            nodes.add(node);
+          });
 
-        return nodes;
+          return nodes;
+        } else {
+          throw Exception('server error: response data is null');
+        }
       } else {
-        throw Exception('server error: response data is null');
+        throw Exception("server error: error code ${response.statusCode}");
       }
-    } else {
-      throw Exception("server error: error code ${response.statusCode}");
+    } catch (e) {
+      throw Exception("Server Error: $e");
     }
-    // } catch (e) {
-    //   throw Exception("Server Error: $e");
-    // }
+  }
+
+  Future<List<ProjectModel>> getAllProjects() async {
+    try {
+      final Response response = await _dio.get(
+        "$_baseURL/$_projectEndPoint/",
+      );
+
+      if (response.statusCode != null && response.statusCode! < 300 ||
+          response.statusCode! >= 200) {
+        List<ProjectModel> projects = [];
+        if (response.data != null || response.data.isNotEmpty) {
+          response.data.forEach((projectData) {
+            ProjectModel project = ProjectModel.fromJson(projectData);
+            projects.add(project);
+          });
+
+          return projects;
+        } else {
+          throw Exception('server error: response data is null');
+        }
+      } else {
+        throw Exception("server error: error code ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Server Error: $e");
+    }
   }
 
   Future<List<NodeModel>> loadNodesComponents() async {

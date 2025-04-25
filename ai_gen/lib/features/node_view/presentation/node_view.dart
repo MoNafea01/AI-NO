@@ -1,4 +1,6 @@
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/reusable_widgets/failure_screen.dart';
+import 'package:ai_gen/core/reusable_widgets/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,52 +22,16 @@ class NodeView extends StatelessWidget {
           if (state is GridNodeViewLoading || state is GridNodeViewInitial) {
             return const LoadingScreen();
           } else if (state is NodeViewFailure) {
-            return _FailureScreen(state.errMessage);
+            return FailureScreen(
+              state.errMessage,
+              onRetry: context.read<GridNodeViewCubit>().buildNodes,
+            );
           } else if (state is NodeViewSuccess) {
             return const GridNodeView();
           } else {
             return const Scaffold(body: SizedBox());
           }
         },
-      ),
-    );
-  }
-}
-
-class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
-  }
-}
-
-class _FailureScreen extends StatelessWidget {
-  const _FailureScreen(this.errorMessage);
-
-  final String errorMessage;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(errorMessage),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 36,
-                ),
-              ),
-              onPressed: () => context.read<GridNodeViewCubit>().buildNodes(),
-              child: const Text('Retry', style: TextStyle(fontSize: 16)),
-            ),
-          ],
-        ),
       ),
     );
   }

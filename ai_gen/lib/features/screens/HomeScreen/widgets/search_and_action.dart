@@ -1,8 +1,7 @@
 // Search and Actions Row Widget
-import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 
+import 'create_new_project_dialog.dart';
 import 'custom_icon_text_button.dart';
 
 class SearchAndActionsRow extends StatelessWidget {
@@ -59,16 +58,10 @@ class SearchAndActionsRow extends StatelessWidget {
           textColor: Colors.white,
           iconColor: Colors.white,
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NodeView(
-                  projectModel: ProjectModel(
-                    name: "New Project",
-                    description: "New Project Description",
-                    id: 15,
-                  ),
-                ),
+            showDialog(
+              context: context,
+              builder: (context) => const Dialog(
+                child: CreateNewProjectDialog(),
               ),
             );
           },
