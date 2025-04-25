@@ -10,6 +10,7 @@ class FlattenLayer(BaseLayer):
         self.name = name
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.cur_id = cur_id 
+        self.uid = kwargs.get('uid', None)
         super().__init__(project_id=project_id)
 
     @property
@@ -30,4 +31,5 @@ class FlattenLayer(BaseLayer):
         return {
             "message": "Flatten layer created",
             "node_name": "flatten_layer",
+            "uid": self.uid,
         }

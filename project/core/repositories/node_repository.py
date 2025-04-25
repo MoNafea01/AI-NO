@@ -39,7 +39,7 @@ class NodeSaver:
         node_type = payload.get('node_type', "general")
         children = payload.get("children", [])
         project_id = payload.get('project_id')
-        
+        uid = payload.get('uid')
         # Save to file system and get path
         node_path = None
         if path:
@@ -61,7 +61,8 @@ class NodeSaver:
                 'task': task,
                 'node_type': node_type,
                 'children': children,
-                'project_id': project_id
+                'project_id': project_id,
+                "uid": uid,
             }
         )
         
@@ -74,7 +75,8 @@ class NodeSaver:
             "task": "save",
             "node_type": "saver",
             "children": children,
-            "project_id": project_id
+            "project_id": project_id,
+            "uid": uid,
         }
 
 
@@ -234,7 +236,7 @@ class NodeDeleter:
                     for value in children:
                         child = Node.objects.get(node_id = value)
                         delete_node(child)
-
+            
             delete_node(node)
 
             return True, f"Node {node_id} deleted."

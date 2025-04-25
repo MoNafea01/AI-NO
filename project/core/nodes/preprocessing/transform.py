@@ -24,6 +24,8 @@ class Transform(BaseNode):
         self.preprocessor_path = preprocessor_path
         self.data = NodeDataExtractor()(data)
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
+
         self.payload = self._transform()
 
     def _transform(self):
@@ -54,7 +56,7 @@ class Transform(BaseNode):
             transformer = PreprocessorTransformer(preprocessor, self.data)
             output = transformer.transform_data()
             payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', 
-                                                   node_type='transformer', project_id=self.project_id)
+                                                   node_type='transformer', project_id=self.project_id, uid=self.uid)
             
             NodeSaver()(payload, rf"{SAVING_DIR}\preprocessing")
             payload.pop("node_data", None)

@@ -66,7 +66,7 @@ default_data = [
     {"node_name": "dropout_layer", "params": {"rate": 0.5}},
     {"node_name": "sequential_model", "params":{}},
     {"node_name": "model_compiler", "params": {"optimizer":"adam","loss":"sparse_categorical_crossentropy","metrics":["accuracy"]}},
-    {"node_name": "nn_model_fitter", "params": {"epochs": 10,"batch_size": 32,"validation_split": 0.2}},
+    {"node_name": "nn_fitter", "params": {"epochs": 10,"batch_size": 32,"validation_split": 0.2}},
 
 ]
 

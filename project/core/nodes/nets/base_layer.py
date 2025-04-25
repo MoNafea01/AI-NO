@@ -56,8 +56,8 @@ class BaseLayer(BaseNode):
     def layer_class(self):
         raise NotImplementedError("layer_class method not implemented.")
     
-    def build_payload(self, layer, message, node_name):
-        payload = PayloadBuilder.build_payload(message, layer, node_name, params=self.get_params())
+    def build_payload(self, layer, message, node_name, **kwargs):
+        payload = PayloadBuilder.build_payload(message, layer, node_name, params=self.get_params(), **kwargs)
         return payload
     
     def layer_name(self):

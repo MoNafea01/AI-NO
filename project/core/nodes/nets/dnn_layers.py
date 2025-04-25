@@ -12,6 +12,7 @@ class DenseLayer(BaseLayer):
         self.name = name
         self.layer_path = path
         self.cur_id = cur_id
+        self.uid = kwargs.get('uid', None)
 
         self.prev_node = self.load_args(prev_node, attr="node_id")
         super().__init__(project_id=project_id)
@@ -31,13 +32,14 @@ class DenseLayer(BaseLayer):
         return {
             "units": self.units, 
             "activation": self.activation, 
-            "name": self.name
+            "name": self.name,
         }
     
     def payload_configs(self):
         return {
             "message": "Dense layer created",
             "node_name": "dense_layer",
+            "uid": self.uid,
         }
 
 
@@ -49,6 +51,7 @@ class DropoutLayer(BaseLayer):
         self.layer_path = path
         self.name = name
         self.cur_id = cur_id
+        self.uid = kwargs.get('uid', None)
 
         self.prev_node = self.load_args(prev_node, attr="node_id")
         super().__init__(project_id=project_id)
@@ -65,10 +68,13 @@ class DropoutLayer(BaseLayer):
         return f"dropout_{self.cur_id}"
     
     def get_params(self):
-        return {"rate": self.rate, "name": self.name}
+        return {"rate": self.rate, 
+                "name": self.name,
+                }
     
     def payload_configs(self):
         return {
             "message": "Dropout layer created",
             "node_name": "dropout_layer",
+            "uid": self.uid,
         }

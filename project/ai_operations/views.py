@@ -6,12 +6,12 @@ from rest_framework.parsers import MultiPartParser
 
 from core.nodes import *
 from core.repositories import *
-
 import datetime, os, tempfile, subprocess, sys, random
 from django.http import HttpResponse
 from .serializers import *
 import pandas as pd
 import json
+from core.nodes.configs.const_ import get_node_name_by_api_ref
 
 class NodeQueryMixin:
     """
@@ -112,6 +112,10 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         return_serialized = request.query_params.get('return_serialized', '0') == '1'
         project_id = request.query_params.get('project_id')
 
+        ref = request.path.strip('/').split('/')[-1] + '/'
+        node_name = get_node_name_by_api_ref(ref, request)
+        uid = Component.objects.get(node_name=node_name).uid
+
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
@@ -123,7 +127,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             
             if project_id:
                 validated_data['project_id'] = project_id
-            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id)
+            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
             BaseNodeAPIView.cur_id += 1
 
             response_data = processor(output_channel, return_serialized=return_serialized)
@@ -138,7 +142,11 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         project_id = request.query_params.get('project_id')
         node_id = request.query_params.get("node_id", None)
         return_serialized = request.query_params.get('return_serialized', '0') == '1'
-        
+
+        ref = request.path.strip('/').split('/')[-1] + '/'
+        node_name = get_node_name_by_api_ref(ref, request)
+        uid = Component.objects.get(node_name=node_name).uid
+
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
@@ -146,7 +154,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             if project_id:
                 validated_data['project_id'] = project_id
 
-            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id)
+            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
             BaseNodeAPIView.cur_id += 1
             
             success, message = NodeUpdater(return_serialized)(node_id, processor())
@@ -476,8 +484,10 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         loader = NodeLoader(from_db=False)
         payload = loader(node_id=node_id, path=path)
         node_name = payload.get("message").split(" ")[1]
+        uid = Component.objects.get(node_name="node_loader").uid
         payload.update({"node_name":node_name,
-                        "project_id": project_id})
+                        "project_id": project_id,
+                        "uid": uid})
         
         NodeSaver()(payload, path=rf"{SAVING_DIR}\other")
 
@@ -530,6 +540,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
         path = request.data.get("node_path")  # Optional path parameter
         project_id = request.query_params.get('project_id')
         return_serialized = request.query_params.get("return_serialized") == "1"
+        uid = Component.objects.get(node_name="node_saver").uid
         try:
             saver = NodeSaver()
             if isinstance(payload, int):
@@ -537,7 +548,8 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
             node_data = NodeDataExtractor()(payload)
             payload["node_data"] = node_data
             payload["node_id"] = id(saver)
-            payload.update({"project_id": project_id})
+            payload.update({"project_id": project_id, 
+                            "uid": uid})
             saved_response = saver(payload, path=path)
             response = saver(saved_response)
 

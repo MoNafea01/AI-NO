@@ -25,6 +25,8 @@ class FitTransform:
         self.preprocessor_path = preprocessor_path
         self.data = NodeDataExtractor()(data)
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
+
         self.payload = self._fit_transform()
 
     def _fit_transform(self):
@@ -57,13 +59,15 @@ class FitTransform:
 
             payload = []
             payload.append(PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output),
-                                                         "fitter_transformer", node_type="fitter_transformer", task="fit_transform", project_id=self.project_id))
+                                                         "fitter_transformer", node_type="fitter_transformer", task="fit_transform", project_id=self.project_id,
+                                                         uid=self.uid))
             
             names = ["Fitted Preprocessor", "Transformed Data"]
             tasks = ["fit_preprocessor", "transform"]
+            uids = [self.uid - 2, self.uid - 1]
             for i in range(1, 3):
                 payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [fitted_preprocessor, output][i-1], "fitter_transformer",
-                                                             node_type="fitter_transformer", task=tasks[i-1], project_id=self.project_id))
+                                                             node_type="fitter_transformer", task=tasks[i-1], project_id=self.project_id, uid=uids[i-1]))
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
