@@ -489,7 +489,8 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                         "project_id": project_id,
                         "uid": uid})
         
-        NodeSaver()(payload, path=rf"{SAVING_DIR}\other")
+        project_path = f"{project_id}\\" if project_id else ""
+        NodeSaver()(payload, path=rf"{SAVING_DIR}\{project_path}other")
 
         # Reload the node with serialization settings
         payload = NodeLoader(return_serialized=return_serialized, return_path= not return_serialized)(node_id=payload.get("node_id"))

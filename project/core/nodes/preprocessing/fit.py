@@ -60,7 +60,8 @@ class Fit(BaseNode):
                                                    node_type="fitter", task="fit_preprocessor", project_id=self.project_id,
                                                    uid=self.uid)
             
-            NodeSaver()(payload, rf"{SAVING_DIR}\preprocessing")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}preprocessing")
             payload.pop("node_data", None)
             return payload
         except Exception as e:
