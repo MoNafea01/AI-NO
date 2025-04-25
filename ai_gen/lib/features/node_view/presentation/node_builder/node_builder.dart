@@ -74,11 +74,11 @@ class NodeBuilder {
 
   // build the last List of nodes
   List<Function(Offset, VSOutputData?)> _buildNodes(List<NodeModel> nodesList) {
-    return nodesList.map((NodeModel node) => _buildNode(node)).toList();
+    return nodesList.map((NodeModel node) => buildNode(node)).toList();
   }
 
   //build the node itself
-  Function(Offset, VSOutputData?) _buildNode(NodeModel node) {
+  Function(Offset, VSOutputData?) buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
       NodeModel newNode = node.copyWith(projectId: projectId);
       return VSNodeData(

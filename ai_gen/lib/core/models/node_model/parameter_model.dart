@@ -22,11 +22,17 @@ class ParameterModel {
     this.name = 'param_name',
     this.choices = const [],
     String? type,
-    defaultValue,
+    dynamic defaultValue,
+    dynamic value,
   })  : _type = type,
-        _defaultValue = defaultValue,
-        _value = defaultValue {
-    if (defaultValue is List) _value = [...defaultValue];
+        _defaultValue = defaultValue {
+    if (value != null) {
+      _value = value;
+    } else if (defaultValue is List) {
+      _value = [...defaultValue];
+    } else {
+      _value = defaultValue;
+    }
   }
 
   get defaultValue => _defaultValue;
@@ -36,12 +42,14 @@ class ParameterModel {
     String? type,
     defaultValue,
     List? choices,
+    dynamic value,
   }) {
     return ParameterModel(
       name: name ?? this.name,
       type: type ?? _type,
       defaultValue: defaultValue ?? _defaultValue,
       choices: choices ?? this.choices,
+      value: value ?? _value,
     );
   }
 
@@ -79,7 +87,6 @@ class ParameterModel {
   get value => _value;
 
   set value(dynamic newValue) {
-    print('set value: $newValue of type ${newValue.runtimeType}');
     switch (type) {
       case ParameterType.string:
         _value = newValue.toString();

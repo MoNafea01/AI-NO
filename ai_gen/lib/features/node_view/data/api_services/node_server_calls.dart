@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/network/network_constants.dart';
+import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
@@ -59,17 +62,47 @@ class NodeServerCalls {
   Future<List<NodeModel>> getProjectNodes(int projectId) async {
     try {
       final Response response = await _dio.get(
-        "$_baseURL/$_nodesEndPoint/?$projectId/",
+        "$_baseURL/$_nodesEndPoint/?project_id=$projectId",
       );
 
       if (response.statusCode != null && response.statusCode! < 300 ||
           response.statusCode! >= 200) {
         List<NodeModel> nodes = [];
+
         if (response.data != null || response.data.isNotEmpty) {
-          response.data.forEach((nodeData) {
-            NodeModel node = NodeModel.fromJson(nodeData);
-            nodes.add(node);
-          });
+          response.data.forEach(
+            (nodeData) {
+              if (nodeData["location_x"] == 0 && nodeData["location_y"] == 0) {
+                // indicates fake node like the two outputs of the data loader
+                return;
+              }
+              NodeModel? componentNode =
+                  NodeSerializer.nodesDictionary[nodeData["uid"]];
+
+              NodeModel? x = componentNode?.copyWith(
+                projectId: nodeData["project"],
+                nodeId: nodeData["node_id"],
+                offset: Offset(nodeData["location_x"] ?? 350,
+                    nodeData["location_y"] ?? 350),
+                params: NodeSerializer.nodesDictionary[nodeData["uid"]]!.params
+                    .map((componentParameter) {
+                  print(nodeData["params"]?.firstWhere(
+                    (param) => param[componentParameter.name] != null,
+                  )[componentParameter.name]);
+                  if (nodeData["params"] is List &&
+                      nodeData["params"].isNotEmpty) {
+                    return componentParameter.copyWith(
+                      value: nodeData["params"]?.firstWhere(
+                        (param) => param[componentParameter.name] != null,
+                      )[componentParameter.name],
+                    );
+                  }
+                  return componentParameter.copyWith();
+                }).toList(),
+              );
+              if (x != null) nodes.add(x);
+            },
+          );
 
           return nodes;
         } else {
@@ -85,7 +118,7 @@ class NodeServerCalls {
 
   Future updateProjectNodes(List<Map> nodes, int projectId) async {
     try {
-      print(nodes);
+      print("project Nodes: $nodes");
       final Response response = await _dio.put(
         "$_baseURL/$_nodesEndPoint/?project_id=$projectId",
         data: nodes,
@@ -129,21 +162,28 @@ class NodeServerCalls {
     }
   }
 
-  Future<List<NodeModel>> loadNodesComponents() async {
+  Future<Map<int, NodeModel>> loadNodesComponents() async {
     try {
       final Response response =
           await _dio.get("$_baseURL/$_allComponentsEndPoint");
-      List<NodeModel> nodes = [];
+
+      Map<int, NodeModel> nodesDictionary = {};
 
       if (response.statusCode != null && response.statusCode! < 300 ||
           response.statusCode! >= 200) {
         if (response.data != null) {
-          response.data.forEach((nodeData) {
-            NodeModel node = NodeModel.fromJson(nodeData);
-            nodes.add(node);
-          });
+          response.data.forEach(
+            (nodeData) {
+              NodeModel node = NodeModel.fromJson(nodeData);
+              if (nodeData['uid'] != null) {
+                nodesDictionary[nodeData['uid']] = node;
+              } else {
+                print("Node:${node.name} returned with uid is null");
+              }
+            },
+          );
 
-          return nodes;
+          return nodesDictionary;
         } else {
           throw Exception('server error: response data is null');
         }

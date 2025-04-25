@@ -17,7 +17,6 @@ class TransparentSidesPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint();
 
-    print(size.width);
     // Clip for rounded corners
     final RRect roundedRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(0, 0, size.width, size.height),

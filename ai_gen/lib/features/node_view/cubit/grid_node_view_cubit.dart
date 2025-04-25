@@ -4,8 +4,8 @@ import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.da
 import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:meta/meta.dart';
 
 part 'node_view_state.dart';
 
@@ -30,17 +30,29 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   Future buildNodes() async {
     try {
       emit(GridNodeViewLoading());
-      await _getProject();
+      await _loadOrCreateProject();
 
-      // print(_nodeServerCalls.getProjectNodes(projectModel.id!));
-
+      final NodeBuilder nodeBuilderInstance =
+          NodeBuilder(projectId: projectModel.id!);
       final List<Object> nodeBuilder =
-          await NodeBuilder(projectId: projectModel.id!).buildNodesMenu();
+          await nodeBuilderInstance.buildNodesMenu();
+
+      List<NodeModel> projectNodes = await _loadProjectNodes();
 
       nodeDataProvider = VSNodeDataProvider(
         nodeManager: VSNodeManager(nodeBuilders: nodeBuilder),
         withAppbar: true,
       );
+
+      List nodeBuilders = projectNodes.map(
+        (node) {
+          return nodeBuilderInstance.buildNode(node)(
+            node.offset ?? const Offset(350, 350),
+            null,
+          );
+        },
+      ).toList();
+      nodeDataProvider.updateOrCreateNodes([...nodeBuilders]);
 
       emit(NodeViewSuccess());
     } catch (e) {
@@ -48,11 +60,21 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     }
   }
 
-  Future<void> _getProject() async {
+  Future<List<NodeModel>> _loadProjectNodes() async {
+    List<NodeModel> projectNodes =
+        await _nodeServerCalls.getProjectNodes(projectModel.id!);
+
+    for (var nodeModel in projectNodes) {
+      print("Project Node: ${nodeModel.toJson()}");
+    }
+    return projectNodes;
+  }
+
+  Future<void> _loadOrCreateProject() async {
     if (projectModel.id == null) {
       projectModel = await _nodeServerCalls.createProject(
         projectModel.name ?? "project Name",
-        projectModel.description ?? "projectDescription",
+        projectModel.description ?? "project Description",
       );
       print("Project Created: ${projectModel.toJson().toString()}");
     } else {
