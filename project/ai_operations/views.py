@@ -126,6 +126,11 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                     validated_data[key] = self.extract_node_id(validated_data[key])
             
             if project_id:
+                try:
+                    project_id = Project.objects.get(id=project_id).id
+                except :
+                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
+                
                 validated_data['project_id'] = project_id
             processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
             BaseNodeAPIView.cur_id += 1
@@ -152,6 +157,11 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         if serializer.is_valid():
             validated_data = serializer.validated_data
             if project_id:
+                try:
+                    project_id = Project.objects.get(id=project_id).id
+                except :
+                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
+                
                 validated_data['project_id'] = project_id
 
             processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
@@ -504,6 +514,11 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                 path = serializer.validated_data.get('node_path')
                 return_serialized = request.query_params.get("return_serialized") == "1"
                 project_id = request.query_params.get('project_id')
+
+                try:
+                    project_id = Project.objects.get(id=project_id).id
+                except :
+                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
                 
                 payload = self.get_serialized_payload(node_id, path, return_serialized, project_id)
                 return Response(payload, status=status.HTTP_200_OK)
@@ -516,21 +531,30 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
     def put(self, request):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
-            node_id = serializer.validated_data.get("node_id")
-            path = serializer.validated_data.get('node_path')
-            return_serialized = request.query_params.get("return_serialized") == "1"
-            project_id = request.query_params.get('project_id')
-            payload = self.get_serialized_payload(node_id, path, return_serialized, project_id)
-            
-            node_id = request.query_params.get("node_id", None)
-            success, message = NodeUpdater(return_serialized)(node_id, payload)
+            try:
+                node_id = serializer.validated_data.get("node_id")
+                path = serializer.validated_data.get('node_path')
+                return_serialized = request.query_params.get("return_serialized") == "1"
+                project_id = request.query_params.get('project_id')
 
-            message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
-                    
-            if success:
-                return Response({"message": message}, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    project_id = Project.objects.get(id=project_id).id
+                except :
+                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
+
+                payload = self.get_serialized_payload(node_id, path, return_serialized, project_id)
+                node_id = request.query_params.get("node_id", None)
+                success, message = NodeUpdater(return_serialized)(node_id, payload)
+
+                message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
+                        
+                if success:
+                    return Response({"message": message}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
@@ -549,6 +573,11 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
             node_data = NodeDataExtractor()(payload)
             payload["node_data"] = node_data
             payload["node_id"] = id(saver)
+            try:
+                project_id = Project.objects.get(id=project_id).id
+            except :
+                project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
+                
             payload.update({"project_id": project_id, 
                             "uid": uid})
             saved_response = saver(payload, path=path)
