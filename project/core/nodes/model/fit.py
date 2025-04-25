@@ -27,6 +27,7 @@ class Fit(BaseNode):
         self.model_path = model_path
         self.X, self.y = NodeDataExtractor()(X, y)
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self._fit()
 
     def _fit(self):
@@ -57,11 +58,13 @@ class Fit(BaseNode):
             fitter = ModelFitter(model, self.X, self.y)
             fitted_model = fitter.fit_model()
 
-            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model")
+            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model",
+                                                   uid=self.uid)
             if self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, rf"{SAVING_DIR}\model")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}model")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

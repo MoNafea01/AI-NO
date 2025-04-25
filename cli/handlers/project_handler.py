@@ -3,8 +3,8 @@ from .block_handler import send_request_to_api
 
 def handle_project_command(sub_cmd, args):
     commands = {
-        "create_project": create_project,       # project_id
-        "mkprj": create_project,                # project_id
+        "create_project": create_project,       # project_name, project_description
+        "mkprj": create_project,                # project_name, project_description
         "select_project": select_project,       # project_id
         "selprj": select_project,               # project_id
         "deselect_project": deselect_project,   # None
@@ -25,18 +25,21 @@ def handle_project_command(sub_cmd, args):
     return False, f"Unknown project command: {sub_cmd}"
 
 
-def create_project(project_id):
+def create_project(project_name, project_description = "Project Created from CLI" ):
     data_store = get_data_store()
     active_user = data_store["active_user"]
     if not active_user:
         return False, "No user selected."
+        
+    response = send_request_to_api({"project_name":f"{project_name}",
+                                    "project_description": f"{project_description}",
+                                    }, "projects/", method_type="post")
+    project_id = response.get("id")
+
     data_store["users"][active_user]["projects"][project_id] = []
     if not data_store['active_project']:
         data_store["active_project"] = project_id
-        
-    response = send_request_to_api({"project_name":f"{project_id}",
-                                    "project_description": f"Project number {project_id}"
-                                    }, "projects/", method_type="post")
+
     return True, f"Project {project_id} created."
 
 

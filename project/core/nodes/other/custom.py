@@ -12,14 +12,17 @@ class Joiner(BaseNode):
     def __init__(self, data_1, data_2, project_id=None, *args, **kwargs):
         self.data_1, self.data_2 = NodeDataExtractor()(data_1, data_2)
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self.join()
     
     def join(self):
         try:
             joined_data = (self.data_1, self.data_2)
-            payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join", project_id=self.project_id)
+            payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join", project_id=self.project_id,
+                                                   uid=self.uid)
             
-            NodeSaver()(payload, rf"{SAVING_DIR}\other")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}other")
             payload.pop("node_data", None)
             return payload
         except Exception as e:
@@ -37,6 +40,7 @@ class Splitter:
     def __init__(self, data, project_id=None, *args, **kwargs):
         self.project_id = project_id
         self.data = NodeDataExtractor()(data)
+        self.uid = kwargs.get('uid', None)
         self.payload = self.split()
 
     def split(self):
@@ -44,14 +48,15 @@ class Splitter:
             out1, out2 = self.data
 
             payload = []
-            payload.append(PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split", project_id=self.project_id))
+            payload.append(PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split", project_id=self.project_id, uid=self.uid))
             
             for i in range(1, 3):
-                payload.append(PayloadBuilder.build_payload(f"data_{i}", [out1, out2][i-1], "splitter", node_type="custom", task="split", project_id=self.project_id))
+                payload.append(PayloadBuilder.build_payload(f"data_{i}", [out1, out2][i-1], "splitter", node_type="custom", task="split", project_id=self.project_id, uid=self.uid))
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
-                NodeSaver()(payload[i], rf"{SAVING_DIR}\other")
+                project_path = f"{self.project_id}\\" if self.project_id else ""
+                NodeSaver()(payload[i], rf"{SAVING_DIR}\{project_path}other")
                 payload[i].pop("node_data", None)
             
             return payload

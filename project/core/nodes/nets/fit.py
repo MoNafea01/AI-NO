@@ -12,6 +12,7 @@ class Fit(BaseNode):
         self.epochs = epochs
         self.X, self.y = NodeDataExtractor()(X, y)
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self._fit()
 
     def _fit(self):
@@ -41,11 +42,14 @@ class Fit(BaseNode):
         try:
             model.fit(self.X, self.y, batch_size=self.batch_size, epochs=self.epochs)
 
-            payload = PayloadBuilder.build_payload("NN fitted", model, "nn_fitter", node_type="fitter", task="fit_model")
+            payload = PayloadBuilder.build_payload("NN fitted", model, "nn_fitter", node_type="fitter", task="fit_model",
+                                                       params={"batch_size": self.batch_size, "epochs": self.epochs},
+                                                       uid=self.uid)
             if self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, rf"{SAVING_DIR}\nets")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}nets")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

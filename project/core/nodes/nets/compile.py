@@ -15,6 +15,7 @@ class CompileModel(BaseNode):
         self.nn_model = nn_model
         self.nn_model_path = model_path
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self._compile()
     
     def _compile(self):
@@ -47,12 +48,14 @@ class CompileModel(BaseNode):
                 raise ValueError("Loss, optimizer, and metrics must be provided for compilation.")
 
             payload = PayloadBuilder.build_payload("Model Compiled", model, "model_compiler", task="compile_model", node_type="compiler",
-                                                       params={"loss": self.loss, "optimizer": self.optimizer, "metrics": self.metrics})
+                                                       params={"loss": self.loss, "optimizer": self.optimizer, "metrics": self.metrics},
+                                                       uid=self.uid)
 
             if self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, path=rf"{SAVING_DIR}\nets")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, path=rf"{SAVING_DIR}\{project_path}nets")
             payload.pop("node_data", None)
             return payload
         

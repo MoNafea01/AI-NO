@@ -8,6 +8,7 @@ class Evaluator(BaseNode):
         self.y_true, self.y_pred = NodeDataExtractor()(y_true, y_pred)
         self.metric = metric
         self.project_id=project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self.evaluate(self.y_true, self.y_pred)
 
     def evaluate(self, y_true, y_pred):
@@ -17,10 +18,13 @@ class Evaluator(BaseNode):
             
             output = metrics[self.metric](y_true, y_pred)
             output = round(output,2)
-            payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate")
+            payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate",
+                                                   uid=self.uid)
             if self.project_id:
                 payload['project_id'] = self.project_id
-            NodeSaver()(payload, rf"{SAVING_DIR}\model")
+            
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}model")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

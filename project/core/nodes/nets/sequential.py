@@ -10,6 +10,8 @@ class SequentialNet(BaseLayer):
         self.layer = self.load_args(layer, attr="node_id")
         self.layers, self.layers_names  = self.get_layers()
         self.cur_id = cur_id
+        self.uid = kwargs.get('uid', None)
+
         super().__init__(project_id=project_id)
     
     def get_layers(self):
@@ -54,4 +56,5 @@ class SequentialNet(BaseLayer):
         return {
             "message": "Sequential model created",
             "node_name": "sequential_model",
+            "uid": self.uid,
         }

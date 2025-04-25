@@ -10,6 +10,8 @@ class InputLayer(BaseLayer):
         self.name = name
         self.layer_path = path
         self.cur_id = cur_id
+        self.uid = kwargs.get('uid', None)
+
         super().__init__(project_id=project_id)
     
     @property
@@ -30,4 +32,5 @@ class InputLayer(BaseLayer):
         return {
             "message": "Input layer created",
             "node_name": "input_layer",
+            "uid": self.uid,
         }

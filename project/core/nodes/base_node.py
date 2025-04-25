@@ -45,7 +45,8 @@ class BaseNode:
             if hasattr(self, 'project_id') and self.project_id:
                 payload['project_id'] = self.project_id
             
-            NodeSaver()(payload, path=rf"{SAVING_DIR}\{self.get_folder()}")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, path=rf"{SAVING_DIR}\{project_path}{self.get_folder()}")
             payload.pop("node_data", None)
             return payload
         

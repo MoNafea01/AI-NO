@@ -15,6 +15,7 @@ class Conv2DLayer(BaseLayer):
         self.layer_path = path
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.cur_id = cur_id
+        self.uid = kwargs.get('uid', None)
         super().__init__(project_id=project_id)
 
     @property
@@ -34,13 +35,14 @@ class Conv2DLayer(BaseLayer):
                 "strides": self.strides, 
                 "padding": self.padding, 
                 "activation": self.activation, 
-                "name": self.name
+                "name": self.name,
                 }
     
     def payload_configs(self):
         return {
             "message": "Conv2D layer created",
             "node_name": "conv2d_layer",
+            "uid": self.uid,
         }
 
 
@@ -56,6 +58,7 @@ class MaxPool2DLayer(BaseLayer):
         self.layer_path = path
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.cur_id = cur_id
+        self.uid = kwargs.get('uid', None)
         super().__init__(project_id=project_id)
     
     @property
@@ -73,11 +76,12 @@ class MaxPool2DLayer(BaseLayer):
         return {"pool_size": self.pool_size, 
                 "strides": self.strides, 
                 "padding": self.padding, 
-                "name": self.name
+                "name": self.name,
                 }
 
     def payload_configs(self):
         return {
             "message": "MaxPooling2D layer created",
             "node_name": "maxpool2d_layer",
+            "uid": self.uid,
         }

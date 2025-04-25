@@ -20,6 +20,7 @@ class Node(models.Model):
     task = models.CharField(max_length=255,default='general')
     node_type = models.CharField(max_length=255, default="general")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='nodes', null=True, blank=True)
+    uid = models.BigIntegerField(null=True, blank=True)
     children = models.JSONField(null=True, blank=True, default=list)
     location_x = models.FloatField(default=0.0)
     location_y = models.FloatField(default=0.0)
