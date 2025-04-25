@@ -25,6 +25,7 @@ class Fit(BaseNode):
         self.preprocessor_path = preprocessor_path
         self.data = NodeDataExtractor()(data)
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self._fit()
 
     def _fit(self):
@@ -56,9 +57,11 @@ class Fit(BaseNode):
             fitted_preprocessor = fitter.fit_preprocessor()
 
             payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", 
-                                                   node_type="fitter", task="fit_preprocessor", project_id=self.project_id)
+                                                   node_type="fitter", task="fit_preprocessor", project_id=self.project_id,
+                                                   uid=self.uid)
             
-            NodeSaver()(payload, rf"{SAVING_DIR}\preprocessing")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}preprocessing")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

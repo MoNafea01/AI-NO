@@ -24,6 +24,7 @@ class Predict(BaseNode):
         self.model_path = model_path
         self.X = NodeDataExtractor()(X)
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self._predict()
 
     def _predict(self):
@@ -53,10 +54,13 @@ class Predict(BaseNode):
         try:
             predictor = ModelPredictor(model, self.X)
             predictions = predictor.predict_model()
-            payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict')
+            payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict',
+                                                    uid=self.uid)
             if self.project_id:
                 payload['project_id'] = self.project_id
-            NodeSaver()(payload, rf"{SAVING_DIR}\model")
+            
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}model")
             payload.pop("node_data", None)
             return payload
         except Exception as e:

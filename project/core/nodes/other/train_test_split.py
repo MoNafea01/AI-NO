@@ -8,6 +8,7 @@ class TrainTestSplit(BaseNode):
         self.data = NodeDataExtractor()(data)
         self.params = params if params else {'test_size': 0.2, 'random_state': 42}
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self.split()
 
     def split(self):
@@ -15,15 +16,18 @@ class TrainTestSplit(BaseNode):
             out1, out2 = train_test_split(self.data,**self.params)
 
             payload = []
-            payload.append(PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split", project_id=self.project_id))
+            payload.append(PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split", project_id=self.project_id,
+                                                        uid=self.uid, params=self.params))
 
             names = ["Train data", "Test data"]
             for i in range(1, 3):
-                payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [out1, out2][i-1], "train_test_split", node_type="splitter", task="split", project_id=self.project_id))
+                payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [out1, out2][i-1], "train_test_split", node_type="splitter", task="split", project_id=self.project_id,
+                                                            uid=self.uid))
 
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
-                NodeSaver()(payload[i], rf"{SAVING_DIR}\other")
+                project_path = f"{self.project_id}\\" if self.project_id else ""
+                NodeSaver()(payload[i], rf"{SAVING_DIR}\{project_path}other")
                 payload[i].pop("node_data", None)
 
             return payload

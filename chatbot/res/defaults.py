@@ -1,23 +1,25 @@
 import json
 
 nodes = ['ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net', 'sgd_classifier', 
-         'ridge_classifier', 'logistic_regression', 'rbf_svr', 'linear_svr', 'poly_svr', 'sigmoid_svr', 
-         'rbf_svc', 'linear_svc', 'poly_svc', 'sigmoid_svc', 'bagging_regressor', 'adaboost_regressor', 
-         'gradient_boosting_regressor', 'decision_tree_regressor', 'random_forest_regressor', 'bagging_classifier', 
-         'adaboost_classifier', 'gradient_boosting_classifier', 'decision_tree_classifier', 'random_forest_classifier', 
-         'gaussian_nb', 'bernoulli_nb', 'multinomial_nb', 'knn_regressor', 'knn_classifier',
-         
-         'model_fitter', 'predictor', 'evaluator', 
-         
-         'maxabs_scaler', 'normalizer', 'minmax_scaler', 'robust_scaler', 
-         'standard_scaler', 'label_encoder', 'onehot_encoder', 'ordinal_encoder', 
-         'label_binarizer', 'knn_imputer', 'simple_imputer', 'binarizer', 
+        'ridge_classifier', 'logistic_regression', 'rbf_svr', 'linear_svr', 'poly_svr', 'sigmoid_svr', 
+        'rbf_svc', 'linear_svc', 'poly_svc', 'sigmoid_svc', 'bagging_regressor', 'adaboost_regressor', 
+        'gradient_boosting_regressor', 'decision_tree_regressor', 'random_forest_regressor', 'bagging_classifier', 
+        'adaboost_classifier', 'gradient_boosting_classifier', 'decision_tree_classifier', 'random_forest_classifier', 
+        'gaussian_nb', 'bernoulli_nb', 'multinomial_nb', 'knn_regressor', 'knn_classifier',
 
-         'preprocessor_fitter', 'transformer', 'fitter_transformer', 
-         'data_loader', 'splitter', 'joiner', 'train_test_split',
-         'input_layer', 'conv2d_layer', 'maxpool2d_layer', 'flatten_layer', 'dense_layer', 
-         'dropout_layer', 'sequential_model', 'nn_model_fitter', 'model_compiler', 
- ]
+        'model_fitter', 'predictor', 'evaluator', 
+
+        'maxabs_scaler', 'normalizer', 'minmax_scaler', 'robust_scaler', 
+        'standard_scaler', 'label_encoder', 'onehot_encoder', 'ordinal_encoder', 
+        'label_binarizer', 'knn_imputer', 'simple_imputer', 'binarizer',
+
+        'preprocessor_fitter', 'transformer', 'fitter_transformer', 
+
+        "data_loader", "splitter", "joiner", "train_test_split",
+
+        'input_layer', 'conv2d_layer', 'maxpool2d_layer', 'flatten_layer', 'dense_layer', 
+        'dropout_layer', 'sequential_model', 'nn_fitter','model_compiler', 'node_saver', 'node_loader'
+        ]
 
 editable = [
     'alpha', 'penalty', 'C', 'kernel', 'l1_ratio', 'n_neighbors', 'n_estimators',
@@ -25,7 +27,7 @@ editable = [
     'strategy', 'threshold', 'batch_size', 'epochs', 'filters', 'kernel_size',
     'activation', 'pool_size', 'units', 'rate', 'optimizer', 'loss',
     'metrics', 'shape', 'test_size', 'random_state', 'dataset_name',
-    'data', 'data_1', 'data_2', 'prev_node', 'layer', 'nn_model', 'model', 'compiled_model',
+    'data', 'data_1', 'data_2', 'prev_node', 'layer', 'nn_model', 'compiled_model',
     'X', 'y', 'y_true', 'y_pred', 'metric', 'preprocessor', "<user_name>", "<password>",
     "<project_id>", "<node_name>", "<node_id>", "<args>"
 ]
@@ -96,8 +98,11 @@ params = [{'alpha': 1.0,},
     {"params": {"units": 128, "activation": "relu"}, "prev_node": 1},
     {"params": {"rate": 0.5}, "prev_node": 1},
     {"params": {}, "layer": 1},
-    {"params": {"batch_size":20, "epochs":10}, "compiled_model": 1, "X": 2, "y": 3},
-    {"params": {"optimizer": "sgd","loss": "categorical_crossentropy","metrics": ["accuracy"]}, "model": 1},
+    {"params": {"batch_size":20, "epochs":10}, "nn_model": 1, "X": 2, "y": 3},
+    {"params": {"optimizer": "sgd","loss": "categorical_crossentropy","metrics": ["accuracy"]}, "compiled_model": 1},
+    {"params": {}, "node_path": 1, "node": 2},
+    {"params": {}, "node_path": 1}
+
 ]
 
 mapp = dict(zip(nodes, params))

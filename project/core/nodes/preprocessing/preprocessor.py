@@ -14,6 +14,8 @@ class Preprocessor(BaseNode):
         default_params = self._get_default_params()
         default_params.update(params) if params else {}
         self.params = default_params
+        self.uid = kwargs.get('uid', None)
+
         super().__init__(project_id=project_id)
 
     def _get_default_params(self) -> dict:
@@ -36,6 +38,7 @@ class Preprocessor(BaseNode):
             "task": "preprocessing",
             "node_type": self.get_type,
             "node_name": self.node_name,
+            "uid": self.uid,
         }
 
     def get_params(self):

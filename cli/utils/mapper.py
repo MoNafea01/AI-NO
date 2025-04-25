@@ -21,13 +21,14 @@ nodes = ['ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net',
  "data_loader", "splitter", "joiner", "train_test_split",
 
  'input_layer', 'conv2d_layer', 'maxpool2d_layer', 'flatten_layer', 'dense_layer', 
- 'dropout_layer', 'sequential_model', 'nn_model_fitter','model_compiler', 
+ 'dropout_layer', 'sequential_model', 'nn_fitter','model_compiler', 'node_saver', 'node_loader'
  ]
 
 api_ref = [
     *models, "fit_model/", "predict/", "evaluate/",
     *preprocessors, "fit_preprocessor/", "transform/", "fit_transform/",
     "data_loader/", "splitter/", "joiner/", "train_test_split/", 
-    "create_input/", "conv2d/", "maxpool2d/", "flatten/", "dense/", "dropout/", "sequential/", "fit_net/", "compile/"
+    "create_input/", "conv2d/", "maxpool2d/", "flatten/", "dense/", "dropout/", "sequential/", 
+    "fit_net/", "compile/", "save_node/", "load_node/"
 ]
 mapper = dict(zip(nodes, api_ref))

@@ -96,25 +96,25 @@ def help_commands(*args):
 User commands:
 	register    <user_name> <password>	// Register a new user
 	login 	    <user_name> <password>	// Login to a user 
-	remove_user <user_name>			// remove a user (you have to be admin to do that)
-	make_admin  <user_name>			// make a user as an admin (you have to be admin to do that)
+	remove_user <user_name>	                // remove a user (you have to be admin to do that)
+	make_admin  <user_name>		        // make a user as an admin (you have to be admin to do that)
 
-	----- Shortcuts -----
+	----- aliases -----
 
 	rmusr  <user_name>
 	mkadm  <user_name>
 
 Project commands:
-	create_project <project_id>		// create a project
-	select_project <project_id>		// select a project
-	remove_project <project_id>		// remove a project
-	deselect_project			// deselect a project
-	list_projects				// list all projects
-	clear_project  <project_id>		// clear all nodes in a project
-    load_project   <project_id>     // loads a poject from database
-	get_project    <project_id>		// get all nodes in a project
+	create_project <project_name> <description> [optional]		// create a project
+	select_project <project_id>		                        // select a project
+	remove_project <project_id>		                        // remove a project
+	deselect_project			                        // deselect current project
+	list_projects				                        // list all projects
+	clear_project  <project_id>		                        // clear all nodes in a project
+    load_project   <project_id>                                         // loads a poject from database
+	get_project    <project_id>		                        // get all nodes in a project
 
-	----- Shortcuts -----
+	----- aliases -----
 
 	mkprj  <project_id>
 	selprj <project_id>
@@ -124,13 +124,13 @@ Project commands:
 	cls    <project_id>
     
 node commands:
-	make    <node_name> <args>		// create a node
-	edit    <node_name> <node_id> <args>	// update an existing node
-	remove  <node_name> <node_id>		// remove an existing node
-	show	<node_name> <node_id>		// get a node
-	list  					// list all nodes
+	make    <node_name> <args>		    // create a node
+	edit    <node_name> <node_id> <args>	    // update an existing node
+	remove  <node_name> <node_id>		    // remove an existing node
+	show	<node_name> <node_id>		    // get a node
+	list  					    // list all nodes
     
-	----- Shortcuts -----
+	----- aliases -----
 	
 	ls
     

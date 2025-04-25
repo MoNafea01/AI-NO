@@ -73,6 +73,7 @@ class DataLoader:
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
         X, y = self.loader.load()
         self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
         self.payload = self.build_payload(dataset_name, dataset_path, X, y)
         
     
@@ -82,15 +83,18 @@ class DataLoader:
 
         
         payload = []
-        payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id))
+        payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
+                                                    uid=self.uid))
         names = ["X", "y"]
 
         for i in range(1, 3):
-            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}_{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id))
+            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}_{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
+                                                        uid=self.uid))
         
         payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
         for i in range(3):
-            NodeSaver()(payload[i], path=rf"{SAVING_DIR}\other")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload[i], path=rf"{SAVING_DIR}\{project_path}other")
             payload[i].pop("node_data", None)
         
         return payload

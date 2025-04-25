@@ -39,7 +39,7 @@ class NodeSaver:
         node_type = payload.get('node_type', "general")
         children = payload.get("children", [])
         project_id = payload.get('project_id')
-        
+        uid = payload.get('uid')
         # Save to file system and get path
         node_path = None
         if path:
@@ -61,7 +61,8 @@ class NodeSaver:
                 'task': task,
                 'node_type': node_type,
                 'children': children,
-                'project_id': project_id
+                'project_id': project_id,
+                "uid": uid,
             }
         )
         
@@ -74,7 +75,8 @@ class NodeSaver:
             "task": "save",
             "node_type": "saver",
             "children": children,
-            "project_id": project_id
+            "project_id": project_id,
+            "uid": uid,
         }
 
 
@@ -234,7 +236,7 @@ class NodeDeleter:
                     for value in children:
                         child = Node.objects.get(node_id = value)
                         delete_node(child)
-
+            
             delete_node(node)
 
             return True, f"Node {node_id} deleted."
@@ -339,13 +341,10 @@ class ClearAllNodes:
             else:
                 project = Node.objects.all()
             # deletes all objects in the Node model
-            nodes_paths = [node.node_data for node in project]
+            nodes_path = SAVING_DIR + "\\" + str(project_id) if project_id else SAVING_DIR
             project.delete()
             nodes_dir = os.path.abspath(SAVING_DIR)
-            for node in nodes_paths:
-                abs_path = os.path.abspath(node)
-                if os.path.exists(abs_path):
-                    os.remove(abs_path)
+            shutil.rmtree(nodes_path, ignore_errors=True)
             
             f_count = 0
             for *_, files in os.walk(nodes_dir):
@@ -353,8 +352,6 @@ class ClearAllNodes:
 
             if not f_count:
                 shutil.rmtree(nodes_dir, ignore_errors=True)
-
-
 
             return True, "All nodes cleared."
         except Exception as e:

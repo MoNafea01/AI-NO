@@ -46,7 +46,8 @@ class BaseLayer(BaseNode):
             if hasattr(self, 'project_id') and self.project_id:
                 payload['project_id'] = self.project_id
 
-            NodeSaver()(payload, path=rf"{SAVING_DIR}\nets")
+            project_path = f"{self.project_id}\\" if self.project_id else ""
+            NodeSaver()(payload, path=rf"{SAVING_DIR}\{project_path}nets")
             payload.pop("node_data", None)
             return payload
         
@@ -56,8 +57,8 @@ class BaseLayer(BaseNode):
     def layer_class(self):
         raise NotImplementedError("layer_class method not implemented.")
     
-    def build_payload(self, layer, message, node_name):
-        payload = PayloadBuilder.build_payload(message, layer, node_name, params=self.get_params())
+    def build_payload(self, layer, message, node_name, **kwargs):
+        payload = PayloadBuilder.build_payload(message, layer, node_name, params=self.get_params(), **kwargs)
         return payload
     
     def layer_name(self):
