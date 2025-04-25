@@ -12,6 +12,10 @@ from .serializers import *
 import pandas as pd
 import json
 from core.nodes.configs.const_ import get_node_name_by_api_ref
+from __init__ import *
+
+from chatbot.app import generate_cli
+from cli.call_cli import call_script
 
 class NodeQueryMixin:
     """
@@ -1161,3 +1165,66 @@ class ProjectViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
+class ChatbotAPIView(APIView):
+    """API endpoint for interacting with the chatbot."""
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            # Extract required parameters
+            query = request.data.get('query')
+            mode = request.data.get('mode', 'manual')  # Default to manual mode
+            project_id = request.query_params.get('project_id')
+
+            if project_id:
+                try:
+                    project_id = Project.objects.get(id=project_id).id
+                except Project.DoesNotExist:
+                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
+
+                call_script(f"select_project {project_id}")
+            modes = {
+                "manual": '1',
+                "auto": '2'
+            }
+            if mode in modes.keys():
+                mode = modes[mode]
+
+            model_name = request.data.get('model_name', 'gemini-1.5-pro')  # Default model
+            iteration = request.data.get('iteration', 0)  # Current iteration
+            to_db = request.data.get('to_db', False)  # Flag for database usage
+
+            
+            if not query:
+                return Response({"error": "Query is required"}, status=status.HTTP_400_BAD_REQUEST)
+                
+            # Validate mode
+            if mode not in ['1', '2', 'manual', 'auto']:
+                return Response({"error": "Mode must be '1' (manual) or '2' (auto)"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            response, logs = generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration)
+            
+            return Response({"output": response, "status": "success", "logs": logs}, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class CLIAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            command = request.data.get('command')
+            
+            if not command:
+                return Response({"error": "Command is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Call the CLI script with the provided command and parameters
+            response = call_script(command)
+            
+            return Response(response, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -319,3 +319,4 @@ class ImportProjectSerializer(serializers.Serializer):
                                    help_text="Format of the import file (auto will detect based on extension)")
     password = serializers.CharField(required=False, allow_blank=True, 
                                    help_text="Password for encrypted AINOPRJ files", default="aino_secret_key")
+    

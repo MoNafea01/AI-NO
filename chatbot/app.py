@@ -1,14 +1,15 @@
 #chatbot/app.py
 from __init__ import *
 
-from core.rag_pipeline import run_pipeline
-from core.docs import get_docs
-from core.utils import extract_id_message, parse_command_list, init_logger
+from chatbot.core.rag_pipeline import run_pipeline
+from chatbot.core.docs import get_docs
+from chatbot.core.utils import extract_id_message, parse_command_list, init_logger
 from cli.call_cli import call_script
 
 # Configure logging
 parent_path = os.path.dirname(os.path.abspath(__file__))
 log_file = os.path.join(parent_path, "aino_logs.log")
+cb_logs_path = os.path.join(parent_path, "chatbot_logs.txt")
 logger = init_logger(__name__, log_file)
 
 
@@ -62,7 +63,7 @@ def manual_mode(question, model, to_db):
         log_msg_inner('-'*50)
 
         logger.debug("Writing log to chatbot_logs.txt")
-        with open("chatbot_logs.txt", "a", encoding="utf-8") as f:
+        with open(cb_logs_path, "a", encoding="utf-8") as f:
             f.write(log)
             f.write("\n\n")
 
@@ -89,7 +90,7 @@ def auto_mode(question, model, to_db, cur_iter):
             msg = "Auto mode is not supported without DB."
             logger.warning(msg)
             log_msg_inner(msg)
-            with open("chatbot_logs.txt", "a", encoding="utf-8") as f:
+            with open(cb_logs_path, "a", encoding="utf-8") as f:
                 f.write(log)
                 f.write("\n\n")
 
@@ -117,7 +118,7 @@ def auto_mode(question, model, to_db, cur_iter):
             log_msg_inner('-'*50)
 
         logger.debug("Writing log to chatbot_logs.txt")
-        with open("chatbot_logs.txt", "a", encoding="utf-8") as f:
+        with open(cb_logs_path, "a", encoding="utf-8") as f:
             f.write(log)
             f.write("\n\n")
 
@@ -140,6 +141,7 @@ def run_app():
                 ("Gemini 1.5 Pro", "gemini-1.5-pro"), 
                 ("Gemini 1.5 Flash ", "gemini-1.5-flash"),
                 ("Gemini 2.0 Flash ", "gemini-2.0-flash"),
+                ("DeepSeek R1", "deepseek-r1:7b"),
                 ], value="gemini-2.0-flash")
             user_input = gr.Textbox(lines=3, label="Describe your pipeline")
             final_output = gr.Textbox(label="Final CLI Commands")
