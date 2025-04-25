@@ -103,8 +103,17 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
         return null;
       },
     );
-
+    _updateProjectNodes();
     emit(NodeViewSuccess());
+  }
+
+  Future _updateProjectNodes() async {
+    List<Map<String, dynamic>> nodes = nodeDataProvider.nodes.values
+        .where((e) => e.node != null)
+        .map((e) => e.node!.toJson())
+        .toList();
+
+    await _nodeServerCalls.updateProjectNodes(nodes, projectModel.id!);
   }
 
   void _closeRunMenu() {

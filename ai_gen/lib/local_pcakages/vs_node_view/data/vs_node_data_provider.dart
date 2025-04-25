@@ -92,8 +92,9 @@ class VSNodeDataProvider extends ChangeNotifier {
   ///
   ///Offset will be applied to all nodes based on the offset from the moved nodes original position
   void moveNode(VSNodeData nodeData, Offset offset) {
-    final movedOffset = applyViewPortTransfrom(offset) - nodeData.widgetOffset;
+    nodeData.node?.offset = offset; //update node object offset
 
+    final movedOffset = applyViewPortTransfrom(offset) - nodeData.widgetOffset;
     final List<VSNodeData> modifiedNodes = [];
 
     if (selectedNodes.contains(nodeData.id)) {
@@ -147,7 +148,9 @@ class VSNodeDataProvider extends ChangeNotifier {
   void createNodeFromSidebar(VSNodeDataBuilder builder,
       {Offset offset = const Offset(250, 250)}) {
     final Offset movedOffset = applyViewPortTransfrom(offset);
-    updateOrCreateNodes([builder(movedOffset, null)]);
+    VSNodeData nodeData = builder(movedOffset, null);
+    nodeData.node?.offset = offset;
+    updateOrCreateNodes([nodeData]);
   }
 
   ///Set of currently selected node ids

@@ -83,6 +83,25 @@ class NodeServerCalls {
     }
   }
 
+  Future updateProjectNodes(List<Map> nodes, int projectId) async {
+    try {
+      print(nodes);
+      final Response response = await _dio.put(
+        "$_baseURL/$_nodesEndPoint/?project_id=$projectId",
+        data: nodes,
+      );
+
+      if (response.statusCode != null && response.statusCode! < 300 ||
+          response.statusCode! >= 200) {
+        return response.data;
+      } else {
+        throw Exception("server error: error code ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Server Error: $e");
+    }
+  }
+
   Future<List<ProjectModel>> getAllProjects() async {
     try {
       final Response response = await _dio.get(

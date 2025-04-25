@@ -18,6 +18,7 @@ class NodeModel {
   List<String>? inputDots;
   List<String>? outputDots;
   String? endPoint;
+  Offset? offset;
 
   NodeModel({
     this.id,
@@ -34,6 +35,7 @@ class NodeModel {
     this.endPoint,
     this.projectId,
     this.nodeId,
+    this.offset,
   });
 
   NodeModel copyWith({
@@ -67,6 +69,7 @@ class NodeModel {
       inputDots: inputDots ?? this.inputDots,
       outputDots: outputDots ?? this.outputDots,
       endPoint: endPoint ?? this.endPoint,
+      offset: offset,
     );
   }
 
@@ -87,6 +90,14 @@ class NodeModel {
         ? json['output_channels'].cast<String>()
         : [];
 
+    Offset? offset;
+    if (json['location_x'] != null && json['location_y'] != null) {
+      offset = Offset(
+        json['location_x'].toDouble(),
+        json['location_y'].toDouble(),
+      );
+    }
+
     return NodeModel(
       id: num.parse(json['uid'].toString()),
       index: json['idx'] != null ? int.parse(json['idx'].toString()) : 6,
@@ -100,6 +111,7 @@ class NodeModel {
       inputDots: inputDots,
       outputDots: outputDots,
       params: params,
+      offset: offset,
     );
   }
 
@@ -117,6 +129,10 @@ class NodeModel {
     json['input_channels'] = inputDots;
     json['output_channels'] = outputDots;
     json['api_call'] = endPoint;
+    json['location_x'] = offset?.dx;
+    json['location_y'] = offset?.dy;
+    json['project_id'] = projectId;
+    json['node_id'] = nodeId;
     return json;
   }
 

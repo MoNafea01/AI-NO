@@ -10,9 +10,17 @@ class CreateNewProjectDialog extends StatefulWidget {
 }
 
 class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
-  final TextEditingController _projectNameController = TextEditingController();
-  final TextEditingController _projectDescriptionController =
-      TextEditingController();
+  late final GlobalKey<FormState> _formKey;
+  late final TextEditingController _projectNameController;
+  late final TextEditingController _projectDescriptionController;
+
+  @override
+  void initState() {
+    _formKey = GlobalKey<FormState>();
+    _projectNameController = TextEditingController();
+    _projectDescriptionController = TextEditingController();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -45,7 +53,6 @@ class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
     if (mounted) Navigator.pop(context);
   }
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Container(

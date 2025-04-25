@@ -55,7 +55,9 @@ class _VSNodeState extends State<VSNode> {
     nodeProvider.moveNode(widget.data, newPosition);
   }
 
-  Transform _draggedNode() {
+  Widget _draggedNode() {
+    if (!mounted) return const SizedBox();
+
     return Transform.scale(
       scale: 1 / nodeProvider.viewportScale,
       child: Material(
