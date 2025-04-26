@@ -45,7 +45,7 @@ def extract_id_message(json_str):
             logger.info(f"Processing multi-channel node: {json_obj.get('node_name')}")
             for i in range(len(json_obj.get("children", []))):
                 logger.debug(f"Processing child {i+1}")
-                child = call_script(f"show {json_obj.get("node_name")} {node_id} {i+1}")
+                child = call_script(f"show {json_obj.get('node_name')} {node_id} {i+1}")
                 try:
                     child_message = child.get("message")
                     child_node_id = child.get("node_id")
