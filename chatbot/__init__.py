@@ -18,8 +18,8 @@ if os.getenv('CI'):  # If running in GitHub Actions (they set CI=true)
     api_key_content = os.getenv('GOOGLE_API_KEY')
     if not api_key_content:
         raise ValueError("GOOGLE_API_KEY environment variable is not set.")
-    api_key = api_key_content
-
+    api_key = json.loads(api_key_content)
+    
 else:
     if not os.path.exists(api_key_path):
         raise FileNotFoundError(f"API key file not found at {api_key_path}. Please provide the correct path.")
@@ -31,10 +31,9 @@ else:
 
     with open(api_key_path, 'r') as f:
         api_key = json.load(f)
-        api_key = api_key.get("GOOGLE_API_KEY")
 
 # setting the API key as an environment variable
-os.environ['GOOGLE_API_KEY'] = api_key
+os.environ['GOOGLE_API_KEY'] = api_key.get("GOOGLE_API_KEY")
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
