@@ -13,15 +13,17 @@ tf.get_logger().setLevel('ERROR')
 
 # getting the API key from a JSON file
 api_key_path = os.path.join(os.path.dirname(__file__), 'credentials', 'google_credentials.json')
-if not os.path.exists(api_key_path):
-    raise FileNotFoundError(f"API key file not found at {api_key_path}. Please provide the correct path.")
 
 if os.getenv('CI'):  # If running in GitHub Actions (they set CI=true)
     api_key_content = os.getenv('GOOGLE_API_KEY')
     if not api_key_content:
         raise ValueError("GOOGLE_API_KEY environment variable is not set.")
     api_key = json.loads(api_key_content)
+    
 else:
+    if not os.path.exists(api_key_path):
+        raise FileNotFoundError(f"API key file not found at {api_key_path}. Please provide the correct path.")
+
     # Local development
     api_key_path = os.path.join(os.path.dirname(__file__), 'credentials', 'google_credentials.json')
     if not os.path.exists(api_key_path):
