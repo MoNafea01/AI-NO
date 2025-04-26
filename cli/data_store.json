@@ -6,7 +6,7 @@
                 "1": [
                     {
                         "message": "Model logistic_regression created",
-                        "node_id": 1550809731328,
+                        "node_id": 2371536802000,
                         "node_name": "logistic_regression",
                         "task": "classification",
                         "children": [],
@@ -15,248 +15,43 @@
                             "C": 1.0
                         },
                         "node_type": "linear_models",
-                        "project_id": "1",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\model\\logistic_regression_1550809731328.pkl"
-                    },
-                    {
-                        "message": "Preprocessor maxabs_scaler created",
-                        "node_id": 1550806058432,
-                        "node_name": "maxabs_scaler",
-                        "task": "preprocessing",
-                        "children": [],
-                        "params": {},
-                        "node_type": "scaler",
-                        "project_id": "1",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\preprocessing\\maxabs_scaler_1550806058432.pkl"
-                    },
-                    {
-                        "node_id": 2336734951952,
-                        "node_name": "standard_scaler",
-                        "message": "Node standard_scaler Loaded.",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\other\\standard_scaler_2336734951952.pkl",
-                        "params": {},
-                        "task": "load_node",
-                        "node_type": "loader",
+                        "uid": 6,
                         "project_id": 1,
-                        "uid": 52,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2371536802000.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 2371465007216,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "params": {
+                            "penalty": "l2",
+                            "C": 1.0
+                        },
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "project_id": 1,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2371465007216.pkl"
+                    }
+                ],
+                "5": [],
+                "13": [
+                    {
+                        "node_id": 2438712952784,
+                        "node_name": "node_saver",
+                        "message": "Node standard_scaler saved.",
+                        "params": {},
+                        "task": "save",
+                        "node_type": "saver",
+                        "uid": 51,
                         "children": [],
                         "location_x": 0.0,
                         "location_y": 0.0,
                         "input_ports": [],
-                        "output_ports": []
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2287895991440,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2287895991440.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2287895989280,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2287895989280.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2985705930336,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2985705930336.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 3046564815904,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_3046564815904.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2490198743936,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 0.1
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2490198743936.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2664708613920,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\1\\model\\logistic_regression_2664708613920.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2067958213872,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\1\\model\\logistic_regression_2067958213872.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2867425437376,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\1\\model\\logistic_regression_2867425437376.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2745773939440,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\1\\model\\logistic_regression_2745773939440.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2031453812784,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 0.1
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\1\\model\\logistic_regression_2031453812784.pkl"
-                    }
-                ],
-                "5": [],
-                "2": [
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2006265163280,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 2,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\2\\model\\logistic_regression_2006265163280.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2006308418480,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 2,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\2\\model\\logistic_regression_2006308418480.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2006304603936,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 2,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\2\\model\\logistic_regression_2006304603936.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2138351445888,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 2,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\2\\model\\logistic_regression_2138351445888.pkl"
+                        "output_ports": [],
+                        "project": 13,
+                        "node_data": null
                     }
                 ]
             }

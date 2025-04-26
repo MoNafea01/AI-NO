@@ -1,5 +1,5 @@
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from core.nodes.configs.const_ import SAVING_DIR
 
 class PreprocessorFitterTransformer:

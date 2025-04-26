@@ -1,6 +1,6 @@
-from ..repositories.node_repository import NodeSaver, NodeDataExtractor
+from ..repositories import NodeSaver, NodeDataExtractor
 from .utils import PayloadBuilder
-from core.nodes.configs.const_ import SAVING_DIR
+from ..nodes.configs.const_ import SAVING_DIR
 
 class BaseNode:
     '''Base class for all nodes.'''

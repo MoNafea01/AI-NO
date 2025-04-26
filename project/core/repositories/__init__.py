@@ -1,11 +1,15 @@
-from core.repositories.node_repository import (NodeSaver, NodeLoader, NodeDeleter, NodeDataExtractor, 
-                                               NodeUpdater, ClearAllNodes)
+from core.repositories.operations import NodeSaver, NodeLoader, NodeDeleter, NodeUpdater
+
+from core.repositories.node_repository import (NodeDataExtractor, 
+                                               ClearAllNodes, Repository)
+
 
 __all__ = [
     "NodeSaver",
     "NodeLoader",
     "NodeDeleter",
-    "NodeDataExtractor",
     "NodeUpdater",
-    "ClearAllNodes"
+    "NodeDataExtractor",
+    "ClearAllNodes",
+    "Repository",
 ]

@@ -149,7 +149,8 @@
         "data_2": "data_2_id"
     },
     "train_test_split": {
-        "data": "data_id",
+        "X": "X_id",
+        "y": "y_id",
         "params": {
             "test_size": 0.2,
             "random_state": 42

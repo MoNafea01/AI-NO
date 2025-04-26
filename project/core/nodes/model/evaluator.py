@@ -1,6 +1,6 @@
 from ..utils import PayloadBuilder
 from ..configs.metrics import METRICS as metrics
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from ..base_node import BaseNode, SAVING_DIR
 
 class Evaluator(BaseNode):

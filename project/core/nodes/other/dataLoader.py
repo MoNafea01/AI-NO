@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from ..utils import NodeNameHandler, PayloadBuilder
 from ..configs.datasets import DATASETS as datasets
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from core.nodes.configs.const_ import SAVING_DIR
 
 class BaseDataLoader:

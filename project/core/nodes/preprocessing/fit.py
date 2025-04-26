@@ -1,6 +1,6 @@
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
-from ..base_node import BaseNode, SAVING_DIR
+from ...repositories import NodeSaver, NodeDataExtractor
+from core.nodes.base_node import BaseNode, SAVING_DIR
 
 
 class PreprocessorFitter:

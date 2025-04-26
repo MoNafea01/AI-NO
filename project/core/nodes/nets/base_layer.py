@@ -1,4 +1,4 @@
-from ...repositories.node_repository import NodeSaver, NodeLoader, NodeDataExtractor
+from ...repositories import NodeSaver, NodeLoader, NodeDataExtractor
 from .utils import PayloadBuilder
 from ..base_node import BaseNode, SAVING_DIR
 

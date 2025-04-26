@@ -89,7 +89,7 @@ params = [{'alpha': 1.0,},
     {"params": {"dataset_name": "iris"}},
     {"data": 1},
     {"data_1": 1, "data_2": 2},
-    {"data": 1, "params": {"test_size": 0.2, "random_state": 42}},
+    {"X": 1, "y": 2, "params": {"test_size": 0.2, "random_state": 42}},
 
     {"params": {"shape": [28, 28, 1]}},
     {"params": {"filters": 32, "kernel_size": (3, 3), "activation": "relu"}, "prev_node": 1},

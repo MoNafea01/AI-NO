@@ -24,8 +24,11 @@ class DataLoaderSerializer(serializers.Serializer):
 
 
 class TrainTestSplitSerializer(serializers.Serializer):
-    data = JSONOrIntField(required=True)
+    X = JSONOrIntField(required=False)
+    y = JSONOrIntField(required=False)
     params = serializers.JSONField(required=False)
+    def validate(self, data):
+        return validate(data, (('X', 'y'), 'X', 'y'))
 
 
 class SplitterSerializer(serializers.Serializer):
@@ -303,7 +306,11 @@ def validate(data, keys):
         return data
     key1 = ' and '.join(keys[0]) if isinstance(keys[0], tuple) else keys[0]
     key2 = ' and '.join(keys[1]) if isinstance(keys[1], tuple) else keys[1]
-    raise serializers.ValidationError(f"You must provide {key1} - or - {key2}.")
+    key3 = ' and '.join(keys[2]) if len(keys) > 2 else None
+    if key3:
+        raise serializers.ValidationError(f"You must provide {key1} - or - {key2} - or - {key3}.")
+    else:
+        raise serializers.ValidationError(f"You must provide {key1} - or - {key2}.")
 
 
 class ExportProjectSerializer(serializers.Serializer):

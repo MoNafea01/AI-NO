@@ -1,5 +1,5 @@
 from keras.api.models import Sequential
-from ...repositories.node_repository import NodeLoader, NodeDataExtractor
+from ...repositories import NodeLoader, NodeDataExtractor
 from .base_layer import BaseLayer
 
 class SequentialNet(BaseLayer):
