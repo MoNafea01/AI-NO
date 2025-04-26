@@ -44,6 +44,7 @@ jobs:
       - name: Run Tests
         env:
           DJANGO_SETTINGS_MODULE: project.settings
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
           cd project
           python manage.py makemigrations
