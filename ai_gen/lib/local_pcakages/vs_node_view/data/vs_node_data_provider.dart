@@ -34,6 +34,8 @@ class VSNodeDataProvider extends ChangeNotifier {
   final bool withAppbar;
   final double appbarHeight;
 
+  late TransformationController transformationController;
+
   ///Gets the closest [VSNodeDataProvider] from the widget tree
   static VSNodeDataProvider of(BuildContext context) {
     return context
@@ -92,7 +94,8 @@ class VSNodeDataProvider extends ChangeNotifier {
   ///
   ///Offset will be applied to all nodes based on the offset from the moved nodes original position
   void moveNode(VSNodeData nodeData, Offset offset) {
-    nodeData.node?.offset = offset; //update node object offset
+    nodeData.node?.offset =
+        transformationController.toScene(offset); //update node object offset
 
     final movedOffset = applyViewPortTransfrom(offset) - nodeData.widgetOffset;
     final List<VSNodeData> modifiedNodes = [];
