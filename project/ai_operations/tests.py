@@ -109,7 +109,7 @@ class PipeLineTest(APITestCase):
                 # Verify updated model details
                 put_response = self.client.get(url, format="json", query_params={"node_id":ids[i]})
                 self.assertEqual(put_response.data.get("node_name"), "train_test_split")
-
+        
         # DELETE
         for node_id in ids:
             delete_response = self.client.delete(url, format="json", query_params={"node_id":node_id})
@@ -120,7 +120,9 @@ class PipeLineTest(APITestCase):
         ids = []
         data = self.client.post(f"/api/data_loader/",{"params": {"dataset_name":"diabetes"}}, format="json")
         node_id = data.data.get("node_id")
+
         data = self.client.get(f"/api/data_loader/", format="json", query_params={"node_id":node_id, "return_data": 1})
+
         X, y = data.data.get("children")
         model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
 
@@ -167,17 +169,19 @@ class PipeLineTest(APITestCase):
         ids = []
         data = self.client.post(f"/api/data_loader/",{"params": {"dataset_name":"iris"}}, format="json")
         node_id = data.data.get("node_id")
+
         data = self.client.get(f"/api/data_loader/", format="json", query_params={"node_id":node_id, "return_data": 1})
         X, y = data.data.get("children")
 
         data = self.client.post(f"/api/train_test_split/", {"X": X, "y": y, "params": {"test_size": 0.2, "random_state": 42}}, format="json")
+
         data = self.client.get(f"/api/train_test_split/", format="json", query_params={"node_id":data.data.get("node_id"), "return_data": 1})
         (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
 
        
         model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
         model = self.client.post(f"/api/fit_model/", {"X": X_train, "y": y_train, "model": model}, format="json").data.get("node_id")
-        
+
         # POST
         for data in _requests_['post']:
             if not data.get("model_path"):
@@ -221,20 +225,24 @@ class PipeLineTest(APITestCase):
         ids = []
         data = self.client.post(f"/api/data_loader/",{"params": {"dataset_name":"iris"}}, format="json")
         node_id = data.data.get("node_id")
+
         data = self.client.get(f"/api/data_loader/", format="json", query_params={"node_id":node_id, "return_data": 1})
         X, y = data.data.get("children")
 
         data = self.client.post(f"/api/train_test_split/", {"X": X, "y": y, "params": {"test_size": 0.2, "random_state": 42}}, format="json")
+
         data = self.client.get(f"/api/train_test_split/", format="json", query_params={"node_id":data.data.get("node_id"), "return_data": 1})
         X, y = data.data.get("children")
         (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
         
         model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
+
         model = self.client.post(f"/api/fit_model/", {"X": X_train, "y": y_train, "model": model}, format="json").data.get("node_id")
-        
+
         y_pred = self.client.post(f"/api/predict/", {"X": X_test, "model": model}, format="json").data.get("node_id")
 
-        y_train, y_test = self.client.post(f"/api/splitter/", {"data": y} , format="json").data.get("children")
+        data = self.client.post(f"/api/splitter/", {"data": y} , format="json")
+        y_train, y_test = data.data.get("children")
         # POST
         for data in _requests_['post']:
             data.update({"y_pred": y_pred, "y_true": y_test})
@@ -268,6 +276,12 @@ class PipeLineTest(APITestCase):
         for node_id in ids:
             delete_response = self.client.delete(url, format="json", query_params={"node_id":node_id})
             self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+    def test_07_clear_nodes(self, url='/api/clear_nodes/'):
+        # Clear all nodes
+        response = self.client.delete(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 # class PipelineIntegrationTest(APITestCase):
