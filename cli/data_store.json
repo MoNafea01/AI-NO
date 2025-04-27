@@ -33,21 +33,6 @@
                         "uid": 6,
                         "project_id": 1,
                         "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2371465007216.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2229176601104,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "D:\\MO\\Z_Grad_Proj\\AI-NO\\project\\core\\saved\\1\\model\\logistic_regression_2229176601104.pkl"
                     }
                 ],
                 "5": [],

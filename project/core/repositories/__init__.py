@@ -3,7 +3,6 @@ from core.repositories.operations import NodeSaver, NodeLoader, NodeDeleter, Nod
 from core.repositories.node_repository import (NodeDataExtractor, 
                                                ClearAllNodes, Repository)
 
-
 __all__ = [
     "NodeSaver",
     "NodeLoader",
