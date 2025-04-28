@@ -1,7 +1,10 @@
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
+import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 import 'node_content.dart';
 
@@ -108,10 +111,14 @@ class _VSNodeState extends State<VSNode> {
         } else if (value == 'rename') {
           setState(() => widget.data.isRenaming = true);
         } else if (value == 'delete') {
-          setState(() {
-            widget.data.deleteNode?.call();
-            nodeProvider.removeNodes([widget.data]);
-          });
+          final NodeServerCalls nodeServerCalls =
+              GetIt.I.get<NodeServerCalls>();
+          NodeModel? nodeModel = widget.data.node;
+          if (nodeModel?.nodeId != null) nodeServerCalls.deleteNode(nodeModel!);
+          widget.data.deleteNode?.call();
+
+          nodeProvider.removeNodes([widget.data]);
+          setState(() {});
         }
       },
     );

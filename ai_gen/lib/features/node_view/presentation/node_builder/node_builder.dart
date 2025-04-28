@@ -1,10 +1,8 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/network_interface.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import '../../../../main.dart';
 import 'custom_interfaces/aino_general_Interface.dart';
@@ -94,10 +92,6 @@ class NodeBuilder {
         inputData: _buildInputData(newNode, ref),
         outputData: _buildOutputData(newNode),
         deleteNode: () {
-          final NodeServerCalls nodeServerCalls =
-              GetIt.I.get<NodeServerCalls>();
-          if (newNode.nodeId != null) nodeServerCalls.deleteNode(newNode);
-
           scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
           scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
