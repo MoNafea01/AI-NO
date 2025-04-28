@@ -1,5 +1,5 @@
 import os, re, cv2, numpy as np
-from api.models import Node
+from ai_operations.models import Node
 from core.nodes.configs.const_ import (
     MODELS_TASKS, PREPROCESSORS_TASKS, NN_TASKS, DATA_HANDLER_TASKS, NN_NAMES, MODELS_NAMES, PREPROCESSORS_NAMES, DATA_HANDLER_NAMES)
 from .configs.const_ import MODELS_NAMES, PREPROCESSORS_NAMES
