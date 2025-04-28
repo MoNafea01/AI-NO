@@ -21,8 +21,8 @@ class Joiner(BaseNode):
             payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join", project_id=self.project_id,
                                                    uid=self.uid)
             
-            project_path = f"{self.project_id}\\" if self.project_id else ""
-            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}other")
+            project_path = f"{self.project_id}/" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}other")
             payload.pop("node_data", None)
             return payload
         except Exception as e:
@@ -55,8 +55,8 @@ class Splitter:
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
-                project_path = f"{self.project_id}\\" if self.project_id else ""
-                NodeSaver()(payload[i], rf"{SAVING_DIR}\{project_path}other")
+                project_path = f"{self.project_id}/" if self.project_id else ""
+                NodeSaver()(payload[i], rf"{SAVING_DIR}/{project_path}other")
                 payload[i].pop("node_data", None)
             
             return payload

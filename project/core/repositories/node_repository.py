@@ -18,7 +18,7 @@ class ClearAllNodes:
             else:
                 project = Node.objects.all()
             # deletes all objects in the Node model
-            nodes_path = SAVING_DIR + "\\" + str(project_id) if project_id else SAVING_DIR
+            nodes_path = SAVING_DIR + "/" + str(project_id) if project_id else SAVING_DIR
             project.delete()
             nodes_dir = os.path.abspath(SAVING_DIR)
             shutil.rmtree(nodes_path, ignore_errors=True)

@@ -12,7 +12,7 @@ from core.nodes import *
 from core.repositories import *
 from core.nodes.configs.const_ import get_node_name_by_api_ref
 
-from chatbot.app import generate_cli
+from chatbot.app import sync_generate_cli
 from cli.call_cli import call_script
 
 class NodeQueryMixin:
@@ -520,8 +520,8 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                         "project_id": project_id,
                         "uid": uid})
         
-        project_path = f"{project_id}\\" if project_id else ""
-        NodeSaver()(payload, path=rf"{SAVING_DIR}\{project_path}other")
+        project_path = f"{project_id}/" if project_id else ""
+        NodeSaver()(payload, path=rf"{SAVING_DIR}/{project_path}other")
 
         # Reload the node with serialization settings
         payload = NodeLoader(return_serialized=return_serialized, return_path= not return_serialized)(node_id=payload.get("node_id"))
@@ -1221,7 +1221,7 @@ class ChatbotAPIView(APIView):
                 return Response({"error": "Mode must be '1' (manual) or '2' (auto)"}, 
                               status=status.HTTP_400_BAD_REQUEST)
             
-            response, logs = generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration)
+            response, logs = sync_generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration)
             
             return Response({"output": response, "status": "success", "logs": logs}, status=status.HTTP_200_OK)
         

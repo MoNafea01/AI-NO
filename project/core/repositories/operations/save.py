@@ -36,7 +36,7 @@ class NodeSaver:
         # Save to file system and get path
         node_path = None
         if path:
-            node_path = rf"{path}\{node_name}_{node_id}.pkl"
+            node_path = rf"{path}/{node_name}_{node_id}.pkl"
             nodes_dir = os.path.dirname(node_path)
             os.makedirs(nodes_dir, exist_ok=True)
             joblib.dump(node, node_path)

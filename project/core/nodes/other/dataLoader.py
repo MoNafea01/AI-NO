@@ -100,8 +100,8 @@ class DataLoader:
         
         payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
         for i in range(3):
-            project_path = f"{self.project_id}\\" if self.project_id else ""
-            NodeSaver()(payload[i], path=rf"{SAVING_DIR}\{project_path}other")
+            project_path = f"{self.project_id}/" if self.project_id else ""
+            NodeSaver()(payload[i], path=rf"{SAVING_DIR}/{project_path}other")
             payload[i].pop("node_data", None)
         
         return payload

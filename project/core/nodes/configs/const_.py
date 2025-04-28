@@ -91,6 +91,6 @@ def get_node_name_by_api_ref(api_ref, request):
     return None
 
 if settings.TESTING:
-    SAVING_DIR = r"core\test_saved"
+    SAVING_DIR = "core/test_saved"
 else:
-    SAVING_DIR = r"core\saved"
+    SAVING_DIR = "core/saved"
