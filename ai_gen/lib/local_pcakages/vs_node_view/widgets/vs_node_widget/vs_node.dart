@@ -6,18 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'node_content.dart';
 
 class VSNode extends StatefulWidget {
-  const VSNode({
-    required this.data,
-    this.nodeTitleBuilder,
-    super.key,
-  });
+  const VSNode({required this.data, this.nodeTitleBuilder, super.key});
 
   final VSNodeData data;
 
-  final Widget Function(
-    BuildContext context,
-    VSNodeData nodeData,
-  )? nodeTitleBuilder;
+  final Widget Function(BuildContext context, VSNodeData nodeData)?
+      nodeTitleBuilder;
 
   @override
   State<VSNode> createState() => _VSNodeState();
@@ -39,15 +33,15 @@ class _VSNodeState extends State<VSNode> {
   @override
   Widget build(BuildContext context) {
     return Draggable(
-      onDragUpdate: _whileDragging,
-      childWhenDragging: const SizedBox(),
+      onDragUpdate: _moveNode,
+      childWhenDragging: const SizedBox.shrink(),
       feedback: _draggedNode(),
       child: _node(),
     );
   }
 
-  void _whileDragging(details) {
-    if (_anchor.currentContext == null) return;
+  void _moveNode(details) {
+    if (!mounted || _anchor.currentContext == null) return;
 
     final RenderBox renderBox =
         _anchor.currentContext?.findRenderObject() as RenderBox;
@@ -56,15 +50,15 @@ class _VSNodeState extends State<VSNode> {
   }
 
   Widget _draggedNode() {
-    if (!mounted) return const SizedBox();
+    if (!mounted) return const SizedBox.shrink();
 
-    return Transform.scale(
-      scale: 1 / nodeProvider.viewportScale,
-      child: Material(
-        key: _key2,
-        borderRadius: BorderRadius.circular(12),
-        child: InheritedNodeDataProvider(
-          provider: nodeProvider,
+    return InheritedNodeDataProvider(
+      provider: nodeProvider,
+      child: Transform.scale(
+        scale: 1 / nodeProvider.viewportScale,
+        child: Material(
+          key: _key2,
+          borderRadius: BorderRadius.circular(12),
           child: NodeContent(
             nodeProvider: nodeProvider,
             data: widget.data,
@@ -105,19 +99,21 @@ class _VSNodeState extends State<VSNode> {
         PopupMenuItem(value: 'rename', child: Text('Rename')),
         PopupMenuItem(value: 'delete', child: Text('Delete')),
       ],
-    ).then((value) {
-      if (value == 'properties') {
-        context
-            .read<GridNodeViewCubit>()
-            .updateActiveNodePropertiesCard(widget.data.node);
-      } else if (value == 'rename') {
-        setState(() => widget.data.isRenaming = true);
-      } else if (value == 'delete') {
-        setState(() {
-          widget.data.deleteNode?.call();
-          nodeProvider.removeNodes([widget.data]);
-        });
-      }
-    });
+    ).then(
+      (value) {
+        if (value == 'properties') {
+          context
+              .read<GridNodeViewCubit>()
+              .updateActiveNodePropertiesCard(widget.data.node);
+        } else if (value == 'rename') {
+          setState(() => widget.data.isRenaming = true);
+        } else if (value == 'delete') {
+          setState(() {
+            widget.data.deleteNode?.call();
+            nodeProvider.removeNodes([widget.data]);
+          });
+        }
+      },
+    );
   }
 }

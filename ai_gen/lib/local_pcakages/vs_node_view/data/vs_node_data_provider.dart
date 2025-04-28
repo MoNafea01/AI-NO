@@ -74,7 +74,7 @@ class VSNodeDataProvider extends ChangeNotifier {
   ///
   ///Notifies listeners to this provider
   void loadSerializedNodes(String serializedNodes) {
-    nodeManager.loadSerializedNodes(serializedNodes);
+    nodeManager.loadLocalSerializedNodes(serializedNodes);
     notifyListeners();
   }
 
@@ -138,21 +138,23 @@ class VSNodeDataProvider extends ChangeNotifier {
   ///
   ///Notifies listeners to this provider
   void createNodeFromContext(VSNodeDataBuilder builder) {
-    updateOrCreateNodes(
-      [
-        builder(
-          _contextMenuContext!.offset,
-          _contextMenuContext!.reference,
-        )
-      ],
+    VSNodeData _builder = builder(
+      _contextMenuContext!.offset,
+      _contextMenuContext!.reference,
     );
+
+    _builder.node?.offset =
+        transformationController.toScene(_contextMenuContext!.offset);
+
+    updateOrCreateNodes([_builder]);
   }
 
   void createNodeFromSidebar(VSNodeDataBuilder builder,
       {Offset offset = const Offset(250, 250)}) {
     final Offset movedOffset = applyViewPortTransfrom(offset);
     VSNodeData nodeData = builder(movedOffset, null);
-    nodeData.node?.offset = offset;
+    nodeData.node?.offset = transformationController.toScene(offset);
+
     updateOrCreateNodes([nodeData]);
   }
 

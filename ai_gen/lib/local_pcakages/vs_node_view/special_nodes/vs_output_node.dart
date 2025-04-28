@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../data/evaluation_error.dart';
 import '../data/standard_interfaces/vs_dynamic_interface.dart';
 import '../data/vs_interface.dart';
@@ -11,17 +9,16 @@ class VSOutputNode extends VSNodeData {
   ///
   ///Used to traverse the node tree and evalutate them to a result
   VSOutputNode({
-    required String type,
-    required Offset widgetOffset,
+    required super.type,
+    required super.widgetOffset,
     VSOutputData? ref,
-    double? nodeWidth,
-    String? title,
-    String? toolTip,
+    super.nodeWidth,
+    super.title,
+    super.toolTip,
     String? inputTitle,
-    Function(VSInputData interfaceData)? onUpdatedConnection,
+    super.node,
+    super.onUpdatedConnection,
   }) : super(
-          type: type,
-          widgetOffset: widgetOffset,
           inputData: [
             VSDynamicInputData(
               type: type,
@@ -30,10 +27,6 @@ class VSOutputNode extends VSNodeData {
             )
           ],
           outputData: const [],
-          nodeWidth: nodeWidth,
-          title: title,
-          toolTip: toolTip,
-          onUpdatedConnection: onUpdatedConnection,
         );
 
   ///Evalutes the tree from this node and returns the result

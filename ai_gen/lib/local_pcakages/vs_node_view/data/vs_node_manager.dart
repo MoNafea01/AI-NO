@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../common.dart';
 import '../special_nodes/vs_output_node.dart';
 import 'vs_node_data.dart';
@@ -31,15 +33,13 @@ class VSNodeManager {
     );
 
     if (serializedNodes != null) {
-      _nodes = serializationManager.deserializeNodes(serializedNodes);
+      _nodes = serializationManager.localDeserializeNodes(serializedNodes);
     }
   }
 
   late VSNodeSerializationManager serializationManager;
   Map<String, dynamic> get nodeBuildersMap =>
       serializationManager.contextNodeBuilders;
-
-      
 
   ///This function gets called whenever the nodes get updated
   ///
@@ -63,13 +63,21 @@ class VSNodeManager {
       _nodes.values.whereType<VSOutputNode>();
 
   ///Calls serializationManager.serializeNodes with the current node data and returns a String
-  String serializeNodes() {
-    return serializationManager.serializeNodes(_nodes);
+  String localSerializeNodes() {
+    return serializationManager.localSerializeNodes(_nodes);
   }
 
   ///Loades nodes from string and replaces current nodes
-  void loadSerializedNodes(String serializedNodes) {
-    nodes = serializationManager.deserializeNodes(serializedNodes);
+  void loadLocalSerializedNodes(String serializedNodes) {
+    nodes = serializationManager.localDeserializeNodes(serializedNodes);
+  }
+
+  List<Map<String, dynamic>> mySerializeNodes() {
+    return serializationManager.mySerializeNodes(_nodes);
+  }
+
+  void myDeSerializedNodes(Response response) {
+    nodes = serializationManager.myDeserializeNodes(response);
   }
 
   ///Updates or Creates a nodes
@@ -100,5 +108,3 @@ class VSNodeManager {
     nodes = {};
   }
 }
-
-

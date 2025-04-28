@@ -80,8 +80,11 @@ class NodeBuilder {
   //build the node itself
   Function(Offset, VSOutputData?) buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
+      // print(ref);
+
       NodeModel newNode = node.copyWith(projectId: projectId);
       return VSNodeData(
+        id: newNode.nodeId?.toString(),
         node: newNode,
         type: newNode.name,
         title: newNode.displayName,

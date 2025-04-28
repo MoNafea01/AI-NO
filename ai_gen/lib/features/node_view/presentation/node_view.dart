@@ -16,7 +16,7 @@ class NodeView extends StatelessWidget {
   Widget build(BuildContext _) {
     return BlocProvider(
       create: (context) =>
-          GridNodeViewCubit(projectModel: projectModel)..buildNodes(),
+          GridNodeViewCubit(projectModel: projectModel)..loadNodeView(),
       child: BlocBuilder<GridNodeViewCubit, GridNodeViewState>(
         builder: (context, state) {
           if (state is GridNodeViewLoading || state is GridNodeViewInitial) {
@@ -24,7 +24,7 @@ class NodeView extends StatelessWidget {
           } else if (state is NodeViewFailure) {
             return FailureScreen(
               state.errMessage,
-              onRetry: context.read<GridNodeViewCubit>().buildNodes,
+              onRetry: context.read<GridNodeViewCubit>().loadNodeView,
             );
           } else if (state is NodeViewSuccess) {
             return const GridNodeView();

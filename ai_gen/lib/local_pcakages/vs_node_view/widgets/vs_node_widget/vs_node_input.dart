@@ -16,7 +16,6 @@ class VSNodeInput extends StatefulWidget {
   const VSNodeInput({required this.data, super.key});
 
   final VSInputData data;
-
   @override
   State<VSNodeInput> createState() => _VSNodeInputState();
 }
@@ -53,6 +52,7 @@ class _VSNodeInputState extends State<VSNodeInput> {
 
   void updateConnectedNode(VSOutputData? data) {
     widget.data.connectedInterface = data;
+
     VSNodeDataProvider.of(context).updateOrCreateNodes(
       [widget.data.nodeData!],
     );

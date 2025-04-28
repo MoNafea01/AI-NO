@@ -12,8 +12,6 @@ class ParamDropDownMenu extends StatefulWidget {
 class _ParamDropDownMenuState extends State<ParamDropDownMenu> {
   @override
   Widget build(BuildContext context) {
-    print(widget.parameter);
-
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 32),
       child: DropdownButtonHideUnderline(

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../common.dart';
@@ -89,7 +91,7 @@ class VSNodeSerializationManager {
   final Map<String, dynamic> contextNodeBuilders = {};
 
   ///Calls jsonEncode on data
-  String serializeNodes(Map<String, VSNodeData> data) {
+  String localSerializeNodes(Map<String, VSNodeData> data) {
     return jsonEncode(data);
   }
 
@@ -98,12 +100,14 @@ class VSNodeSerializationManager {
   ///2. reconstruct connections between the nodes
   ///
   ///Returns a Map<NodeId,VSNodeData>
-  Map<String, VSNodeData> deserializeNodes(String dataString) {
+  Map<String, VSNodeData> localDeserializeNodes(String dataString) {
     final data = jsonDecode(dataString) as Map<String, dynamic>;
 
     final Map<String, VSNodeData> decoded = {};
 
     data.forEach((key, value) {
+      print("key: $key");
+      print("value: $value");
       final node = _nodeBuilders[value["type"]]?.call(Offset.zero, null);
 
       if (node == null) {
@@ -128,25 +132,127 @@ class VSNodeSerializationManager {
       decoded[key] = node;
     });
 
-    data.forEach((key, value) {
-      final inputData = value["inputData"] as List<dynamic>;
-      final Map<String, VSOutputData?> inputRefs = {};
+    data.forEach(
+      (key, value) {
+        final inputData = value["input_ports"] as List<dynamic>;
+        final Map<String, VSOutputData?> inputRefs = {};
 
-      for (final element in inputData) {
-        final serializedOutput = element["connectedNode"];
+        for (final element in inputData) {
+          final serializedOutput = element["connectedNode"];
 
-        if (serializedOutput != null) {
-          final refOutput =
-              decoded[serializedOutput["nodeData"]]?.outputData.firstWhere(
-                    (element) => element.type == serializedOutput["name"],
-                  );
-          inputRefs[element["name"]] = refOutput;
+          if (serializedOutput != null) {
+            final refOutput =
+                decoded[serializedOutput["nodeData"]]?.outputData.firstWhere(
+                      (element) => element.type == serializedOutput["name"],
+                    );
+            inputRefs[element["name"]] = refOutput;
+          }
         }
-      }
 
-      decoded[key]?.setRefData(inputRefs);
-    });
+        decoded[key]?.setRefData(inputRefs);
+      },
+    );
 
     return decoded;
+  }
+
+  List<Map<String, dynamic>> mySerializeNodes(Map<String, VSNodeData> data) {
+    return data.values
+        .where((e) => e.node != null)
+        .map((e) => e.toJson())
+        .toList();
+  }
+
+  ///Deserializes data in two steps:
+  ///1. builds new nodes with position and id from saved data
+  ///2. reconstruct connections between the nodes
+  ///
+  ///Returns a Map<NodeId,VSNodeData>
+  Map<String, VSNodeData> myDeserializeNodes(Response response) {
+    dynamic responseData = response.data;
+
+    Map<String, dynamic> data = {};
+    responseData.forEach((e) => data[e["node_id"].toString()] = e);
+
+    final Map<String, VSNodeData> decoded = {};
+
+    data.forEach(
+      (key, value) {
+        final VSNodeData? nodeData =
+            _nodeBuilders[value["node_name"]]?.call(Offset.zero, null);
+
+        if (nodeData == null ||
+            (value["location_x"] == 0 && value["location_y"] == 0)) {
+          //ignore: avoid_print
+          print(
+            "A node ${value["node_id"]} was serialized but the builder for its type is missing.",
+          );
+          onBuilderMissing?.call(value);
+          return;
+        }
+
+        NodeModel? nodeModel = nodeData.node;
+        if (nodeModel == null) return;
+
+        nodeModel = _createNewNodeInstance(nodeModel, value);
+
+        nodeData.setBaseData(
+          nodeModel.nodeId.toString(),
+          nodeModel.displayName ?? nodeModel.name,
+          nodeModel.offset!,
+          nodeModel: nodeModel,
+        );
+
+        decoded[key] = nodeData;
+      },
+    );
+
+    print("decoded: $decoded");
+    data.forEach(
+      (key, value) {
+        final inputData = value["input_ports"] as List<dynamic>;
+        final Map<String, VSOutputData?> inputRefs = {};
+
+        for (final element in inputData) {
+          final serializedOutput = element["connectedNode"];
+
+          if (serializedOutput != null) {
+            final refOutput = decoded[serializedOutput["nodeData"].toString()]
+                ?.outputData
+                .firstWhere(
+                  (element) => element.type == serializedOutput["name"],
+                );
+            inputRefs[element["name"]] = refOutput;
+          }
+        }
+
+        decoded[key]?.setRefData(inputRefs);
+      },
+    );
+
+    return decoded;
+  }
+
+  NodeModel _createNewNodeInstance(NodeModel nodeModel, value) {
+    return nodeModel.copyWith(
+      projectId: value["project"],
+      nodeId: value["node_id"],
+      offset: Offset(value["location_x"] ?? 350, value["location_y"] ?? 350),
+      params: nodeModel.params.map(
+        (param) {
+          if (value["params"] is List && value["params"].isNotEmpty) {
+            var matchingParam = value["params"].firstWhere(
+              (p) => p[param.name] != null,
+              orElse: () => null,
+            );
+
+            if (matchingParam != null) {
+              return param.copyWith(value: matchingParam[param.name]);
+            }
+          }
+          return param.copyWith();
+        },
+      ).toList(),
+    );
   }
 }

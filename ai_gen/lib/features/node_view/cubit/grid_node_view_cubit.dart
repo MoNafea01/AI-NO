@@ -4,6 +4,7 @@ import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.da
 import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:bloc/bloc.dart';
+import 'package:dio/src/response.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -20,6 +21,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   Iterable<String?>? results;
   late bool showGrid;
   NodeModel? activePropertiesNode;
+  late VSNodeManager nodeManager;
 
   final NodeServerCalls _nodeServerCalls = GetIt.I.get<NodeServerCalls>();
   void toggleGrid() {
@@ -27,47 +29,26 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     emit(NodeViewSuccess());
   }
 
-  Future buildNodes() async {
+  Future loadNodeView() async {
     try {
       emit(GridNodeViewLoading());
       await _loadOrCreateProject();
 
-      final NodeBuilder nodeBuilderInstance =
-          NodeBuilder(projectId: projectModel.id!);
       final List<Object> nodeBuilder =
-          await nodeBuilderInstance.buildNodesMenu();
+          await NodeBuilder(projectId: projectModel.id!).buildNodesMenu();
+      nodeManager = VSNodeManager(nodeBuilders: nodeBuilder);
 
-      List<NodeModel> projectNodes = await _loadProjectNodes();
+      await _loadProjectNodes();
 
       nodeDataProvider = VSNodeDataProvider(
-        nodeManager: VSNodeManager(nodeBuilders: nodeBuilder),
+        nodeManager: nodeManager,
         withAppbar: true,
       );
-
-      List nodeBuilders = projectNodes.map(
-        (node) {
-          return nodeBuilderInstance.buildNode(node)(
-            node.offset ?? const Offset(350, 350),
-            null,
-          );
-        },
-      ).toList();
-      nodeDataProvider.updateOrCreateNodes([...nodeBuilders]);
 
       emit(NodeViewSuccess());
     } catch (e) {
       emit(NodeViewFailure(e.toString()));
     }
-  }
-
-  Future<List<NodeModel>> _loadProjectNodes() async {
-    List<NodeModel> projectNodes =
-        await _nodeServerCalls.getProjectNodes(projectModel.id!);
-
-    for (var nodeModel in projectNodes) {
-      print("Project Node: ${nodeModel.toJson()}");
-    }
-    return projectNodes;
   }
 
   Future<void> _loadOrCreateProject() async {
@@ -76,11 +57,16 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
         projectModel.name ?? "project Name",
         projectModel.description ?? "project Description",
       );
-      print("Project Created: ${projectModel.toJson().toString()}");
     } else {
       projectModel = await _nodeServerCalls.getProject(projectModel.id!);
-      print("Project get Data: ${projectModel.toJson().toString()}");
     }
+  }
+
+  Future<void> _loadProjectNodes() async {
+    Response responseProjectNodes =
+        await _nodeServerCalls.loadProjectNodes(projectModel.id!);
+
+    nodeManager.myDeSerializedNodes(responseProjectNodes);
   }
 
   Future clearNodes() async {
@@ -89,13 +75,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
       _closeActiveNodePropertiesCard();
       _closeRunMenu();
 
-      final List<Object> nodeBuilder =
-          await NodeBuilder(projectId: 1).buildNodesMenu();
-
-      nodeDataProvider = VSNodeDataProvider(
-        nodeManager: VSNodeManager(nodeBuilders: nodeBuilder),
-        withAppbar: true,
-      );
+      nodeManager.clearNodes();
 
       emit(NodeViewSuccess());
     } catch (e) {
@@ -104,37 +84,39 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   }
 
   void runNodes() async {
-    _closeActiveNodePropertiesCard();
-    closeRunMenu();
+    try {
+      _closeActiveNodePropertiesCard();
+      closeRunMenu();
 
-    List<MapEntry<String, dynamic>> entries = [];
+      List<MapEntry<String, dynamic>> entries = [];
 
-    for (VSOutputNode vsOutputNode
-        in nodeDataProvider.nodeManager.getOutputNodes) {
-      MapEntry<String, dynamic> nodeOutput = await vsOutputNode.evaluate();
-      dynamic asyncOutput = await nodeOutput.value;
-      nodeOutput = MapEntry(nodeOutput.key, asyncOutput);
-      entries.add(nodeOutput);
+      for (VSOutputNode vsOutputNode
+          in nodeDataProvider.nodeManager.getOutputNodes) {
+        MapEntry<String, dynamic> nodeOutput = await vsOutputNode.evaluate();
+        dynamic asyncOutput = await nodeOutput.value;
+        nodeOutput = MapEntry(nodeOutput.key, asyncOutput);
+        entries.add(nodeOutput);
+      }
+
+      results = entries.map(
+        (output) {
+          if (output.value != null) {
+            return "${output.key}: ${output.value}".replaceAll(",", ",\n");
+          }
+          return null;
+        },
+      );
+
+      _updateProjectNodes();
+      emit(NodeViewSuccess());
+    } catch (e) {
+      results = ("Wrong parameter type").split(",");
+      emit(NodeViewSuccess());
     }
-
-    results = entries.map(
-      (output) {
-        if (output.value != null) {
-          return "${output.key}: ${output.value}".replaceAll(",", ",\n");
-        }
-        return null;
-      },
-    );
-    _updateProjectNodes();
-    emit(NodeViewSuccess());
   }
 
   Future _updateProjectNodes() async {
-    List<Map<String, dynamic>> nodes = nodeDataProvider.nodes.values
-        .where((e) => e.node != null)
-        .map((e) => e.node!.toJson())
-        .toList();
-
+    List<Map<String, dynamic>> nodes = nodeManager.mySerializeNodes();
     await _nodeServerCalls.updateProjectNodes(nodes, projectModel.id!);
   }
 
