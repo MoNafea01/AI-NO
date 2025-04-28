@@ -1,18 +1,17 @@
 #chatbot/core/templates.py
 import os
-from chatbot.core.utils import init_logger
+from chatbot.core.utils import init_logger, load_config
 # Configure logging
 parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-log_file = os.path.join(parent_path, "aino_logs.log")
-logger = init_logger(__name__, log_file)
-
 template_dir = os.path.join(parent_path, 'templates')
+config = load_config('config/config.yaml')
 
 def get_template(mode):
+    logger = init_logger(__name__, config)
     logger.info(f"Loading template for mode: {mode}")
     file_map = {
-        '1': 'manual_template.txt',
-        '2': 'auto_template.txt'
+        '1': config['templates']['manual'],
+        '2': config['templates']['auto']
     }
     template_path = os.path.join(template_dir, file_map[mode])
     logger.debug(f"Template path: {template_path}")

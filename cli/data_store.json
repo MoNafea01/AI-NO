@@ -3,38 +3,7 @@
         "admin": {
             "password": "admin",
             "projects": {
-                "1": [
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2371536802000,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2371536802000.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 2371465007216,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "params": {
-                            "penalty": "l2",
-                            "C": 1.0
-                        },
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2371465007216.pkl"
-                    }
-                ],
+                "1": [],
                 "5": [],
                 "13": [
                     {

@@ -7,7 +7,7 @@ import time
 class JSONOrIntField(serializers.Field):
     def to_internal_value(self, data):
         """Convert input data to a Python native datatype."""
-        if isinstance(data, (dict, list, int)):  # Allow JSON (dict/list) and int
+        if isinstance(data, (dict, list, int, str)):  # Allow JSON (dict/list) and int
             return data
         raise serializers.ValidationError("This field must be a JSON object or an integer.")
 

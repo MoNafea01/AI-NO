@@ -29,7 +29,7 @@ class Fit(BaseNode):
         self.payload = self._fit()
 
     def _fit(self):
-        if isinstance(self.preprocessor, (dict, int)):
+        if isinstance(self.preprocessor, (dict, int, str)):
             return self._fit_from_id()
         elif isinstance(rf"{self.preprocessor_path}", str):
             return self._fit_from_path()

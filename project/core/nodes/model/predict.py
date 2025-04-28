@@ -28,7 +28,7 @@ class Predict(BaseNode):
         self.payload = self._predict()
 
     def _predict(self):
-        if isinstance(self.model, (dict, int)):
+        if isinstance(self.model, (dict, int, str)):
             return self._predict_from_id()
         elif isinstance(rf"{self.model}", str):
             return self._predict_from_path()

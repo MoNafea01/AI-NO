@@ -16,7 +16,7 @@ class Fit(BaseNode):
         self.payload = self._fit()
 
     def _fit(self):
-        if isinstance(self.model, (dict, int)):
+        if isinstance(self.model, (dict, int, str)):
             return self._fit_from_dict()
         elif isinstance(rf"{self.model_path}", str):
             return self._fit_from_path()
