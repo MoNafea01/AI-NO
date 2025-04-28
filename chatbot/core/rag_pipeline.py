@@ -14,14 +14,14 @@ from chatbot.core.utils import init_logger, load_config
 config = load_config('config/config.yaml')
 logger = init_logger(__name__, config)
 
-def get_llm(model_name="gemini-1.5-pro"):
+def get_llm(model_name="gemini-1.5-pro", temperature=0.1, max_tokens=500):
     logger.info(f"Initializing LLM: {model_name}")
     try:
         if model_name.startswith("gemini"):
             llm = ChatGoogleGenerativeAI(
                 model=model_name,
-                temperature=0.1,
-                max_output_tokens=500,
+                temperature=temperature,
+                max_output_tokens=max_tokens,
                 google_api_key=os.getenv("GOOGLE_API_KEY")
             )
         elif model_name.startswith("deepseek"):

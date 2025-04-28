@@ -3,8 +3,13 @@ import gradio as gr, ast
 from __init__ import *
 from chatbot.core.utils import init_logger, load_config, parse_command_list, call_script, extract_id_message
 from chatbot.core.docs import get_docs
-from chatbot.core.rag_pipeline import run_pipeline
+from chatbot.core.rag_pipeline import run_pipeline, get_llm
 from chatbot.agents.orchestrator import OrchestratorAgent
+from chatbot.agents.router_agent import RouterAgent
+from chatbot.agents.clarification_agent import ClarificationAgent
+
+from langchain.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 # Configure logging
 parent_path = os.path.dirname(os.path.abspath(__file__))
@@ -12,6 +17,18 @@ cb_logs_path = os.path.join(parent_path, "chatbot_logs.txt")
 config = load_config('config/config.yaml')
 logger = init_logger(__name__, config)
 
+chat_config = config['chat']
+chat_model = get_llm(
+    model_name=chat_config['model'],
+    temperature=chat_config['temperature'],
+    max_tokens=chat_config['max_tokens'],)
+
+chat_prompt = ChatPromptTemplate.from_template("Answer the following query conversationally:\n{query}")
+chat_chain = (
+    chat_prompt 
+    | chat_model 
+    | StrOutputParser()
+    )
 
 def sync_generate_cli(user_input, to_db, model, selected_mode, cur_iter):
     logger.info(f"Generating CLI commands for mode: {selected_mode}, model: {model}")
@@ -129,37 +146,81 @@ def auto_mode(question, model, to_db, cur_iter):
         logger.exception(f"Error in auto_mode: {str(e)}")
         raise
 
-async def generate_cli(user_input, to_db, model, selected_mode):
+async def process_query(user_input, route, to_db, model, selected_mode, chat_history):
+    # router = RouterAgent(logger, config)
+    # clarification = ClarificationAgent(logger, config)
     orchestrator = OrchestratorAgent(logger, config, model_name=model)
+    
+    # Store chat history
+    chat_history = chat_history or []
+    chat_history.append(("user", user_input))
+    
+    # Route the query
+    # route_result = await router.execute({"question": user_input})
+    # route = route_result["route"]
+    # print(f"Route: {route}")
+    # query = route_result["query"]
+    
+    if route  == "1":
+        logger.info("Processing as chat query")
+        response = await chat_chain.ainvoke({"query": user_input})
+        chat_history.append(("bot", response))
+        return "", response, chat_history
+    
+    # Check for clarification
+    # clarification_result = await clarification.execute({"query": query})
+    # if clarification_result["status"] == "needs_clarification":
+    #     logger.info("Query needs clarification")
+    #     chat_history.append(("bot", clarification_result["prompt"]))
+    #     return "", clarification_result["prompt"], chat_history
+    
+    # Process CLI query
+    logger.info("Processing as CLI query")
     result = await orchestrator.execute({
         "question": user_input,
         "mode": selected_mode,
         "to_db": to_db
     })
-    return result["output"], result["log"]
+    chat_history.append(("bot", f"Generated CLI Commands:\n{result['output']}\n\nLog:\n{result['log']}"))
+    return result["output"], result["log"], chat_history
+
+# async def generate_cli(user_input, to_db, model, selected_mode):
+#     orchestrator = OrchestratorAgent(logger, config, model_name=model)
+    
+#     result = await orchestrator.execute({
+#         "question": user_input,
+#         "mode": selected_mode,
+#         "to_db": to_db
+#     })
+#     return result["output"], result["log"]
+
 
 def run_app():
     logger.info("Starting CLI Generator Assistant application")
-    try:
-        with gr.Blocks(title="CLI Generator Assistant") as app:
-            gr.Markdown("# 🤖 Node Generator Agent")
-            send_to_db = gr.Checkbox("Send Prompts to Database", value=True, label="Send to DB")
-            select_mode = gr.Radio(label="Select Mode", choices=[("Manual", "1"), ("Auto", "2")], value="1")
-            model = gr.Dropdown(label="Select a Model", choices=config['models'], value=config['models'][2])
-            user_input = gr.Textbox(lines=3, label="Describe your pipeline")
-            final_output = gr.Textbox(label="Final CLI Commands")
+    with gr.Blocks(title="CLI Generator Assistant") as app:
+        gr.Markdown("# 🤖 Node Generator Agent")
+        send_to_db = gr.Checkbox("Send Prompts to Database", value=True, label="Send to DB")
+        select_mode = gr.Radio(label="Select Mode", choices=[("Manual", "1"), ("Auto", "2")], value="1")
+        model = gr.Dropdown(
+            label="Select a Model",
+            choices=config['models'],
+            value=config['models'][2]
+        )
+        route = gr.Radio(label="Chat or Agent",choices=[("Chat", "1"), ("Agent", "2")], value="1")
+        user_input = gr.Textbox(lines=3, label="Describe your pipeline or ask a question")
+        final_output = gr.Textbox(label="Final CLI Commands")
+        log_output = gr.Textbox(lines=10, label="Log", interactive=False)
+        chat_history = gr.State([])
 
-            btn = gr.Button("Generate Commands")
-            log_output = gr.Textbox(lines=10, label="Log", interactive=False)
+        btn = gr.Button("Submit")
+        btn.click(
+            fn=process_query,
+            inputs=[user_input, route, send_to_db, model, select_mode, chat_history],
+            outputs=[final_output, log_output, chat_history]
+        )
 
-            btn.click(fn=generate_cli, inputs=[user_input, send_to_db, model, select_mode], outputs=[final_output, log_output])
-            
-            logger.info("Launching Gradio application")
-            app.launch()
-
-    except Exception as e:
-        logger.exception(f"Error running application: {str(e)}")
-        raise
+        logger.info("Launching Gradio application")
+        app.launch()
 
 if __name__ == "__main__":
     logger.info("Initializing application")

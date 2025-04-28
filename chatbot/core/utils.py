@@ -110,7 +110,34 @@ def extract_id_message(json_str):
         logger.info(f"Skipped Extraction: {str(e)}")
         return json_str
 
+def load_json_file(file_path):
+    """
+    Load a JSON file and return its contents.
     
+    Args:
+        file_path (str): Path to the JSON file.
+        
+    Returns:
+        dict: Contents of the JSON file.
+        
+    Raises:
+        FileNotFoundError: If the file doesn't exist.
+        json.JSONDecodeError: If the file is invalid JSON.
+    """
+    logger = logging.getLogger(__name__)
+    full_path = os.path.join(parent_path, file_path)
+    logger.info(f"Loading JSON file: {full_path}")
+    try:
+        with open(full_path, 'r') as f:
+            data = json.load(f)
+        logger.debug("JSON file loaded successfully")
+        return data
+    except FileNotFoundError:
+        logger.error(f"JSON file not found: {full_path}")
+        raise
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON in file {full_path}: {str(e)}")
+        raise
 
 def parse_command_list(output: str):
     logger.info("Parsing command list")
