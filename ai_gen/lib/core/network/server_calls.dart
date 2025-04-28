@@ -6,7 +6,7 @@ import 'network_constants.dart';
 
 class ServerCalls {
   final String _baseURL = NetworkConstants.baseURL;
-  final String _allComponentsApi = NetworkConstants.allComponentsApi;
+  final String _allComponentsApi = NetworkConstants.allComponentsEndPoint;
 
   final Dio dio = GetIt.I.get<Dio>();
 

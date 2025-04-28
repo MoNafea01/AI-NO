@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'parameter_model.dart';
 
 class NodeModel {
-  num? id;
+  int id;
   dynamic nodeId;
+  int? projectId;
   int? index;
   String name;
   String? displayName;
@@ -13,13 +14,14 @@ class NodeModel {
   String category;
   String type;
   String task;
-  List<ParameterModel>? params;
+  List<ParameterModel> params;
   List<String>? inputDots;
   List<String>? outputDots;
   String? endPoint;
+  Offset? offset;
 
   NodeModel({
-    this.id,
+    required this.id,
     this.index,
     this.name = "Node",
     this.displayName,
@@ -27,14 +29,18 @@ class NodeModel {
     this.category = "others",
     this.type = "others",
     this.task = "others",
-    this.params,
+    this.params = const [],
     this.inputDots,
     this.outputDots,
     this.endPoint,
+    this.projectId,
+    this.nodeId,
+    this.offset,
   });
 
   NodeModel copyWith({
-    num? id,
+    required int projectId,
+    int? id,
     dynamic nodeId,
     int? index,
     String? name,
@@ -45,69 +51,80 @@ class NodeModel {
     List<ParameterModel>? params,
     List<String>? inputDots,
     List<String>? outputDots,
-    String? apiCall,
+    String? endPoint,
+    String? description,
+    Offset? offset,
   }) {
     return NodeModel(
       id: id ?? this.id,
+      nodeId: nodeId ?? this.nodeId,
+      projectId: projectId,
       index: index ?? this.index,
       name: name ?? this.name,
       displayName: displayName ?? this.displayName,
-      description: description,
+      description: description ?? this.description,
       category: category ?? this.category,
       type: type ?? this.type,
       task: task ?? this.task,
       params: params ??
-          this.params?.map((parameter) => parameter.copyWith()).toList(),
+          this.params.map((parameter) => parameter.copyWith()).toList(),
       inputDots: inputDots ?? this.inputDots,
       outputDots: outputDots ?? this.outputDots,
-      endPoint: apiCall ?? this.endPoint,
+      endPoint: endPoint ?? this.endPoint,
+      offset: offset ?? this.offset,
     );
   }
 
-  factory NodeModel.fromJson(dynamic json) {
+  factory NodeModel.fromJson(json) {
     String name = json['node_name'] ?? "Node";
-    String category = json['category'] ?? "cat ${json['id']}";
-    String type = json['node_type'] ?? "type ${json['id']}";
-    String task = json['task'] ?? "task ${json['id']}";
-    num id = num.parse(json['id'].toString());
-    int index = json['idx'] != null ? int.parse(json['idx'].toString()) : 6;
-    String displayName = json['displayed_name'] ?? name;
-    String description = json['description'];
 
     List<ParameterModel> params = [];
-    if (json['params'] != null) {
+    if (json['params'] != null && json['params'] is List) {
       params = (json['params'] as List)
           .map((e) => ParameterModel.fromJson(e as Map<String, dynamic>))
           .toList();
+    } else if (json['params'] is Map) {
+      params
+          .add(ParameterModel.fromJson(json['params'] as Map<String, dynamic>));
     }
 
     List<String>? inputDots = json['input_channels'] != null
         ? json['input_channels'].cast<String>()
         : [];
-    List<String> outputDots = json['output_channels'] != null
+    List<String>? outputDots = json['output_channels'] != null
         ? json['output_channels'].cast<String>()
         : [];
-    String? apiCall = json['api_call'];
+
+    Offset? offset;
+    if (json['location_x'] != null && json['location_y'] != null) {
+      offset = Offset(
+        json['location_x'].toDouble(),
+        json['location_y'].toDouble(),
+      );
+    }
 
     return NodeModel(
-      id: id,
-      index: index,
+      id: json['uid'],
+      nodeId: json['node_id'],
+      projectId: json['project'],
+      index: json['idx'] != null ? int.parse(json['idx'].toString()) : 6,
       name: name,
-      category: category,
-      type: type,
-      task: task,
-      endPoint: apiCall,
-      displayName: displayName,
-      description: description,
+      displayName: json['displayed_name'] ?? name,
+      description: json['description'],
+      category: json['category'] ?? "cat ${json['uid']}",
+      type: json['node_type'] ?? "type ${json['uid']}",
+      task: json['task'] ?? "task ${json['uid']}",
+      endPoint: json['api_call'],
       inputDots: inputDots,
       outputDots: outputDots,
       params: params,
+      offset: offset,
     );
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = <String, dynamic>{};
-    json['id'] = id;
+    json['uid'] = id;
     json['idx'] = index;
     json['node_name'] = name;
     json['displayed_name'] = displayName;
@@ -115,29 +132,26 @@ class NodeModel {
     json['category'] = category;
     json['node_type'] = type;
     json['task'] = task;
-    json['params'] = params?.map((e) => e.toJson()).toList();
+    json['params'] = params.map((param) => param.toJson()).toList();
     json['input_channels'] = inputDots;
     json['output_channels'] = outputDots;
     json['api_call'] = endPoint;
+    json['location_x'] = offset?.dx;
+    json['location_y'] = offset?.dy;
+    json['project'] = projectId;
+    json['node_id'] = nodeId;
     return json;
   }
 
   // to be used in the API call as the api data
   Map<String, dynamic> get paramsToJson {
     Map<String, dynamic> paramsMap = {};
-    params?.forEach((param) => paramsMap.addAll(param.toJson()));
+    params.forEach((param) => paramsMap.addAll(param.toJson()));
 
     return paramsMap;
   }
 
   Color get color {
-    // if (name == "model_fitter") {
-    //   return NodeTypes.models.color;
-    // }
-    // if (name == "preprocessor_fitter") {
-    //   return NodeTypes.preprocessors.color;
-    // }
-
     switch (category) {
       case "Models":
         return NodeTypes.models.color;

@@ -34,6 +34,8 @@ class VSNodeDataProvider extends ChangeNotifier {
   final bool withAppbar;
   final double appbarHeight;
 
+  late TransformationController transformationController;
+
   ///Gets the closest [VSNodeDataProvider] from the widget tree
   static VSNodeDataProvider of(BuildContext context) {
     return context
@@ -72,7 +74,7 @@ class VSNodeDataProvider extends ChangeNotifier {
   ///
   ///Notifies listeners to this provider
   void loadSerializedNodes(String serializedNodes) {
-    nodeManager.loadSerializedNodes(serializedNodes);
+    nodeManager.loadLocalSerializedNodes(serializedNodes);
     notifyListeners();
   }
 
@@ -92,8 +94,10 @@ class VSNodeDataProvider extends ChangeNotifier {
   ///
   ///Offset will be applied to all nodes based on the offset from the moved nodes original position
   void moveNode(VSNodeData nodeData, Offset offset) {
-    final movedOffset = applyViewPortTransfrom(offset) - nodeData.widgetOffset;
+    nodeData.node?.offset =
+        transformationController.toScene(offset); //update node object offset
 
+    final movedOffset = applyViewPortTransfrom(offset) - nodeData.widgetOffset;
     final List<VSNodeData> modifiedNodes = [];
 
     if (selectedNodes.contains(nodeData.id)) {
@@ -134,20 +138,24 @@ class VSNodeDataProvider extends ChangeNotifier {
   ///
   ///Notifies listeners to this provider
   void createNodeFromContext(VSNodeDataBuilder builder) {
-    updateOrCreateNodes(
-      [
-        builder(
-          _contextMenuContext!.offset,
-          _contextMenuContext!.reference,
-        )
-      ],
+    VSNodeData _builder = builder(
+      _contextMenuContext!.offset,
+      _contextMenuContext!.reference,
     );
+
+    _builder.node?.offset =
+        transformationController.toScene(_contextMenuContext!.offset);
+
+    updateOrCreateNodes([_builder]);
   }
 
   void createNodeFromSidebar(VSNodeDataBuilder builder,
       {Offset offset = const Offset(250, 250)}) {
     final Offset movedOffset = applyViewPortTransfrom(offset);
-    updateOrCreateNodes([builder(movedOffset, null)]);
+    VSNodeData nodeData = builder(movedOffset, null);
+    nodeData.node?.offset = transformationController.toScene(offset);
+
+    updateOrCreateNodes([nodeData]);
   }
 
   ///Set of currently selected node ids

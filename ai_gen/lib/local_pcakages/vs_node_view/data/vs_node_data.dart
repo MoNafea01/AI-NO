@@ -32,7 +32,7 @@ class VSNodeData {
     }
   }
 
-  final NodeModel? node;
+  NodeModel? node;
 
   ///The nodes ID
   ///
@@ -79,12 +79,13 @@ class VSNodeData {
 
   Map<String, dynamic> toJson() {
     return {
+      ...node?.toJson() ?? {},
       'id': id,
       'type': type,
       'title': _title,
       'widgetOffset': widgetOffset.toJson(),
-      'inputData': inputData,
-      'outputData': outputData,
+      'input_ports': inputData,
+      'output_ports': outputData,
     };
   }
 
@@ -94,11 +95,13 @@ class VSNodeData {
   void setBaseData(
     String id,
     String title,
-    Offset widgetOffset,
-  ) {
+    Offset widgetOffset, {
+    NodeModel? nodeModel,
+  }) {
     _id = id;
     _title = title;
     this.widgetOffset = widgetOffset;
+    if (nodeModel != null) this.node = nodeModel;
   }
 
   ///Used for deserializing
