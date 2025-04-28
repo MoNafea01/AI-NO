@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'param_dropdown_menu.dart';
+import 'param_multi_select_menu.dart';
 import 'param_text_field.dart';
 
 class ParamInput extends StatefulWidget {
@@ -52,6 +53,8 @@ class _ParamInputState extends State<ParamInput> {
         return ParamNumInput(parameter: widget.parameter);
       case ParameterType.dropDownList:
         return ParamDropDownMenu(parameter: widget.parameter);
+      case ParameterType.listString:
+        return ParamMultiSelectMenu(parameter: widget.parameter);
       default:
         return ParamTextField(parameter: widget.parameter);
     }
@@ -67,7 +70,7 @@ class _ParamInputState extends State<ParamInput> {
             borderRadius: BorderRadius.circular(50),
             onTap: () {
               setState(() {
-                widget.parameter.value = widget.parameter.defaultValue;
+                widget.parameter.resetValue();
               });
             },
             child: Padding(

@@ -2,10 +2,11 @@
 # backend/core/nodes/dataLoader.py
 import os
 import pandas as pd
-from ..utils import NodeNameHandler, PayloadBuilder
+from ..utils import NodeNameHandler, PayloadBuilder, load_data
 from ..configs.datasets import DATASETS as datasets
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from core.nodes.configs.const_ import SAVING_DIR
+
 
 class BaseDataLoader:
     """Abstract base class for all data loaders."""
@@ -41,14 +42,20 @@ class CustomDataLoader:
                 data = NodeDataExtractor()(self.dataset_path)
                 X, y = data
                 
-            elif self.dataset_path.endswith('.csv'):
-                
-                data = pd.read_csv(self.dataset_path)
+            elif self.dataset_path.endswith('.csv') or self.dataset_path.endswith('.xlsx'):
+                if self.dataset_path.endswith('.xlsx'):
+                    data = pd.read_excel(self.dataset_path)
+                else:
+                    data = pd.read_csv(self.dataset_path)
+
                 X = data.iloc[:, :-1].values
                 if data.shape[1] == 1:
                     y = None
                 else:
                     y = data.iloc[:, -1].values
+
+            if not os.path.isfile(self.dataset_path):
+                X, y, _ = load_data(self.dataset_path)
 
             return X, y
         except Exception as e:

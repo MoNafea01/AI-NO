@@ -1,5 +1,5 @@
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from ..base_node import BaseNode, SAVING_DIR
 from keras.api.models import Sequential
 
@@ -19,7 +19,7 @@ class CompileModel(BaseNode):
         self.payload = self._compile()
     
     def _compile(self):
-        if isinstance(self.nn_model, (dict, int)):
+        if isinstance(self.nn_model, (dict, int, str)):
             return self._compile_from_dict(self.nn_model)
         elif isinstance(rf"{self.model_path}", str):
             return self._compile_from_path(self.nn_model_path)

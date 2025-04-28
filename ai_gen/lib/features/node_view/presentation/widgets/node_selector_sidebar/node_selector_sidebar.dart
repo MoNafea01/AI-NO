@@ -143,12 +143,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              children: [
-                Text(
-                  entry.key,
-                ),
-                const SizedBox(width: 100)
-              ],
+              children: [Text(entry.key), const SizedBox(width: 100)],
             ),
           ),
         ),

@@ -1,4 +1,4 @@
-import os, re
+import os, re, cv2, numpy as np
 from ai_operations.models import Node
 from core.nodes.configs.const_ import (
     MODELS_TASKS, PREPROCESSORS_TASKS, NN_TASKS, DATA_HANDLER_TASKS, NN_NAMES, MODELS_NAMES, PREPROCESSORS_NAMES, DATA_HANDLER_NAMES)
@@ -125,3 +125,65 @@ def delete_node(node: Node):
         os.remove(node_path)
     node.delete()
 
+
+def load_imgs(path: str) -> list[str]:
+    """
+    Params:
+    - path : str : The Path of the dataset
+    This Function takes the default Path of the dataset and returns the list of images and their labels
+    Note the Images are the Pathe of the images
+    return:
+    - imgs : List[str] : List of the images
+    """
+
+    dirs = os.listdir(path)
+    imgs = []
+    labels = []
+    for folder in dirs:
+        for img in os.listdir(os.path.join(path, folder)):
+            img_path = os.path.join(path, folder, img)
+            imgs.append(img_path)
+            labels.append(folder)
+    return imgs, labels
+
+def label_encoding(labels: list[str]) -> tuple[list[int], dict[str, int]]:
+    """
+    Params:
+    - labels : List[str] : List of the labels
+    This function takes the list of labels and returns the encoded labels and the label dictionary
+    return:
+    - encoded_labels : List[int] : List of the encoded labels
+    - label_dict : Dict[str, int] : Dictionary of the labels and their encoded values
+    """
+
+    label_dict = {k:v for v,k in enumerate(np.unique(labels))}
+    encoded_labels = [label_dict[label] for label in labels]
+    return encoded_labels, label_dict
+
+def load_data(path: str) -> tuple[np.array, np.array, dict[str, int]]:
+
+    """
+
+    Params:
+    - path : str : The Path of the dataset
+
+    This function takes the path of the dataset and returns the images, encoded labels and the label dictionary
+    Note that Images are the numpy array of the images
+
+    return:
+    - img_arr : np.array : Numpy array of the images
+    - encoded_labels : np.array : Numpy array of the encoded labels
+    - label_dict : Dict[str, int] : Dictionary of the labels and their encoded values
+
+    """
+    imgs, labels = load_imgs(path)
+    encoded_labels, label_dict = label_encoding(labels)
+    img_arr = []
+    for img in imgs:
+        img = cv2.imread(img)
+        img = cv2.resize(img, (150,150))
+        img = img/255
+        img_arr.append(img)
+    img_arr = np.array(img_arr)
+    encoded_labels = np.array(encoded_labels)
+    return img_arr, encoded_labels, label_dict

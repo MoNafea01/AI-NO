@@ -6,25 +6,69 @@ import ast
 import json
 import logging
 import logging.handlers
+import yaml
 from cli.call_cli import call_script
 
 MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
+parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-def init_logger(name, path):
-    log_file = path
+def init_logger(name, config=None, log_file=None):
+    if not config:
+        config = {
+            'logging': {
+                'path': os.path.join(parent_path, "aino_logs.log"),
+                'max_bytes': 1024 * 1024 * 5,  # 5 MB
+                'backup_count': 5
+            }
+        }
+    log_file = os.path.join(parent_path, config['logging']['path'])
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
-    handler = logging.handlers.RotatingFileHandler(log_file, mode='a', maxBytes=5*1024*1024, backupCount=50)
+    handler = logging.handlers.RotatingFileHandler(
+        log_file, mode='a', 
+        maxBytes=config['logging']['max_bytes'], 
+        backupCount=config['logging']['backup_count']
+        )
+    
     handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
     logger.addHandler(handler)
 
     return logger
 
-# Configure logging
-parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 log_file = os.path.join(parent_path, "aino_logs.log")
-logger = init_logger(__name__, log_file)
+logger = init_logger(__name__, log_file=log_file)
 
+def load_config(config_path="config.yaml"):
+    """
+    Load configuration from a YAML file.
+    
+    Args:
+        config_path (str): Path to the YAML configuration file.
+        
+    Returns:
+        dict: Configuration dictionary.
+        
+    Raises:
+        FileNotFoundError: If the config file doesn't exist.
+        yaml.YAMLError: If the YAML file is invalid.
+    """
+    config_path = os.path.join(parent_path, config_path)
+    logger.info(f"Loading configuration from {config_path}")
+    
+    try:
+        with open(config_path, 'r') as file:
+            config = yaml.safe_load(file)
+        logger.debug("Configuration loaded successfully")
+        return config
+    except FileNotFoundError:
+        logger.error(f"Configuration file not found: {config_path}")
+        raise
+    except yaml.YAMLError as e:
+        logger.error(f"Error parsing YAML file: {str(e)}")
+        raise
+
+config = load_config(config_path="config/config.yaml")
+# Configure logging
 
 def extract_id_message(json_str):
     logger.info("Extracting ID and message from JSON")
@@ -40,12 +84,14 @@ def extract_id_message(json_str):
         message = json_obj.get("message")
         node_id = json_obj.get("node_id")
         logger.debug(f"Extracted message: {message}, node_id: {node_id}")
+        out.append({"message":message, "node_id": node_id})
 
         if json_obj.get("node_name") in MULTI_CHANNEL_NODES:
             logger.info(f"Processing multi-channel node: {json_obj.get('node_name')}")
             for i in range(len(json_obj.get("children", []))):
                 logger.debug(f"Processing child {i+1}")
-                child = call_script(f"show {json_obj.get("node_name")} {node_id} {i+1}")
+                child = call_script(f"show {json_obj.get('node_name')} {node_id} {i+1}")
+
                 try:
                     child_message = child.get("message")
                     child_node_id = child.get("node_id")
@@ -56,7 +102,7 @@ def extract_id_message(json_str):
                     logger.error(f"Error processing child node {i+1}: {str(e)}")
                     continue
 
-        out.append({"message":message, "node_id": node_id})
+        
         logger.info("Extraction completed successfully")
         return f'{out}'
     

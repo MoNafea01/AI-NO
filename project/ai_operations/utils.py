@@ -1,19 +1,28 @@
 MODEL = {
-    'post': [{"model_name": "logistic_regression","model_type": "linear_models","task": "classification"},
-             {"model_path":r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\testing\logistic_regression_2144678917760.pkl"}
-             ],
-    'put' : [{"model_name": "linear_regression","model_type": "linear_models","task": "regression"},
-             {"model_path": r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\testing\linear_regression_2144678909792.pkl"}
-             ],
+    'post': [{"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}],
+    'put' : [{"model_name": "linear_regression","model_type": "linear_models","task": "regression"},],
     }
 
-DATA_LOADER = {
-    'post': [{"params": {"dataset_name":"diabetes"}},
-             {"dataset_path":r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\testing\data_loader_1464733871296.pkl"}
+FIT_MODEL = {
+    'post': [{}],
+    'put' : [{}]
+}
+
+PREDICT_MODEL = {
+    'post': [{}],
+    'put' : [{}]
+}
+
+EVALUATE_MODEL = {
+    'post': [{"params": {"metric": "mse"}},
              ],
-    'put': [{"params": {"dataset_name":"diabetes"}},
-            {"dataset_path":r"C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\testing\data_loader_1464733871296.pkl"}
-            ]
+    'put' : [{"params": {"metric": "r2"}},
+             ]
+}
+
+DATA_LOADER = {
+    'post': [{"params": {"dataset_name":"diabetes"}}],
+    'put': [{"params": {"dataset_name":"diabetes"}}]
 }
 
 TR_TE_SP = {
@@ -23,10 +32,23 @@ TR_TE_SP = {
 
 
 
+
 _requests_ = {
     'create_model': {
         'post': MODEL['post'],
         'put': MODEL['put'],
+    },
+    'fit_model':{
+        'post': FIT_MODEL['post'],
+        'put': FIT_MODEL['put']
+    },
+    'predict_model': {
+        'post': PREDICT_MODEL['post'],
+        'put': PREDICT_MODEL['put'],
+    },
+    'evaluate_model': {
+        'post': EVALUATE_MODEL['post'],
+        'put': EVALUATE_MODEL['put'],
     },
     'data_loader': {
         'post': DATA_LOADER['post'],
@@ -35,7 +57,7 @@ _requests_ = {
     'train_test_split': {
         'post': TR_TE_SP['post'],
         'put': TR_TE_SP['put'],
-    }
+    },
 }
 
 _query_set_ = {

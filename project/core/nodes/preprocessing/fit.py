@@ -1,6 +1,6 @@
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
-from ..base_node import BaseNode, SAVING_DIR
+from ...repositories import NodeSaver, NodeDataExtractor
+from core.nodes.base_node import BaseNode, SAVING_DIR
 
 
 class PreprocessorFitter:
@@ -29,7 +29,7 @@ class Fit(BaseNode):
         self.payload = self._fit()
 
     def _fit(self):
-        if isinstance(self.preprocessor, (dict, int)):
+        if isinstance(self.preprocessor, (dict, int, str)):
             return self._fit_from_id()
         elif isinstance(rf"{self.preprocessor_path}", str):
             return self._fit_from_path()

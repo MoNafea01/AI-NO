@@ -1,23 +1,20 @@
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
+import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 import 'node_content.dart';
 
 class VSNode extends StatefulWidget {
-  const VSNode({
-    required this.data,
-    this.nodeTitleBuilder,
-    super.key,
-  });
+  const VSNode({required this.data, this.nodeTitleBuilder, super.key});
 
   final VSNodeData data;
 
-  final Widget Function(
-    BuildContext context,
-    VSNodeData nodeData,
-  )? nodeTitleBuilder;
+  final Widget Function(BuildContext context, VSNodeData nodeData)?
+      nodeTitleBuilder;
 
   @override
   State<VSNode> createState() => _VSNodeState();
@@ -39,15 +36,15 @@ class _VSNodeState extends State<VSNode> {
   @override
   Widget build(BuildContext context) {
     return Draggable(
-      onDragUpdate: _whileDragging,
-      childWhenDragging: const SizedBox(),
+      onDragUpdate: _moveNode,
+      childWhenDragging: const SizedBox.shrink(),
       feedback: _draggedNode(),
       child: _node(),
     );
   }
 
-  void _whileDragging(details) {
-    if (_anchor.currentContext == null) return;
+  void _moveNode(details) {
+    if (!mounted || _anchor.currentContext == null) return;
 
     final RenderBox renderBox =
         _anchor.currentContext?.findRenderObject() as RenderBox;
@@ -55,14 +52,16 @@ class _VSNodeState extends State<VSNode> {
     nodeProvider.moveNode(widget.data, newPosition);
   }
 
-  Transform _draggedNode() {
-    return Transform.scale(
-      scale: 1 / nodeProvider.viewportScale,
-      child: Material(
-        key: _key2,
-        borderRadius: BorderRadius.circular(12),
-        child: InheritedNodeDataProvider(
-          provider: nodeProvider,
+  Widget _draggedNode() {
+    if (!mounted) return const SizedBox.shrink();
+
+    return InheritedNodeDataProvider(
+      provider: nodeProvider,
+      child: Transform.scale(
+        scale: 1 / nodeProvider.viewportScale,
+        child: Material(
+          key: _key2,
+          borderRadius: BorderRadius.circular(12),
           child: NodeContent(
             nodeProvider: nodeProvider,
             data: widget.data,
@@ -103,19 +102,25 @@ class _VSNodeState extends State<VSNode> {
         PopupMenuItem(value: 'rename', child: Text('Rename')),
         PopupMenuItem(value: 'delete', child: Text('Delete')),
       ],
-    ).then((value) {
-      if (value == 'properties') {
-        context
-            .read<GridNodeViewCubit>()
-            .updateActiveNodePropertiesCard(widget.data.node);
-      } else if (value == 'rename') {
-        setState(() => widget.data.isRenaming = true);
-      } else if (value == 'delete') {
-        setState(() {
+    ).then(
+      (value) {
+        if (value == 'properties') {
+          context
+              .read<GridNodeViewCubit>()
+              .updateActiveNodePropertiesCard(widget.data.node);
+        } else if (value == 'rename') {
+          setState(() => widget.data.isRenaming = true);
+        } else if (value == 'delete') {
+          final NodeServerCalls nodeServerCalls =
+              GetIt.I.get<NodeServerCalls>();
+          NodeModel? nodeModel = widget.data.node;
+          if (nodeModel?.nodeId != null) nodeServerCalls.deleteNode(nodeModel!);
           widget.data.deleteNode?.call();
+
           nodeProvider.removeNodes([widget.data]);
-        });
-      }
-    });
+          setState(() {});
+        }
+      },
+    );
   }
 }

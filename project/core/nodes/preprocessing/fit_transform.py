@@ -1,5 +1,5 @@
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from core.nodes.configs.const_ import SAVING_DIR
 
 class PreprocessorFitterTransformer:
@@ -30,7 +30,7 @@ class FitTransform:
         self.payload = self._fit_transform()
 
     def _fit_transform(self):
-        if isinstance(self.preprocessor, (dict, int)):
+        if isinstance(self.preprocessor, (dict, int, str)):
             return self._fit_transform_from_id()
         elif isinstance(rf"{self.preprocessor_path}", str):
             return self._fit_transform_from_path()

@@ -1,6 +1,6 @@
 import numpy as np
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from ..base_node import BaseNode, SAVING_DIR
 
 class ModelFitter:
@@ -31,7 +31,7 @@ class Fit(BaseNode):
         self.payload = self._fit()
 
     def _fit(self):
-        if isinstance(self.model, (dict, int)):
+        if isinstance(self.model, (dict, int, str)):
             return self._fit_from_dict(self.model)
         elif isinstance(rf"{self.model_path}", str):
             return self._fit_from_path(self.model_path)

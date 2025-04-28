@@ -1,5 +1,5 @@
 abstract class Helper {
-  static List<num> parseList(dynamic text) {
+  static List<num> parseIntList(dynamic text) {
     return text
         .toString()
         .replaceAll("[", "")

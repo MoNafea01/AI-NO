@@ -1,12 +1,12 @@
-import os
 from core.nodes.configs.models import MODELS
 from core.nodes.configs.preprocessors import PREPROCESSORS
+from django.conf import settings
 
 # these nodes are in json format and are used to be input to other nodes
 DICT_NODES = ['data', 'data_1', 'data_2', 
               'X', 'y', 'model', 'y_true', 
               'y_pred', 'preprocessor', 'prev_node', 
-              'layer', 'node']
+              'layer', 'node', 'compiled_model', 'nn_model']
 
 # these are layers names
 PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer"]
@@ -40,12 +40,6 @@ DATA_HANDLER_TASKS = ["load_data", "split", "join"]
 
 DATA_NODES = ["data_loader", "train_test_split", "splitter", "joiner",
               "predictor", "evaluator", "transformer"]
-
-if os.getenv("TESTING_ENV", "0") == "1":
-    SAVING_DIR = r"core\test_saved"
-else:
-    SAVING_DIR = r"core\saved"
-
 
 models = ["create_model/"] * 31
 preprocessors = ["create_preprocessor/"] * 12
@@ -93,4 +87,10 @@ def get_node_name_by_api_ref(api_ref, request):
             else:
                 node_name = name
             return node_name
+        
     return None
+
+if settings.TESTING:
+    SAVING_DIR = r"core\test_saved"
+else:
+    SAVING_DIR = r"core\saved"

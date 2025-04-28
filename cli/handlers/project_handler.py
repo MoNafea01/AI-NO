@@ -48,9 +48,18 @@ def select_project(project_id):
     active_user = data_store["active_user"]
     if not active_user:
         return False, "No user selected."
+    
     if project_id in data_store["users"][active_user]["projects"]:
         data_store["active_project"] = project_id
         return True, f"Project {project_id} selected."
+    
+    response = send_request_to_api([], f"projects/{project_id}", method_type="get").get("id", None)
+    if response:
+        data_store["active_project"] = project_id
+        status, nodes = load_project(project_id)
+        data_store["users"][active_user]["projects"][project_id] = nodes
+        return True, f"Project {project_id} selected."
+    
     return False, "Project does not exist."
 
 

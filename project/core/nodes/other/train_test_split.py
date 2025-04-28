@@ -1,11 +1,11 @@
 from sklearn.model_selection import train_test_split
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from ..utils import PayloadBuilder
 from ..base_node import BaseNode, SAVING_DIR
 
 class TrainTestSplit(BaseNode):
-    def __init__(self, data, params=None, project_id: int = None, *args, **kwargs):
-        self.data = NodeDataExtractor()(data)
+    def __init__(self, X, y, params=None, project_id: int = None, *args, **kwargs):
+        self.X, self.y = NodeDataExtractor()(X, y)
         self.params = params if params else {'test_size': 0.2, 'random_state': 42}
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
@@ -13,13 +13,18 @@ class TrainTestSplit(BaseNode):
 
     def split(self):
         try:
-            out1, out2 = train_test_split(self.data,**self.params)
+            out1, out2 = None, None
+
+            if self.X is not None:
+                out1 = train_test_split(self.X, **self.params)
+            if self.y is not None:
+                out2 = train_test_split(self.y, **self.params)
 
             payload = []
             payload.append(PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split", project_id=self.project_id,
                                                         uid=self.uid, params=self.params))
 
-            names = ["Train data", "Test data"]
+            names = ["X_Split", "y_Split"]
             for i in range(1, 3):
                 payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [out1, out2][i-1], "train_test_split", node_type="splitter", task="split", project_id=self.project_id,
                                                             uid=self.uid))

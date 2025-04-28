@@ -1,7 +1,8 @@
 from ..utils import PayloadBuilder
 from ..configs.metrics import METRICS as metrics
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from ..base_node import BaseNode, SAVING_DIR
+import numpy as np
 
 class Evaluator(BaseNode):
     def __init__(self, metric='accuracy', y_true=None, y_pred=None, project_id=None, *args, **kwargs):
@@ -16,8 +17,15 @@ class Evaluator(BaseNode):
             if self.metric not in metrics.keys():
                 raise ValueError(f"Unsupported metric: {self.metric}")
             
+
+            if len(y_pred.shape) > 1:
+                if y_pred.shape[1] > 1:
+                    y_pred = np.argmax(y_pred, axis=1)
+                else:
+                    y_pred = np.round(y_pred, 3).astype(int).flatten()
+            
             output = metrics[self.metric](y_true, y_pred)
-            output = round(output,2)
+            output = round(output,3)
             payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate",
                                                    uid=self.uid)
             if self.project_id:

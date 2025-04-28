@@ -3,7 +3,26 @@
         "admin": {
             "password": "admin",
             "projects": {
-                "1": []
+                "1": [],
+                "5": [],
+                "13": [
+                    {
+                        "node_id": 2438712952784,
+                        "node_name": "node_saver",
+                        "message": "Node standard_scaler saved.",
+                        "params": {},
+                        "task": "save",
+                        "node_type": "saver",
+                        "uid": 51,
+                        "children": [],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 13,
+                        "node_data": null
+                    }
+                ]
             }
         }
     },

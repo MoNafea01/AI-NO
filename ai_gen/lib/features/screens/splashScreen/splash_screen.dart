@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
         // Check if the screen is still in the widget tree (not disposed)
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const ProjectsDashboard()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       }
     });

@@ -4,7 +4,8 @@ enum ParameterType {
   string,
   int,
   double,
-  list,
+  listInt,
+  listString,
   boolean,
   dropDownList,
   directory,
@@ -14,7 +15,7 @@ class ParameterModel {
   String name;
   String? _type;
   dynamic _value;
-  dynamic _defaultValue;
+  final dynamic _defaultValue;
   final List? choices;
 
   ParameterModel({
@@ -22,27 +23,37 @@ class ParameterModel {
     this.choices = const [],
     String? type,
     dynamic defaultValue,
+    dynamic value,
   })  : _type = type,
-        _defaultValue = defaultValue,
-        _value = defaultValue;
+        _defaultValue = defaultValue {
+    if (value != null) {
+      _value = value;
+    } else if (defaultValue is List) {
+      _value = [...defaultValue];
+    } else {
+      _value = defaultValue;
+    }
+  }
 
   get defaultValue => _defaultValue;
 
   ParameterModel copyWith({
     String? name,
     String? type,
-    dynamic defaultValue,
+    defaultValue,
     List? choices,
+    dynamic value,
   }) {
     return ParameterModel(
       name: name ?? this.name,
       type: type ?? _type,
       defaultValue: defaultValue ?? _defaultValue,
       choices: choices ?? this.choices,
+      value: value ?? _value,
     );
   }
 
-  factory ParameterModel.fromJson(dynamic json) {
+  factory ParameterModel.fromJson(json) {
     return ParameterModel(
       name: json['name'] ?? 'Parameter',
       type: json['type'],
@@ -52,19 +63,20 @@ class ParameterModel {
   }
 
   get type {
-    if (choices != null && choices!.isNotEmpty) {
-      return ParameterType.dropDownList;
-    }
-
     switch (_type) {
       case 'str':
-        return ParameterType.string;
+        return (choices != null || choices!.isNotEmpty)
+            ? ParameterType.dropDownList
+            : ParameterType.string;
+
       case 'int':
         return ParameterType.int;
       case 'float':
         return ParameterType.double;
-      case 'list':
-        return ParameterType.list;
+      case 'list_int':
+        return ParameterType.listInt;
+      case 'list_str':
+        return ParameterType.listString;
       case 'bool':
         return ParameterType.boolean;
       default:
@@ -82,6 +94,12 @@ class ParameterModel {
       case ParameterType.int:
         _value = int.tryParse(newValue.toString()) ?? 0;
         break;
+      case ParameterType.listInt:
+        _value = Helper.parseIntList(newValue);
+        break;
+      case ParameterType.boolean:
+        _value = newValue == 'true' || newValue == true;
+        break;
       case ParameterType.double:
         if (newValue is String) {
           _value = double.tryParse(newValue)?.toStringAsFixed(2) ?? 0.0;
@@ -92,14 +110,16 @@ class ParameterModel {
           _value = 0.0;
         }
         break;
-      case ParameterType.list:
-        _value = Helper.parseList(newValue);
-        break;
-      case ParameterType.boolean:
-        _value = newValue == 'true' || newValue == true;
-        break;
       default:
         _value = newValue;
+    }
+  }
+
+  void resetValue() {
+    if (_defaultValue is List) {
+      _value = _value = [..._defaultValue];
+    } else {
+      _value = _defaultValue;
     }
   }
 
@@ -109,4 +129,19 @@ class ParameterModel {
   String toString() {
     return '{$name: $value ($_type)}';
   }
+
+  /// This method is used to print the types of parameters
+  /// call this in the constructor
+  /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
+// static final Map<String, int> _typesMap = {};
+// void _printNodeTypes() {
+//   if (type != null) {
+//     if (_typesMap.containsKey(type)) {
+//       _typesMap[type] = _typesMap[type]! + 1;
+//     } else {
+//       _typesMap[type] = 1;
+//     }
+//     print(_typesMap);
+//   }
+// }
 }

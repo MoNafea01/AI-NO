@@ -1,0 +1,16 @@
+models:
+  - gemini-1.5-pro
+  - gemini-1.5-flash
+  - gemini-2.0-flash
+  - deepseek-r1:7b
+retrieval:
+  top_k: 5
+  embedding_model: all-MiniLM-L6-v2
+logging:
+  path: aino_logs.log
+  max_bytes: 5242880
+  backup_count: 50
+templates:
+  manual: manual_template.txt
+  auto: auto_template.txt
+max_iterations: 10

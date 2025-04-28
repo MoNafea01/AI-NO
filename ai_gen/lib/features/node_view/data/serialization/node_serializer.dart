@@ -1,14 +1,19 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:get_it/get_it.dart';
 
+import '../api_services/node_server_calls.dart';
+
 class NodeSerializer {
+  static Map<int, NodeModel> nodesDictionary = {};
+
   Future<Map<String, Map<String, Map<String, List<NodeModel>>>>>
       categorizeNodes() async {
     try {
       NodeServerCalls serverCalls = GetIt.I.get<NodeServerCalls>();
       // read the nodes from the server
-      List<NodeModel> nodes = await serverCalls.loadAllNodes();
+      nodesDictionary = await serverCalls.loadNodesComponents();
+
+      List<NodeModel> nodes = nodesDictionary.values.toList();
 
       // categorize nodes by category, type, and task and return them in a 3 level map
       return _categorizeNodes(nodes);
@@ -49,17 +54,17 @@ class NodeSerializer {
 }
 
 // Example of the returned map:
-Map<String, Map<String, Map<String, List<NodeModel>>>> mapScheme = {
-  "Models": {
-    "linear_models": {
-      "regression": [NodeModel(), NodeModel()],
-      "classification": [NodeModel()],
-      "clustering": [NodeModel()],
-    },
-    "svm": {
-      "regression": [NodeModel(), NodeModel()],
-      "classification": [NodeModel()],
-      "clustering": [NodeModel()],
-    }
-  },
-};
+// Map<String, Map<String, Map<String, List<NodeModel>>>> mapScheme = {
+//   "Models": {
+//     "linear_models": {
+//       "regression": [NodeModel(), NodeModel()],
+//       "classification": [NodeModel()],
+//       "clustering": [NodeModel()],
+//     },
+//     "svm": {
+//       "regression": [NodeModel(), NodeModel()],
+//       "classification": [NodeModel()],
+//       "clustering": [NodeModel()],
+//     }
+//   },
+// };

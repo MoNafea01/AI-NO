@@ -1,17 +1,19 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
+from __init__ import *
+import json, datetime, tempfile, subprocess, random, pandas as pd
+
+from rest_framework import status, viewsets
 from rest_framework.views import APIView, Response
-from rest_framework import status
 from rest_framework.parsers import MultiPartParser
+from django.http import HttpResponse
+from django.conf import settings
+from .serializers import *
 
 from core.nodes import *
 from core.repositories import *
-import datetime, os, tempfile, subprocess, sys, random
-from django.http import HttpResponse
-from .serializers import *
-import pandas as pd
-import json
 from core.nodes.configs.const_ import get_node_name_by_api_ref
+
+from chatbot.app import generate_cli
+from cli.call_cli import call_script
 
 class NodeQueryMixin:
     """
@@ -31,6 +33,7 @@ class NodeQueryMixin:
             if node_name not in DATA_NODES:
                 retrun_data = False
 
+            # get chain of nodes using "output" query_param, specific for layer nodes
             if output.isdigit() and int(output) > 0:
                 depth = int(output)
                 current_node = NodeLoader(return_path=return_path)(node_id=node_id)
@@ -40,6 +43,8 @@ class NodeQueryMixin:
                     if isinstance(child_id, int):
                         current_node = NodeLoader(return_path=return_path)(node_id=str(child_id))
                         node_id = str(child_id)
+                
+                # get node's children, for multi_channel nodes it has 2 children
                 else:
                     for i in range(depth):
                         child = current_node.get("children", [])
@@ -72,7 +77,8 @@ class NodeQueryMixin:
             if project_id and str(node.get('project_id')) != str(project_id):
                 return Response({"error": "Node does not belong to the specified project"}, 
                               status=status.HTTP_400_BAD_REQUEST)
-                
+            
+            # Check if node is a multi_channel node to delete it's dependencies
             node_name = node.get('node_name')
             is_multi_channel = node_name in MULTI_CHANNEL_NODES
             if not node_id:
@@ -91,6 +97,7 @@ class NodeQueryMixin:
 
 
 class BaseNodeAPIView(APIView, NodeQueryMixin):
+    # cur_id is specified to layer nodes to give it an incremental name
     cur_id = 0
     def get_serializer_class(self):
         """Override this method to return the appropriate serializer class."""
@@ -106,25 +113,36 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             return value["node_id"]
         return value
 
-    def post(self, request):
-
-        output_channel = request.query_params.get('output', None)
+    def get_processor_and_args(self, request):
+        # for multi-channel nodes, else it returns the parent one
+        output_channel = request.query_params.get('output', None) 
+        # return the node_data as hashed object for serialization
         return_serialized = request.query_params.get('return_serialized', '0') == '1'
-        project_id = request.query_params.get('project_id')
+        project_id = request.query_params.get('project_id') 
+        node_id = request.query_params.get("node_id", None)
 
-        ref = request.path.strip('/').split('/')[-1] + '/'
-        node_name = get_node_name_by_api_ref(ref, request)
-        uid = Component.objects.get(node_name=node_name).uid
+        if settings.TESTING:
+            uid = 0
+        else:
+            try:
+                # get uid component for node by its name
+                ref = request.path.strip('/').split('/')[-1] + '/'
+                node_name = get_node_name_by_api_ref(ref, request)
+                uid = Component.objects.get(node_name=node_name).uid
+            except Component.DoesNotExist:
+                return Response({"error": f"Component with name {node_name}not found"}, status=status.HTTP_404_NOT_FOUND), None, None, None
 
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
 
+            # Extract node IDs from validated data if it's a dict
             for key in DICT_NODES:
                 if key in validated_data:
                     validated_data[key] = self.extract_node_id(validated_data[key])
             
+            # Check if project_id is in database, if not create a new project
             if project_id:
                 try:
                     project_id = Project.objects.get(id=project_id).id
@@ -135,38 +153,39 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
             BaseNodeAPIView.cur_id += 1
 
+            return processor, return_serialized, output_channel, node_id
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST), None, None, None
+
+    def post(self, request):
+
+        result = self.get_processor_and_args(request)
+        if isinstance(result[0], Response):
+            return result[0]
+        processor, return_serialized, output_channel, _ = result
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(data=request.data)
+        if serializer.is_valid():
             response_data = processor(output_channel, return_serialized=return_serialized)
             node_id = response_data.get("node_id")
-            response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
+
+            # Returns node_data chosen
+            response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path = not return_serialized)(node_id)
             return Response(response_data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
-
-        project_id = request.query_params.get('project_id')
-        node_id = request.query_params.get("node_id", None)
-        return_serialized = request.query_params.get('return_serialized', '0') == '1'
-
-        ref = request.path.strip('/').split('/')[-1] + '/'
-        node_name = get_node_name_by_api_ref(ref, request)
-        uid = Component.objects.get(node_name=node_name).uid
+        result = self.get_processor_and_args(request)
+        if isinstance(result[0], Response):
+            return result[0]
+        
+        processor, return_serialized, _, node_id = result
 
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            validated_data = serializer.validated_data
-            if project_id:
-                try:
-                    project_id = Project.objects.get(id=project_id).id
-                except :
-                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
-                
-                validated_data['project_id'] = project_id
-
-            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
-            BaseNodeAPIView.cur_id += 1
-            
             success, message = NodeUpdater(return_serialized)(node_id, processor())
             message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
             
@@ -174,6 +193,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             return Response(message if success else {"error": message}, status=status_code)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class DataLoaderAPIView(BaseNodeAPIView):
@@ -194,7 +214,8 @@ class TrainTestSplitAPIView(BaseNodeAPIView):
 
     def get_processor(self, validated_data, *args, **kwargs):
         return TrainTestSplit(
-            data=validated_data.get('data'),
+            X=validated_data.get('X'),
+            y=validated_data.get('y'),
             params=validated_data.get('params'),
             **kwargs
         )
@@ -1161,3 +1182,66 @@ class ProjectViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
+class ChatbotAPIView(APIView):
+    """API endpoint for interacting with the chatbot."""
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            # Extract required parameters
+            query = request.data.get('query')
+            mode = request.data.get('mode', 'manual')  # Default to manual mode
+            project_id = request.query_params.get('project_id')
+
+            if project_id:
+                try:
+                    project_id = Project.objects.get(id=project_id).id
+                except Project.DoesNotExist:
+                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
+
+                call_script(f"select_project {project_id}")
+            modes = {
+                "manual": '1',
+                "auto": '2'
+            }
+            if mode in modes.keys():
+                mode = modes[mode]
+                
+            model_name = request.data.get('model_name', 'gemini-1.5-pro')  # Default model
+            iteration = request.data.get('iteration', 0)  # Current iteration
+            to_db = request.data.get('to_db', False)  # Flag for database usage
+
+            
+            if not query:
+                return Response({"error": "Query is required"}, status=status.HTTP_400_BAD_REQUEST)
+                
+            # Validate mode
+            if mode not in ['1', '2', 'manual', 'auto']:
+                return Response({"error": "Mode must be '1' (manual) or '2' (auto)"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            response, logs = generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration)
+            
+            return Response({"output": response, "status": "success", "logs": logs}, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class CLIAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            command = request.data.get('command')
+            
+            if not command:
+                return Response({"error": "Command is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Call the CLI script with the provided command and parameters
+            response = call_script(command)
+            
+            return Response(response, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

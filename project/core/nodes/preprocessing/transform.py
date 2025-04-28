@@ -1,5 +1,5 @@
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
+from ...repositories import NodeSaver, NodeDataExtractor
 from ..base_node import BaseNode, SAVING_DIR
 
 class PreprocessorTransformer:
@@ -29,7 +29,7 @@ class Transform(BaseNode):
         self.payload = self._transform()
 
     def _transform(self):
-        if isinstance(self.preprocessor, (dict, int)):
+        if isinstance(self.preprocessor, (dict, int, str)):
             return self._transform_from_id()
         elif isinstance(rf"{self.preprocessor}", str):
             return self._transform_from_path()

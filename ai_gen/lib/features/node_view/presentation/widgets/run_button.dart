@@ -28,26 +28,41 @@ class RunButton extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            IconButton(
-              style: IconButton.styleFrom(
-                padding: const EdgeInsets.all(0),
-                minimumSize: const Size(0, 0),
-              ),
-              onPressed: () {
-                context.read<GridNodeViewCubit>().closeRunMenu();
-              },
-              icon: const Icon(Icons.close),
+    return Container(
+      constraints: const BoxConstraints(minWidth: 200, maxWidth: 400),
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: _decoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          IconButton(
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.all(0),
+              minimumSize: const Size(0, 0),
             ),
-            Text(scopeOutput),
-          ],
-        ),
+            onPressed: () {
+              context.read<GridNodeViewCubit>().closeRunMenu();
+            },
+            icon: const Icon(Icons.close),
+          ),
+          Text(scopeOutput),
+        ],
       ),
+    );
+  }
+
+  BoxDecoration _decoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withValues(alpha: 0.8),
+          blurRadius: 4,
+          offset: const Offset(0, 2),
+        ),
+      ],
     );
   }
 

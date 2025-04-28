@@ -18,7 +18,9 @@ class _ParamDropDownMenuState extends State<ParamDropDownMenu> {
         child: DropdownButton<String>(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           isDense: true,
-          value: widget.parameter.value.toString(),
+          value: widget.parameter.value is List
+              ? widget.parameter.value[0].toString()
+              : widget.parameter.value.toString(),
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down),
           items: widget.parameter.choices?.map((value) {
