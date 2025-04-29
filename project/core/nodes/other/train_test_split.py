@@ -5,7 +5,7 @@ from ..base_node import BaseNode, SAVING_DIR
 
 class TrainTestSplit(BaseNode):
     def __init__(self, X, y, params=None, project_id: int = None, *args, **kwargs):
-        self.X, self.y = NodeDataExtractor()(X, y)
+        self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
         self.params = params if params else {'test_size': 0.2, 'random_state': 42}
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
@@ -52,6 +52,6 @@ class TrainTestSplit(BaseNode):
 
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(payload)
+            node_data = NodeDataExtractor(return_serialized=True)(payload, project_id=self.project_id)
             payload.update({"node_data": node_data})
         return payload

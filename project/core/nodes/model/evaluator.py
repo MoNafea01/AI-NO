@@ -6,7 +6,7 @@ import numpy as np
 
 class Evaluator(BaseNode):
     def __init__(self, metric='accuracy', y_true=None, y_pred=None, project_id=None, *args, **kwargs):
-        self.y_true, self.y_pred = NodeDataExtractor()(y_true, y_pred)
+        self.y_true, self.y_pred = NodeDataExtractor()(y_true, y_pred, project_id=project_id)
         self.metric = metric
         self.project_id=project_id
         self.uid = kwargs.get('uid', None)

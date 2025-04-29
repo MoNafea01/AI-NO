@@ -14,6 +14,8 @@ PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_laye
 # nodes with more than one record on database
 MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
 
+CHILDREN_NODES = ["data_loader", "train_test_split", "splitter", "fitter_transformer", 
+                  "dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer"]
 
 MODELS_NAMES = ["model_fitter", "evaluator", "predictor"]
 for model_type in MODELS.keys():

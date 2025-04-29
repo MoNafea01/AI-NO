@@ -10,7 +10,7 @@ class Joiner(BaseNode):
     Note that the dictionary must have a key named "data" that has a list of two elements\n
     """
     def __init__(self, data_1, data_2, project_id=None, *args, **kwargs):
-        self.data_1, self.data_2 = NodeDataExtractor()(data_1, data_2)
+        self.data_1, self.data_2 = NodeDataExtractor()(data_1, data_2, project_id=project_id)
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self.join()
@@ -39,7 +39,7 @@ class Splitter:
     """
     def __init__(self, data, project_id=None, *args, **kwargs):
         self.project_id = project_id
-        self.data = NodeDataExtractor()(data)
+        self.data = NodeDataExtractor()(data, project_id=project_id)
         self.uid = kwargs.get('uid', None)
         self.payload = self.split()
 
@@ -76,6 +76,6 @@ class Splitter:
         
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(payload)
+            node_data = NodeDataExtractor(return_serialized=True)(payload, project_id=self.project_id)
             payload.update({"node_data": node_data})
         return payload

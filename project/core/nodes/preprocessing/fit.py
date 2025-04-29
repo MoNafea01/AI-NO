@@ -23,7 +23,7 @@ class Fit(BaseNode):
     def __init__(self, data, preprocessor=None, preprocessor_path=None, project_id=None, *args, **kwargs):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeDataExtractor()(data)
+        self.data = NodeDataExtractor()(data, project_id=project_id)
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self._fit()
@@ -38,14 +38,14 @@ class Fit(BaseNode):
 
     def _fit_from_id(self):
         try:
-            preprocessor = NodeDataExtractor()(self.preprocessor)
+            preprocessor = NodeDataExtractor()(self.preprocessor, project_id=self.project_id)
             return self._fit_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor by ID: {e}")
 
     def _fit_from_path(self):
         try:
-            preprocessor = NodeDataExtractor()(self.preprocessor_path)
+            preprocessor = NodeDataExtractor()(self.preprocessor_path, project_id=self.project_id)
             return self._fit_handler(preprocessor)
         except Exception as e:
             raise ValueError(f"Error fitting preprocessor by path: {e}")

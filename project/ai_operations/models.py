@@ -12,7 +12,8 @@ class Project(models.Model):
 
 
 class Node(models.Model):
-    node_id = models.BigIntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
+    node_id = models.BigIntegerField()
     node_name = models.CharField(max_length=255)
     message = models.CharField(max_length=255, default="Done")
     node_data = models.CharField(max_length=500, null=True, blank=True)
@@ -28,6 +29,8 @@ class Node(models.Model):
     output_ports = models.JSONField(default=list)  # List of node_ids for output connections
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        unique_together = ('project', 'node_id')
 
     def __str__(self):
         return f"{self.node_name} ({self.node_id})"

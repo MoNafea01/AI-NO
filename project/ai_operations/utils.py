@@ -1,16 +1,28 @@
 MODEL = {
-    'post': [{"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}],
-    'put' : [{"model_name": "linear_regression","model_type": "linear_models","task": "regression"},],
+    'post': [{"model_name": "logistic_regression","model_type": "linear_models","task": "classification"},
+             {"model_path":"C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/testing/logistic_regression_2144678917760.pkl"}
+             ],
+    'put' : [{"model_name": "linear_regression","model_type": "linear_models","task": "regression"},
+             {"model_path": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/testing/linear_regression_2144678909792.pkl"}
+             ],
     }
 
 FIT_MODEL = {
-    'post': [{}],
-    'put' : [{}]
+    'post': [{},
+             {"model_path":"C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/testing/logistic_regression_2144678917760.pkl"}
+             ],
+    'put' : [{},
+             {"model_path":"C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/testing/linear_regression_2144678909792.pkl"}
+             ]
 }
 
 PREDICT_MODEL = {
-    'post': [{}],
-    'put' : [{}]
+    'post': [{},
+             {"model_path":"C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/testing/model_fitter_2291558202736.pkl"}
+             ],
+    'put' : [{},
+             {"model_path":"C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/testing/model_fitter_2291558202736.pkl"}
+             ]
 }
 
 EVALUATE_MODEL = {
@@ -21,8 +33,12 @@ EVALUATE_MODEL = {
 }
 
 DATA_LOADER = {
-    'post': [{"params": {"dataset_name":"diabetes"}}],
-    'put': [{"params": {"dataset_name":"diabetes"}}]
+    'post': [{"params": {"dataset_name":"diabetes"}},
+             {"dataset_path":"C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/testing/data_loader_1464733871296.pkl"}
+             ],
+    'put': [{"params": {"dataset_name":"diabetes"}},
+            {"dataset_path":"C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/testing/data_loader_1464733871296.pkl"}
+            ]
 }
 
 TR_TE_SP = {

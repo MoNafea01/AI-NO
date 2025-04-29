@@ -22,7 +22,7 @@ class Predict(BaseNode):
     def __init__(self, X, model=None, model_path=None, project_id=None, *args, **kwargs):
         self.model = model
         self.model_path = model_path
-        self.X = NodeDataExtractor()(X)
+        self.X = NodeDataExtractor()(X, project_id=project_id)
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self._predict()
@@ -37,14 +37,14 @@ class Predict(BaseNode):
 
     def _predict_from_id(self):
         try:
-            model = NodeDataExtractor()(self.model)
+            model = NodeDataExtractor()(self.model, project_id=self.project_id)
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by ID: {e}")
 
     def _predict_from_path(self):
         try:
-            model = NodeDataExtractor()(self.model_path)
+            model = NodeDataExtractor()(self.model_path, project_id=self.project_id)
             return self._predict_handler(model)
         except Exception as e:
             raise ValueError(f"Error predicting using model by path: {e}")

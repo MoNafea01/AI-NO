@@ -25,7 +25,7 @@ class Fit(BaseNode):
     def __init__(self, X, y, model=None, model_path=None, project_id=None, *args, **kwargs):
         self.model = model
         self.model_path = model_path
-        self.X, self.y = NodeDataExtractor()(X, y)
+        self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self._fit()
@@ -40,14 +40,14 @@ class Fit(BaseNode):
 
     def _fit_from_dict(self, model_id):
         try:
-            model = NodeDataExtractor()(model_id)
+            model = NodeDataExtractor()(model_id, project_id=self.project_id)
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by ID: {e}")
 
     def _fit_from_path(self, model_path):
         try:
-            model = NodeDataExtractor()(model_path)
+            model = NodeDataExtractor()(model_path, project_id=self.project_id)
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by path: {e}")

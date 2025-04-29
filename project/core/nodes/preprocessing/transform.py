@@ -22,7 +22,7 @@ class Transform(BaseNode):
     def __init__(self, data, preprocessor=None, preprocessor_path=None, project_id=None, *args, **kwargs):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeDataExtractor()(data)
+        self.data = NodeDataExtractor()(data, project_id=project_id)
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
 
@@ -38,14 +38,14 @@ class Transform(BaseNode):
 
     def _transform_from_id(self):
         try:
-            prepocessor = NodeDataExtractor()(self.preprocessor)
+            prepocessor = NodeDataExtractor()(self.preprocessor, project_id=self.project_id)
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by ID: {e}")
 
     def _transform_from_path(self):
         try:
-            prepocessor = NodeDataExtractor()(self.preprocessor_path)
+            prepocessor = NodeDataExtractor()(self.preprocessor_path, project_id=self.project_id)
             return self._transform_handler(prepocessor)
         except Exception as e:
             raise ValueError(f"Error transformation using preprocessor by path: {e}")

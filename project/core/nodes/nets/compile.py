@@ -28,14 +28,14 @@ class CompileModel(BaseNode):
 
     def _compile_from_dict(self, model_id):
         try:
-            model = NodeDataExtractor()(model_id)
+            model = NodeDataExtractor()(model_id, project_id=self.project_id)
             return self._compile_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by ID: {e}")
 
     def _compile_from_path(self, nn_model_path):
         try:
-            model = NodeDataExtractor()(path=nn_model_path)
+            model = NodeDataExtractor()(path=nn_model_path, project_id=self.project_id)
             return self._compile_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model from path: {e}")

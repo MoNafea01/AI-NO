@@ -23,7 +23,7 @@ class BaseNode:
     
     def _load_from_path(self):
         try:
-            node = NodeDataExtractor()(self.node_path)
+            node = NodeDataExtractor()(self.node_path, project_id=self.project_id)
             return self.load_handler(node)
         except Exception as e:
             raise ValueError(f"Error loading node from path: {e}")
@@ -89,6 +89,6 @@ class BaseNode:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload, project_id=self.project_id)
             self.payload.update({"node_data": node_data})
         return self.payload

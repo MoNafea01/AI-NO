@@ -5,8 +5,23 @@
             "projects": {
                 "1": [
                     {
+                        "message": "data loaded: iris",
+                        "node_id": 2579304681920,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            2579306955664,
+                            2579306955280
+                        ],
+                        "params": {},
+                        "node_type": "loader",
+                        "project_id": 1,
+                        "uid": 50,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\other\\data_loader_2579304681920.pkl"
+                    },
+                    {
                         "message": "Model logistic_regression created",
-                        "node_id": 2151883026320,
+                        "node_id": 1821773697280,
                         "node_name": "logistic_regression",
                         "task": "classification",
                         "children": [],
@@ -17,38 +32,41 @@
                         "node_type": "linear_models",
                         "uid": 6,
                         "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2151883026320.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_1821773697280.pkl"
                     },
                     {
-                        "message": "Preprocessor maxabs_scaler created",
-                        "node_id": 2151930464784,
-                        "node_name": "maxabs_scaler",
-                        "task": "preprocessing",
+                        "message": "Model logistic_regression created",
+                        "node_id": 2522304776192,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
                         "children": [],
-                        "params": {},
-                        "node_type": "scaler",
-                        "uid": 34,
+                        "params": {
+                            "penalty": "l2",
+                            "C": 1.0
+                        },
+                        "node_type": "linear_models",
+                        "uid": 6,
                         "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\preprocessing\\maxabs_scaler_2151930464784.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2522304776192.pkl"
                     },
                     {
                         "message": "data loaded: iris",
-                        "node_id": 2151931059072,
+                        "node_id": 2522325426240,
                         "node_name": "data_loader",
                         "task": "load_data",
                         "children": [
-                            2151882966480,
-                            2151882970704
+                            2522325471024,
+                            2522325479568
                         ],
                         "params": {},
                         "node_type": "loader",
                         "project_id": 1,
                         "uid": 50,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\other\\data_loader_2151931059072.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\other\\data_loader_2522325426240.pkl"
                     },
                     {
                         "message": "Model logistic_regression created",
-                        "node_id": 2151954381232,
+                        "node_id": 2522252953024,
                         "node_name": "logistic_regression",
                         "task": "classification",
                         "children": [],
@@ -59,11 +77,11 @@
                         "node_type": "linear_models",
                         "uid": 6,
                         "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2151954381232.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2522252953024.pkl"
                     },
                     {
                         "message": "Model logistic_regression created",
-                        "node_id": 2151890362272,
+                        "node_id": 2522183232944,
                         "node_name": "logistic_regression",
                         "task": "classification",
                         "children": [],
@@ -74,359 +92,22 @@
                         "node_type": "linear_models",
                         "uid": 6,
                         "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2151890362272.pkl"
-                    },
-                    {
-                        "message": "data loaded: iris",
-                        "node_id": 2151940311936,
-                        "node_name": "data_loader",
-                        "task": "load_data",
-                        "children": [
-                            2151941948496,
-                            2151941956272
-                        ],
-                        "params": {},
-                        "node_type": "loader",
-                        "project_id": 1,
-                        "uid": 50,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\other\\data_loader_2151940311936.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2522183232944.pkl"
                     },
                     {
                         "message": "Model logistic_regression created",
-                        "node_id": 2151932606944,
+                        "node_id": 2649058726768,
                         "node_name": "logistic_regression",
                         "task": "classification",
                         "children": [],
                         "params": {
                             "penalty": "l2",
-                            "C": 0.5
+                            "C": 1.0
                         },
                         "node_type": "linear_models",
                         "uid": 6,
                         "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2151932606944.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
-                        "params": {
-                            "coef_": [
-                                [
-                                    -0.4083170598623443,
-                                    0.7298855097029365,
-                                    -2.0622795909165426,
-                                    -0.8632042216969729
-                                ],
-                                [
-                                    0.371879364521839,
-                                    -0.3629838499287915,
-                                    -0.1091784649027147,
-                                    -0.6758478205303181
-                                ],
-                                [
-                                    0.036437695340498615,
-                                    -0.36690165977414674,
-                                    2.171458055819252,
-                                    1.5390520422272882
-                                ]
-                            ],
-                            "intercept_": [
-                                8.511236389053337,
-                                2.1158862495485202,
-                                -10.627122638602087
-                            ],
-                            "classes_": [
-                                0,
-                                1,
-                                2
-                            ],
-                            "n_iter_": [
-                                79
-                            ]
-                        },
-                        "node_id": 2151932983584,
-                        "node_name": "model_fitter",
-                        "children": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\model_fitter_2151932983584.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
-                        "params": {
-                            "coef_": [
-                                [
-                                    -0.4083170598623443,
-                                    0.7298855097029365,
-                                    -2.0622795909165426,
-                                    -0.8632042216969729
-                                ],
-                                [
-                                    0.371879364521839,
-                                    -0.3629838499287915,
-                                    -0.1091784649027147,
-                                    -0.6758478205303181
-                                ],
-                                [
-                                    0.036437695340498615,
-                                    -0.36690165977414674,
-                                    2.171458055819252,
-                                    1.5390520422272882
-                                ]
-                            ],
-                            "intercept_": [
-                                8.511236389053337,
-                                2.1158862495485202,
-                                -10.627122638602087
-                            ],
-                            "classes_": [
-                                0,
-                                1,
-                                2
-                            ],
-                            "n_iter_": [
-                                79
-                            ]
-                        },
-                        "node_id": 2151931674544,
-                        "node_name": "model_fitter",
-                        "children": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\model_fitter_2151931674544.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
-                        "params": {
-                            "coef_": [
-                                [
-                                    -0.4083170598623443,
-                                    0.7298855097029365,
-                                    -2.0622795909165426,
-                                    -0.8632042216969729
-                                ],
-                                [
-                                    0.371879364521839,
-                                    -0.3629838499287915,
-                                    -0.1091784649027147,
-                                    -0.6758478205303181
-                                ],
-                                [
-                                    0.036437695340498615,
-                                    -0.36690165977414674,
-                                    2.171458055819252,
-                                    1.5390520422272882
-                                ]
-                            ],
-                            "intercept_": [
-                                8.511236389053337,
-                                2.1158862495485202,
-                                -10.627122638602087
-                            ],
-                            "classes_": [
-                                0,
-                                1,
-                                2
-                            ],
-                            "n_iter_": [
-                                79
-                            ]
-                        },
-                        "node_id": 2151932971584,
-                        "node_name": "model_fitter",
-                        "children": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\model_fitter_2151932971584.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
-                        "params": {
-                            "coef_": [
-                                [
-                                    -0.4083170598623443,
-                                    0.7298855097029365,
-                                    -2.0622795909165426,
-                                    -0.8632042216969729
-                                ],
-                                [
-                                    0.371879364521839,
-                                    -0.3629838499287915,
-                                    -0.1091784649027147,
-                                    -0.6758478205303181
-                                ],
-                                [
-                                    0.036437695340498615,
-                                    -0.36690165977414674,
-                                    2.171458055819252,
-                                    1.5390520422272882
-                                ]
-                            ],
-                            "intercept_": [
-                                8.511236389053337,
-                                2.1158862495485202,
-                                -10.627122638602087
-                            ],
-                            "classes_": [
-                                0,
-                                1,
-                                2
-                            ],
-                            "n_iter_": [
-                                79
-                            ]
-                        },
-                        "node_id": 2151899464912,
-                        "node_name": "model_fitter",
-                        "children": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\model_fitter_2151899464912.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
-                        "params": {
-                            "coef_": [
-                                [
-                                    -0.4083170598623443,
-                                    0.7298855097029365,
-                                    -2.0622795909165426,
-                                    -0.8632042216969729
-                                ],
-                                [
-                                    0.371879364521839,
-                                    -0.3629838499287915,
-                                    -0.1091784649027147,
-                                    -0.6758478205303181
-                                ],
-                                [
-                                    0.036437695340498615,
-                                    -0.36690165977414674,
-                                    2.171458055819252,
-                                    1.5390520422272882
-                                ]
-                            ],
-                            "intercept_": [
-                                8.511236389053337,
-                                2.1158862495485202,
-                                -10.627122638602087
-                            ],
-                            "classes_": [
-                                0,
-                                1,
-                                2
-                            ],
-                            "n_iter_": [
-                                79
-                            ]
-                        },
-                        "node_id": 2151932978928,
-                        "node_name": "model_fitter",
-                        "children": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\model_fitter_2151932978928.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
-                        "params": {
-                            "coef_": [
-                                [
-                                    -0.4083170598623443,
-                                    0.7298855097029365,
-                                    -2.0622795909165426,
-                                    -0.8632042216969729
-                                ],
-                                [
-                                    0.371879364521839,
-                                    -0.3629838499287915,
-                                    -0.1091784649027147,
-                                    -0.6758478205303181
-                                ],
-                                [
-                                    0.036437695340498615,
-                                    -0.36690165977414674,
-                                    2.171458055819252,
-                                    1.5390520422272882
-                                ]
-                            ],
-                            "intercept_": [
-                                8.511236389053337,
-                                2.1158862495485202,
-                                -10.627122638602087
-                            ],
-                            "classes_": [
-                                0,
-                                1,
-                                2
-                            ],
-                            "n_iter_": [
-                                79
-                            ]
-                        },
-                        "node_id": 2151930477648,
-                        "node_name": "model_fitter",
-                        "children": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\model_fitter_2151930477648.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
-                        "params": {
-                            "coef_": [
-                                [
-                                    -0.4083170598623443,
-                                    0.7298855097029365,
-                                    -2.0622795909165426,
-                                    -0.8632042216969729
-                                ],
-                                [
-                                    0.371879364521839,
-                                    -0.3629838499287915,
-                                    -0.1091784649027147,
-                                    -0.6758478205303181
-                                ],
-                                [
-                                    0.036437695340498615,
-                                    -0.36690165977414674,
-                                    2.171458055819252,
-                                    1.5390520422272882
-                                ]
-                            ],
-                            "intercept_": [
-                                8.511236389053337,
-                                2.1158862495485202,
-                                -10.627122638602087
-                            ],
-                            "classes_": [
-                                0,
-                                1,
-                                2
-                            ],
-                            "n_iter_": [
-                                79
-                            ]
-                        },
-                        "node_id": 2151932596144,
-                        "node_name": "model_fitter",
-                        "children": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
-                        "project_id": 1,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\model_fitter_2151932596144.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2649058726768.pkl"
                     }
                 ],
                 "5": [],
@@ -447,7 +128,25 @@
                         "project": 13,
                         "node_data": null
                     }
-                ]
+                ],
+                "14": [
+                    {
+                        "message": "data loaded: iris",
+                        "node_id": 2628892096064,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            2628894130224,
+                            2628894138096
+                        ],
+                        "params": {},
+                        "node_type": "loader",
+                        "project_id": 14,
+                        "uid": 50,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\14\\other\\data_loader_2628892096064.pkl"
+                    }
+                ],
+                "3": []
             }
         }
     },

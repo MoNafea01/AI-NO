@@ -10,7 +10,7 @@ class Fit(BaseNode):
         self.model_path = model_path
         self.batch_size = batch_size
         self.epochs = epochs
-        self.X, self.y = NodeDataExtractor()(X, y)
+        self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self._fit()
@@ -25,14 +25,14 @@ class Fit(BaseNode):
 
     def _fit_from_dict(self):
         try:
-            model = NodeDataExtractor()(self.model)
+            model = NodeDataExtractor()(self.model, project_id=self.project_id)
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by ID: {e}")
 
     def _fit_from_path(self):
         try:
-            model = NodeDataExtractor()(self.model_path)
+            model = NodeDataExtractor()(self.model_path, project_id=self.project_id)
             return self._fit_handler(model)
         except Exception as e:
             raise ValueError(f"Error fitting model by path: {e}")

@@ -16,8 +16,9 @@ class BaseDataLoader:
 
 class PredefinedDataLoader(BaseDataLoader):
     """Loads predefined datasets like iris or diabetes."""
-    def __init__(self, dataset_name):
+    def __init__(self, dataset_name, project_id):
         self.dataset_name = dataset_name
+        self.project_id = project_id
 
     def load(self):
         try:
@@ -31,15 +32,16 @@ class PredefinedDataLoader(BaseDataLoader):
 
 
 class CustomDataLoader:
-    def __init__(self, dataset_path):
+    def __init__(self, dataset_path, project_id):
         self.dataset_path = dataset_path
+        self.project_id = project_id
     def load(self):
         try:
             if not os.path.exists(self.dataset_path):
                 raise FileNotFoundError(f"dataset not found: {self.dataset_path}")
             
             if self.dataset_path.endswith('.pkl'):
-                data = NodeDataExtractor()(self.dataset_path)
+                data = NodeDataExtractor()(self.dataset_path, project_id=self.project_id)
                 X, y = data
                 
             elif self.dataset_path.endswith('.csv') or self.dataset_path.endswith('.xlsx'):
@@ -65,11 +67,11 @@ class CustomDataLoader:
 class DataLoaderFactory:
     """Factory class for creating data loaders."""
     @staticmethod
-    def create(dataset_name=None, dataset_path=None):
+    def create(dataset_name=None, dataset_path=None, project_id=None):
         if dataset_name:
-            return PredefinedDataLoader(dataset_name)
+            return PredefinedDataLoader(dataset_name, project_id)
         elif dataset_path:
-            return CustomDataLoader(dataset_path)
+            return CustomDataLoader(dataset_path, project_id)
         else:
             raise ValueError("Either dataset_name or dataset_path must be provided.")
 
@@ -77,7 +79,7 @@ class DataLoaderFactory:
 class DataLoader:
     """Facade for loading data using different strategies."""
     def __init__(self, dataset_name: str = None, dataset_path: str = None, project_id: int = None, *args, **kwargs):
-        self.loader = DataLoaderFactory.create(dataset_name, dataset_path)
+        self.loader = DataLoaderFactory.create(dataset_name, dataset_path, project_id)
         X, y = self.loader.load()
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
@@ -119,6 +121,6 @@ class DataLoader:
 
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(payload)
+            node_data = NodeDataExtractor(return_serialized=True)(payload, project_id=self.project_id)
             payload.update({"node_data": node_data})
         return payload

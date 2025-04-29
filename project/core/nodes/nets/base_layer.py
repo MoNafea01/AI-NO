@@ -25,7 +25,7 @@ class BaseLayer(BaseNode):
     
     def _load_from_path(self):
         try:
-            layer = NodeDataExtractor()(self.layer_path)
+            layer = NodeDataExtractor()(self.layer_path, project_id=self.project_id)
             return self.load_handler(layer)
         except Exception as e:
             raise ValueError(f"Error loading layer from path: {e}")
@@ -77,7 +77,8 @@ class BaseLayer(BaseNode):
         l = []
         for arg in args:
             if isinstance(arg, dict):
-                data = NodeLoader()(arg.get("node_id")).get(attr)
+                success, data = NodeLoader()(arg.get("node_id"))
+                data = data.get(attr)
                 if data is not None:
                     l.append(data)
             else:

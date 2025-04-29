@@ -44,11 +44,13 @@ class NodeLoader:
     def __call__(
             self, 
             node_id: int = None, 
+            project_id: int = None,
             path: str = None, 
             ) -> dict:
-        
-        if not (node_id or path):
-            raise ValueError("Either node_id or path must be provided.")
+        node_id = int(node_id) if node_id else None
+        project_id = int(project_id) if project_id else None
+        if not (node_id  or path):
+            return False, "Either(node_id and project_id) or path must be provided."
         
         try:
             # Load from path if provided
@@ -56,13 +58,13 @@ class NodeLoader:
                 try:
                     node_data = joblib.load(path)
                     node_name, node_id = NodeNameHandler.handle_name(path)
-                    return self.build_payload(node_data, node_name, node_id, path)
+                    return True, self.build_payload(node_data, node_name, node_id, project_id, path)
                 except Exception as e:
-                    raise ValueError(f"Error loading node from path: {e}")
+                    return False, ValueError(f"Error loading node from path: {e}")
 
             path = None
             # Load from database if no path provided
-            node_entry = Node.objects.get(node_id=node_id)
+            node_entry = Node.objects.get(node_id=node_id, project_id=project_id)
             node_path = node_entry.node_data  # Get the stored path
             node_data = node_path
             try:
@@ -72,16 +74,16 @@ class NodeLoader:
                     print(Warning(f"Node data file not found at path: {node_path}"))
                     
             except Exception as e:
-                raise ValueError(f"Error loading node from path: {e}")
+                return False, f"Error loading node from path: {e}"
                 
-            return self.build_payload(node_data, node_entry.node_name, node_id, path)
+            return True, self.build_payload(node_data, node_entry.node_name, node_id, project_id, path)
         
         except ObjectDoesNotExist:
-            raise ValueError(f"Node with node_id {node_id} does not exist.")
+            return False, f"Node with node_id {node_id} does not exist in project with id = {project_id}."
         except Exception as e:
-            raise ValueError(f"Error loading node: {e}")
+            return False, f"Error loading node: {e}"
     
-    def build_payload(self, node_data, name, node_id, path):
+    def build_payload(self, node_data, name, node_id, project_id, path):
         if path:
             self.from_db = False
         payload = {
@@ -91,12 +93,13 @@ class NodeLoader:
                 "params": {},
                 "task": "load_node",
                 "node_type": "loader",
+                "project": project_id,
                 "children": [],
             }
         
             
         if self.from_db:
-            payload = Node.objects.filter(node_id=node_id).values().first()
+            payload = Node.objects.filter(node_id=node_id, project_id=project_id).values().first()
             payload.pop("created_at", None)
             payload.pop("updated_at", None)
 

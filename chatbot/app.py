@@ -23,30 +23,48 @@ chat_model = get_llm(
     temperature=chat_config['temperature'],
     max_tokens=chat_config['max_tokens'],)
 
-chat_prompt = ChatPromptTemplate.from_template("Answer the following query conversationally:\n{query}")
+chat_prompt = ChatPromptTemplate.from_template("Answer the following query conversationally:\n{query} use the context if needed:\n{context}")
 chat_chain = (
     chat_prompt 
     | chat_model 
     | StrOutputParser()
     )
 
-def sync_generate_cli(user_input, to_db, model, selected_mode, cur_iter):
+def sync_generate_cli(user_input, to_db, model, selected_mode, cur_iter, route='chat', history=None):
     logger.info(f"Generating CLI commands for mode: {selected_mode}, model: {model}")
     MANUAL = '1'
     AUTO = '2'
+    if route in ['agent', '2']:
+        try:
+            if selected_mode == MANUAL:
+                logger.debug("Processing in manual mode")
+                return manual_mode(user_input, model, to_db)
+            
+            elif selected_mode == AUTO:
+                logger.debug("Processing in auto mode")
+                return auto_mode(user_input, model, to_db, cur_iter)
+            
+        except Exception as e:
+            logger.exception(f"Error in generate_cli: {str(e)}")
+            raise
+    
+    elif route in ['chat', '1']:
+        if isinstance(history, list):
+            l = []
+            for d in history:
+                print(d)
+                if isinstance(d, dict):
+                    d = {k: v for k, v in d.items()}
+                l.append(str(d))
+            context = "\n".join(l)
+        else:
+            context = "initial context"
+        
+        logger.debug("Processing in chat mode")
+        response = chat_chain.invoke({"query": user_input, "context": context})
+        history.append({"user": user_input, "bot": response})
+        return response, None, history
 
-    try:
-        if selected_mode == MANUAL:
-            logger.debug("Processing in manual mode")
-            return manual_mode(user_input, model, to_db)
-        
-        elif selected_mode == AUTO:
-            logger.debug("Processing in auto mode")
-            return auto_mode(user_input, model, to_db, cur_iter)
-        
-    except Exception as e:
-        logger.exception(f"Error in generate_cli: {str(e)}")
-        raise
 
 def manual_mode(question, model, to_db):
     logger.info(f"Running manual mode for question: {question}")
@@ -85,7 +103,7 @@ def manual_mode(question, model, to_db):
             f.write("\n\n")
 
         logger.info("Manual mode processing completed")
-        return out, log
+        return out, log, None
     except Exception as e:
         logger.exception(f"Error in manual_mode: {str(e)}")
         raise
@@ -111,7 +129,7 @@ def auto_mode(question, model, to_db, cur_iter):
                 f.write(log)
                 f.write("\n\n")
 
-            return msg, log
+            return msg, log, None
         
         while cur_iter < 10:
             cur_iter += 1
@@ -140,7 +158,7 @@ def auto_mode(question, model, to_db, cur_iter):
             f.write("\n\n")
 
         logger.info("Auto mode processing completed")
-        return rag_output, log
+        return rag_output, log, None
     
     except Exception as e:
         logger.exception(f"Error in auto_mode: {str(e)}")
@@ -161,7 +179,12 @@ async def process_query(user_input, route, to_db, model, selected_mode, chat_his
     # print(f"Route: {route}")
     # query = route_result["query"]
     
-    if route  == "1":
+    routes = {
+        "chat": "1",
+        "agent": "2",
+    }
+
+    if route  == routes["chat"]:
         logger.info("Processing as chat query")
         response = await chat_chain.ainvoke({"query": user_input})
         chat_history.append(("bot", response))
