@@ -54,8 +54,7 @@ class Predict(BaseNode):
             model = NodeDataExtractor()(self.model_path, project_id=self.project_id)
             if isinstance(model, str):
                 return "Failed to load model. Please check the provided path."
-            if not hasattr(model, 'predict'):
-                return "Model does not have a predict method. Please check the provided path."
+
             return self._predict_handler(model)
         except Exception as e:
             return f"Error predicting using model by path: {e}"
