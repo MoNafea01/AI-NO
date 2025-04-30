@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/core/themes/asset_paths.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
@@ -44,11 +46,27 @@ class SignupForm extends StatelessWidget {
         ),
         const SizedBox(height: 32),
 
-        // Full Name Field
+        // Username
         CustomTextField(
-          hintText: 'Full name',
+          hintText: 'Username',
+          suffixIcon: Icons.person_2_outlined,
+          onChanged: (value) => authProvider.setUsername(value),
+        ),
+        const SizedBox(height: 16),
+
+// First Name
+        CustomTextField(
+          hintText: 'First name',
           suffixIcon: Icons.person_outline,
-          onChanged: (value) => authProvider.setFullName(value),
+          onChanged: (value) => authProvider.setFirstName(value),
+        ),
+        const SizedBox(height: 16),
+
+// Last Name
+        CustomTextField(
+          hintText: 'Last name',
+          suffixIcon: Icons.person_outline,
+          onChanged: (value) => authProvider.setLastName(value),
         ),
         const SizedBox(height: 16),
 
@@ -109,9 +127,20 @@ class SignupForm extends StatelessWidget {
           buttonName: 'Sign up',
           textButtonColor: AppColors.appBackgroundColor,
           onPressed: () {
-            if (authProvider.isSignUpValid && !authProvider.isLoading) {
-              authProvider.signUp(context); // Pass context here
-            }
+            print("email: ${authProvider.email}");
+            print(
+                "isValidEmail: ${authProvider.isValidEmail(authProvider.email)}");
+            print("password: ${authProvider.password}");
+            print(
+                "password valid: ${authProvider.isStrongPassword(authProvider.password)}");
+
+            print("agreeTerms: ${authProvider.agreeTerms}");
+            print("isSignUpValid: ${authProvider.isSignUpValid}");
+            authProvider.signUp(context);
+
+            // if (authProvider.isSignUpValid && !authProvider.isLoading) {
+            //   authProvider.signUp(context); // Pass context here
+            // }
           },
         ),
 

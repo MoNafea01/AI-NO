@@ -1,6 +1,8 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:convert';
+import 'package:ai_gen/core/network/network_constants.dart';
+import 'package:ai_gen/features/HomeScreen/home_screen.dart';
 import 'package:ai_gen/features/OtpVerificationScreen/otp_verification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -13,6 +15,19 @@ class AuthProvider with ChangeNotifier {
   String _confirmPassword = '';
   bool _agreeTerms = false;
   bool isLoading = false;
+  String _username = '';
+
+  String _firstName = '';
+  String _lastName = '';
+  String _otp = '';
+
+  void setUsername(String value) {
+    print("username set to $value");
+    _username = value;
+  }
+
+  void setFirstName(String value) => _firstName = value;
+  void setLastName(String value) => _lastName = value;
 
   final _storage = const FlutterSecureStorage();
   bool rememberMe = false;
@@ -42,6 +57,10 @@ class AuthProvider with ChangeNotifier {
 
   // 🔄 Reset form state
   void resetForm() {
+    _username = '';
+    _firstName = '';
+    _lastName = '';
+
     _fullName = '';
     _email = '';
     _password = '';
@@ -65,7 +84,9 @@ class AuthProvider with ChangeNotifier {
   }
 
   bool get isSignUpValid {
-    return _fullName.isNotEmpty &&
+    return _username.isNotEmpty &&
+        _firstName.isNotEmpty &&
+        _lastName.isNotEmpty &&
         isValidEmail(_email) &&
         isStrongPassword(_password) &&
         _confirmPassword == _password &&
@@ -78,7 +99,7 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final response = await http.post(
-        Uri.parse('https://your-api-url.com/login/'),
+        Uri.parse('${NetworkConstants.apiAuthBaseUrl}/login/'),
         body: {
           'email': _email,
           'password': _password,
@@ -93,8 +114,16 @@ class AuthProvider with ChangeNotifier {
         await _saveTokens(access, refresh);
 
         // Navigate to dashboard/home
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  const DashboardScreen(), // adjust screen as needed
+            ));
+        // Navigator.pushReplacementNamed(context, '/dashboard');
       } else {
+        print(data);
+        print("Error: ${data['detail'] ?? data}");
         _showErrorDialog(context, "Invalid credentials. Try again.");
       }
     } catch (e) {
@@ -110,7 +139,10 @@ class AuthProvider with ChangeNotifier {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Login Error'),
-        content: Text(message),
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.red),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -128,47 +160,100 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final response = await http.post(
-        Uri.parse(
-            'https://your-api-url.com/register/'), // ⛳ Replace with actual API
-        body: {
+        Uri.parse('${NetworkConstants.apiAuthBaseUrl}/register/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
           'email': _email,
+          'username': _username,
+          'first_name': _firstName,
+          'last_name': _lastName,
           'password': _password,
-          'full_name': _fullName,
-        },
+          'password2': _confirmPassword,
+        }),
       );
 
+      print('STATUS CODE: ${response.statusCode}');
+      print('BODY: ${response.body}');
+
       final data = jsonDecode(response.body);
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final accessToken = data['access'];
-        final refreshToken = data['refresh'];
-        await _saveTokens(accessToken, refreshToken);
-
+        // Navigate to OTP screen next
         Navigator.push(
-          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
             builder: (_) => OTPVerificationScreen(email: _email),
           ),
         );
       } else {
-        debugPrint('Signup failed: ${response.body}');
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text('Signup failed: ${data['detail'] ?? 'Unknown error'}')),
-        );
+        // Handle API error
+        print("Error: ${data['detail'] ?? data}");
       }
     } catch (e) {
-      debugPrint("Signup exception: $e");
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $e')),
-      );
+      print("Signup error: $e");
     } finally {
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  void setOtp(String value) => _otp = value;
+
+  Future<void> verifyOtp(BuildContext context, String email) async {
+    print('Verifying OTP...');
+    print('Email: $email');
+    print('OTP entered: $_otp');
+
+    try {
+      final response = await http.post(
+        Uri.parse('${NetworkConstants.apiAuthBaseUrl}/verify-email/'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'otp': _otp,
+        }),
+      );
+
+      print('Status Code: ${response.statusCode}');
+      print('Response: ${response.body}');
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        final access = data['access'];
+        final refresh = data['refresh'];
+
+        await _saveTokens(access, refresh);
+
+        // Navigate to dashboard or home screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const DashboardScreen(), // adjust screen as needed
+          ),
+        );
+      } else {
+        final error = data['detail'] ?? 'OTP verification failed.';
+        _showErrorDialog(context, error.toString());
+      }
+    } catch (e) {
+      _showErrorDialog(context, 'Something went wrong: $e');
+    }
+  }
+
+  Future<void> requestOtpAgain(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${NetworkConstants.apiAuthBaseUrl}/request-otp/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      final data = jsonDecode(response.body);
+      // You can show a toast/snackbar here if needed
+    } catch (e) {
+      print('Error requesting OTP: $e');
     }
   }
 }
