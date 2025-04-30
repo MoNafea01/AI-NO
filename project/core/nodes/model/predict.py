@@ -43,6 +43,7 @@ class Predict(BaseNode):
     def _predict_from_id(self):
         try:
             model = NodeDataExtractor()(self.model, project_id=self.project_id)
+            
             if isinstance(model, str):
                 return "Failed to load model. Please check the provided ID."
             return self._predict_handler(model)

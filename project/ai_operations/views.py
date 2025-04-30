@@ -310,8 +310,8 @@ class PredictAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data, *args, **kwargs):
         return Predict(
             X=validated_data.get('X'),
-            model=validated_data.get('model'),
-            model_path=validated_data.get('model_path'),
+            model=validated_data.get('fitted_model'),
+            model_path=validated_data.get('fitted_model_path'),
             **kwargs
         )
 
@@ -371,8 +371,8 @@ class TransformAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data, *args, **kwargs):
         return Transform(
             data=validated_data.get('data'),
-            preprocessor=validated_data.get('preprocessor'),
-            preprocessor_path=validated_data.get('preprocessor_path'),
+            preprocessor=validated_data.get('fitted_preprocessor'),
+            preprocessor_path=validated_data.get('fitted_preprocessor_path'),
             **kwargs
         )
 
