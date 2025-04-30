@@ -232,7 +232,7 @@ class NodeSerializer(serializers.ModelSerializer):
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
-                validated_data["project"] = project
+                validated_data["project_id"] = project.id
             except Project.DoesNotExist:
                 raise serializers.ValidationError(f"Project with id {project_id} does not exist")
         
@@ -255,7 +255,7 @@ class NodeSerializer(serializers.ModelSerializer):
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
-                validated_data["project"] = project
+                validated_data["project_id"] = project.id
             except Project.DoesNotExist:
                 raise serializers.ValidationError(f"Project with id {project_id} does not exist")
         

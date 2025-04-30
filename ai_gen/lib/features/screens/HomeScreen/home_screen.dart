@@ -4,7 +4,9 @@ import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'widgets/main_content.dart';
+import 'widgets/header_section.dart';
+import 'widgets/project_table.dart';
+import 'widgets/search_and_action.dart';
 import 'widgets/side_bar_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -19,7 +21,20 @@ class HomeScreen extends StatelessWidget {
         body: Row(
           children: [
             Sidebar(),
-            Expanded(child: _Content()),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 65, vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 20,
+                  children: [
+                    HeaderSection(),
+                    SearchAndActionsRow(),
+                    Expanded(child: _Content()),
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -37,7 +52,7 @@ class _Content extends StatelessWidget {
         if (state is HomeLoading || state is HomeInitial) {
           return const LoadingScreen();
         } else if (state is HomeSuccess) {
-          return const MainContent();
+          return const ProjectsTable();
         }
         return FailureScreen(
           (state as HomeFailure).errMsg,

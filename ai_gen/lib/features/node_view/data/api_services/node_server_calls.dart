@@ -66,6 +66,7 @@ class NodeServerCalls {
         "$_baseURL/$_nodesEndPoint/?project_id=$projectId",
         data: nodes,
       );
+
       ApiErrorHandler.checkResponseStatus(response);
     } on DioException catch (e) {
       throw ApiErrorHandler.dioHandler(e);
@@ -79,7 +80,7 @@ class NodeServerCalls {
       final response = await _dio.get("$_baseURL/$_projectEndPoint/");
       ApiErrorHandler.checkResponseStatus(response);
 
-      if (response.data != null && response.data.isNotEmpty) {
+      if (response.data != null) {
         return List<ProjectModel>.from(
           response.data.map((project) => ProjectModel.fromJson(project)),
         );
@@ -182,7 +183,7 @@ class NodeServerCalls {
       if (onResponseSuccess != null) onResponseSuccess(mapResponse);
       return mapResponse;
     } on DioException catch (e) {
-      throw ApiErrorHandler.dioHandler(e);
+      return ApiErrorHandler.dioHandler(e);
     } catch (e) {
       throw ApiErrorHandler.handleGeneral(e as Exception);
     }

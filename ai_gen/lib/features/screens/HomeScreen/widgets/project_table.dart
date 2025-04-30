@@ -12,6 +12,16 @@ class ProjectsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     HomeSuccess homeState = context.watch<HomeCubit>().state as HomeSuccess;
+
+    if (homeState.projects.isEmpty) {
+      return const Center(
+        child: Text(
+          "No Projects Found",
+          style: TextStyle(fontSize: 20),
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(color: Colors.white),

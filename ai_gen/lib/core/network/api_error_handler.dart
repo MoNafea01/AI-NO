@@ -1,13 +1,14 @@
 import 'package:dio/dio.dart';
 
 class ApiErrorHandler {
-  static Exception dioHandler(DioException e) {
+  static Map<String, dynamic> dioHandler(DioException e) {
     if (e.response != null) {
-      return Exception(
-        'Error: ${e.response?.statusMessage}, Status Code: ${e.response?.statusCode}',
-      );
+      return {
+        'Error':
+            '${e.response?.statusMessage}, Status Code: ${e.response?.statusCode},${e.response?.data}'
+      };
     } else {
-      return Exception('Unknown Internal Server Error');
+      return {'Error': 'Unknown Internal Server Error'};
     }
   }
 

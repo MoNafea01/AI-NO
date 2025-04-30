@@ -20,6 +20,7 @@ class HomeCubit extends Cubit<HomeState> {
 
       emit(HomeSuccess(projects: projects));
     } catch (e) {
+      print(e);
       emit(HomeFailure(errMsg: e.toString()));
     }
   }
