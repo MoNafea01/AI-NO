@@ -242,19 +242,33 @@ Future<void> verifyOtp(BuildContext context, String email) async {
   }
 
 
-  Future<void> requestOtpAgain(String email) async {
+ Future<void> requestOtpAgain(String email) async {
+    final token = await _storage.read(key: 'accessToken');
+    print("Using access token: $token");
+
     try {
       final response = await http.post(
         Uri.parse('${NetworkConstants.apiAuthBaseUrl}/request-otp/'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // ✅ Required header
+        },
         body: jsonEncode({'email': email}),
       );
 
-      final data = jsonDecode(response.body);
       print('Request OTP Status Code: ${response.statusCode}');
-      print('Request OTP Response: $data');
+      print('Request OTP Response: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Optionally show confirmation
+        debugPrint('OTP resent successfully');
+      } else {
+        // Optionally handle specific errors
+        debugPrint('Failed to resend OTP: ${response.body}');
+      }
     } catch (e) {
-      print('Error requesting OTP: $e');
+      debugPrint('Error requesting OTP: $e');
     }
   }
+
 }
