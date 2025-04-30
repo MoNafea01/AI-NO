@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
