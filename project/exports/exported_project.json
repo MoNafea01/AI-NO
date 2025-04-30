@@ -1,0 +1,186 @@
+{
+    "project_id": "1",
+    "project_name": "prj1",
+    "project_description": "First Project",
+    "export_date": "2025-04-24T21:10:30.458373",
+    "nodes": [
+        {
+            "node_id": 1582775603504,
+            "node_name": "dense_layer",
+            "message": "Dense layer created",
+            "params": {
+                "units": 1000,
+                "activation": "relu",
+                "name": "dense_layer_1"
+            },
+            "task": "neural_network",
+            "node_type": "nn_layer",
+            "children": [
+                1582763677104
+            ],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/nets/dense_layer_1582775603504.pkl"
+        },
+        {
+            "node_id": 1582775609792,
+            "node_name": "dense_layer",
+            "message": "Dense layer created",
+            "params": {
+                "units": 1,
+                "activation": "sigmoid",
+                "name": "dense_layer_2"
+            },
+            "task": "neural_network",
+            "node_type": "nn_layer",
+            "children": [
+                1582775603504
+            ],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/nets/dense_layer_1582775609792.pkl"
+        },
+        {
+            "node_id": 1582763679744,
+            "node_name": "sequential_model",
+            "message": "Sequential model created",
+            "params": {
+                "layers": [
+                    "input_layer_0",
+                    "dense_layer_1",
+                    "dense_layer_2"
+                ],
+                "name": "sequential_model_3"
+            },
+            "task": "neural_network",
+            "node_type": "nn_layer",
+            "children": [],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/nets/sequential_model_1582763679744.pkl"
+        },
+        {
+            "node_id": 1582771633280,
+            "node_name": "model_compiler",
+            "message": "Model Compiled",
+            "params": {
+                "loss": "binary_crossentropy",
+                "optimizer": "adam",
+                "metrics": [
+                    "accuracy"
+                ]
+            },
+            "task": "compile_model",
+            "node_type": "compiler",
+            "children": [],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/nets/model_compiler_1582771633280.pkl"
+        },
+        {
+            "node_id": 1582773834880,
+            "node_name": "data_loader",
+            "message": "data loaded: iris",
+            "params": {},
+            "task": "load_data",
+            "node_type": "loader",
+            "children": [
+                1582775767984,
+                1582775765872
+            ],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/other/data_loader_1582773834880.pkl"
+        },
+        {
+            "node_id": 1582775767984,
+            "node_name": "data_loader",
+            "message": "data loaded: iris_X",
+            "params": {},
+            "task": "load_data",
+            "node_type": "loader",
+            "children": [],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/other/data_loader_1582775767984.pkl"
+        },
+        {
+            "node_id": 1582775765872,
+            "node_name": "data_loader",
+            "message": "data loaded: iris_y",
+            "params": {},
+            "task": "load_data",
+            "node_type": "loader",
+            "children": [],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/other/data_loader_1582775765872.pkl"
+        },
+        {
+            "node_id": 1582773425456,
+            "node_name": "predictor",
+            "message": "Model Predictions",
+            "params": {},
+            "task": "predict",
+            "node_type": "predictor",
+            "children": [],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/model/predictor_1582773425456.pkl"
+        },
+        {
+            "node_id": 1940231895248,
+            "node_name": "evaluator",
+            "message": "mse score",
+            "params": {},
+            "task": "evaluate",
+            "node_type": "metric",
+            "children": [],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/model/evaluator_1940231895248.pkl"
+        },
+        {
+            "node_id": 1940231833840,
+            "node_name": "evaluator",
+            "message": "rmse score",
+            "params": {},
+            "task": "evaluate",
+            "node_type": "metric",
+            "children": [],
+            "location_x": 0.0,
+            "location_y": 0.0,
+            "input_ports": [],
+            "output_ports": [],
+            "project": 1,
+            "node_data": "C:/Users/a1mme/OneDrive/Desktop/MO/test_grad/project/core/saved/model/evaluator_1940231833840.pkl"
+        }
+    ]
+}

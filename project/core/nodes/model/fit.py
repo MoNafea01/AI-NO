@@ -1,8 +1,7 @@
 import numpy as np
-from .model import Model
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeLoader
-
+from ...repositories import NodeSaver, NodeDataExtractor
+from ..base_node import BaseNode, SAVING_DIR
 
 class ModelFitter:
     """Handles the fitting of models."""
@@ -14,81 +13,71 @@ class ModelFitter:
     def fit_model(self):
         """Fits the model with the provided data."""
         try:
-            self.y = np.array(self.y).reshape(-1, 1)
+            self.y = np.array(self.y).ravel()
             self.model.fit(self.X, self.y)
         except Exception as e:
-            raise ValueError(f"Error fitting model: {e}")
+            return f"Error fitting model: {e}"
         return self.model
 
 
-class Fit:
+class Fit(BaseNode):
     """Orchestrates the fitting process."""
-    def __init__(self, X, y, model=None, model_path=None):
-        self.model = model
+    def __init__(self, X, y, model=None, model_path=None, project_id=None, *args, **kwargs):
         self.model_path = model_path
-        self.X = NodeLoader()(X.get("node_id")).get('node_data') if isinstance(X, dict) else X
-        self.y = NodeLoader()(y.get("node_id")).get('node_data') if isinstance(y, dict) else y
-        self.payload = self._fit()
+        self.X, self.y= NodeDataExtractor()(X, y, project_id=project_id)
+        err = None
+        if any(isinstance(i, str) for i in [self.X, self.y]):
+            err = "Failed to load Nodes. Please check the provided IDs."
+        
+        self.model = model
+        self.project_id = project_id
+        self.uid = kwargs.get('uid', None)
+        self.payload = self._fit(err)
 
-    def _fit(self):
-        if isinstance(self.model, dict):
-            return self._fit_from_dict()
+    def _fit(self,err=None):
+        if err:
+            return err
+        if isinstance(self.model, (dict, int, str)):
+            return self._fit_from_dict(self.model)
         elif isinstance(rf"{self.model_path}", str):
-            return self._fit_from_path()
+            return self._fit_from_path(self.model_path)
         else:
-            raise ValueError("Invalid model or path provided.")
+            return "Invalid model or path provided."
 
-    def _fit_from_dict(self):
+    def _fit_from_dict(self, model_id):
         try:
-            model = NodeLoader()(self.model.get("node_id")).get('node_data')  # Load model using ID from database
+            model = NodeDataExtractor()(model_id, project_id=self.project_id)
+            if isinstance(model, str):
+                return "Failed to load model. Please check the provided ID."
             return self._fit_handler(model)
         except Exception as e:
-            raise ValueError(f"Error fitting model by ID: {e}")
+            return f"Error fitting model by ID: {e}"
 
-    def _fit_from_path(self):
+    def _fit_from_path(self, model_path):
         try:
-            model = NodeLoader()(path=self.model_path).get('node_data')
+            model = NodeDataExtractor()(model_path, project_id=self.project_id)
+            if isinstance(model, str):
+                return "Failed to load model. Please check the provided path."
             return self._fit_handler(model)
         except Exception as e:
-            raise ValueError(f"Error fitting model by path: {e}")
+            return f"Error fitting model by path: {e}"
     
 
     def _fit_handler(self, model):
         try:
             fitter = ModelFitter(model, self.X, self.y)
             fitted_model = fitter.fit_model()
+            if isinstance(fitted_model, str):
+                return fitted_model
 
-            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model")
-            NodeSaver()(payload, "core/nodes/saved/models")
-            del payload['node_data']
+            payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model",
+                                                   uid=self.uid)
+            if self.project_id:
+                payload['project_id'] = self.project_id
+
+            project_path = f"{self.project_id}/" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}model")
+            payload.pop("node_data", None)
             return payload
         except Exception as e:
-            raise ValueError(f"Error fitting model: {e}")
-        
-    def __str__(self):
-        return str(self.payload)
-
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
-            self.payload.update({"node_data": node_data})
-        return self.payload
-
-
-if __name__ == '__main__':
-    # model = "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\backend\\core\\nodes\\saved\\models\\linear_regression_1983596293552.pkl"
-    model_args = {
-        "model_name": "logistic_regression",
-        "model_type": "linear_models",
-        "task": "classification",
-        "params": {}
-    }
-    fit_args = {
-        "X": [[1, 2], [2, 3]],
-        "y": [3, 4],
-    }
-
-    model = Model(**model_args)
-    fit = Fit(**fit_args, model=model)
-    print(fit)
+            return f"Error fitting model: {e}"

@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:flutter/material.dart';
 
 import '../common.dart';
@@ -12,6 +13,7 @@ class VSNodeData {
     required this.widgetOffset,
     required this.inputData,
     required this.outputData,
+    this.node,
     this.deleteNode,
     String? id,
     this.nodeWidth,
@@ -29,6 +31,8 @@ class VSNodeData {
       value.nodeData = this;
     }
   }
+
+  NodeModel? node;
 
   ///The nodes ID
   ///
@@ -75,12 +79,13 @@ class VSNodeData {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      ...node?.toJson() ?? {},
+      // 'id': id,
       'type': type,
       'title': _title,
       'widgetOffset': widgetOffset.toJson(),
-      'inputData': inputData,
-      'outputData': outputData,
+      'input_ports': inputData,
+      'output_ports': outputData,
     };
   }
 
@@ -90,11 +95,13 @@ class VSNodeData {
   void setBaseData(
     String id,
     String title,
-    Offset widgetOffset,
-  ) {
+    Offset widgetOffset, {
+    NodeModel? nodeModel,
+  }) {
     _id = id;
     _title = title;
     this.widgetOffset = widgetOffset;
+    if (nodeModel != null) this.node = nodeModel;
   }
 
   ///Used for deserializing

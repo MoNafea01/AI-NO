@@ -12,7 +12,7 @@ class VSHistoryManger {
       _history.removeRange(historyIndex + 1, _history.length);
     }
 
-    _history.add(provider.nodeManager.serializeNodes());
+    _history.add(provider.nodeManager.localSerializeNodes());
     historyIndex++;
   }
 

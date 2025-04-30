@@ -77,21 +77,20 @@ class VSNodeView extends StatelessWidget {
       child: ListenableBuilder(
         listenable: nodeDataProvider,
         builder: (context, _) {
-          final nodes = nodeDataProvider.nodes.values.map((VSNodeData value) {
-            return Positioned(
-              left: value.widgetOffset.dx,
-              top: value.widgetOffset.dy,
-              child: nodeBuilder?.call(
-                    context,
-                    value,
-                  ) ??
-                  VSNode(
-                    key: ValueKey(value.id),
-                    data: value,
-                    nodeTitleBuilder: nodeTitleBuilder,
-                  ),
-            );
-          });
+          final nodes = nodeDataProvider.nodes.values.map(
+            (VSNodeData value) {
+              return Positioned(
+                left: value.widgetOffset.dx,
+                top: value.widgetOffset.dy,
+                child: nodeBuilder?.call(context, value) ??
+                    VSNode(
+                      key: ValueKey(value.id),
+                      data: value,
+                      nodeTitleBuilder: nodeTitleBuilder,
+                    ),
+              );
+            },
+          );
 
           final view = Stack(
             children: [
@@ -134,13 +133,8 @@ class VSNodeView extends StatelessWidget {
           );
 
           if (enableSelectionArea) {
-            return selectionAreaBuilder?.call(
-                  context,
-                  view,
-                ) ??
-                VSSelectionArea(
-                  child: view,
-                );
+            return selectionAreaBuilder?.call(context, view) ??
+                VSSelectionArea(child: view);
           } else {
             return view;
           }

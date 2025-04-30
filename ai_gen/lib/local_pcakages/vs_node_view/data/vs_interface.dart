@@ -98,6 +98,7 @@ abstract class VSInputData extends VSInterfaceData {
   set connectedInterface(VSOutputData? data) {
     if (data == null || acceptInput(data)) {
       _connectedInterface = data;
+
       nodeData?.onUpdatedConnection?.call(this);
     }
   }
@@ -158,7 +159,7 @@ abstract class VSOutputData<T> extends VSInterfaceData {
   Map<String, dynamic> toJson() {
     return {
       "name": type,
-      "nodeData": nodeData?.id,
+      "nodeData": nodeData?.node?.nodeId,
     };
   }
 }

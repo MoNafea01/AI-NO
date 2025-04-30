@@ -14,6 +14,23 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textSecondary,
   );
+
+  //node title
+  static const TextStyle nodeTitleTextStyle = TextStyle(
+    fontSize: 16,
+    height: 20 / 16,
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
+  );
+
+  //node output&input
+  static const TextStyle nodeInterfaceTextStyle = TextStyle(
+    fontSize: 13,
+    height: 20 / 13,
+    fontWeight: FontWeight.w400,
+    color: Colors.white,
+  );
+
   static const TextStyle black16w400 = TextStyle(
     fontSize: 16,
     height: 24 / 16,

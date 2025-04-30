@@ -1,125 +1,68 @@
+from ..base_node import BaseNode
 from ..configs.models import MODELS as models
-from .utils import PayloadBuilder
 from ..utils import NodeNameHandler
-from ...repositories.node_repository import NodeSaver, NodeLoader
-from sklearn.base import BaseEstimator
 
 
-class Model:
-    """Handles model creation and parameter management."""
+class Model(BaseNode):
+    '''Handles model creation and parameter management.'''
     def __init__(self, model_name: str, model_type: str, task: str, 
-                 params: dict = None, model_path: str = None) -> dict:
+                 params: dict = None, model_path: str = None, project_id: int = None, *args, **kwargs) -> dict:
         '''Initializes the Model object.'''
-
         self.model_name = model_name
         self.model_type = model_type
         self.task = task
-        self.model_path = model_path
+        self.node_path = model_path
         default_params = self._get_default_params()
-        default_params.update(params) if params else {}
-        print(default_params)
-        self.params = default_params
-        self.payload = self._create_model()
 
-    def _get_default_params(self) -> BaseEstimator:
+        if isinstance(params, dict):
+            for param, value in params.items():
+                if param in default_params.keys():
+                    default_params[param] = value
+
+        self.params = default_params
+        self.uid = kwargs.get('uid', None)
+        super().__init__(project_id=project_id)  # Pass project_id to BaseNode
+    
+    def _get_default_params(self) -> dict:
         '''Returns the default parameters for the model.'''
         try:
             return models.get(self.model_type, {}).get(self.task, {}).get(self.model_name, {}).get('params', {})
         except AttributeError:
-            raise ValueError(f"Invalid configuration for model type: {self.model_type}, task: {self.task}, model name: {self.model_name}.")
-
-    def _create_model(self) -> dict:
-        '''Creates the model payload.'''
-        if self.model_path:
-            return self._create_from_path()
-        else:
-            return self._create_from_dict()
+            return f"Invalid configuration for model type: {self.model_type}, task: {self.task}, model name: {self.model_name}."
     
-    def _create_from_dict(self) -> dict:
-        '''Creates the model payload using json provided.'''
-        try:
-            # check the informtion provided in the json
-            if self.model_type not in models:
-                raise ValueError(f"Unsupported model type: {self.model_type}. Available types are: {list(models.keys())}.")
-            if self.task not in models[self.model_type]:
-                raise ValueError(f"Unsupported task type: {self.task} for model type: {self.model_type}.")
-            if self.model_name not in models[self.model_type][self.task]:
-                raise ValueError(f"Unsupported model name: {self.model_name} for task: {self.task}.")
-
-            # create the model instance (sklearn)
-            model_node = models[self.model_type][self.task][self.model_name]['node']
-            model = model_node(**self.params)
-
-            # create the payload
-            return self._create_handler(model, self.model_name, self.model_type, self.task)
-        except Exception as e:
-            raise ValueError(f"Error creating model from json: {e}")
-        
-    def _create_from_path(self):
-        '''Creates the model payload using the model path.'''
-        try:
-            model = NodeLoader()(path=self.model_path).get("node_data") # load the model from the path given
-            model_name, _ = NodeNameHandler.handle_name(self.model_path) # get the model name from the path
-            model_type, task = self.find_model_type_and_task(model_name, models) # get the model type and task
-            
-            # create the payload
-            return self._create_handler(model, model_name, model_type, task)
-        except Exception as e:
-            raise ValueError(f"Error loading model from path: {e}")
+    @property
+    def node_class(self):
+        return models.get(self.model_type, {}).get(self.task, {}).get(self.model_name, {}).get('node', None)
     
-    def _create_handler(self, model: BaseEstimator, model_name: str = None, 
-                        model_type: str = None, task:str = None) -> dict:
-        '''Creates the payload for the model.'''
-        try:
-            payload = PayloadBuilder.build_payload(f"Model created: {model_name}", 
-                                                    model, model_name, 
-                                                    node_type=model_type, 
-                                                    task=task)
-            # save the model to the disk & database
-            NodeSaver()(payload, path=f"core\\nodes\\saved\\models")
-
-            # Remove the actual node object from the payload because it can't be serialized
-            del payload['node_data']
-            return payload
-        except Exception as e:
-            raise ValueError(f"Error creating model: {e}")
-
-    # extract type and task of a given model_name from the models dictionary
-    def find_model_type_and_task(self, model_name: str, models: dict) -> tuple:
-        ''' Extract Model Type and Task from the model name.'''
-        for model_type in models:
-            for task in models.get(model_type):
-                if model_name in models.get(model_type).get(task):
-                    return model_type, task
-        return "general", "general"
-
-    def __str__(self):
-        return str(self.payload)
-
-    def __call__(self, *args, **kwargs):
-        return_serialized = kwargs.get("return_serialized", False)
-        if return_serialized:
-            node_data = NodeLoader()(self.payload.get("node_id"),from_db=True, return_serialized=True).get('node_data')
-            self.payload.update({"node_data": node_data})
-        return self.payload
-
-
-
-if __name__ == '__main__':
-    args = {
-        "model_name": "ridge",
-        "model_type": "linear_models",
-        "task": "regression",
-        "params": {
-            "alpha": 0.1,
-            "fit_intercept": True,
-            "normalize": False,
-            "copy_X": True,
-            "max_iter": None,
-            "tol": 0.001,
-            "solver": "auto",
-            "random_state": None
+    def node_params(self):
+        return self.params
+    
+    def payload_configs(self):
+        return {
+            "message": f"Model {self.node_name} created",
+            "task": self.get_type_task()[1],
+            "node_type": self.get_type_task()[0],
+            "node_name": self.node_name,
+            "uid": self.uid,
         }
-    }
-    model = Model(**args)
-    print(model)
+    
+    def get_params(self):
+        return self.params
+    
+    @property
+    def node_name(self):
+        if self.node_path:
+            self.model_name, _ = NodeNameHandler.handle_name(self.node_path)
+        return self.model_name
+    
+    def get_type_task(self):
+        if self.node_path:
+            name = self.node_name
+            for model_type in models:
+                for task in models.get(model_type):
+                    if name in models.get(model_type).get(task):
+                        return model_type, task
+        return self.model_type, self.task
+
+    def get_folder(self):
+        return "model"

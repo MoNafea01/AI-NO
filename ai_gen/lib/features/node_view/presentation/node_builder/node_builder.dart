@@ -1,19 +1,19 @@
-import 'package:ai_gen/core/models/node_model/Params.dart';
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/functions/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/network_interface.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
-import 'package:ai_gen/main.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
+import '../../../../main.dart';
 import 'custom_interfaces/aino_general_Interface.dart';
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
 import 'custom_interfaces/preprocessor_interface.dart';
-import 'custom_interfaces/vs_text_input_data.dart';
 
 class NodeBuilder {
+  NodeBuilder({required this.projectId});
+  final int projectId;
   Future<List<Object>> buildNodesMenu() async {
     final Map<String, Map<String, Map<String, List<NodeModel>>>> allNodes =
         await NodeSerializer().categorizeNodes();
@@ -21,7 +21,7 @@ class NodeBuilder {
     return [
       // output node
       (Offset offset, VSOutputData? ref) => VSOutputNode(
-            type: "Scope",
+            type: "Run",
             widgetOffset: offset,
             ref: ref,
           ),
@@ -73,14 +73,18 @@ class NodeBuilder {
 
   // build the last List of nodes
   List<Function(Offset, VSOutputData?)> _buildNodes(List<NodeModel> nodesList) {
-    return nodesList.map((NodeModel node) => _buildNode(node)).toList();
+    return nodesList.map((NodeModel node) => buildNode(node)).toList();
   }
 
   //build the node itself
-  Function(Offset, VSOutputData?) _buildNode(NodeModel node) {
+  Function(Offset, VSOutputData?) buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
-      NodeModel newNode = node.copyWith();
+      // print(ref);
+
+      NodeModel newNode = node.copyWith(projectId: projectId);
       return VSNodeData(
+        id: newNode.nodeId?.toString(),
+        node: newNode,
         type: newNode.name,
         title: newNode.displayName,
         nodeColor: newNode.color,
@@ -89,12 +93,12 @@ class NodeBuilder {
         inputData: _buildInputData(newNode, ref),
         outputData: _buildOutputData(newNode),
         deleteNode: () {
-          final NodeServerCalls nodeServerCalls =
-              GetIt.I.get<NodeServerCalls>();
-          if (newNode.nodeId != null) nodeServerCalls.deleteNode(newNode);
-
+          scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
           scaffoldMessengerKey.currentState?.showSnackBar(
-            SnackBar(content: Text("${node.displayName} deleted")),
+            SnackBar(
+              content: Text("${node.displayName} deleted"),
+              duration: const Duration(seconds: 1),
+            ),
           );
         },
       );
@@ -103,7 +107,6 @@ class NodeBuilder {
 
   List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      ...node.params?.map(_paramInput) ?? [],
       ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
           [],
     ];
@@ -120,13 +123,6 @@ class NodeBuilder {
     return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
   }
 
-  VSInputData _paramInput(Params param) {
-    final controller = TextEditingController(text: param.value.toString());
-    controller.addListener(() => param.value = controller.text);
-
-    return VsTextInputData(type: param.name, controller: controller);
-  }
-
   List<VSOutputData> _buildOutputData(NodeModel node) {
     if (node.outputDots == null || node.outputDots!.isEmpty) return [];
 
@@ -140,9 +136,12 @@ class NodeBuilder {
     if (node.category == "Preprocessors") {
       return [VSPreprocessorOutputData(type: outputDot, node: node)];
     }
+    if (node.category == "Network") {
+      return [VSNetworkOutputData(type: outputDot, node: node)];
+    }
     if (node.name == "model_fitter" || node.name == "preprocessor_fitter") {
       return [
-        VSAINOGeneralOutputData(
+        VSFitterOutputData(
           type: outputDot,
           node: node,
           outputIcon: Icons.square_sharp,

@@ -1,67 +1,101 @@
+import 'package:ai_gen/core/models/node_model/parameter_model.dart';
+import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class ParamNumInput extends StatefulWidget {
-  ParamNumInput({required this.value, super.key});
+  const ParamNumInput({required this.parameter, super.key});
 
-  double value;
+  final ParameterModel parameter;
   @override
   State<ParamNumInput> createState() => _ParamNumInputState();
 }
 
 class _ParamNumInputState extends State<ParamNumInput> {
+  late TextEditingController controller;
+  @override
+  void initState() {
+    controller = TextEditingController(text: widget.parameter.value.toString());
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant ParamNumInput oldWidget) {
+    controller.text = widget.parameter.value.toString();
+    super.didUpdateWidget(oldWidget);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(4),
-              bottomLeft: Radius.circular(4),
-            ),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              setState(() {
-                widget.value += 0.1;
-              });
-            },
-          ),
+        _customButton(
+          icon: Icons.add,
+          onTap: () {
+            if (widget.parameter.type == ParameterType.int) {
+              widget.parameter.value += 1;
+            } else if (widget.parameter.type == ParameterType.double) {
+              widget.parameter.value += 0.1;
+            }
+          },
         ),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            alignment: Alignment.center,
-            color: Colors.white,
-            height: 40,
-            child: Text(
-              widget.value.toStringAsFixed(1),
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(4),
-              bottomRight: Radius.circular(4),
-            ),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.remove),
-            onPressed: () {
-              setState(() {
-                if (widget.value > 0.1) {
-                  widget.value -= 0.1;
-                }
-              });
-            },
-          ),
+        _textField(),
+        _customButton(
+          icon: Icons.remove,
+          onTap: () {
+            if (widget.parameter.value > 0.1) {
+              if (widget.parameter.type == ParameterType.int) {
+                widget.parameter.value = widget.parameter.value - 1;
+              } else if (widget.parameter.type == ParameterType.double) {
+                widget.parameter.value = widget.parameter.value - 0.1;
+              }
+            }
+          },
         ),
       ],
+    );
+  }
+
+  Widget _textField() {
+    return Expanded(
+      child: TextField(
+        controller: controller,
+        style: const TextStyle(fontSize: 16),
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          isDense: true,
+        ),
+        onChanged: (value) {
+          setState(() {
+            widget.parameter.value = value;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _customButton({required IconData icon, VoidCallback? onTap}) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          onTap?.call();
+          controller.text = widget.parameter.value.toString();
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: const BoxDecoration(
+          color: AppColors.grey200,
+          borderRadius: BorderRadius.all(Radius.circular(6)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Icon(icon, size: 20),
+          ],
+        ),
+      ),
     );
   }
 }

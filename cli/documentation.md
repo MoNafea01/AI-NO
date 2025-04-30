@@ -19,9 +19,9 @@ CMD interface
    
 2- projects
 
-   `aino create_project project_name`    # create project, replace if exists
+   `aino create_project project_id`    # create project, replace if exists
    
-   `aino select_project project_name`    # for exisiting one
+   `aino select_project project_id`    # for exisiting one
    
    `aino deselect_project`               # deselect project to select another one
    

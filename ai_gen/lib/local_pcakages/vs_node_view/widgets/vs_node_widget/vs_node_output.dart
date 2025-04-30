@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:flutter/material.dart';
 
 import '../../common.dart';
@@ -8,38 +9,33 @@ import '../../special_nodes/vs_widget_node.dart';
 import '../line_drawer/gradiant_line_drawer.dart';
 
 class VSNodeOutput extends StatefulWidget {
-  /// Base node output widget
-  /// Used in [VSNode]
-  /// Uses [Draggable] to make a connection with [VSInputData]
-  const VSNodeOutput({required this.data, super.key});
+  const VSNodeOutput({required this.data, Key? key}) : super(key: key);
 
   final VSOutputData data;
 
   @override
-  State<VSNodeOutput> createState() => _VSNodeOutputState();
+  State<VSNodeOutput> createState() => VSNodeOutputState();
 }
 
-class _VSNodeOutputState extends State<VSNodeOutput> {
+class VSNodeOutputState extends State<VSNodeOutput> {
   Offset? dragPos;
   RenderBox? renderBox;
-  final GlobalKey _anchor = GlobalKey();
+  late final GlobalKey _anchor;
 
   @override
   void initState() {
+    _anchor = GlobalKey();
     super.initState();
-    updateRenderBox();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
     updateRenderBox();
   }
 
   @override
   void didUpdateWidget(covariant VSNodeOutput oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (widget.data.widgetOffset == null ||
+        widget.data.widgetOffset != oldWidget.data.widgetOffset ||
+        widget.data.title != oldWidget.data.title ||
         widget.data.nodeData is VSListNode) {
       updateRenderBox();
     }
@@ -61,51 +57,53 @@ class _VSNodeOutputState extends State<VSNodeOutput> {
 
   @override
   Widget build(BuildContext context) {
-    final firstItem = widget.data.nodeData is VSWidgetNode
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 4,
+      children: [
+        outputTitle(),
+        outputIcon(context),
+      ],
+    );
+  }
+
+  Widget outputTitle() {
+    return widget.data.nodeData is VSWidgetNode
         ? (widget.data.nodeData as VSWidgetNode).child
         : Text(
             widget.data.title,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+            style: AppTextStyles.nodeInterfaceTextStyle,
           );
+  }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        firstItem,
-        const SizedBox(width: 3),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: CustomPaint(
-            foregroundPainter: _buildGradientLinePainter(),
-            child: Draggable<VSOutputData>(
-              data: widget.data,
-              onDragUpdate: (details) =>
-                  updateLinePosition(details.localPosition),
-              onDragEnd: (details) => setState(() {
-                dragPos = null;
-              }),
-              onDraggableCanceled: (velocity, offset) {
-                VSNodeDataProvider.of(context).openContextMenu(
-                  position: offset,
-                  outputData: widget.data,
-                );
-              },
-              feedback: Icon(
-                widget.data.outputIcon,
-                color: widget.data.interfaceColor,
-                size: 15,
-              ),
-              child: wrapWithToolTip(
-                toolTip: widget.data.toolTip,
-                child: widget.data.getInterfaceIcon(
-                  context: context,
-                  anchor: _anchor,
-                ),
-              ),
-            ),
+  CustomPaint outputIcon(BuildContext context) {
+    return CustomPaint(
+      foregroundPainter: _buildGradientLinePainter(),
+      child: Draggable<VSOutputData>(
+        data: widget.data,
+        onDragUpdate: (details) => updateLinePosition(details.localPosition),
+        onDragEnd: (details) => setState(() {
+          dragPos = null;
+        }),
+        onDraggableCanceled: (velocity, offset) {
+          VSNodeDataProvider.of(context).openContextMenu(
+            position: offset,
+            outputData: widget.data,
+          );
+        },
+        feedback: Icon(
+          widget.data.outputIcon,
+          color: widget.data.interfaceColor,
+          size: 15,
+        ),
+        child: wrapWithToolTip(
+          toolTip: widget.data.toolTip,
+          child: widget.data.getInterfaceIcon(
+            context: context,
+            anchor: _anchor,
           ),
         ),
-      ],
+      ),
     );
   }
 

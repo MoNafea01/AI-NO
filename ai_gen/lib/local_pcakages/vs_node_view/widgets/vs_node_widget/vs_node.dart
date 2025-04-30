@@ -1,169 +1,126 @@
+import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
+import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
-import '../../data/vs_node_data.dart';
-import '../../data/vs_node_data_provider.dart';
-import 'vs_node_input.dart';
-import 'vs_node_output.dart';
-import 'vs_node_title.dart';
+import 'node_content.dart';
 
 class VSNode extends StatefulWidget {
-  /// The base node widget
-  /// Used inside [VSNodeView] to display nodes
-  const VSNode({
-    required this.data,
-    this.width = 125,
-    this.nodeTitleBuilder,
-    super.key,
-  });
+  const VSNode({required this.data, this.nodeTitleBuilder, super.key});
 
-  /// The data the widget will use to build the UI
   final VSNodeData data;
 
-  /// Default width of the node
-  /// Will be used unless width is specified inside [VSNodeData]
-  final double width;
-
-  /// Can be used to take control over the building of the node titles
-  /// See [VSNodeTitle] for reference
-  final Widget Function(
-    BuildContext context,
-    VSNodeData nodeData,
-  )? nodeTitleBuilder;
+  final Widget Function(BuildContext context, VSNodeData nodeData)?
+      nodeTitleBuilder;
 
   @override
   State<VSNode> createState() => _VSNodeState();
 }
 
 class _VSNodeState extends State<VSNode> {
-  final GlobalKey _anchor = GlobalKey();
-  final GlobalKey key2 = GlobalKey();
+  late final GlobalKey _anchor;
+  late final GlobalKey _key2;
+  late final VSNodeDataProvider nodeProvider;
+
+  @override
+  void initState() {
+    _anchor = GlobalKey();
+    _key2 = GlobalKey();
+    nodeProvider = VSNodeDataProvider.of(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final nodeProvider = VSNodeDataProvider.of(context);
-
     return Draggable(
-      onDragEnd: (details) {
-        if (_anchor.currentContext == null) return;
-        final RenderBox renderBox =
-            _anchor.currentContext?.findRenderObject() as RenderBox;
-        Offset newPosition = renderBox.localToGlobal(Offset.zero);
-
-        // Update the node position if it has changed
-        nodeProvider.moveNode(widget.data, newPosition);
-      },
-      feedback: draggedNode(nodeProvider, context),
-      childWhenDragging: const SizedBox(),
-      child: _node(context, nodeProvider),
+      onDragUpdate: _moveNode,
+      childWhenDragging: const SizedBox.shrink(),
+      feedback: _draggedNode(),
+      child: _node(),
     );
   }
 
-  Transform draggedNode(VSNodeDataProvider nodeProvider, BuildContext context) {
-    return Transform.scale(
-      scale: 1 / nodeProvider.viewportScale,
-      child: Material(
-        key: key2,
-        child: _buildNodeContent(context),
+  void _moveNode(details) {
+    if (!mounted || _anchor.currentContext == null) return;
+
+    final RenderBox renderBox =
+        _anchor.currentContext?.findRenderObject() as RenderBox;
+    Offset newPosition = renderBox.localToGlobal(Offset.zero);
+    nodeProvider.moveNode(widget.data, newPosition);
+  }
+
+  Widget _draggedNode() {
+    if (!mounted) return const SizedBox.shrink();
+
+    return InheritedNodeDataProvider(
+      provider: nodeProvider,
+      child: Transform.scale(
+        scale: 1 / nodeProvider.viewportScale,
+        child: Material(
+          key: _key2,
+          borderRadius: BorderRadius.circular(12),
+          child: NodeContent(
+            nodeProvider: nodeProvider,
+            data: widget.data,
+            anchor: _anchor,
+          ),
+        ),
       ),
     );
   }
 
-  GestureDetector _node(BuildContext context, VSNodeDataProvider nodeProvider) {
+  GestureDetector _node() {
     return GestureDetector(
       onDoubleTap: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              alignment: Alignment.centerRight,
-              title: const Text("Node"),
-              content: const Text("Node"),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Close"),
-                ),
-              ],
-            );
-          },
-        );
+        context
+            .read<GridNodeViewCubit>()
+            .updateActiveNodePropertiesCard(widget.data.node);
       },
-      onSecondaryTapUp: (details) {
-        showMenu(
-          context: context,
-          position: RelativeRect.fromLTRB(
-            details.globalPosition.dx,
-            details.globalPosition.dy,
-            details.globalPosition.dx,
-            details.globalPosition.dy,
-          ),
-          items: const [
-            PopupMenuItem(value: 'rename', child: Text('Rename')),
-            PopupMenuItem(value: 'delete', child: Text('Delete')),
-          ],
-        ).then((value) {
-          if (value == 'rename') {
-            setState(() => widget.data.isRenaming = true);
-          } else if (value == 'delete') {
-            setState(() {
-              widget.data.deleteNode?.call();
-              nodeProvider.removeNodes([widget.data]);
-            });
-          }
-        });
-      },
-      child: _buildNodeContent(context),
-    );
-  }
-
-  Widget _buildNodeContent(BuildContext context) {
-    final VSNodeDataProvider nodeProvider = VSNodeDataProvider.of(context);
-    final List<Widget> inputWidgets = [];
-    final List<Widget> outputWidgets = [];
-
-    for (final value in widget.data.inputData) {
-      inputWidgets.add(VSNodeInput(data: value));
-    }
-
-    for (final value in widget.data.outputData) {
-      outputWidgets.add(VSNodeOutput(data: value));
-    }
-    return Container(
-      key: _anchor,
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black38),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 3,
-            offset: Offset(0, 1),
-          ),
-        ],
-        borderRadius: BorderRadius.circular(12),
-        color: nodeProvider.selectedNodes.contains(widget.data.id)
-            ? Colors.lightBlue
-            : widget.data.nodeColor,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _interfaceWidget(inputWidgets),
-          const SizedBox(width: 8),
-          widget.nodeTitleBuilder?.call(context, widget.data) ??
-              VSNodeTitle(data: widget.data),
-          const SizedBox(width: 8),
-          _interfaceWidget(outputWidgets),
-        ],
+      onSecondaryTapUp: _popMenu,
+      child: NodeContent(
+        nodeProvider: nodeProvider,
+        data: widget.data,
+        anchor: _anchor,
       ),
     );
   }
 
-  Widget _interfaceWidget(List<Widget> widgets) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: widgets,
+  void _popMenu(details) {
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        details.globalPosition.dx,
+        details.globalPosition.dy,
+        details.globalPosition.dx,
+        details.globalPosition.dy,
+      ),
+      items: const [
+        PopupMenuItem(value: 'properties', child: Text('Properties')),
+        PopupMenuItem(value: 'rename', child: Text('Rename')),
+        PopupMenuItem(value: 'delete', child: Text('Delete')),
+      ],
+    ).then(
+      (value) {
+        if (value == 'properties') {
+          context
+              .read<GridNodeViewCubit>()
+              .updateActiveNodePropertiesCard(widget.data.node);
+        } else if (value == 'rename') {
+          setState(() => widget.data.isRenaming = true);
+        } else if (value == 'delete') {
+          final NodeServerCalls nodeServerCalls =
+              GetIt.I.get<NodeServerCalls>();
+          NodeModel? nodeModel = widget.data.node;
+          if (nodeModel?.nodeId != null) nodeServerCalls.deleteNode(nodeModel!);
+          widget.data.deleteNode?.call();
+
+          nodeProvider.removeNodes([widget.data]);
+          setState(() {});
+        }
+      },
     );
   }
 }
