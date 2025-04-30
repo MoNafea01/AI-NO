@@ -1,8 +1,11 @@
+import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
+import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
-import 'package:ai_gen/features/screens/splashScreen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'core/di/get_it_initialize.dart';
 import 'core/helper/my_windows_manager.dart';
@@ -24,7 +27,8 @@ void main() async {
   //   await serverManager.startServer();
   // }
 
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => AuthProvider(), child: const MyApp()));
 }
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -80,7 +84,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       debugShowCheckedModeBanner: false,
       title: 'AI Gen',
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      home: SplashScreen(),
+      home: const SignupScreen(),
     );
   }
 }

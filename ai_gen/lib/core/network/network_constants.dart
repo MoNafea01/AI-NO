@@ -3,4 +3,6 @@ abstract class NetworkConstants {
   static const String allComponentsEndPoint = "components";
   static const String projectEndPoint = "projects";
   static const String nodesEndPoint = "nodes";
+  static const String allComponentsApi = "components";
+  static const String apiAuthBaseUrl = "https://lucky0wl.pythonanywhere.com";
 }
