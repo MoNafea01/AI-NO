@@ -1261,7 +1261,7 @@ class ChatbotAPIView(APIView):
                 return Response({"error": "Mode must be '1' (manual) or '2' (auto)"}, 
                               status=status.HTTP_400_BAD_REQUEST)
 
-            if mode not in ['chat', '1', 'agent', '2']:
+            if route not in ['chat', '1', 'agent', '2']:
                 return Response({"error": "Choose 'agent' or 'chat'"}, status=status.HTTP_400_BAD_REQUEST)
             
             response, logs, hist = sync_generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration, route=route, history=ChatbotAPIView.history)
