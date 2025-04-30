@@ -154,7 +154,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   // 📩 Sign Up + Navigate to OTP
-  Future<void> signUp(BuildContext context) async {
+ Future<void> signUp(BuildContext context) async {
     isLoading = true;
     notifyListeners();
 
@@ -172,12 +172,16 @@ class AuthProvider with ChangeNotifier {
         }),
       );
 
-      print('STATUS CODE: ${response.statusCode}');
-      print('BODY: ${response.body}');
-
       final data = jsonDecode(response.body);
+      print('STATUS CODE: ${response.statusCode}');
+      print('BODY: $data');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Navigate to OTP screen next
+        final access = data['access'];
+        final refresh = data['refresh'];
+        await _saveTokens(access, refresh); // ✅ Save right after signup
+
+        // 🔁 Now navigate to OTP screen
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -185,7 +189,6 @@ class AuthProvider with ChangeNotifier {
           ),
         );
       } else {
-        // Handle API error
         print("Error: ${data['detail'] ?? data}");
       }
     } catch (e) {
@@ -196,51 +199,48 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  void setOtp(String value) => _otp = value;
 
-  Future<void> verifyOtp(BuildContext context, String email) async {
-    print('Verifying OTP...');
-    print('Email: $email');
-    print('OTP entered: $_otp');
+  void setOtp(String value) => _otp = value;
+Future<void> verifyOtp(BuildContext context, String email) async {
+    final accessToken = await _storage.read(key: 'accessToken');
+    print('Token retrieved for verification: $accessToken');
+
+    if (accessToken == null) {
+      _showErrorDialog(context, 'No access token found.');
+      return;
+    }
 
     try {
       final response = await http.post(
         Uri.parse('${NetworkConstants.apiAuthBaseUrl}/verify-email/'),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
         },
-        body: jsonEncode({
-          'email': email,
-          'otp': _otp,
-        }),
+        body: jsonEncode({'email': email, 'otp': _otp}),
       );
 
-      print('Status Code: ${response.statusCode}');
-      print('Response: ${response.body}');
-
       final data = jsonDecode(response.body);
+      print("VERIFY OTP RESPONSE: $data");
 
       if (response.statusCode == 200) {
-        final access = data['access'];
-        final refresh = data['refresh'];
+        final newAccess = data['access'];
+        final newRefresh = data['refresh'];
 
-        await _saveTokens(access, refresh);
+        await _saveTokens(newAccess, newRefresh); // 🔁 replace old token
 
-        // Navigate to dashboard or home screen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => const DashboardScreen(), // adjust screen as needed
-          ),
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
         );
       } else {
-        final error = data['detail'] ?? 'OTP verification failed.';
-        _showErrorDialog(context, error.toString());
+        _showErrorDialog(context, data['detail'] ?? 'OTP verification failed.');
       }
     } catch (e) {
-      _showErrorDialog(context, 'Something went wrong: $e');
+      _showErrorDialog(context, 'Error verifying OTP: $e');
     }
   }
+
 
   Future<void> requestOtpAgain(String email) async {
     try {
@@ -251,7 +251,8 @@ class AuthProvider with ChangeNotifier {
       );
 
       final data = jsonDecode(response.body);
-      // You can show a toast/snackbar here if needed
+      print('Request OTP Status Code: ${response.statusCode}');
+      print('Request OTP Response: $data');
     } catch (e) {
       print('Error requesting OTP: $e');
     }

@@ -267,12 +267,13 @@ class LoginForm extends StatelessWidget {
           buttonName: 'Sign in',
           textButtonColor: AppColors.appBackgroundColor,
           onPressed: () {
-            if (authProvider.isValidEmail(authProvider.email) &&
-                authProvider.password.isNotEmpty) {
-              authProvider.signIn(context);
-            } else {
-              _showErrorDialog(context, 'Please enter valid credentials.');
-            }
+            authProvider.signIn(context);
+            // if (authProvider.isValidEmail(authProvider.email) &&
+            //     authProvider.password.isNotEmpty) {
+            //   authProvider.signIn(context);
+            // } else {
+            //   _showErrorDialog(context, 'Please enter valid credentials.');
+            // }
           },
         ),
         const SizedBox(height: 24),
