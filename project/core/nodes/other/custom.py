@@ -11,11 +11,16 @@ class Joiner(BaseNode):
     """
     def __init__(self, data_1, data_2, project_id=None, *args, **kwargs):
         self.data_1, self.data_2 = NodeDataExtractor()(data_1, data_2, project_id=project_id)
+        err = None
+        if any(isinstance(i, str) for i in [self.data_1, self.data_2]):
+            err = "Failed to load Nodes. Please check the provided IDs."
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
-        self.payload = self.join()
+        self.payload = self.join(err)
     
-    def join(self):
+    def join(self, err = None):
+        if err:
+            return err
         try:
             joined_data = (self.data_1, self.data_2)
             payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join", project_id=self.project_id,
@@ -26,7 +31,7 @@ class Joiner(BaseNode):
             payload.pop("node_data", None)
             return payload
         except Exception as e:
-            raise ValueError(f"Error joining data: {e}")
+            return f"Error joining data: {e}"
 
 
 class Splitter:
@@ -40,10 +45,15 @@ class Splitter:
     def __init__(self, data, project_id=None, *args, **kwargs):
         self.project_id = project_id
         self.data = NodeDataExtractor()(data, project_id=project_id)
+        err = None
+        if isinstance(self.data, str):
+            err = "Failed to load Nodes. Please check the provided IDs."
         self.uid = kwargs.get('uid', None)
-        self.payload = self.split()
+        self.payload = self.split(err)
 
-    def split(self):
+    def split(self, err=None):
+        if err:
+            return err
         try:
             out1, out2 = self.data
 
@@ -61,7 +71,7 @@ class Splitter:
             
             return payload
         except Exception as e:
-            raise ValueError(f"Error splitting data: {e}")
+            return f"Error splitting data: {e}"
     
     def __str__(self):
         return f"data: {self.payload}"
@@ -73,6 +83,9 @@ class Splitter:
                 payload = self.payload[1]
             elif arg == '2':
                 payload = self.payload[2]
+                
+        if isinstance(self.payload, str):
+            payload = self.payload
         
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:

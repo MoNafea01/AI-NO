@@ -13,7 +13,7 @@ class ModelPredictor(BaseNode):
         try:
             predictions = self.model.predict(self.X)
         except Exception as e:
-            raise ValueError(f"Error fitting model: {e}")
+            return f"Error fitting model: {e}"
         return predictions
 
 
@@ -23,31 +23,42 @@ class Predict(BaseNode):
         self.model = model
         self.model_path = model_path
         self.X = NodeDataExtractor()(X, project_id=project_id)
+        err = None
+        if isinstance(self.X, str):
+            err = "Failed to load X. Please check the provided IDs."
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
-        self.payload = self._predict()
+        self.payload = self._predict(err)
 
-    def _predict(self):
+    def _predict(self, err=None):
+        if err:
+            return err
         if isinstance(self.model, (dict, int, str)):
             return self._predict_from_id()
         elif isinstance(rf"{self.model}", str):
             return self._predict_from_path()
         else:
-            raise ValueError("Invalid model or path provided.")
+            return "Invalid model or path provided."
 
     def _predict_from_id(self):
         try:
             model = NodeDataExtractor()(self.model, project_id=self.project_id)
+            if isinstance(model, str):
+                return "Failed to load model. Please check the provided ID."
             return self._predict_handler(model)
         except Exception as e:
-            raise ValueError(f"Error predicting using model by ID: {e}")
+            return f"Error predicting using model by ID: {e}"
 
     def _predict_from_path(self):
         try:
             model = NodeDataExtractor()(self.model_path, project_id=self.project_id)
+            if isinstance(model, str):
+                return "Failed to load model. Please check the provided path."
+            if not hasattr(model, 'predict'):
+                return "Model does not have a predict method. Please check the provided path."
             return self._predict_handler(model)
         except Exception as e:
-            raise ValueError(f"Error predicting using model by path: {e}")
+            return f"Error predicting using model by path: {e}"
     
 
     def _predict_handler(self, model):
@@ -64,4 +75,4 @@ class Predict(BaseNode):
             payload.pop("node_data", None)
             return payload
         except Exception as e:
-            raise ValueError(f"Error Predicting model: {e}")
+            return f"Error Predicting model: {e}"

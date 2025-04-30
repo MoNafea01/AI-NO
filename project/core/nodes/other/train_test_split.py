@@ -5,13 +5,19 @@ from ..base_node import BaseNode, SAVING_DIR
 
 class TrainTestSplit(BaseNode):
     def __init__(self, X, y, params=None, project_id: int = None, *args, **kwargs):
+        err = None
         self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
+        if any(isinstance(i, str) for i in [self.X, self.y]):
+            err = "Failed to load Nodes. Please check the provided IDs."
+
         self.params = params if params else {'test_size': 0.2, 'random_state': 42}
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
-        self.payload = self.split()
+        self.payload = self.split(err)
 
-    def split(self):
+    def split(self, err=None):
+        if err:
+            return err
         try:
             out1, out2 = None, None
 
@@ -37,7 +43,7 @@ class TrainTestSplit(BaseNode):
 
             return payload
         except Exception as e:
-            raise ValueError(f"Error splitting data: {e}")
+            return f"Error splitting data: {e}"
 
     def __str__(self):
         return f"data: {self.payload}"
@@ -49,6 +55,9 @@ class TrainTestSplit(BaseNode):
                 payload = self.payload[1]
             elif arg == '2':
                 payload = self.payload[2]
+                
+        if isinstance(self.payload, str):
+            payload = self.payload
 
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:

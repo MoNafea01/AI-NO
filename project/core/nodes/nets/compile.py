@@ -24,28 +24,32 @@ class CompileModel(BaseNode):
         elif isinstance(rf"{self.model_path}", str):
             return self._compile_from_path(self.nn_model_path)
         else:
-            raise ValueError("Invalid model or path provided.")
+            return "Invalid model or path provided."
 
     def _compile_from_dict(self, model_id):
         try:
             model = NodeDataExtractor()(model_id, project_id=self.project_id)
+            if isinstance(model, str):
+                return "Failed to load model. Please check the provided ID."
             return self._compile_handler(model)
         except Exception as e:
-            raise ValueError(f"Error fitting model by ID: {e}")
+            return f"Error Compiling model by ID: {e}"
 
     def _compile_from_path(self, nn_model_path):
         try:
             model = NodeDataExtractor()(path=nn_model_path, project_id=self.project_id)
+            if isinstance(model, str):
+                return "Failed to load model. Please check the provided path."
             return self._compile_handler(model)
         except Exception as e:
-            raise ValueError(f"Error fitting model from path: {e}")
+            return f"Error Compiling model from path: {e}"
 
     def _compile_handler(self, model:Sequential):
         try:
             if self.loss and self.optimizer:
                 model.compile(loss=self.loss, optimizer=self.optimizer, metrics=self.metrics)
             else:
-                raise ValueError("Loss, optimizer, and metrics must be provided for compilation.")
+                return "Loss, optimizer, and metrics must be provided for compilation."
 
             payload = PayloadBuilder.build_payload("Model Compiled", model, "model_compiler", task="compile_model", node_type="compiler",
                                                        params={"loss": self.loss, "optimizer": self.optimizer, "metrics": self.metrics},
@@ -60,4 +64,4 @@ class CompileModel(BaseNode):
             return payload
         
         except Exception as e:
-            raise ValueError(f"Error creating compile layer payload: {e}")
+            return f"Error creating compile layer payload: {e}"

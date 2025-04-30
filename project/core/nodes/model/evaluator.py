@@ -7,15 +7,21 @@ import numpy as np
 class Evaluator(BaseNode):
     def __init__(self, metric='accuracy', y_true=None, y_pred=None, project_id=None, *args, **kwargs):
         self.y_true, self.y_pred = NodeDataExtractor()(y_true, y_pred, project_id=project_id)
+        err = None
+        if any(isinstance(i, str) for i in [self.y_true, self.y_pred]):
+            err = "Failed to load Nodes. Please check the provided IDs."
+        
         self.metric = metric
         self.project_id=project_id
         self.uid = kwargs.get('uid', None)
-        self.payload = self.evaluate(self.y_true, self.y_pred)
+        self.payload = self.evaluate(self.y_true, self.y_pred, err)
 
-    def evaluate(self, y_true, y_pred):
+    def evaluate(self, y_true, y_pred, err=None):
+        if err:
+            return err
         try:
             if self.metric not in metrics.keys():
-                raise ValueError(f"Unsupported metric: {self.metric}")
+                return f"Unsupported metric: {self.metric}"
             
 
             if len(y_pred.shape) > 1:
@@ -36,4 +42,4 @@ class Evaluator(BaseNode):
             payload.pop("node_data", None)
             return payload
         except Exception as e:
-            raise ValueError(f"Error evaluating model: {e}")
+            return f"Error evaluating model: {e}"

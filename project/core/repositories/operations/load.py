@@ -60,7 +60,7 @@ class NodeLoader:
                     node_name, node_id = NodeNameHandler.handle_name(path)
                     return True, self.build_payload(node_data, node_name, node_id, project_id, path)
                 except Exception as e:
-                    return False, ValueError(f"Error loading node from path: {e}")
+                    return False, f"Error loading node from path: {e}"
 
             path = None
             # Load from database if no path provided

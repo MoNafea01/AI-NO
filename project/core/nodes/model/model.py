@@ -13,7 +13,12 @@ class Model(BaseNode):
         self.task = task
         self.node_path = model_path
         default_params = self._get_default_params()
-        default_params.update(params) if params else {}
+
+        if isinstance(params, dict):
+            for param, value in params.items():
+                if param in default_params.keys():
+                    default_params[param] = value
+
         self.params = default_params
         self.uid = kwargs.get('uid', None)
         super().__init__(project_id=project_id)  # Pass project_id to BaseNode
@@ -23,7 +28,7 @@ class Model(BaseNode):
         try:
             return models.get(self.model_type, {}).get(self.task, {}).get(self.model_name, {}).get('params', {})
         except AttributeError:
-            raise ValueError(f"Invalid configuration for model type: {self.model_type}, task: {self.task}, model name: {self.model_name}.")
+            return f"Invalid configuration for model type: {self.model_type}, task: {self.task}, model name: {self.model_name}."
     
     @property
     def node_class(self):

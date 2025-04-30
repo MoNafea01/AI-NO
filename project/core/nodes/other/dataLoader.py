@@ -23,12 +23,12 @@ class PredefinedDataLoader(BaseDataLoader):
     def load(self):
         try:
             if self.dataset_name not in datasets.keys():
-                raise ValueError(f"Unsupported dataset name: {self.dataset_name}")
+                return f"Unsupported dataset name: {self.dataset_name}", None
             data = datasets[self.dataset_name](return_X_y=True)
             X, y = data
             return X, y
         except Exception as e:
-            raise ValueError(f"Error loading data: {e}")
+            return f"Error loading data: {e}", None
 
 
 class CustomDataLoader:
@@ -38,7 +38,7 @@ class CustomDataLoader:
     def load(self):
         try:
             if not os.path.exists(self.dataset_path):
-                raise FileNotFoundError(f"dataset not found: {self.dataset_path}")
+                return f"dataset not found: {self.dataset_path}", None
             
             if self.dataset_path.endswith('.pkl'):
                 data = NodeDataExtractor()(self.dataset_path, project_id=self.project_id)
@@ -61,7 +61,7 @@ class CustomDataLoader:
 
             return X, y
         except Exception as e:
-            raise ValueError(f"Error loading data: {e}")
+            return f"Error loading data: {e}", None
 
 
 class DataLoaderFactory:
@@ -73,20 +73,29 @@ class DataLoaderFactory:
         elif dataset_path:
             return CustomDataLoader(dataset_path, project_id)
         else:
-            raise ValueError("Either dataset_name or dataset_path must be provided.")
+            return "Either dataset_name or dataset_path must be provided."
 
 
 class DataLoader:
     """Facade for loading data using different strategies."""
     def __init__(self, dataset_name: str = None, dataset_path: str = None, project_id: int = None, *args, **kwargs):
         self.loader = DataLoaderFactory.create(dataset_name, dataset_path, project_id)
+        err = None
+        if isinstance(self.loader, str):
+            err = self.loader
+
         X, y = self.loader.load()
+        if isinstance(X, str):
+            err = X
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
-        self.payload = self.build_payload(dataset_name, dataset_path, X, y)
+        self.payload = self.build_payload(dataset_name, dataset_path, X, y, err)
         
     
-    def build_payload(self, dataset_name, dataset_path, X, y):
+    def build_payload(self, dataset_name, dataset_path, X, y, err=None):
+        if err:
+            return err
+        
         if not dataset_name:
             dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
 
@@ -119,6 +128,9 @@ class DataLoader:
             elif arg == '2':
                 payload = self.payload[2]
 
+        if isinstance(self.payload, str):
+            payload = self.payload
+        
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
             node_data = NodeDataExtractor(return_serialized=True)(payload, project_id=self.project_id)

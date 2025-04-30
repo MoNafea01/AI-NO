@@ -14,7 +14,7 @@ class PreprocessorFitterTransformer:
             self.preprocessor.fit(self.data)
             output = self.preprocessor.transform(self.data)
         except Exception as e:
-            raise ValueError(f"Error fitting and transforming preprocessor: {e}")
+            return f"Error fitting and transforming preprocessor: {e}"
         return (self.preprocessor, output)
 
 
@@ -24,32 +24,43 @@ class FitTransform:
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
         self.data = NodeDataExtractor()(data, project_id=project_id)
+        err = None
+        if isinstance(self.data, str):
+            err = "Failed to load Nodes. Please check the provided IDs."
+
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
 
-        self.payload = self._fit_transform()
+        self.payload = self._fit_transform(err)
 
-    def _fit_transform(self):
+    def _fit_transform(self, err=None):
+        if err:
+            return err
         if isinstance(self.preprocessor, (dict, int, str)):
             return self._fit_transform_from_id()
         elif isinstance(rf"{self.preprocessor_path}", str):
             return self._fit_transform_from_path()
         else:
-            raise ValueError("Invalid preprocessor or path provided.")
+            return "Invalid preprocessor or path provided."
 
     def _fit_transform_from_id(self):
         try:
             preprocessor = NodeDataExtractor()(self.preprocessor, project_id=self.project_id)
+            if isinstance(preprocessor, str):
+                return "Failed to load preprocessor. Please check the provided ID."
             return self._fit_transform_handler(preprocessor)
         except Exception as e:
-            raise ValueError(f"Error fitting and transforming preprocessor by ID: {e}")
+            return f"Error fitting and transforming preprocessor by ID: {e}"
 
     def _fit_transform_from_path(self):
         try:
             preprocessor = NodeDataExtractor()(self.preprocessor_path, project_id=self.project_id)
+            if isinstance(preprocessor, str):
+                return "Failed to load preprocessor. Please check the provided path."
+            
             return self._fit_transform_handler(preprocessor)
         except Exception as e:
-            raise ValueError(f"Error fitting and transforming preprocessor by path: {e}")
+            return f"Error fitting and transforming preprocessor by path: {e}"
     
 
     def _fit_transform_handler(self, preprocessor):
@@ -77,7 +88,7 @@ class FitTransform:
 
             return payload
         except Exception as e:
-            raise ValueError(f"Error fitting and transforming preprocessor: {e}")
+            return f"Error fitting and transforming preprocessor: {e}"
 
 
     def __str__(self):
@@ -90,6 +101,9 @@ class FitTransform:
                 payload = self.payload[1]
             elif arg == '2':
                 payload = self.payload[2]
+        
+        if isinstance(self.payload, str):
+            payload = self.payload
 
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:

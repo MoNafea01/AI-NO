@@ -51,21 +51,27 @@ class NodeDataExtractor:
         for arg in args:
             if isinstance(arg, dict):
                 success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg.get("node_id"), project_id=project_id)
-                data = data.get("node_data")
+                if success:
+                    data = data.get("node_data")
+
                 if data is not None:
                     l.append(data)
             elif isinstance(arg, int):
                 success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg, project_id=project_id)
-                data = data.get("node_data")
+                if success:
+                    data = data.get("node_data")
+
                 if data is not None:
                     l.append(data)
             elif isinstance(arg, str):
                 if arg.isnumeric():
                     success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(int(arg), project_id=project_id)
-                    data = data.get("node_data")
+                    if success:
+                        data = data.get("node_data")
                 else:
                     success, data = NodeLoader(from_db=False, return_serialized=self.return_serialized, return_path=self.return_path)(path=arg)
-                    data = data.get("node_data")
+                    if success:
+                        data = data.get("node_data")
                 if data is not None:
                     l.append(data)
             else:
@@ -93,8 +99,8 @@ class Repository:
     def load(self, node_id: int = None, path: str = None) -> dict:
         """Loads the node from the database or filesystem."""
         from core.repositories.operations import NodeLoader
-        success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(node_id, path)
-        return data
+        
+        return NodeLoader(self.from_db, self.return_serialized, self.return_path)(node_id, path)
     
     def update(self, node_id: int, payload: dict) -> dict:
         """Updates the node in the database and filesystem."""

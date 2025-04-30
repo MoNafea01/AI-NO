@@ -189,6 +189,9 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
             response_data = processor(output_channel, return_serialized=return_serialized)
+            if isinstance(response_data, str):
+                return Response({"error": response_data}, status=status.HTTP_400_BAD_REQUEST)
+            
             node_id = response_data.get("node_id")
             project_id = response_data.get("project_id")
 
@@ -209,6 +212,9 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
             success, message = NodeUpdater(return_serialized)(node_id, project_id, processor())
+            if isinstance(message, str):
+                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            
             message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
             
             status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
@@ -780,6 +786,9 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
             for item in data:
                 if project_id:
                     item['project_id'] = project_id
+                if item.get('project'):
+                    item.pop('project')
+                    
             serializer = self.get_serializer(data=data, many=True)
         else:
             # Handle single node creation
@@ -816,7 +825,7 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
                     instance = Node.objects.get(node_id=node_id, project_id=project_id)
                     # Update fields directly
                     for field, value in item.items():
-                        if field not in ['node_id', 'project_id']:  # Skip node_id as it shouldn't be updated
+                        if field not in ['node_id', 'project_id', 'project']:  # Skip node_id as it shouldn't be updated
                             setattr(instance, field, value)
                     
                     # Set project if provided in query params

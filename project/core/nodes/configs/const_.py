@@ -77,6 +77,7 @@ api_ref = [
 mapper = dict(zip(nodes, api_ref))
 
 def get_node_name_by_api_ref(api_ref, request):
+    from core.nodes.utils import NodeNameHandler
     """
     Get the node name by api ref.
     """
@@ -84,8 +85,14 @@ def get_node_name_by_api_ref(api_ref, request):
         if api == api_ref:
             if name in MODELS_NAMES[3:]:
                 node_name = request.data.get("model_name")
+                node_path = request.data.get("model_path")
+                if node_path:
+                    node_name, _ = NodeNameHandler.handle_name(node_path)
             elif name in PREPROCESSORS_NAMES[3:]:
                 node_name = request.data.get("preprocessor_name")
+                node_path = request.data.get("preprocessor_path")
+                if node_path:
+                    node_name, _ = NodeNameHandler.handle_name(node_path)
             else:
                 node_name = name
             return node_name

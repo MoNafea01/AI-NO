@@ -26,7 +26,7 @@ class NodeDeleter:
             ) -> tuple:
 
         if not node_id:
-            raise ValueError("Node ID must be provided.")
+            return False, "Node ID must be provided."
         
         node_id = int(node_id) if node_id else None
         project_id = int(project_id) if project_id else None
@@ -48,4 +48,4 @@ class NodeDeleter:
         except ObjectDoesNotExist:
             return False, f"Node {node_id} does not exist in project with id={project_id}."
         except Exception as e:
-            raise e  # Re-raise for the view to handle
+            return False, e  # Re-raise for the view to handle

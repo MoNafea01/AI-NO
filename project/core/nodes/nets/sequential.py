@@ -9,10 +9,14 @@ class SequentialNet(BaseLayer):
         self.name, self.layer_path = self.load_args(name, path)
         self.layer = self.load_args(layer, attr="node_id")
         self.layers, self.layers_names  = self.get_layers(project_id)
+        err = None
+        if self.layers == []:
+            err = "No layers found in the model or there is an incorrect layer id."
+
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        super().__init__(project_id=project_id, err=err)
 
-        super().__init__(project_id=project_id)
     
     def get_layers(self, project_id):
         cur_id = self.layer
@@ -21,6 +25,8 @@ class SequentialNet(BaseLayer):
         layers_ids = [cur_id]
         while True:
             success, task = NodeLoader()(cur_id, project_id=project_id)
+            if not success:
+                return [], []
             task = task.get("task")
             if task != "neural_network":
                 return [], []
