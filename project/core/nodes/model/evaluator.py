@@ -32,6 +32,9 @@ class Evaluator(BaseNode):
             
             output = metrics[self.metric](y_true, y_pred)
             output = round(output,3)
+            if isinstance(output, str):
+                return f"Error calculating metric: {output}"
+            
             payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate",
                                                    uid=self.uid)
             if self.project_id:

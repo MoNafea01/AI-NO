@@ -67,6 +67,8 @@ class Fit(BaseNode):
         try:
             fitter = ModelFitter(model, self.X, self.y)
             fitted_model = fitter.fit_model()
+            if isinstance(fitted_model, str):
+                return fitted_model
 
             payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model",
                                                    uid=self.uid)

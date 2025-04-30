@@ -48,6 +48,8 @@ class CompileModel(BaseNode):
         try:
             if self.loss and self.optimizer:
                 model.compile(loss=self.loss, optimizer=self.optimizer, metrics=self.metrics)
+                if isinstance(model, str):
+                    return f"Model compilation failed. {model}"
             else:
                 return "Loss, optimizer, and metrics must be provided for compilation."
 
