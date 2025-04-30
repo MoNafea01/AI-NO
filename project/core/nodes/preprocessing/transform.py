@@ -65,6 +65,9 @@ class Transform(BaseNode):
         try:
             transformer = PreprocessorTransformer(preprocessor, self.data)
             output = transformer.transform_data()
+            if isinstance(output, str):
+                return output
+            
             payload = PayloadBuilder.build_payload("Preprocessor transformed data", output, "transformer", task='transform', 
                                                    node_type='transformer', project_id=self.project_id, uid=self.uid)
             
