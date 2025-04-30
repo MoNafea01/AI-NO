@@ -12,7 +12,11 @@ class Preprocessor(BaseNode):
         self.task = "preprocessing"
         self.node_path = preprocessor_path
         default_params = self._get_default_params()
-        default_params.update(params) if params else {}
+        if isinstance(params, dict):
+            for param, value in params.items():
+                if param in default_params.keys():
+                    default_params[param] = value
+
         self.params = default_params
         self.uid = kwargs.get('uid', None)
 
@@ -23,7 +27,7 @@ class Preprocessor(BaseNode):
             return preprocessors.get(self.preprocessor_type, {}).get(
                 self.preprocessor_name, {}).get('params', {})
         except AttributeError:
-            raise ValueError(f"Invalid configuration for preprocessor type: {self.preprocessor_type}, task: {self.task}, preprocessor name: {self.preprocessor_name}.")
+            return f"Invalid configuration for preprocessor type: {self.preprocessor_type}, task: {self.task}, preprocessor name: {self.preprocessor_name}."
 
     @property
     def node_class(self):

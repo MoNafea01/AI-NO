@@ -4,12 +4,13 @@ import os
 import json
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.schema import Document
-from core.utils import init_logger
+from chatbot.core.utils import init_logger
+from chatbot.core.utils import load_config
 
 # Configure logging
 parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-log_file = os.path.join(parent_path, "aino_logs.log")
-logger = init_logger(__name__, log_file)
+config = load_config('config/config.yaml')
+logger = init_logger(__name__, config)
 
 res_path = os.path.join(parent_path, "res")
 

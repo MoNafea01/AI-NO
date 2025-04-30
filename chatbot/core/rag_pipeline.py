@@ -1,33 +1,43 @@
-#chatbot/core/rag_pipeline.py
+# #chatbot/core/rag_pipeline.py
 import os
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_ollama import OllamaLLM
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.output_parsers import StrOutputParser
-from core.templates import get_template
-from core.utils import init_logger
+from chatbot.core.templates import get_template
+from chatbot.core.utils import init_logger, load_config
 
-# Configure logging
-parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-log_file = os.path.join(parent_path, "aino_logs.log")
-logger = init_logger(__name__, log_file)
+# # Configure logging
+config = load_config('config/config.yaml')
+logger = init_logger(__name__, config)
 
-def get_llm(model_name="gemini-1.5-pro"):
+def get_llm(model_name="gemini-1.5-pro", temperature=0.1, max_tokens=500):
     logger.info(f"Initializing LLM: {model_name}")
     try:
-        llm = ChatGoogleGenerativeAI(
-        model=model_name,
-        temperature=0.1,
-        max_output_tokens=500,
-        google_api_key=os.getenv("GOOGLE_API_KEY")
-    )
+        if model_name.startswith("gemini"):
+            llm = ChatGoogleGenerativeAI(
+                model=model_name,
+                temperature=temperature,
+                max_output_tokens=max_tokens,
+                google_api_key=os.getenv("GOOGLE_API_KEY")
+            )
+        elif model_name.startswith("deepseek"):
+            llm = OllamaLLM(
+                model=model_name, 
+                temperature=0.1
+            )
+        else:
+            raise ValueError(f"Unsupported model: {model_name}")
+
         logger.debug("LLM initialized successfully")
         return llm
     except Exception as e:
         logger.error(f"Failed to initialize LLM: {str(e)}")
         raise
+
 
 def format_docs(docs):
     logger.debug(f"Formatting {len(docs)} documents")

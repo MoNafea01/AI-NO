@@ -1,5 +1,5 @@
 from keras.api.models import Sequential
-from ...repositories.node_repository import NodeLoader, NodeDataExtractor
+from ...repositories import NodeLoader, NodeDataExtractor
 from .base_layer import BaseLayer
 
 class SequentialNet(BaseLayer):
@@ -8,30 +8,38 @@ class SequentialNet(BaseLayer):
         '''Initializes the Sequential object.'''
         self.name, self.layer_path = self.load_args(name, path)
         self.layer = self.load_args(layer, attr="node_id")
-        self.layers, self.layers_names  = self.get_layers()
+        self.layers, self.layers_names  = self.get_layers(project_id)
+        err = None
+        if self.layers == []:
+            err = "No layers found in the model or there is an incorrect layer id."
+
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        super().__init__(project_id=project_id, err=err)
 
-        super().__init__(project_id=project_id)
     
-    def get_layers(self):
+    def get_layers(self, project_id):
         cur_id = self.layer
         if not self.layer:
             return [], []
         layers_ids = [cur_id]
         while True:
-            task = NodeLoader()(cur_id).get("task")
+            success, task = NodeLoader()(cur_id, project_id=project_id)
+            if not success:
+                return [], []
+            task = task.get("task")
             if task != "neural_network":
                 return [], []
             try:
-                cur_id = NodeLoader()(cur_id).get("children")[0]
+                success, cur_id = NodeLoader()(cur_id, project_id=project_id)
+                cur_id = cur_id.get("children")[0]
             except IndexError:
                 cur_id = None
                 
             if not cur_id:
                 break
             layers_ids.append(cur_id)
-        layers = [NodeDataExtractor()(layer_id) for layer_id in layers_ids][::-1]
+        layers = [NodeDataExtractor()(layer_id, project_id=project_id) for layer_id in layers_ids][::-1]
         layers_names = list(map(lambda x: x.name, layers))
         return layers, layers_names
 

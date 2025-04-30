@@ -3,7 +3,150 @@
         "admin": {
             "password": "admin",
             "projects": {
-                "1": []
+                "1": [
+                    {
+                        "message": "data loaded: iris",
+                        "node_id": 2579304681920,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            2579306955664,
+                            2579306955280
+                        ],
+                        "params": {},
+                        "node_type": "loader",
+                        "project_id": 1,
+                        "uid": 50,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\other\\data_loader_2579304681920.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 1821773697280,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "params": {
+                            "penalty": "l2",
+                            "C": 1.0
+                        },
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "project_id": 1,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_1821773697280.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 2522304776192,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "params": {
+                            "penalty": "l2",
+                            "C": 1.0
+                        },
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "project_id": 1,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2522304776192.pkl"
+                    },
+                    {
+                        "message": "data loaded: iris",
+                        "node_id": 2522325426240,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            2522325471024,
+                            2522325479568
+                        ],
+                        "params": {},
+                        "node_type": "loader",
+                        "project_id": 1,
+                        "uid": 50,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\other\\data_loader_2522325426240.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 2522252953024,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "params": {
+                            "penalty": "l2",
+                            "C": 0.5
+                        },
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "project_id": 1,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2522252953024.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 2522183232944,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "params": {
+                            "penalty": "l2",
+                            "C": 0.5
+                        },
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "project_id": 1,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2522183232944.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 2649058726768,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "params": {
+                            "penalty": "l2",
+                            "C": 1.0
+                        },
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "project_id": 1,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\1\\model\\logistic_regression_2649058726768.pkl"
+                    }
+                ],
+                "5": [],
+                "13": [
+                    {
+                        "node_id": 2438712952784,
+                        "node_name": "node_saver",
+                        "message": "Node standard_scaler saved.",
+                        "params": {},
+                        "task": "save",
+                        "node_type": "saver",
+                        "uid": 51,
+                        "children": [],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 13,
+                        "node_data": null
+                    }
+                ],
+                "14": [
+                    {
+                        "message": "data loaded: iris",
+                        "node_id": 2628892096064,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            2628894130224,
+                            2628894138096
+                        ],
+                        "params": {},
+                        "node_type": "loader",
+                        "project_id": 14,
+                        "uid": 50,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\14\\other\\data_loader_2628892096064.pkl"
+                    }
+                ],
+                "3": []
             }
         }
     },

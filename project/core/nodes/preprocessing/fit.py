@@ -1,6 +1,6 @@
 from .utils import PayloadBuilder
-from ...repositories.node_repository import NodeSaver, NodeDataExtractor
-from ..base_node import BaseNode, SAVING_DIR
+from ...repositories import NodeSaver, NodeDataExtractor
+from core.nodes.base_node import BaseNode, SAVING_DIR
 
 
 class PreprocessorFitter:
@@ -14,7 +14,7 @@ class PreprocessorFitter:
         try:
             self.preprocessor.fit(self.data)
         except Exception as e:
-            raise ValueError(f"Error fitting preprocessor: {e}")
+            return f"Error fitting preprocessor: {e}"
         return self.preprocessor
 
 
@@ -23,32 +23,41 @@ class Fit(BaseNode):
     def __init__(self, data, preprocessor=None, preprocessor_path=None, project_id=None, *args, **kwargs):
         self.preprocessor = preprocessor
         self.preprocessor_path = preprocessor_path
-        self.data = NodeDataExtractor()(data)
+        err = None
+        self.data = NodeDataExtractor()(data, project_id=project_id)
+        if isinstance(self.data, str):
+            err = "Failed to load Nodes. Please check the provided IDs."
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
-        self.payload = self._fit()
+        self.payload = self._fit(err)
 
-    def _fit(self):
-        if isinstance(self.preprocessor, (dict, int)):
+    def _fit(self, err=None):
+        if err:
+            return err
+        if isinstance(self.preprocessor, (dict, int, str)):
             return self._fit_from_id()
         elif isinstance(rf"{self.preprocessor_path}", str):
             return self._fit_from_path()
         else:
-            raise ValueError("Invalid preprocessor or path provided.")
+            return "Invalid preprocessor or path provided."
 
     def _fit_from_id(self):
         try:
-            preprocessor = NodeDataExtractor()(self.preprocessor)
+            preprocessor = NodeDataExtractor()(self.preprocessor, project_id=self.project_id)
+            if isinstance(preprocessor, str):
+                return "Failed to load preprocessor. Please check the provided ID."
             return self._fit_handler(preprocessor)
         except Exception as e:
-            raise ValueError(f"Error fitting preprocessor by ID: {e}")
+            return f"Error fitting preprocessor by ID: {e}"
 
     def _fit_from_path(self):
         try:
-            preprocessor = NodeDataExtractor()(self.preprocessor_path)
+            preprocessor = NodeDataExtractor()(self.preprocessor_path, project_id=self.project_id)
+            if isinstance(preprocessor, str):
+                return "Failed to load preprocessor. Please check the provided path."
             return self._fit_handler(preprocessor)
         except Exception as e:
-            raise ValueError(f"Error fitting preprocessor by path: {e}")
+            return f"Error fitting preprocessor by path: {e}"
     
 
     def _fit_handler(self, preprocessor):
@@ -60,9 +69,9 @@ class Fit(BaseNode):
                                                    node_type="fitter", task="fit_preprocessor", project_id=self.project_id,
                                                    uid=self.uid)
             
-            project_path = f"{self.project_id}\\" if self.project_id else ""
-            NodeSaver()(payload, rf"{SAVING_DIR}\{project_path}preprocessing")
+            project_path = f"{self.project_id}/" if self.project_id else ""
+            NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}preprocessing")
             payload.pop("node_data", None)
             return payload
         except Exception as e:
-            raise ValueError(f"Error fitting preprocessor: {e}")
+            return f"Error fitting preprocessor: {e}"

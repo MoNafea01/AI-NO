@@ -79,17 +79,10 @@
         "n_neighbors": 5
     },
     "model_fitter": {
-        "model": "model_id",
-        "X": "X_id",
-        "y": "y_id"
     },
     "predictor": {
-        "model": "model_id",
-        "X": "X_id"
     },
     "evaluator": {
-        "y_true": "y_true_id",
-        "y_pred": "y_pred_id",
         "params": {
             "metric": "mse"
         }
@@ -125,16 +118,10 @@
         "threshold": 0.0
     },
     "preprocessor_fitter": {
-        "preprocessor": "preprocessor_id",
-        "data": "data_id"
     },
     "transformer": {
-        "preprocessor": "fitted_preprocessor_id",
-        "data": "data_id"
     },
     "fitter_transformer": {
-        "preprocessor": "preprocessor_id",
-        "data": "data_id"
     },
     "data_loader": {
         "params": {
@@ -142,17 +129,12 @@
         }
     },
     "splitter": {
-        "data": "data_id"
     },
     "joiner": {
-        "data_1": "data_1_id",
-        "data_2": "data_2_id"
     },
     "train_test_split": {
-        "data": "data_id",
         "params": {
-            "test_size": 0.2,
-            "random_state": 42
+            "test_size": 0.2
         }
     },
     "input_layer": {
@@ -172,8 +154,7 @@
                 3
             ],
             "activation": "relu"
-        },
-        "prev_node": "prev_node_id"
+        }
     },
     "maxpool2d_layer": {
         "params": {
@@ -181,38 +162,30 @@
                 2,
                 2
             ]
-        },
-        "prev_node": "prev_node_id"
+        }
     },
     "flatten_layer": {
-        "params": {},
-        "prev_node": "prev_node_id"
+        "params": {}
     },
     "dense_layer": {
         "params": {
             "units": 128,
             "activation": "relu"
-        },
-        "prev_node": "prev_node_id"
+        }
     },
     "dropout_layer": {
         "params": {
             "rate": 0.5
-        },
-        "prev_node": "prev_node_id"
+        }
     },
     "sequential_model": {
-        "params": {},
-        "layer": "layer_id"
+        "params": {}
     },
-    "nn_model_fitter": {
+    "nn_fitter": {
         "params": {
             "batch_size": 20,
             "epochs": 10
-        },
-        "model": "model_id",
-        "X": "X_id",
-        "y": "y_id"
+        }
     },
     "model_compiler": {
         "params": {
@@ -221,7 +194,11 @@
             "metrics": [
                 "accuracy"
             ]
-        },
-        "nn_model": "model_id"
+        }
+    },
+    "node_saver": {
+
+    },
+    "node_loader": {
     }
 }
