@@ -10,9 +10,10 @@ from .serializers import *
 
 from core.nodes import *
 from core.repositories import *
-from core.nodes.configs.const_ import get_node_name_by_api_ref
+from core.nodes.configs.const_ import get_node_name_by_api_ref, CHILDREN_NODES
+from core.nodes.utils import FolderHandler
 
-from chatbot.app import generate_cli
+from chatbot.app import sync_generate_cli
 from cli.call_cli import call_script
 
 class NodeQueryMixin:
@@ -29,20 +30,32 @@ class NodeQueryMixin:
             project_id = request.query_params.get('project_id')
             retrun_data = request.query_params.get('return_data', '0') == '1'
 
-            node_name = Node.objects.get(node_id=node_id).node_name
-            if node_name not in DATA_NODES:
-                retrun_data = False
+            if not node_id:
+                return Response({"error": "'node_id' is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            node = Node.objects.filter(node_id=node_id, project_id=project_id).first()
+            if not node:
+                return Response({"error": f"Node not found for project with id = {project_id}."}, status=status.HTTP_404_NOT_FOUND)
+            
+            if node.node_name not in DATA_NODES:
+                return_data = False
 
             # get chain of nodes using "output" query_param, specific for layer nodes
             if output.isdigit() and int(output) > 0:
                 depth = int(output)
-                current_node = NodeLoader(return_path=return_path)(node_id=node_id)
-                children = current_node.get("children", [])
-                if len(current_node.get("children")) > 1:
-                    child_id = children[int(output) - 1] if len(children) >= int(output) else None
-                    if isinstance(child_id, int):
-                        current_node = NodeLoader(return_path=return_path)(node_id=str(child_id))
-                        node_id = str(child_id)
+                try:
+                    success, current_node = NodeLoader(return_path=return_path, return_data=retrun_data)(node_id=node_id, project_id=project_id)
+                    if success:
+                        children = current_node.get("children", [])
+                        if len(current_node.get("children")) > 1:
+                            child_id = children[int(output) - 1] if len(children) >= int(output) else None
+                            if isinstance(child_id, int):
+                                success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
+                                node_id = str(child_id)
+                    else:
+                        return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
+                except Exception as e:
+                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
                 # get node's children, for multi_channel nodes it has 2 children
                 else:
@@ -50,12 +63,18 @@ class NodeQueryMixin:
                         child = current_node.get("children", [])
                         if child:
                             child_id = child[0]
-                            current_node = NodeLoader(return_path=return_path)(node_id=str(child_id))
-                        else:
-                            break
+                            try:
+                                success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
+                                if not success:
+                                    return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
+                            except Exception as e:
+                                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                            
+                            else:
+                                break
                         node_id = str(current_node.get("node_id", node_id))
 
-            payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=retrun_data)(node_id=node_id)
+            success, payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=retrun_data)(node_id=node_id, project_id=project_id)
             
             # Filter by project_id if provided
             if project_id and payload:
@@ -71,26 +90,28 @@ class NodeQueryMixin:
         try:
             node_id = request.query_params.get("node_id")
             project_id = request.query_params.get('project_id')
-            node = NodeLoader()(node_id=node_id)
-            
+            success, node = NodeLoader()(node_id=node_id, project_id=project_id)
+            if success:
             # Check if node belongs to the specified project
-            if project_id and str(node.get('project_id')) != str(project_id):
-                return Response({"error": "Node does not belong to the specified project"}, 
-                              status=status.HTTP_400_BAD_REQUEST)
-            
-            # Check if node is a multi_channel node to delete it's dependencies
-            node_name = node.get('node_name')
-            is_multi_channel = node_name in MULTI_CHANNEL_NODES
-            if not node_id:
-                return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-            try:
-                success, message = NodeDeleter(is_multi_channel)(node_id)
-                if success:
-                    return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-                else:
-                    return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                if project_id and str(node.get('project_id')) != str(project_id):
+                    return Response({"error": "Node does not belong to the specified project"}, 
+                                status=status.HTTP_400_BAD_REQUEST)
+                
+                # Check if node is a multi_channel node to delete it's dependencies
+                node_name = node.get('node_name')
+                is_multi_channel = node_name in MULTI_CHANNEL_NODES
+                if not node_id:
+                    return Response({"error": "Node ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    success, message = NodeDeleter(is_multi_channel)(node_id, project_id=project_id)
+                    if success:
+                        return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+                    else:
+                        return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+                except Exception as e:
+                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"error": node}, status=status.HTTP_400_BAD_REQUEST)
             
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -130,7 +151,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 node_name = get_node_name_by_api_ref(ref, request)
                 uid = Component.objects.get(node_name=node_name).uid
             except Component.DoesNotExist:
-                return Response({"error": f"Component with name {node_name}not found"}, status=status.HTTP_404_NOT_FOUND), None, None, None
+                return Response({"error": f"Component with name {node_name} not found"}, status=status.HTTP_404_NOT_FOUND), None, None, None
 
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
@@ -153,7 +174,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
             BaseNodeAPIView.cur_id += 1
 
-            return processor, return_serialized, output_channel, node_id
+            return processor, return_serialized, output_channel, node_id, project_id
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST), None, None, None
 
@@ -162,16 +183,20 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         result = self.get_processor_and_args(request)
         if isinstance(result[0], Response):
             return result[0]
-        processor, return_serialized, output_channel, _ = result
+        processor, return_serialized, output_channel, *_ = result
 
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
             response_data = processor(output_channel, return_serialized=return_serialized)
+            if isinstance(response_data, str):
+                return Response({"error": response_data}, status=status.HTTP_400_BAD_REQUEST)
+            
             node_id = response_data.get("node_id")
+            project_id = response_data.get("project_id")
 
             # Returns node_data chosen
-            response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path = not return_serialized)(node_id)
+            response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path = not return_serialized)(node_id, project_id=project_id)
             return Response(response_data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -181,13 +206,16 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         if isinstance(result[0], Response):
             return result[0]
         
-        processor, return_serialized, _, node_id = result
+        processor, return_serialized, _, node_id, project_id = result
 
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            success, message = NodeUpdater(return_serialized)(node_id, processor())
-            message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
+            success, message = NodeUpdater(return_serialized)(node_id, project_id, processor())
+            if isinstance(message, str):
+                return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            
+            message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
             
             status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
             return Response(message if success else {"error": message}, status=status_code)
@@ -513,18 +541,18 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
     def get_serialized_payload(self, node_id, path, return_serialized, project_id):
         """Loads a node, saves it, and optionally serializes it."""
         loader = NodeLoader(from_db=False)
-        payload = loader(node_id=node_id, path=path)
+        success, payload = loader(node_id=node_id, project_id= project_id, path=path)
         node_name = payload.get("message").split(" ")[1]
         uid = Component.objects.get(node_name="node_loader").uid
         payload.update({"node_name":node_name,
                         "project_id": project_id,
                         "uid": uid})
         
-        project_path = f"{project_id}\\" if project_id else ""
-        NodeSaver()(payload, path=rf"{SAVING_DIR}\{project_path}other")
+        project_path = f"{project_id}/" if project_id else ""
+        NodeSaver()(payload, path=rf"{SAVING_DIR}/{project_path}other")
 
         # Reload the node with serialization settings
-        payload = NodeLoader(return_serialized=return_serialized, return_path= not return_serialized)(node_id=payload.get("node_id"))
+        success, payload = NodeLoader(return_serialized=return_serialized, return_path= not return_serialized)(node_id=payload.get("node_id"), project_id=project_id)
         return payload
     
     def post(self, request):
@@ -565,9 +593,9 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
 
                 payload = self.get_serialized_payload(node_id, path, return_serialized, project_id)
                 node_id = request.query_params.get("node_id", None)
-                success, message = NodeUpdater(return_serialized)(node_id, payload)
+                success, message = NodeUpdater(return_serialized)(node_id, project_id, payload)
 
-                message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id)
+                message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
                         
                 if success:
                     return Response({"message": message}, status=status.HTTP_200_OK)
@@ -590,8 +618,8 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
         try:
             saver = NodeSaver()
             if isinstance(payload, int):
-                payload = NodeLoader()(node_id=payload)
-            node_data = NodeDataExtractor()(payload)
+                success, payload = NodeLoader()(node_id=payload, project_id=project_id)
+            node_data = NodeDataExtractor()(payload, project_id=project_id)
             payload["node_data"] = node_data
             payload["node_id"] = id(saver)
             try:
@@ -605,7 +633,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
             response = saver(saved_response)
 
             if return_serialized:
-                node_data = NodeDataExtractor(return_serialized=True)(response)
+                node_data = NodeDataExtractor(return_serialized=True)(response, project_id=project_id)
                 response["node_data"] = node_data
 
             return Response(response, status=status.HTTP_200_OK)
@@ -621,19 +649,20 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request):
-        serializer = NodeSaverSerializer(data=request.data)
+        serializer, project_id = NodeSaverSerializer(data=request.data)
         if serializer.is_valid():
             response = self.process_node_save(request)
             response_data = response.data
             node_id = request.query_params.get("node_id")
+            project_id = request.query_params.get('project_id')
             return_serialized = request.query_params.get("return_serialized") == "1"
 
-            success, message = NodeUpdater(return_serialized)(node_id, response_data)
+            success, message = NodeUpdater(return_serialized)(node_id, project_id, response_data)
 
             if return_serialized:
-                message["node_data"] = NodeDataExtractor(return_serialized=True)(message)
+                message["node_data"] = NodeDataExtractor(return_serialized=True)(message, project_id=project_id)
             else:
-                message["node_data"] = NodeDataExtractor(return_path=True)(message)
+                message["node_data"] = NodeDataExtractor(return_path=True)(message, project_id=project_id)
 
             if success:
                 return Response(message, status=status.HTTP_200_OK)
@@ -757,6 +786,9 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
             for item in data:
                 if project_id:
                     item['project_id'] = project_id
+                if item.get('project'):
+                    item.pop('project')
+                    
             serializer = self.get_serializer(data=data, many=True)
         else:
             # Handle single node creation
@@ -764,7 +796,6 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
             if project_id:
                 data['project_id'] = project_id
             serializer = self.get_serializer(data=data)
-
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -791,10 +822,10 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
                     continue
                 
                 try:
-                    instance = Node.objects.get(node_id=node_id)
+                    instance = Node.objects.get(node_id=node_id, project_id=project_id)
                     # Update fields directly
                     for field, value in item.items():
-                        if field not in ['node_id', 'project']:  # Skip node_id as it shouldn't be updated
+                        if field not in ['node_id', 'project_id', 'project']:  # Skip node_id as it shouldn't be updated
                             setattr(instance, field, value)
                     
                     # Set project if provided in query params
@@ -840,13 +871,15 @@ class ExportProjectAPIView(APIView):
             
             # Extract validated data
             default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'exports')
-            save_path = serializer.validated_data.get('path', default_path)
+            save_path = serializer.validated_data.get('folder_path', default_path)
             file_name = serializer.validated_data.get('file_name', 'exported_project')
             format_type = serializer.validated_data.get('format', 'ainoprj').lower()
             save_path = os.path.join(save_path, f'{file_name}.{format_type}')
-            encrypt = serializer.validated_data.get('encrypt', False)
-            password = serializer.validated_data.get('password', '')
-            
+            # encrypt = serializer.validated_data.get('encrypt', False)
+            password = serializer.validated_data.get('password')
+            encrypt = not(password == None)
+            if not password:
+                password = ''
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
             if not project_id:
@@ -1004,7 +1037,7 @@ class ExportProjectAPIView(APIView):
 class ImportProjectAPIView(APIView):
     """API view for importing project nodes from JSON or AINOPRJ format."""
     
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         try:
             # Validate request body using serializer
             serializer = ImportProjectSerializer(data=request.data)
@@ -1014,9 +1047,12 @@ class ImportProjectAPIView(APIView):
             # Extract validated data
             file_path = serializer.validated_data['path']
             format_type = serializer.validated_data.get('format', 'auto')
-            password = serializer.validated_data.get('password', '')
+            password = serializer.validated_data.get('password')
             encrypt = "1" if password else "0"
+            if encrypt == "1" and not password:
+                return Response({"error": "Please change encryption to 0 or add a password"}, status=status.HTTP_400_BAD_REQUEST)
             
+            replace = request.query_params.get('replace', '1') == '1'   # if specified to '0' it will remain nodes, else it will replace them
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
             if not project_id:
@@ -1120,21 +1156,19 @@ class ImportProjectAPIView(APIView):
             
             # Extract nodes from the JSON data
             nodes_data = json_data
+            
             if not nodes_data:
                 return Response({"error": "No nodes found in the import file"}, 
                               status=status.HTTP_400_BAD_REQUEST)
             
+            if replace:
+                # Clear existing nodes for the project
+                Node.objects.filter(project_id=project_id).delete()
             # Prepare nodes for import by setting the project_id
             for node in nodes_data:
-                # Remove any existing IDs from the imported data
-                node.pop('id', None)
-                # Add the current project ID
                 node['project_id'] = project_id
+                [node.pop(i, None) for i in ['project', 'node_data']]
                 
-                # Generate new node_id if needed to avoid conflicts
-                if 'node_id' in node:
-                    # Use timestamp-based node_id to avoid conflicts
-                    node['node_id'] = int(time.time() * 1000) + random.randint(1, 999)
             
             # Create the nodes in the database
             node_serializer = NodeSerializer(data=nodes_data, many=True)
@@ -1186,6 +1220,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 class ChatbotAPIView(APIView):
     """API endpoint for interacting with the chatbot."""
+    history = []
     
     def post(self, request, *args, **kwargs):
         try:
@@ -1193,6 +1228,7 @@ class ChatbotAPIView(APIView):
             query = request.data.get('query')
             mode = request.data.get('mode', 'manual')  # Default to manual mode
             project_id = request.query_params.get('project_id')
+            route = request.data.get("route", "chat")
 
             if project_id:
                 try:
@@ -1211,6 +1247,10 @@ class ChatbotAPIView(APIView):
             model_name = request.data.get('model_name', 'gemini-1.5-pro')  # Default model
             iteration = request.data.get('iteration', 0)  # Current iteration
             to_db = request.data.get('to_db', False)  # Flag for database usage
+            
+            if route in ['1', 'chat']:
+                to_db = False
+                mode = 'manual'
 
             
             if not query:
@@ -1220,9 +1260,13 @@ class ChatbotAPIView(APIView):
             if mode not in ['1', '2', 'manual', 'auto']:
                 return Response({"error": "Mode must be '1' (manual) or '2' (auto)"}, 
                               status=status.HTTP_400_BAD_REQUEST)
+
+            if route not in ['chat', '1', 'agent', '2']:
+                return Response({"error": "Choose 'agent' or 'chat'"}, status=status.HTTP_400_BAD_REQUEST)
             
-            response, logs = generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration)
+            response, logs, hist = sync_generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration, route=route, history=ChatbotAPIView.history)
             
+            ChatbotAPIView.history = hist
             return Response({"output": response, "status": "success", "logs": logs}, status=status.HTTP_200_OK)
         
         except Exception as e:
@@ -1245,3 +1289,5 @@ class CLIAPIView(APIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+

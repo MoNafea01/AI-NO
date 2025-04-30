@@ -10,7 +10,7 @@ class NodeNameHandler:
     def handle_name(path=None):
         if not path:
             raise ValueError("Path must be provided.")
-        name = path.split("\\")[-1].split(".")[0]
+        name = path.split("/")[-1].split("\\")[-1].split(".")[0]
         _name = re.sub(r'\d+', '', name)
         _id = re.sub(r'\D', '', name)
         _id = _id if _id else 0

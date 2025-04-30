@@ -20,22 +20,24 @@ class NodeUpdater:
     def __init__(self, return_serialized : bool = False):
         self.return_serialized = return_serialized
 
-    def __call__(self, node_id: int, payload: dict, ) -> tuple:
+    def __call__(self, node_id: int, project_id: int, payload: dict) -> tuple:
         if not node_id:
             raise ValueError("Node ID must be provided.")
         
         node_id = int(node_id) if node_id else None
+        project_id = int(project_id) if project_id else None
+
         if not isinstance(payload, dict):
             raise ValueError("Payload must be a dictionary.")
         
         try:
             # take the <old> node (by its id)
-            node = Node.objects.get(node_id=node_id)
+            node = Node.objects.get(node_id=node_id, project_id=project_id) # get node from database
             folder_path = os.path.dirname(node.node_data)
             original_id = payload.get("node_id") # id for new node
             
             is_multi_channel = node.node_name in MULTI_CHANNEL_NODES
-            payload["node_data"] = NodeDataExtractor()(original_id)
+            payload["node_data"] = NodeDataExtractor()(original_id, project_id=project_id)
 
             if is_multi_channel:
                 payload["node_data"] = []
@@ -45,13 +47,13 @@ class NodeUpdater:
                 new_ids = node.children
 
                 for o_id in o_ids:
-                    config = NodeLoader()(o_id)
+                    success, config = NodeLoader()(o_id, project_id=project_id)
                     configs.append(config)
 
                 for i in range(2):
                     tmp_id = o_ids[i]
                     new_id = new_ids[i]
-                    data = NodeDataExtractor()(tmp_id)
+                    data = NodeDataExtractor()(tmp_id, project_id=project_id)
                     
                     new_payload = payload.copy()
                     new_payload.update(**configs[i])
@@ -65,7 +67,7 @@ class NodeUpdater:
                 payload['children'] = node.children
                 
             NodeSaver()(payload, path=folder_path)
-            NodeDeleter(is_multi_channel)(original_id)
+            NodeDeleter(is_multi_channel)(original_id, project_id=project_id)
             
             # this part to delete node if its name isn't same as new one's name
             if node.node_name != payload.get("node_name"):
@@ -74,7 +76,7 @@ class NodeUpdater:
                     os.remove(node_path)
 
             # serialization part
-            out_node = NodeLoader(return_serialized=self.return_serialized)(node_id)
+            success, out_node = NodeLoader(return_serialized=self.return_serialized)(node_id, project_id=project_id)
             message = f"Node {out_node.get('node_name')} with id {node_id} updated."
             payload.update({"message": message, "node_data": out_node.get('node_data')})
             return True, payload

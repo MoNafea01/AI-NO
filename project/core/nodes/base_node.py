@@ -17,16 +17,20 @@ class BaseNode:
     def _load_from_dict(self):
         try:
             node = self.node_class(**self.node_params())
+            if isinstance(node, str):
+                return "Failed to create node. Please check the provided parameters."
             return self.load_handler(node)
         except Exception as e:
-            raise ValueError(f"Error creating node from json: {e}")
+            return f"Error creating node from json: {e}"
     
     def _load_from_path(self):
         try:
-            node = NodeDataExtractor()(self.node_path)
+            node = NodeDataExtractor()(self.node_path, project_id=self.project_id)
+            if isinstance(node, str):
+                return "Failed to load node. Please check the provided path."
             return self.load_handler(node)
         except Exception as e:
-            raise ValueError(f"Error loading node from path: {e}")
+            return f"Error loading node from path: {e}"
     
     def load_handler(self, node):
         try:
@@ -36,7 +40,7 @@ class BaseNode:
                     try:
                         payload.update({'children':[self.children]})
                     except Exception as e:
-                        raise ValueError(f"Error updating children: {e}")
+                        return f"Error updating children: {e}"
 
             except Exception as e:
                 pass
@@ -45,16 +49,16 @@ class BaseNode:
             if hasattr(self, 'project_id') and self.project_id:
                 payload['project_id'] = self.project_id
             
-            project_path = f"{self.project_id}\\" if self.project_id else ""
-            NodeSaver()(payload, path=rf"{SAVING_DIR}\{project_path}{self.get_folder()}")
+            project_path = f"{self.project_id}/" if self.project_id else ""
+            NodeSaver()(payload, path=rf"{SAVING_DIR}/{project_path}{self.get_folder()}")
             payload.pop("node_data", None)
             return payload
         
         except Exception as e:
-            raise ValueError(f"Error creating {self.node_name} node payload: {e}")
+            return f"Error creating {self.node_name} node payload: {e}"
 
     def node_class(self):
-        raise NotImplementedError("node_class method not implemented.")
+        return "node_class method not implemented."
     
     def build_payload(self, node, message, node_name, **kwargs):
         payload = PayloadBuilder.build_payload(message, node, node_name, params=self.get_params())
@@ -89,6 +93,6 @@ class BaseNode:
     def __call__(self, *args, **kwargs):
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(self.payload)
+            node_data = NodeDataExtractor(return_serialized=True)(self.payload, project_id=self.project_id)
             self.payload.update({"node_data": node_data})
         return self.payload

@@ -14,3 +14,14 @@ templates:
   manual: manual_template.txt
   auto: auto_template.txt
 max_iterations: 10
+chat:
+  model: gemini-1.5-flash
+  max_tokens: 100
+  temperature: 0.7
+router:
+  model: gemini-2.0-flash
+  prompt_template: file:router_template.txt
+clarification:
+  model: gemini-1.5-flash
+  prompt_template: file:clarification_template.txt
+  node_mapping: res/node_mapping.json

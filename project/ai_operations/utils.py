@@ -1,16 +1,22 @@
 MODEL = {
-    'post': [{"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}],
-    'put' : [{"model_name": "linear_regression","model_type": "linear_models","task": "regression"},],
+    'post': [{"model_name": "logistic_regression","model_type": "linear_models","task": "classification"},
+             ],
+    'put' : [{"model_name": "linear_regression","model_type": "linear_models","task": "regression"},
+             ],
     }
 
 FIT_MODEL = {
-    'post': [{}],
-    'put' : [{}]
+    'post': [{},
+             ],
+    'put' : [{},
+             ]
 }
 
 PREDICT_MODEL = {
-    'post': [{}],
-    'put' : [{}]
+    'post': [{},
+             ],
+    'put' : [{},
+             ]
 }
 
 EVALUATE_MODEL = {
@@ -21,8 +27,10 @@ EVALUATE_MODEL = {
 }
 
 DATA_LOADER = {
-    'post': [{"params": {"dataset_name":"diabetes"}}],
-    'put': [{"params": {"dataset_name":"diabetes"}}]
+    'post': [{"params": {"dataset_name":"diabetes"}},
+             ],
+    'put': [{"params": {"dataset_name":"diabetes"}},
+            ]
 }
 
 TR_TE_SP = {

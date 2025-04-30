@@ -418,3 +418,35 @@ class PipeLineTest(APITestCase):
 
 #         self.client.delete(reverse('clear_nodes'), query_params={"test":1})
 
+# class Testing_Functions(APITestCase):
+    # @classmethod
+    # def setUp(self):
+    #     super().setUpClass()
+
+    # def test_01_test_function(self):
+
+    #     def update_child(node:dict):
+    #         l = []
+    #         children_ids = node.get('children')
+    #         if len(children_ids) >= 1:
+    #             for i, child_id in enumerate(node.get('children')):
+    #                 child = self.client.get('/api/create_model/', query_params={"node_id":child_id}).data
+    #                 child['node_id'] = id(child)
+    #                 node['children'][i] = child['node_id']
+    #                 print(f"child {i}: {child.get('node_id')}")
+    #                 l.append(child['node_id'])
+    #                 update_child(child)
+    #         node.update({"children": l, "node_id": id(node)})
+    #         return node
+
+
+    #     node = self.client.post('/api/create_input/', {'params':{'shape': [4]}}, format='json').data
+    #     print(f"input_layer_id: {node.get('node_id')}")
+    #     node = self.client.post('/api/dense/', {'prev_node': node.get('node_id')}, format='json').data
+    #     print(f"dense__id: {node.get('node_id')}")
+    #     node = self.client.post('/api/dense/', {'prev_node': node.get('node_id')}, format='json').data
+    #     print(f"dense_2_id: {node.get('node_id')}")
+
+    #     update_child(node)
+    #     # print(l)
+    #     print(node)

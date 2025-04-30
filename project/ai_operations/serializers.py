@@ -228,7 +228,7 @@ class NodeSerializer(serializers.ModelSerializer):
         # if node_data_base64 :
         #     validated_data["node_data"] = base64.b64decode(node_data_base64)
 
-        project_id = validated_data.pop("project_id", None)
+        project_id = validated_data.pop("project_id")
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
@@ -251,7 +251,7 @@ class NodeSerializer(serializers.ModelSerializer):
         #     validated_data["node_data"] = base64.b64decode(node_data_base64)
         
         # Handle project_id if provided
-        project_id = validated_data.pop("project_id", None)
+        project_id = validated_data.pop("project_id")
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
@@ -314,8 +314,7 @@ def validate(data, keys):
 
 
 class ExportProjectSerializer(serializers.Serializer):
-    path = serializers.CharField(required=False, allow_blank=True, help_text="File path to save the exported file")
-    encrypt = serializers.BooleanField(required=False, help_text="Whether to encrypt the AINOPRJ file")
+    folder_path = serializers.CharField(required=False, allow_blank=True, help_text="File path to save the exported file")
     format = serializers.ChoiceField(required=False, choices=['json', 'ainoprj'], help_text="Export format (json or ainoprj)")
     file_name = serializers.CharField(required=False, allow_blank=True, help_text="File name for the exported file")
     password = serializers.CharField(required=False, allow_blank=True, help_text="Password for encrypted AINOPRJ files")    
@@ -325,5 +324,5 @@ class ImportProjectSerializer(serializers.Serializer):
     format = serializers.ChoiceField(required=False, default='auto', choices=['auto', 'json', 'ainoprj'], 
                                    help_text="Format of the import file (auto will detect based on extension)")
     password = serializers.CharField(required=False, allow_blank=True, 
-                                   help_text="Password for encrypted AINOPRJ files", default="aino_secret_key")
+                                   help_text="Password for encrypted AINOPRJ files")
     

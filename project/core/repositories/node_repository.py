@@ -18,7 +18,7 @@ class ClearAllNodes:
             else:
                 project = Node.objects.all()
             # deletes all objects in the Node model
-            nodes_path = SAVING_DIR + "\\" + str(project_id) if project_id else SAVING_DIR
+            nodes_path = SAVING_DIR + "/" + str(project_id) if project_id else SAVING_DIR
             project.delete()
             nodes_dir = os.path.abspath(SAVING_DIR)
             shutil.rmtree(nodes_path, ignore_errors=True)
@@ -42,26 +42,36 @@ class NodeDataExtractor:
         self.return_serialized = return_serialized
         self.return_path = return_path
 
-    def __call__(self, *args):
-        return self.node_data_extract(*args)
+    def __call__(self, *args, project_id=None):
+        return self.node_data_extract(*args, project_id=project_id)
 
-    def node_data_extract(self, *args):
+    def node_data_extract(self, *args, project_id):
         from core.repositories.operations import NodeLoader
         l = []
         for arg in args:
             if isinstance(arg, dict):
-                data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg.get("node_id")).get("node_data")
+                success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg.get("node_id"), project_id=project_id)
+                if success:
+                    data = data.get("node_data")
+
                 if data is not None:
                     l.append(data)
             elif isinstance(arg, int):
-                data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg).get("node_data")
+                success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg, project_id=project_id)
+                if success:
+                    data = data.get("node_data")
+
                 if data is not None:
                     l.append(data)
             elif isinstance(arg, str):
                 if arg.isnumeric():
-                    data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(int(arg)).get("node_data")
+                    success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(int(arg), project_id=project_id)
+                    if success:
+                        data = data.get("node_data")
                 else:
-                    data = NodeLoader(from_db=False, return_serialized=self.return_serialized, return_path=self.return_path)(path=arg).get("node_data")
+                    success, data = NodeLoader(from_db=False, return_serialized=self.return_serialized, return_path=self.return_path)(path=arg)
+                    if success:
+                        data = data.get("node_data")
                 if data is not None:
                     l.append(data)
             else:
@@ -89,7 +99,7 @@ class Repository:
     def load(self, node_id: int = None, path: str = None) -> dict:
         """Loads the node from the database or filesystem."""
         from core.repositories.operations import NodeLoader
-
+        
         return NodeLoader(self.from_db, self.return_serialized, self.return_path)(node_id, path)
     
     def update(self, node_id: int, payload: dict) -> dict:

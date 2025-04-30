@@ -22,27 +22,30 @@ class NodeDeleter:
     def __call__(
             self, 
             node_id, 
+            project_id = None,
             ) -> tuple:
 
         if not node_id:
-            raise ValueError("Node ID must be provided.")
+            return False, "Node ID must be provided."
         
         node_id = int(node_id) if node_id else None
+        project_id = int(project_id) if project_id else None
+
         try:
-            node = Node.objects.get(node_id=node_id) # get node from database
+            node = Node.objects.get(node_id=node_id, project_id=project_id) # get node from database
 
             if self.is_multi_channel:
-                old_node = Node.objects.get(node_id = node_id)
+                old_node = Node.objects.get(node_id = node_id, project_id=project_id) # get node from database
                 children = old_node.children
                 if children:
                     for value in children:
-                        child = Node.objects.get(node_id = value)
+                        child = Node.objects.get(node_id = value, project_id=project_id)
                         delete_node(child)
             
             delete_node(node)
 
             return True, f"Node {node_id} deleted."
         except ObjectDoesNotExist:
-            return False, f"Node {node_id} does not exist."
+            return False, f"Node {node_id} does not exist in project with id={project_id}."
         except Exception as e:
-            raise e  # Re-raise for the view to handle
+            return False, e  # Re-raise for the view to handle

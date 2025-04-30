@@ -5,13 +5,19 @@ from ..base_node import BaseNode, SAVING_DIR
 
 class TrainTestSplit(BaseNode):
     def __init__(self, X, y, params=None, project_id: int = None, *args, **kwargs):
-        self.X, self.y = NodeDataExtractor()(X, y)
+        err = None
+        self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
+        if any(isinstance(i, str) for i in [self.X, self.y]):
+            err = "Failed to load Nodes. Please check the provided IDs."
+
         self.params = params if params else {'test_size': 0.2, 'random_state': 42}
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
-        self.payload = self.split()
+        self.payload = self.split(err)
 
-    def split(self):
+    def split(self, err=None):
+        if err:
+            return err
         try:
             out1, out2 = None, None
 
@@ -31,13 +37,13 @@ class TrainTestSplit(BaseNode):
 
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
-                project_path = f"{self.project_id}\\" if self.project_id else ""
-                NodeSaver()(payload[i], rf"{SAVING_DIR}\{project_path}other")
+                project_path = f"{self.project_id}/" if self.project_id else ""
+                NodeSaver()(payload[i], rf"{SAVING_DIR}/{project_path}other")
                 payload[i].pop("node_data", None)
 
             return payload
         except Exception as e:
-            raise ValueError(f"Error splitting data: {e}")
+            return f"Error splitting data: {e}"
 
     def __str__(self):
         return f"data: {self.payload}"
@@ -49,9 +55,12 @@ class TrainTestSplit(BaseNode):
                 payload = self.payload[1]
             elif arg == '2':
                 payload = self.payload[2]
+                
+        if isinstance(self.payload, str):
+            payload = self.payload
 
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = NodeDataExtractor(return_serialized=True)(payload)
+            node_data = NodeDataExtractor(return_serialized=True)(payload, project_id=self.project_id)
             payload.update({"node_data": node_data})
         return payload
