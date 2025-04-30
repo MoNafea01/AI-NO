@@ -65,6 +65,9 @@ class Predict(BaseNode):
         try:
             predictor = ModelPredictor(model, self.X)
             predictions = predictor.predict_model()
+            if isinstance(predictions, str):
+                return f"Error predicting model: {predictions}"
+            
             payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict',
                                                     uid=self.uid)
             if self.project_id:

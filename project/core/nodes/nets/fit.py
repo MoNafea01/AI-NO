@@ -51,6 +51,9 @@ class Fit(BaseNode):
     def _fit_handler(self, model):
         try:
             model.fit(self.X, self.y, batch_size=self.batch_size, epochs=self.epochs)
+            if isinstance(model, str):
+                return f"Model fitting failed. {model}"
+
 
             payload = PayloadBuilder.build_payload("NN fitted", model, "nn_fitter", node_type="fitter", task="fit_model",
                                                        params={"batch_size": self.batch_size, "epochs": self.epochs},

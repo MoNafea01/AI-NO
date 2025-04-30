@@ -64,6 +64,8 @@ class Fit(BaseNode):
         try:
             fitter = PreprocessorFitter(preprocessor, self.data)
             fitted_preprocessor = fitter.fit_preprocessor()
+            if isinstance(fitted_preprocessor, str):
+                return f"Preprocessor fitting failed. {fitted_preprocessor}"
 
             payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", 
                                                    node_type="fitter", task="fit_preprocessor", project_id=self.project_id,

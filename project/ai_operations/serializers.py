@@ -61,10 +61,10 @@ class FitModelSerializer(serializers.Serializer):
 
 class PredictSerializer(serializers.Serializer):
     X = JSONOrIntField(required=True)
-    model = JSONOrIntField(required=False)
-    model_path = serializers.CharField(required=False)
+    fitted_model = JSONOrIntField(required=False)
+    fitted_model_path = serializers.CharField(required=False)
     def validate(self, data):
-        return validate(data, (('model', 'X'), 'model_path'))
+        return validate(data, (('fitted_model', 'X'), 'fitted_model_path'))
 
 
 class EvaluatorSerializer(serializers.Serializer):
@@ -92,10 +92,10 @@ class FitPreprocessorSerializer(serializers.Serializer):
 
 class TransformSerializer(serializers.Serializer):
     data = JSONOrIntField(required=True)
-    preprocessor = JSONOrIntField(required=False)
-    preprocessor_path = serializers.CharField(required=False)
+    fitted_preprocessor = JSONOrIntField(required=False)
+    fitted_preprocessor_path = serializers.CharField(required=False)
     def validate(self, data):
-        return validate(data, (('preprocessor', 'data'), 'preprocessor_path'))
+        return validate(data, (('fitted_preprocessor', 'data'), 'fitted_preprocessor_path'))
 
 
 class FitTransformSerializer(serializers.Serializer):

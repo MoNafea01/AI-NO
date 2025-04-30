@@ -67,6 +67,8 @@ class FitTransform:
         try:
             fitter_transformer = PreprocessorFitterTransformer(preprocessor, self.data)
             fitted_preprocessor, output = fitter_transformer.fit_transform_preprocessor()
+            if isinstance(fitted_preprocessor, str):
+                return f"Preprocessor fitting and transformation failed. {fitted_preprocessor}"
 
             payload = []
             payload.append(PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output),
