@@ -171,7 +171,6 @@ async def process_query(user_input, route, to_db, model, selected_mode, chat_his
     
     # Store chat history
     chat_history = chat_history or []
-    chat_history.append(("user", user_input))
     
     # Route the query
     # route_result = await router.execute({"question": user_input})
@@ -186,9 +185,9 @@ async def process_query(user_input, route, to_db, model, selected_mode, chat_his
 
     if route  == routes["chat"]:
         logger.info("Processing as chat query")
-        response = await chat_chain.ainvoke({"query": user_input})
-        chat_history.append(("bot", response))
-        return "", response, chat_history
+        response = await chat_chain.ainvoke({"query": user_input, "context": chat_history})
+        chat_history.append({"bot": response, "user": user_input})
+        return response, "", chat_history
     
     # Check for clarification
     # clarification_result = await clarification.execute({"query": query})
@@ -231,7 +230,7 @@ def run_app():
         )
         route = gr.Radio(label="Chat or Agent",choices=[("Chat", "1"), ("Agent", "2")], value="1")
         user_input = gr.Textbox(lines=3, label="Describe your pipeline or ask a question")
-        final_output = gr.Textbox(label="Final CLI Commands")
+        final_output = gr.Textbox(label="Final Output")
         log_output = gr.Textbox(lines=10, label="Log", interactive=False)
         chat_history = gr.State([])
 
