@@ -209,113 +209,115 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          'Sign In',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Sign In',
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 32),
-        CustomTextField(
-          hintText: 'Email address',
-          suffixIcon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-          onChanged: authProvider.setEmail,
-        ),
-        const SizedBox(height: 16),
-        CustomTextField(
-          hintText: 'Password',
-          suffixIcon: Icons.lock_outline,
-          isPassword: true,
-          onChanged: authProvider.setPassword,
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 32),
+          CustomTextField(
+            hintText: 'Email address',
+            suffixIcon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+            onChanged: authProvider.setEmail,
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            hintText: 'Password',
+            suffixIcon: Icons.lock_outline,
+            isPassword: true,
+            onChanged: authProvider.setPassword,
+          ),
+          const SizedBox(height: 8),
 
-        // Remember Me & Forgot Password
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Checkbox(
-                  value: authProvider.rememberMe,
-                  onChanged: (value) =>
-                      authProvider.setRememberMe(value ?? false),
+          // Remember Me & Forgot Password
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Checkbox(
+                    value: authProvider.rememberMe,
+                    onChanged: (value) =>
+                        authProvider.setRememberMe(value ?? false),
+                  ),
+                  const Text('Remember me'),
+                ],
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  'Forgot password?',
+                  style: TextStyle(color: Color(0xFF1E88E5)),
                 ),
-                const Text('Remember me'),
-              ],
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                'Forgot password?',
-                style: TextStyle(color: Color(0xFF1E88E5)),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
+            ],
+          ),
+          const SizedBox(height: 16),
 
-        CustomPrimaryButton(
-          buttonBackgroundColor: AppColors.bluePrimaryColor,
-          buttonName: 'Sign in',
-          textButtonColor: AppColors.appBackgroundColor,
-          onPressed: () {
-            authProvider.signIn(context);
-            // if (authProvider.isValidEmail(authProvider.email) &&
-            //     authProvider.password.isNotEmpty) {
-            //   authProvider.signIn(context);
-            // } else {
-            //   _showErrorDialog(context, 'Please enter valid credentials.');
-            // }
-          },
-        ),
-        const SizedBox(height: 24),
+          CustomPrimaryButton(
+            buttonBackgroundColor: AppColors.bluePrimaryColor,
+            buttonName: 'Sign in',
+            textButtonColor: AppColors.appBackgroundColor,
+            onPressed: () {
+              authProvider.signIn(context);
+              // if (authProvider.isValidEmail(authProvider.email) &&
+              //     authProvider.password.isNotEmpty) {
+              //   authProvider.signIn(context);
+              // } else {
+              //   _showErrorDialog(context, 'Please enter valid credentials.');
+              // }
+            },
+          ),
+          const SizedBox(height: 24),
 
-        // Social Sign In
-        const Text(
-          'Or sign in with',
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
+          // Social Sign In
+          const Text(
+            'Or sign in with',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
 
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SocialSignInButton(label: AssetsPaths.googleLogo),
-            SizedBox(width: 8),
-            SocialSignInButton(label: AssetsPaths.appleLogo),
-            SizedBox(width: 8),
-            SocialSignInButton(label: AssetsPaths.facebookLogo),
-            SizedBox(width: 8),
-            SocialSignInButton(label: AssetsPaths.githubLogo),
-          ],
-        ),
-        const SizedBox(height: 24),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SocialSignInButton(label: AssetsPaths.googleLogo),
+              SizedBox(width: 8),
+              SocialSignInButton(label: AssetsPaths.appleLogo),
+              SizedBox(width: 8),
+              SocialSignInButton(label: AssetsPaths.facebookLogo),
+              SizedBox(width: 8),
+              SocialSignInButton(label: AssetsPaths.githubLogo),
+            ],
+          ),
+          const SizedBox(height: 24),
 
-        // Create Account
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("Don't have an account?"),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'Create free account',
-                style: TextStyle(color: Color(0xFF1E88E5)),
+          // Create Account
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("Don't have an account?"),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Create free account',
+                  style: TextStyle(color: Color(0xFF1E88E5)),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

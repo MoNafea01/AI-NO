@@ -1,8 +1,8 @@
 import 'package:ai_gen/core/reusable_widgets/custom_button.dart';
 import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/core/themes/asset_paths.dart';
+import 'package:ai_gen/features/HomeScreen/home_screen.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/menu_actions.dart';
-import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -109,7 +109,7 @@ class _GridNodeViewState extends State<GridNodeView> {
             CustomButton(
               onTap: () =>
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
+                builder: (context) => const DashboardScreen(),
               )),
               child: const Icon(Icons.home),
             ),

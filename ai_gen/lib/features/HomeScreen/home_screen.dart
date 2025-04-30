@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'widgets/create_new_project_button.dart';
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -297,15 +299,7 @@ class ProjectsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.add),
-                      label: const Text('New Project'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
+                    const CreateNewProjectButton(),
                   ],
                 ),
               ],
