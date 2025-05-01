@@ -13,7 +13,7 @@ class ModelPredictor(BaseNode):
         try:
             predictions = self.model.predict(self.X)
         except Exception as e:
-            return f"Error fitting model: {e}"
+            return f"Error predicting data: {e}"
         return predictions
 
 
@@ -43,9 +43,9 @@ class Predict(BaseNode):
     def _predict_from_id(self):
         try:
             model = NodeDataExtractor()(self.model, project_id=self.project_id)
-            
             if isinstance(model, str):
                 return "Failed to load model. Please check the provided ID."
+            
             return self._predict_handler(model)
         except Exception as e:
             return f"Error predicting using model by ID: {e}"
@@ -78,4 +78,4 @@ class Predict(BaseNode):
             payload.pop("node_data", None)
             return payload
         except Exception as e:
-            return f"Error Predicting model: {e}"
+            return f"Error creating Prediction payload: {e}"

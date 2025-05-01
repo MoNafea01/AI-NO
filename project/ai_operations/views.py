@@ -10,7 +10,7 @@ from .serializers import *
 
 from core.nodes import *
 from core.repositories import *
-from core.nodes.configs.const_ import get_node_name_by_api_ref, CHILDREN_NODES
+from core.nodes.configs.const_ import get_node_name_by_api_ref
 from core.nodes.utils import FolderHandler
 
 from chatbot.app import sync_generate_cli
@@ -1213,9 +1213,77 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        project_id = instance.id
+    
+        # Delete all associated nodes first
+        node_count = Node.objects.filter(project_id=project_id).delete()[0]
         self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({
+            "success": True,
+            "message": f"Project deleted successfully with {node_count} associated nodes",
+        }, status=status.HTTP_200_OK)
 
+class BulkProjectDeleteAPIView(APIView):
+    """API view for deleting multiple projects at once."""
+    
+    def delete(self, request):
+        try:
+            # Extract project IDs from request data
+            project_ids = request.data.get('project_ids', [])
+            
+            if not project_ids:
+                return Response({"error": "No project IDs provided"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            if not isinstance(project_ids, list):
+                return Response({"error": "project_ids must be a list"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            # Track deletion results
+            deleted_count = 0
+            not_found_ids = []
+            error_ids = []
+            
+            # Process each project ID
+            for project_id in project_ids:
+                try:
+                    project = Project.objects.get(id=project_id)
+                    
+                    # Delete associated nodes first
+                    node_count = Node.objects.filter(project_id=project_id).delete()[0]
+                    
+                    # Delete the project
+                    project.delete()
+                    deleted_count += 1
+                    
+                except Project.DoesNotExist:
+                    not_found_ids.append(project_id)
+                except Exception as e:
+                    error_ids.append({"id": project_id, "error": str(e)})
+            
+            # Prepare response data
+            response_data = {
+                "success": True,
+                "deleted_count": deleted_count,
+                "total_requested": len(project_ids)
+            }
+            
+            if not_found_ids:
+                response_data["not_found_ids"] = not_found_ids
+            
+            if error_ids:
+                response_data["errors"] = error_ids
+                
+            # Return appropriate status code
+            if deleted_count == 0:
+                if not_found_ids and not error_ids:
+                    return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ChatbotAPIView(APIView):

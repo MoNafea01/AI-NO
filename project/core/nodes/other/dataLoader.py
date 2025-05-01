@@ -93,29 +93,32 @@ class DataLoader:
         
     
     def build_payload(self, dataset_name, dataset_path, X, y, err=None):
-        if err:
-            return err
-        
-        if not dataset_name:
-            dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
+        try:
+            if err:
+                return err
+            
+            if not dataset_name:
+                dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
 
-        
-        payload = []
-        payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
-                                                    uid=self.uid))
-        names = ["X", "y"]
-
-        for i in range(1, 3):
-            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}_{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
+            
+            payload = []
+            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
                                                         uid=self.uid))
-        
-        payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
-        for i in range(3):
-            project_path = f"{self.project_id}/" if self.project_id else ""
-            NodeSaver()(payload[i], path=rf"{SAVING_DIR}/{project_path}other")
-            payload[i].pop("node_data", None)
-        
-        return payload
+            names = ["X", "y"]
+
+            for i in range(1, 3):
+                payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}_{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
+                                                            uid=self.uid))
+            
+            payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
+            for i in range(3):
+                project_path = f"{self.project_id}/" if self.project_id else ""
+                NodeSaver()(payload[i], path=rf"{SAVING_DIR}/{project_path}other")
+                payload[i].pop("node_data", None)
+            
+            return payload
+        except Exception as e:
+            return f"Error building payload: {e}"
 
     def __str__(self):
         return str(self.payload)

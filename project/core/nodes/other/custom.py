@@ -13,7 +13,7 @@ class Joiner(BaseNode):
         self.data_1, self.data_2 = NodeDataExtractor()(data_1, data_2, project_id=project_id)
         err = None
         if any(isinstance(i, str) for i in [self.data_1, self.data_2]):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load Nodes (data_1, data_2) at least one of them. Please check the provided IDs."
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self.join(err)
@@ -47,7 +47,7 @@ class Splitter:
         self.data = NodeDataExtractor()(data, project_id=project_id)
         err = None
         if isinstance(self.data, str):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load data. Please check the provided ID."
         self.uid = kwargs.get('uid', None)
         self.payload = self.split(err)
 

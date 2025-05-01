@@ -27,6 +27,7 @@ class Fit(BaseNode):
         self.data = NodeDataExtractor()(data, project_id=project_id)
         if isinstance(self.data, str):
             err = "Failed to load Nodes. Please check the provided IDs."
+
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self._fit(err)
@@ -46,6 +47,7 @@ class Fit(BaseNode):
             preprocessor = NodeDataExtractor()(self.preprocessor, project_id=self.project_id)
             if isinstance(preprocessor, str):
                 return "Failed to load preprocessor. Please check the provided ID."
+            
             return self._fit_handler(preprocessor)
         except Exception as e:
             return f"Error fitting preprocessor by ID: {e}"
@@ -55,6 +57,7 @@ class Fit(BaseNode):
             preprocessor = NodeDataExtractor()(self.preprocessor_path, project_id=self.project_id)
             if isinstance(preprocessor, str):
                 return "Failed to load preprocessor. Please check the provided path."
+            
             return self._fit_handler(preprocessor)
         except Exception as e:
             return f"Error fitting preprocessor by path: {e}"

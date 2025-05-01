@@ -25,7 +25,7 @@ class Transform(BaseNode):
         err = None
         self.data = NodeDataExtractor()(data, project_id=project_id)
         if isinstance(self.data, str):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load data. Please check the provided ID."
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
 

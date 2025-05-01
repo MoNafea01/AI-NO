@@ -30,7 +30,7 @@ class CompileModel(BaseNode):
         try:
             model = NodeDataExtractor()(model_id, project_id=self.project_id)
             if isinstance(model, str):
-                return "Failed to load model. Please check the provided ID."
+                return "Failed to load nn model. Please check the provided ID."
             return self._compile_handler(model)
         except Exception as e:
             return f"Error Compiling model by ID: {e}"
@@ -39,7 +39,7 @@ class CompileModel(BaseNode):
         try:
             model = NodeDataExtractor()(path=nn_model_path, project_id=self.project_id)
             if isinstance(model, str):
-                return "Failed to load model. Please check the provided path."
+                return "Failed to load nn model. Please check the provided path."
             return self._compile_handler(model)
         except Exception as e:
             return f"Error Compiling model from path: {e}"

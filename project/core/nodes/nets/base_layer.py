@@ -33,6 +33,7 @@ class BaseLayer(BaseNode):
             layer = NodeDataExtractor()(self.layer_path, project_id=self.project_id)
             if isinstance(layer, str):
                 return "Failed to load layer. Please check the provided path."
+            
             return self.load_handler(layer)
         except Exception as e:
             return f"Error loading layer from path: {e}"
