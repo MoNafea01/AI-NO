@@ -23,12 +23,14 @@ class Evaluator(BaseNode):
             if self.metric not in metrics.keys():
                 return f"Unsupported metric: {self.metric}"
             
-
             if len(y_pred.shape) > 1:
-                if y_pred.shape[1] > 1:
-                    y_pred = np.argmax(y_pred, axis=1)
+                if self.metric in ["f1", "precision", "recall", "accuracy"]:
+                    if y_pred.shape[1] > 1:
+                        y_pred = np.argmax(y_pred, axis=1)
+                    else:
+                        y_pred = y_pred.flatten()
                 else:
-                    y_pred = np.round(y_pred, 3).astype(int).flatten()
+                    y_pred = y_pred.flatten()
             
             output = metrics[self.metric](y_true, y_pred)
             output = round(output,3)

@@ -39,7 +39,8 @@ class Fit(BaseNode):
             return err
         if isinstance(self.model, (dict, int, str)):
             return self._fit_from_dict(self.model)
-        elif isinstance(rf"{self.model_path}", str):
+        
+        elif self.model_path and isinstance(self.model_path, str):
             return self._fit_from_path(self.model_path)
         else:
             return "Invalid model or path provided."

@@ -38,7 +38,7 @@ class FitTransform:
             return err
         if isinstance(self.preprocessor, (dict, int, str)):
             return self._fit_transform_from_id()
-        elif isinstance(rf"{self.preprocessor_path}", str):
+        elif self.preprocessor_path and isinstance(self.preprocessor_path, str):
             return self._fit_transform_from_path()
         else:
             return "Invalid preprocessor or path provided."

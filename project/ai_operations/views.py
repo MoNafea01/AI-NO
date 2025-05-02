@@ -11,7 +11,6 @@ from .serializers import *
 from core.nodes import *
 from core.repositories import *
 from core.nodes.configs.const_ import get_node_name_by_api_ref
-from core.nodes.utils import FolderHandler
 
 from chatbot.app import sync_generate_cli
 from cli.call_cli import call_script
@@ -21,14 +20,20 @@ class NodeQueryMixin:
     A mixin to handle 'get' requests for any ViewSet.
     It extracts "node_id" from request parameters and uses NodeLoader.
     """
+    def get_query_params(self, request):
+        """Extracts query parameters from the request."""
+        node_id = request.query_params.get("node_id")
+        output = request.query_params.get('output', "0")
+        return_serialized = request.query_params.get('return_serialized', '0') == '1'
+        return_path = not return_serialized
+        project_id = request.query_params.get('project_id')
+        return_data = request.query_params.get('return_data', '0') == '1'
+        return node_id, output, return_serialized, return_path, project_id, return_data
+    
     def get(self, request, *args, **kwargs):
         try:
-            node_id = request.query_params.get("node_id")
-            output = request.query_params.get('output', "0")
-            return_serialized = request.query_params.get('return_serialized', '0') == '1'
-            return_path = not return_serialized
-            project_id = request.query_params.get('project_id')
-            retrun_data = request.query_params.get('return_data', '0') == '1'
+            # Extract query parameters
+            node_id, output, return_serialized, return_path, project_id, return_data = self.get_query_params(request)
 
             if not node_id:
                 return Response({"error": "'node_id' is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -44,7 +49,7 @@ class NodeQueryMixin:
             if output.isdigit() and int(output) > 0:
                 depth = int(output)
                 try:
-                    success, current_node = NodeLoader(return_path=return_path, return_data=retrun_data)(node_id=node_id, project_id=project_id)
+                    success, current_node = NodeLoader(return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
                     if success:
                         children = current_node.get("children", [])
                         if len(current_node.get("children")) > 1:
@@ -74,8 +79,8 @@ class NodeQueryMixin:
                                 break
                         node_id = str(current_node.get("node_id", node_id))
 
-            success, payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=retrun_data)(node_id=node_id, project_id=project_id)
-            
+            success, payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
+
             # Filter by project_id if provided
             if project_id and payload:
                 if str(payload.get('project_id')) != str(project_id):

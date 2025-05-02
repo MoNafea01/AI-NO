@@ -35,8 +35,10 @@ class Predict(BaseNode):
             return err
         if isinstance(self.model, (dict, int, str)):
             return self._predict_from_id()
-        elif isinstance(rf"{self.model}", str):
+        
+        elif self.model_path and isinstance(self.model_path, str):
             return self._predict_from_path()
+        
         else:
             return "Invalid model or path provided."
 
