@@ -1,12 +1,15 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
+// ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
 import 'package:ai_gen/core/network/network_constants.dart';
+import 'package:ai_gen/core/network/network_helper.dart';
+import 'package:ai_gen/features/HomeScreen/data/user_profile.dart';
 import 'package:ai_gen/features/HomeScreen/home_screen.dart';
 import 'package:ai_gen/features/OtpVerificationScreen/otp_verification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as _dio;
 
 class AuthProvider with ChangeNotifier {
   String _fullName = '';
@@ -16,36 +19,20 @@ class AuthProvider with ChangeNotifier {
   bool _agreeTerms = false;
   bool isLoading = false;
   String _username = '';
-
   String _firstName = '';
   String _lastName = '';
   String _otp = '';
 
-  void setUsername(String value) {
-    print("username set to $value");
-    _username = value;
-  }
-
-  void setFirstName(String value) => _firstName = value;
-  void setLastName(String value) => _lastName = value;
-
   final _storage = const FlutterSecureStorage();
   bool rememberMe = false;
+
+  // 🔐 Getters and Setters
   String get email => _email;
   String get password => _password;
 
-  void setRememberMe(bool value) {
-    rememberMe = value;
-    notifyListeners();
-  }
-
-  // 🔐 Store tokens securely
-  Future<void> _saveTokens(String access, String refresh) async {
-    await _storage.write(key: 'accessToken', value: access);
-    await _storage.write(key: 'refreshToken', value: refresh);
-  }
-
-  // 👤 Setters
+  void setUsername(String value) => _username = value;
+  void setFirstName(String value) => _firstName = value;
+  void setLastName(String value) => _lastName = value;
   void setFullName(String value) => _fullName = value;
   void setEmail(String value) => _email = value;
   void setPassword(String value) => _password = value;
@@ -55,12 +42,15 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // 🔄 Reset form state
+  void setRememberMe(bool value) {
+    rememberMe = value;
+    notifyListeners();
+  }
+
   void resetForm() {
     _username = '';
     _firstName = '';
     _lastName = '';
-
     _fullName = '';
     _email = '';
     _password = '';
@@ -69,29 +59,30 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ Validation helpers
+  Future<void> _saveTokens(String access, String refresh) async {
+    await _storage.write(key: 'accessToken', value: access);
+    await _storage.write(key: 'refreshToken', value: refresh);
+  }
+
   bool get agreeTerms => _agreeTerms;
   bool get isLoad => isLoading;
 
-  bool isValidEmail(String email) {
-    return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
-  }
+  bool isValidEmail(String email) =>
+      RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
 
-  bool isStrongPassword(String password) {
-    return password.length >= 8 &&
-        RegExp(r'[A-Za-z]').hasMatch(password) &&
-        RegExp(r'[0-9]').hasMatch(password);
-  }
+  bool isStrongPassword(String password) =>
+      password.length >= 8 &&
+      RegExp(r'[A-Za-z]').hasMatch(password) &&
+      RegExp(r'[0-9]').hasMatch(password);
 
-  bool get isSignUpValid {
-    return _username.isNotEmpty &&
-        _firstName.isNotEmpty &&
-        _lastName.isNotEmpty &&
-        isValidEmail(_email) &&
-        isStrongPassword(_password) &&
-        _confirmPassword == _password &&
-        agreeTerms;
-  }
+  bool get isSignUpValid =>
+      _username.isNotEmpty &&
+      _firstName.isNotEmpty &&
+      _lastName.isNotEmpty &&
+      isValidEmail(_email) &&
+      isStrongPassword(_password) &&
+      _confirmPassword == _password &&
+      agreeTerms;
 
   Future<void> signIn(BuildContext context) async {
     isLoading = true;
@@ -107,26 +98,16 @@ class AuthProvider with ChangeNotifier {
       );
 
       final data = jsonDecode(response.body);
+      debugPrint('Login response data: $data');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final access = data['access'];
-        final refresh = data['refresh'];
-        await _saveTokens(access, refresh);
-
-        // Navigate to dashboard/home
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) =>
-                  const DashboardScreen(), // adjust screen as needed
-            ));
-        // Navigator.pushReplacementNamed(context, '/dashboard');
+        await _saveTokens(data['access'], data['refresh']);
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const DashboardScreen()));
       } else {
-        print(data);
-        print("Error: ${data['detail'] ?? data}");
-        _showErrorDialog(context, "Invalid credentials. Try again.");
+        _showErrorDialog(context, data['detail'] ?? 'Invalid credentials.');
       }
-    } catch (e) {
+    } catch (_) {
       _showErrorDialog(context, "Something went wrong. Please try again.");
     } finally {
       isLoading = false;
@@ -138,23 +119,17 @@ class AuthProvider with ChangeNotifier {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Login Error'),
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.red),
-        ),
+        title: const Text('Error'),
+        content: Text(message, style: const TextStyle(color: Colors.red)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          )
+              onPressed: () => Navigator.pop(context), child: const Text('OK'))
         ],
       ),
     );
   }
 
-  // 📩 Sign Up + Navigate to OTP
- Future<void> signUp(BuildContext context) async {
+  Future<void> signUp(BuildContext context) async {
     isLoading = true;
     notifyListeners();
 
@@ -173,66 +148,38 @@ class AuthProvider with ChangeNotifier {
       );
 
       final data = jsonDecode(response.body);
-      print('STATUS CODE: ${response.statusCode}');
-      print('BODY: $data');
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final access = data['access'];
-        final refresh = data['refresh'];
-        await _saveTokens(access, refresh); // ✅ Save right after signup
-
-        // 🔁 Now navigate to OTP screen
+        await _saveTokens(data['access'], data['refresh']);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => OTPVerificationScreen(email: _email),
-          ),
+              builder: (_) => OTPVerificationScreen(email: _email)),
         );
       } else {
-        print("Error: ${data['detail'] ?? data}");
+        _showErrorDialog(context, data['detail'] ?? 'Sign up failed.');
       }
     } catch (e) {
-      print("Signup error: $e");
+      _showErrorDialog(context, 'Signup error: $e');
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
-
   void setOtp(String value) => _otp = value;
-Future<void> verifyOtp(BuildContext context, String email) async {
-    final accessToken = await _storage.read(key: 'accessToken');
-    print('Token retrieved for verification: $accessToken');
 
-    if (accessToken == null) {
-      _showErrorDialog(context, 'No access token found.');
-      return;
-    }
-
+  Future<void> verifyOtp(BuildContext context, String email) async {
     try {
-      final response = await http.post(
-        Uri.parse('${NetworkConstants.apiAuthBaseUrl}/verify-email/'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode({'email': email, 'otp': _otp}),
+      final response = await authorizedPost(
+        '${NetworkConstants.apiAuthBaseUrl}/verify-email/',
+        {'email': email, 'otp': _otp},
       );
 
       final data = jsonDecode(response.body);
-      print("VERIFY OTP RESPONSE: $data");
-
       if (response.statusCode == 200) {
-        final newAccess = data['access'];
-        final newRefresh = data['refresh'];
-
-        await _saveTokens(newAccess, newRefresh); // 🔁 replace old token
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
-        );
+        await _saveTokens(data['access'], data['refresh']);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (_) => const DashboardScreen()));
       } else {
         _showErrorDialog(context, data['detail'] ?? 'OTP verification failed.');
       }
@@ -241,34 +188,100 @@ Future<void> verifyOtp(BuildContext context, String email) async {
     }
   }
 
-
- Future<void> requestOtpAgain(String email) async {
-    final token = await _storage.read(key: 'accessToken');
-    print("Using access token: $token");
-
+  Future<void> requestOtpAgain(String email) async {
     try {
-      final response = await http.post(
-        Uri.parse('${NetworkConstants.apiAuthBaseUrl}/request-otp/'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // ✅ Required header
-        },
-        body: jsonEncode({'email': email}),
+      final response = await authorizedPost(
+        '${NetworkConstants.apiAuthBaseUrl}/request-otp/',
+        {'email': email},
       );
 
-      print('Request OTP Status Code: ${response.statusCode}');
-      print('Request OTP Response: ${response.body}');
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Optionally show confirmation
         debugPrint('OTP resent successfully');
       } else {
-        // Optionally handle specific errors
         debugPrint('Failed to resend OTP: ${response.body}');
       }
     } catch (e) {
       debugPrint('Error requesting OTP: $e');
     }
   }
+
+
+
+Future<void> logout(BuildContext context) async {
+    final refreshToken = await _storage.read(key: 'refreshToken');
+
+    if (refreshToken != null) {
+      try {
+        final response = await http.post(
+          Uri.parse('${NetworkConstants.apiAuthBaseUrl}/token/blacklist/'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'refresh': refreshToken}),
+        );
+
+        debugPrint('Logout Status Code: ${response.statusCode}');
+        debugPrint('Logout Response: ${response.body}');
+      } catch (e) {
+        debugPrint('Logout error: $e');
+      }
+    } else {
+      debugPrint('No refresh token found.');
+    }
+
+    // ✅ IMPORTANT: clear stored tokens no matter what
+    await _storage.delete(key: 'accessToken');
+    await _storage.delete(key: 'refreshToken');
+
+    debugPrint('Tokens cleared from storage.');
+    Navigator.pop(context); // Close the current screen
+
+    // Navigate back to login or home
+   // navigatorKey.currentState?.pushReplacementNamed('/login');
+  }
+
+
+
+//profile endpoint
+  Future<UserProfile> getProfile() async {
+     //final _secureStorage = const FlutterSecureStorage();
+   final token = await _storage.read(key: 'accessToken');
+
+
+    if (token == null) {
+      throw Exception('No access token found');
+    }
+
+    final response = await http.get(
+      Uri.parse('${NetworkConstants.apiAuthBaseUrl}/profile/'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return UserProfile.fromJson(data);
+    } else if (response.statusCode == 401) {
+      throw Exception('Unauthorized');
+    } else {
+      throw Exception('Failed to fetch profile: ${response.statusCode}');
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
