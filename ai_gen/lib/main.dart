@@ -1,8 +1,11 @@
+import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
+import 'package:ai_gen/features/splashScreen/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -79,12 +82,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      debugShowCheckedModeBanner: false,
-      title: 'AI Gen',
-      theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      home: const SignupScreen(),
+    return BlocProvider(
+      create: (context) => ProfileCubit(
+        context.read<AuthProvider>(),
+      ),
+      child: MaterialApp(
+        scaffoldMessengerKey: scaffoldMessengerKey,
+        debugShowCheckedModeBanner: false,
+        title: 'AI Gen',
+        theme: ThemeData(scaffoldBackgroundColor: Colors.white),
+
+        //SplashScreen
+        // home: const SignupScreen(),
+        home: const SplashScreen(),
+      ),
     );
   }
 }

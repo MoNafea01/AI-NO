@@ -1,4 +1,8 @@
+import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit.dart';
+import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
+import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'widgets/create_new_project_button.dart';
 
@@ -111,7 +115,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _logoutButton() {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Provider.of<AuthProvider>(context, listen: false).logout(context);
+
+      },
       child: Row(
         children: [
           const Icon(Icons.logout, color: Colors.red),
@@ -138,9 +145,17 @@ class ProfileWidget extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(bottom: 8.0),
-          child: Text("profile"),
+         Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: InkWell(child: const Text("profile"),
+          onTap: () {
+              context.read<ProfileCubit>().loadProfile();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
         ),
         Row(
           children: [
@@ -446,7 +461,7 @@ class ProjectsScreen extends StatelessWidget {
 class ProjectListItem extends StatelessWidget {
   final ProjectItem project;
 
-  const ProjectListItem({super.key, required this.project});
+  const ProjectListItem({required this.project, super.key});
 
   @override
   Widget build(BuildContext context) {
