@@ -8,7 +8,7 @@ enum ParameterType {
   listString,
   boolean,
   dropDownList,
-  directory,
+  path,
 }
 
 class ParameterModel {
@@ -17,13 +17,15 @@ class ParameterModel {
   dynamic _value;
   final dynamic _defaultValue;
   final List? choices;
+  final List? allowedExtensions;
 
   ParameterModel({
     this.name = 'param_name',
-    this.choices = const [],
+    this.choices,
     String? type,
     dynamic defaultValue,
     dynamic value,
+    this.allowedExtensions,
   })  : _type = type,
         _defaultValue = defaultValue {
     if (value != null) {
@@ -50,6 +52,7 @@ class ParameterModel {
       defaultValue: defaultValue ?? _defaultValue,
       choices: choices ?? this.choices,
       value: value ?? _value,
+      allowedExtensions: allowedExtensions,
     );
   }
 
@@ -59,13 +62,15 @@ class ParameterModel {
       type: json['type'],
       defaultValue: json['default'],
       choices: json['choices'] as List? ?? [],
+      allowedExtensions: json['extensions'] as List? ?? [],
     );
   }
 
   get type {
+    print('$name parameter type: $_type, choices: $choices');
     switch (_type) {
       case 'str':
-        return (choices != null || choices!.isNotEmpty)
+        return (choices != null && choices!.isNotEmpty)
             ? ParameterType.dropDownList
             : ParameterType.string;
 
@@ -79,8 +84,10 @@ class ParameterModel {
         return ParameterType.listString;
       case 'bool':
         return ParameterType.boolean;
+      case 'path':
+        return ParameterType.path;
       default:
-        return _type;
+        return ParameterType.string;
     }
   }
 

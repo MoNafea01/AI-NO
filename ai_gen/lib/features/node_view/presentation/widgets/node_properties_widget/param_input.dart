@@ -3,6 +3,7 @@ import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/core/themes/asset_paths.dart';
 import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/node_properties_widget/param_num_input.dart';
+import 'package:ai_gen/features/node_view/presentation/widgets/node_properties_widget/param_select_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -47,6 +48,7 @@ class _ParamInputState extends State<ParamInput> {
   }
 
   Widget _selectParamWidget() {
+    print(widget.parameter.type);
     switch (widget.parameter.type) {
       case ParameterType.int:
       case ParameterType.double:
@@ -55,6 +57,8 @@ class _ParamInputState extends State<ParamInput> {
         return ParamDropDownMenu(parameter: widget.parameter);
       case ParameterType.listString:
         return ParamMultiSelectMenu(parameter: widget.parameter);
+      case ParameterType.path:
+        return ParamSelectPath(parameter: widget.parameter);
       default:
         return ParamTextField(parameter: widget.parameter);
     }

@@ -36,12 +36,10 @@ class _ParamTextFieldState extends State<ParamTextField> {
       child: Center(
         child: TextField(
           controller: controller,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             border: InputBorder.none,
             isDense: true,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            suffixIcon: _suffixIcon(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           ),
           onChanged: (value) {
             setState(() {
@@ -51,15 +49,5 @@ class _ParamTextFieldState extends State<ParamTextField> {
         ),
       ),
     );
-  }
-
-  Widget? _suffixIcon() {
-    if (widget.parameter.type == ParameterType.directory) {
-      return GestureDetector(
-        onTap: () {},
-        child: const Icon(Icons.close),
-      );
-    }
-    return null;
   }
 }

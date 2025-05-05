@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.7.5+1
+version: 0.8.0
 
 environment:
   sdk: ^3.5.3
@@ -48,13 +48,11 @@ dependencies:
   fluttertoast: ^8.2.12
   #for the Dropdown menus and combo boxes
   dropdown_button2: ^2.3.9
+  #for selecting files from the file system
+  file_picker: ^10.1.2
+
   #the node view package that is localized and used in this project
   vs_node_view: ^2.1.1
-
-
-
-
-
 
 
 dev_dependencies:
