@@ -253,17 +253,17 @@ Future<void> logout(BuildContext context) async {
 
 
 //profile endpoint
-  Future<UserProfile> getProfile() async {
-     //final _secureStorage = const FlutterSecureStorage();
-   final token = await _storage.read(key: 'accessToken');
-
+ Future<UserProfile> getProfile() async {
+    final token = await _storage.read(key: 'accessToken');
 
     if (token == null) {
       throw Exception('No access token found');
     }
 
-    final response = await http.get(
-      Uri.parse('${NetworkConstants.apiAuthBaseUrl}/profile/'),
+    final profileUrl = Uri.parse('${NetworkConstants.apiAuthBaseUrl}/profile/');
+
+    http.Response response = await http.get(
+      profileUrl,
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -273,18 +273,58 @@ Future<void> logout(BuildContext context) async {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       _userProfile = UserProfile.fromJson(data);
+
+      // Save user details
       await _storage.write(key: 'username', value: _userProfile?.username);
       await _storage.write(key: 'firstName', value: _userProfile?.firstName);
       await _storage.write(key: 'lastName', value: _userProfile?.lastName);
       await _storage.write(key: 'email', value: _userProfile?.email);
 
-      return UserProfile.fromJson(data);
+      return _userProfile!;
     } else if (response.statusCode == 401) {
-      throw Exception('Unauthorized');
+      // Token expired → refresh and retry
+      try {
+        await refreshAccessToken(); // make sure this updates 'accessToken' in storage
+
+        final newToken = await _storage.read(key: 'accessToken');
+
+        if (newToken == null) {
+          throw Exception('Failed to refresh token');
+        }
+
+        // Retry profile request
+        response = await http.get(
+          profileUrl,
+          headers: {
+            'Authorization': 'Bearer $newToken',
+            'Content-Type': 'application/json',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          _userProfile = UserProfile.fromJson(data);
+
+          // Save user details
+          await _storage.write(key: 'username', value: _userProfile?.username);
+          await _storage.write(
+              key: 'firstName', value: _userProfile?.firstName);
+          await _storage.write(key: 'lastName', value: _userProfile?.lastName);
+          await _storage.write(key: 'email', value: _userProfile?.email);
+
+          return _userProfile!;
+        } else {
+          throw Exception(
+              'Failed to fetch profile after refreshing token: ${response.statusCode}');
+        }
+      } catch (e) {
+        throw Exception('Unauthorized and failed to refresh token: $e');
+      }
     } else {
       throw Exception('Failed to fetch profile: ${response.statusCode}');
     }
   }
+
 
 
 //to get user data when reopen the app
@@ -305,6 +345,77 @@ Future<void> loadStoredProfile() async {
     }
   }
 
+  //to update user data
+
+Future<void> updateProfile({
+    required String username,
+    required String firstName,
+    required String lastName,
+    required String email,
+  }) async {
+    final token = await _storage.read(key: 'accessToken');
+    if (token == null) {
+      throw Exception('No access token found');
+    }
+
+    final response = await http.put(
+      Uri.parse('${NetworkConstants.apiAuthBaseUrl}/profile/'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'username': username,
+        'first_name': firstName,
+        'last_name': lastName,
+        'email': email,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      _userProfile = UserProfile.fromJson(data);
+
+      // Update secure storage
+      await _storage.write(key: 'username', value: _userProfile!.username);
+      await _storage.write(key: 'firstName', value: _userProfile!.firstName);
+      await _storage.write(key: 'lastName', value: _userProfile!.lastName);
+      await _storage.write(key: 'email', value: _userProfile!.email);
+
+      notifyListeners();
+    } else if (response.statusCode == 401) {
+      throw Exception('Unauthorized: Please log in again.');
+    } else {
+      throw Exception('Failed to update profile: ${response.statusCode}');
+    }
+  }
+
+
+// to handle get profile request 
+
+
+
+Future<void> refreshAccessToken() async {
+    final refreshToken = await _storage.read(key: 'refreshToken');
+
+    if (refreshToken == null) {
+      throw Exception('No refresh token found');
+    }
+
+    final response = await http.post(
+      Uri.parse('${NetworkConstants.apiAuthBaseUrl}/token/refresh/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'refresh': refreshToken}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      await _storage.write(key: 'accessToken', value: data['access']);
+      debugPrint('Access token refreshed.');
+    } else {
+      throw Exception('Failed to refresh access token');
+    }
+  }
 
 
 
