@@ -44,11 +44,15 @@ class CustomDataLoader:
                 data = NodeDataExtractor()(self.dataset_path, project_id=self.project_id)
                 X, y = data
                 
-            elif self.dataset_path.endswith('.csv') or self.dataset_path.endswith('.xlsx'):
+            elif self.dataset_path.endswith('.csv') or self.dataset_path.endswith('.xlsx') or self.dataset_path.endswith('.tsv'):
                 if self.dataset_path.endswith('.xlsx'):
                     data = pd.read_excel(self.dataset_path)
                 else:
-                    data = pd.read_csv(self.dataset_path)
+                    if self.dataset_path.endswith('.tsv'):
+                        data = pd.read_csv(self.dataset_path, sep='\t')
+                    else:
+                        if self.dataset_path.endswith('.csv'):
+                            data = pd.read_csv(self.dataset_path)
 
                 X = data.iloc[:, :-1].values
                 if data.shape[1] == 1:
@@ -56,8 +60,11 @@ class CustomDataLoader:
                 else:
                     y = data.iloc[:, -1].values
 
-            if not os.path.isfile(self.dataset_path):
+            elif not os.path.isfile(self.dataset_path):
                 X, y, _ = load_data(self.dataset_path)
+
+            else:
+                return f"Unsupported file format: .{self.dataset_path.split('.')[-1]}", None
 
             return X, y
         except Exception as e:
@@ -68,10 +75,10 @@ class DataLoaderFactory:
     """Factory class for creating data loaders."""
     @staticmethod
     def create(dataset_name=None, dataset_path=None, project_id=None):
-        if dataset_name:
-            return PredefinedDataLoader(dataset_name, project_id)
-        elif dataset_path:
+        if dataset_path:
             return CustomDataLoader(dataset_path, project_id)
+        elif dataset_name:
+            return PredefinedDataLoader(dataset_name, project_id)
         else:
             return "Either dataset_name or dataset_path must be provided."
 
@@ -93,29 +100,32 @@ class DataLoader:
         
     
     def build_payload(self, dataset_name, dataset_path, X, y, err=None):
-        if err:
-            return err
-        
-        if not dataset_name:
-            dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
+        try:
+            if err:
+                return err
+            
+            if dataset_path:
+                dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
 
-        
-        payload = []
-        payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
-                                                    uid=self.uid))
-        names = ["X", "y"]
-
-        for i in range(1, 3):
-            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}_{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
+            
+            payload = []
+            payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
                                                         uid=self.uid))
-        
-        payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
-        for i in range(3):
-            project_path = f"{self.project_id}/" if self.project_id else ""
-            NodeSaver()(payload[i], path=rf"{SAVING_DIR}/{project_path}other")
-            payload[i].pop("node_data", None)
-        
-        return payload
+            names = ["X", "y"]
+
+            for i in range(1, 3):
+                payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}_{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
+                                                            uid=self.uid))
+            
+            payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
+            for i in range(3):
+                project_path = f"{self.project_id}/" if self.project_id else ""
+                NodeSaver()(payload[i], path=rf"{SAVING_DIR}/{project_path}other")
+                payload[i].pop("node_data", None)
+            
+            return payload
+        except Exception as e:
+            return f"Error building payload: {e}"
 
     def __str__(self):
         return str(self.payload)

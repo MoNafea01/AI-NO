@@ -27,7 +27,7 @@ class Fit(BaseNode):
         self.X, self.y= NodeDataExtractor()(X, y, project_id=project_id)
         err = None
         if any(isinstance(i, str) for i in [self.X, self.y]):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load Nodes (X, y) at least one of them. Please check the provided IDs."
         
         self.model = model
         self.project_id = project_id
@@ -39,7 +39,8 @@ class Fit(BaseNode):
             return err
         if isinstance(self.model, (dict, int, str)):
             return self._fit_from_dict(self.model)
-        elif isinstance(rf"{self.model_path}", str):
+        
+        elif self.model_path and isinstance(self.model_path, str):
             return self._fit_from_path(self.model_path)
         else:
             return "Invalid model or path provided."
@@ -80,4 +81,4 @@ class Fit(BaseNode):
             payload.pop("node_data", None)
             return payload
         except Exception as e:
-            return f"Error fitting model: {e}"
+            return f"Error creating fitting payload: {e}"

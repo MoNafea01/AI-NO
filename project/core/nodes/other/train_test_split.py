@@ -8,23 +8,31 @@ class TrainTestSplit(BaseNode):
         err = None
         self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
         if any(isinstance(i, str) for i in [self.X, self.y]):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load Nodes (X, y) at least one of them. Please check the provided IDs."
 
         self.params = params if params else {'test_size': 0.2, 'random_state': 42}
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self.split(err)
 
+    def train_test_split(self, X=None, y=None, **params):
+        try:
+            if X is not None:
+                X = train_test_split(X, **params)
+            if y is not None:
+                y = train_test_split(y, **params)
+            return X, y
+        except Exception as e:
+            return f"Error splitting data: {e}", None
+        
     def split(self, err=None):
         if err:
             return err
         try:
-            out1, out2 = None, None
 
-            if self.X is not None:
-                out1 = train_test_split(self.X, **self.params)
-            if self.y is not None:
-                out2 = train_test_split(self.y, **self.params)
+            out1, out2 = self.train_test_split(X=self.X, y=self.y, **self.params)
+            if isinstance(out1, str) or isinstance(out2, str):
+                return out1
 
             payload = []
             payload.append(PayloadBuilder.build_payload("Data", (out1, out2), "train_test_split", node_type="splitter", task="split", project_id=self.project_id,
@@ -43,7 +51,7 @@ class TrainTestSplit(BaseNode):
 
             return payload
         except Exception as e:
-            return f"Error splitting data: {e}"
+            return f"Error splitting data (train test split): {e}"
 
     def __str__(self):
         return f"data: {self.payload}"
