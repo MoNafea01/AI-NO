@@ -80,7 +80,9 @@ class _ParamSelectPathState extends State<ParamSelectPath> {
 
     if (result != null) {
       PlatformFile file = result.files.first;
+
       controller.text = file.path ?? '';
+      widget.parameter.value = file.path ?? '';
     }
   }
 }

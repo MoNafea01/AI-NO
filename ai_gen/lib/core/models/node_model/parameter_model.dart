@@ -67,7 +67,6 @@ class ParameterModel {
   }
 
   get type {
-    print('$name parameter type: $_type, choices: $choices');
     switch (_type) {
       case 'str':
         return (choices != null && choices!.isNotEmpty)
@@ -109,7 +108,7 @@ class ParameterModel {
         break;
       case ParameterType.double:
         if (newValue is String) {
-          _value = double.tryParse(newValue)?.toStringAsFixed(2) ?? 0.0;
+          _value = double.tryParse(newValue)?.toStringAsFixed(2) ?? "0.0";
           _value = double.parse(_value);
         } else if (newValue is double) {
           _value = double.parse(newValue.toStringAsFixed(2));
@@ -130,16 +129,18 @@ class ParameterModel {
     }
   }
 
-  Map<String, dynamic> toJson() => {name: _value};
+  Map<String, dynamic> toJson() {
+    return {name: _value};
+  }
 
   @override
   String toString() {
-    return '{$name: $value ($_type)}';
+    return '{$name: $_value ($_type)}';
   }
 
-  /// This method is used to print the types of parameters
-  /// call this in the constructor
-  /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
+  // /// This method is used to print the types of parameters
+  // /// call this in the constructor
+  // /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
 // static final Map<String, int> _typesMap = {};
 // void _printNodeTypes() {
 //   if (type != null) {

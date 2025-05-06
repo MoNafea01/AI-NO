@@ -1,5 +1,4 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/core/models/node_model/parameter_model.dart';
 import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ import 'custom_interfaces/aino_general_Interface.dart';
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
 import 'custom_interfaces/preprocessor_interface.dart';
-import 'custom_interfaces/vs_text_input_data.dart';
 
 class NodeBuilder {
   Future<List<Object>> buildNodesMenu() async {
@@ -86,23 +84,15 @@ class NodeBuilder {
         type: newNode.name,
         title: newNode.displayName,
         toolTip: newNode.description,
-        // menuToolTip: "",
         widgetOffset: offset,
         inputData: _buildInputData(newNode, ref),
         outputData: _buildOutputData(newNode),
-        // deleteAction: () {
-        //   print("${newNode.name} Deleted");
-        //   final NodeServerCalls nodeServerCalls =
-        //       GetIt.I.get<NodeServerCalls>();
-        //   if (newNode.nodeId != null) nodeServerCalls.deleteNode(newNode);
-        // },
       );
     };
   }
 
   List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      ...node.params?.map(_paramInput) ?? [],
       ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
           [],
     ];
@@ -117,13 +107,6 @@ class NodeBuilder {
       return VSPreprocessorInputData(type: inputDot, initialConnection: ref);
     }
     return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
-  }
-
-  VSInputData _paramInput(ParameterModel param) {
-    final controller = TextEditingController(text: param.value.toString());
-    controller.addListener(() => param.value = controller.text);
-
-    return VsTextInputData(type: param.name, controller: controller);
   }
 
   List<VSOutputData> _buildOutputData(NodeModel node) {
