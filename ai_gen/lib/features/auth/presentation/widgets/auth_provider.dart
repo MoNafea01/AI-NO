@@ -9,7 +9,6 @@ import 'package:ai_gen/features/OtpVerificationScreen/otp_verification_screen.da
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as _dio;
 
 class AuthProvider with ChangeNotifier {
   String _fullName = '';
@@ -28,6 +27,10 @@ class AuthProvider with ChangeNotifier {
 
   // 🔐 Getters and Setters
   String get email => _email;
+  String get userName => _username;
+  String get firstName => _firstName;
+  String get lastName => _lastName;
+  String get fullName => _fullName;
   String get password => _password;
 
   void setUsername(String value) => _username = value;
@@ -40,6 +43,14 @@ class AuthProvider with ChangeNotifier {
   void setAgreeTerms(bool value) {
     _agreeTerms = value;
     notifyListeners();
+  }
+  UserProfile? _userProfile; // Add this to your provider class
+
+  UserProfile? get userProfile => _userProfile;
+
+  // Constructor to load stored profile details on startup
+  AuthProvider() {
+    loadStoredProfile();
   }
 
   void setRememberMe(bool value) {
@@ -102,6 +113,7 @@ class AuthProvider with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         await _saveTokens(data['access'], data['refresh']);
+         await  getProfile();
         Navigator.push(context,
             MaterialPageRoute(builder: (_) => const DashboardScreen()));
       } else {
@@ -260,6 +272,12 @@ Future<void> logout(BuildContext context) async {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      _userProfile = UserProfile.fromJson(data);
+      await _storage.write(key: 'username', value: _userProfile?.username);
+      await _storage.write(key: 'firstName', value: _userProfile?.firstName);
+      await _storage.write(key: 'lastName', value: _userProfile?.lastName);
+      await _storage.write(key: 'email', value: _userProfile?.email);
+
       return UserProfile.fromJson(data);
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized');
@@ -269,6 +287,23 @@ Future<void> logout(BuildContext context) async {
   }
 
 
+//to get user data when reopen the app
+Future<void> loadStoredProfile() async {
+    final username = await _storage.read(key: 'username');
+    final firstName = await _storage.read(key: 'firstName');
+    final lastName = await _storage.read(key: 'lastName');
+    final email = await _storage.read(key: 'email');
+
+    if (username != null && email != null) {
+      _userProfile = UserProfile(
+        username: username,
+        firstName: firstName!,
+        lastName: lastName!,
+        email: email,
+      );
+      notifyListeners();
+    }
+  }
 
 
 

@@ -142,6 +142,14 @@ class ProfileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProfile = context.watch<AuthProvider>().userProfile;
+    //final authProvider = Provider.of<AuthProvider>(context);
+    final userName = userProfile?.username ;
+    // final firstName = userProfile?.firstName;
+    final email = userProfile?.email;
+   
+
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -159,10 +167,10 @@ class ProfileWidget extends StatelessWidget {
         ),
         Row(
           children: [
-            const CircleAvatar(
+             const CircleAvatar(
               backgroundColor: Colors.blue,
               radius: 16,
-              child: Text('JW',
+              child: Text( '',
                   style: TextStyle(fontSize: 12, color: Colors.white)),
             ),
             const SizedBox(width: 8),
@@ -170,16 +178,16 @@ class ProfileWidget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Jenny Wilson',
-                    style: TextStyle(
+                 Text(
+                    userName ?? 'username',
+                    style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    'jen.wilson@example.com',
+                    email ?? 'example@gmail.com',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade700,
