@@ -236,7 +236,7 @@ class DataLoaderAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data, *args, **kwargs):
         return DataLoader(
             dataset_name=validated_data.get("params", {}).get("dataset_name"),
-            dataset_path=validated_data.get('dataset_path'),
+            dataset_path=validated_data.get("params", {}).get("dataset_path"),
             **kwargs
         )
 
@@ -543,10 +543,10 @@ class NetModelFitterAPIView(BaseNodeAPIView):
 
 class NodeLoaderAPIView(APIView, NodeQueryMixin):
 
-    def get_serialized_payload(self, node_id, path, return_serialized, project_id):
+    def get_serialized_payload(self, path, return_serialized, project_id):
         """Loads a node, saves it, and optionally serializes it."""
         loader = NodeLoader(from_db=False)
-        success, payload = loader(node_id=node_id, project_id= project_id, path=path)
+        success, payload = loader(project_id= project_id, path=path)
         node_name = payload.get("message").split(" ")[1]
         uid = Component.objects.get(node_name="node_loader").uid
         payload.update({"node_name":node_name,
@@ -564,8 +564,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                node_id = serializer.validated_data.get("node_id")
-                path = serializer.validated_data.get('node_path')
+                path = serializer.validated_data.get('params', {}).get('node_path')
                 return_serialized = request.query_params.get("return_serialized") == "1"
                 project_id = request.query_params.get('project_id')
 
@@ -574,7 +573,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                 except :
                     project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
                 
-                payload = self.get_serialized_payload(node_id, path, return_serialized, project_id)
+                payload = self.get_serialized_payload(path, return_serialized, project_id)
                 return Response(payload, status=status.HTTP_200_OK)
             
             except ValueError as e:
@@ -586,8 +585,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                node_id = serializer.validated_data.get("node_id")
-                path = serializer.validated_data.get('node_path')
+                path = serializer.validated_data.get("params", {}).get('node_path')
                 return_serialized = request.query_params.get("return_serialized") == "1"
                 project_id = request.query_params.get('project_id')
 
@@ -596,7 +594,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                 except :
                     project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
 
-                payload = self.get_serialized_payload(node_id, path, return_serialized, project_id)
+                payload = self.get_serialized_payload(path, return_serialized, project_id)
                 node_id = request.query_params.get("node_id", None)
                 success, message = NodeUpdater(return_serialized)(node_id, project_id, payload)
 

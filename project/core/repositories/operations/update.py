@@ -36,7 +36,7 @@ class NodeUpdater:
             folder_path = os.path.dirname(node.node_data)
             original_id = payload.get("node_id") # id for new node
             
-            is_multi_channel = node.node_name in MULTI_CHANNEL_NODES
+            is_multi_channel = payload.get("node_name") in MULTI_CHANNEL_NODES
             payload["node_data"] = NodeDataExtractor()(original_id, project_id=project_id)
 
             if is_multi_channel:

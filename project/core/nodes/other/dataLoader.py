@@ -44,11 +44,15 @@ class CustomDataLoader:
                 data = NodeDataExtractor()(self.dataset_path, project_id=self.project_id)
                 X, y = data
                 
-            elif self.dataset_path.endswith('.csv') or self.dataset_path.endswith('.xlsx'):
+            elif self.dataset_path.endswith('.csv') or self.dataset_path.endswith('.xlsx') or self.dataset_path.endswith('.tsv'):
                 if self.dataset_path.endswith('.xlsx'):
                     data = pd.read_excel(self.dataset_path)
                 else:
-                    data = pd.read_csv(self.dataset_path)
+                    if self.dataset_path.endswith('.tsv'):
+                        data = pd.read_csv(self.dataset_path, sep='\t')
+                    else:
+                        if self.dataset_path.endswith('.csv'):
+                            data = pd.read_csv(self.dataset_path)
 
                 X = data.iloc[:, :-1].values
                 if data.shape[1] == 1:
@@ -56,8 +60,11 @@ class CustomDataLoader:
                 else:
                     y = data.iloc[:, -1].values
 
-            if not os.path.isfile(self.dataset_path):
+            elif not os.path.isfile(self.dataset_path):
                 X, y, _ = load_data(self.dataset_path)
+
+            else:
+                return f"Unsupported file format: .{self.dataset_path.split('.')[-1]}", None
 
             return X, y
         except Exception as e:
@@ -68,10 +75,10 @@ class DataLoaderFactory:
     """Factory class for creating data loaders."""
     @staticmethod
     def create(dataset_name=None, dataset_path=None, project_id=None):
-        if dataset_name:
-            return PredefinedDataLoader(dataset_name, project_id)
-        elif dataset_path:
+        if dataset_path:
             return CustomDataLoader(dataset_path, project_id)
+        elif dataset_name:
+            return PredefinedDataLoader(dataset_name, project_id)
         else:
             return "Either dataset_name or dataset_path must be provided."
 
@@ -97,7 +104,7 @@ class DataLoader:
             if err:
                 return err
             
-            if not dataset_name:
+            if dataset_path:
                 dataset_name, _ = NodeNameHandler.handle_name(dataset_path)
 
             
