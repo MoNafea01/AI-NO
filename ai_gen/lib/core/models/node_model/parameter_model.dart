@@ -8,7 +8,7 @@ enum ParameterType {
   listString,
   boolean,
   dropDownList,
-  directory,
+  path,
 }
 
 class ParameterModel {
@@ -17,13 +17,15 @@ class ParameterModel {
   dynamic _value;
   final dynamic _defaultValue;
   final List? choices;
+  final List? allowedExtensions;
 
   ParameterModel({
     this.name = 'param_name',
-    this.choices = const [],
+    this.choices,
     String? type,
     dynamic defaultValue,
     dynamic value,
+    this.allowedExtensions,
   })  : _type = type,
         _defaultValue = defaultValue {
     if (value != null) {
@@ -50,6 +52,7 @@ class ParameterModel {
       defaultValue: defaultValue ?? _defaultValue,
       choices: choices ?? this.choices,
       value: value ?? _value,
+      allowedExtensions: allowedExtensions,
     );
   }
 
@@ -59,13 +62,14 @@ class ParameterModel {
       type: json['type'],
       defaultValue: json['default'],
       choices: json['choices'] as List? ?? [],
+      allowedExtensions: json['extensions'] as List? ?? [],
     );
   }
 
   get type {
     switch (_type) {
       case 'str':
-        return (choices != null || choices!.isNotEmpty)
+        return (choices != null && choices!.isNotEmpty)
             ? ParameterType.dropDownList
             : ParameterType.string;
 
@@ -79,8 +83,10 @@ class ParameterModel {
         return ParameterType.listString;
       case 'bool':
         return ParameterType.boolean;
+      case 'path':
+        return ParameterType.path;
       default:
-        return _type;
+        return ParameterType.string;
     }
   }
 
@@ -102,7 +108,7 @@ class ParameterModel {
         break;
       case ParameterType.double:
         if (newValue is String) {
-          _value = double.tryParse(newValue)?.toStringAsFixed(2) ?? 0.0;
+          _value = double.tryParse(newValue)?.toStringAsFixed(2) ?? "0.0";
           _value = double.parse(_value);
         } else if (newValue is double) {
           _value = double.parse(newValue.toStringAsFixed(2));
@@ -123,16 +129,18 @@ class ParameterModel {
     }
   }
 
-  Map<String, dynamic> toJson() => {name: _value};
+  Map<String, dynamic> toJson() {
+    return {name: _value};
+  }
 
   @override
   String toString() {
-    return '{$name: $value ($_type)}';
+    return '{$name: $_value ($_type)}';
   }
 
-  /// This method is used to print the types of parameters
-  /// call this in the constructor
-  /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
+  // /// This method is used to print the types of parameters
+  // /// call this in the constructor
+  // /// the last types used{float: 30, str: 24, int: 12, list_int: 10, list_str: 2}
 // static final Map<String, int> _typesMap = {};
 // void _printNodeTypes() {
 //   if (type != null) {

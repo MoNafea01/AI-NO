@@ -86,7 +86,8 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   void runNodes() async {
     try {
       _closeActiveNodePropertiesCard();
-      closeRunMenu();
+      results = ("Running nodes...").split(",");
+      emit(NodeViewSuccess());
 
       List<MapEntry<String, dynamic>> entries = [];
 

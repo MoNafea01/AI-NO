@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 
 import 'param_dropdown_menu.dart';
 import 'param_multi_select_menu.dart';
+import 'param_select_path.dart';
 import 'param_text_field.dart';
 
 class ParamInput extends StatefulWidget {
@@ -55,6 +56,8 @@ class _ParamInputState extends State<ParamInput> {
         return ParamDropDownMenu(parameter: widget.parameter);
       case ParameterType.listString:
         return ParamMultiSelectMenu(parameter: widget.parameter);
+      case ParameterType.path:
+        return ParamSelectPath(parameter: widget.parameter);
       default:
         return ParamTextField(parameter: widget.parameter);
     }
