@@ -84,7 +84,7 @@
         "y": "y_id"
     },
     "predictor": {
-        "model": "model_id",
+        "fitted_model": "fitted_model_id",
         "X": "X_id"
     },
     "evaluator": {
@@ -129,7 +129,7 @@
         "data": "data_id"
     },
     "transformer": {
-        "preprocessor": "fitted_preprocessor_id",
+        "fitted_preprocessor": "fitted_preprocessor_id",
         "data": "data_id"
     },
     "fitter_transformer": {

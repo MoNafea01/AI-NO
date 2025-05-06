@@ -10,8 +10,7 @@ from .serializers import *
 
 from core.nodes import *
 from core.repositories import *
-from core.nodes.configs.const_ import get_node_name_by_api_ref, CHILDREN_NODES
-from core.nodes.utils import FolderHandler
+from core.nodes.configs.const_ import get_node_name_by_api_ref
 
 from chatbot.app import sync_generate_cli
 from cli.call_cli import call_script
@@ -21,14 +20,20 @@ class NodeQueryMixin:
     A mixin to handle 'get' requests for any ViewSet.
     It extracts "node_id" from request parameters and uses NodeLoader.
     """
+    def get_query_params(self, request):
+        """Extracts query parameters from the request."""
+        node_id = request.query_params.get("node_id")
+        output = request.query_params.get('output', "0")
+        return_serialized = request.query_params.get('return_serialized', '0') == '1'
+        return_path = not return_serialized
+        project_id = request.query_params.get('project_id')
+        return_data = request.query_params.get('return_data', '0') == '1'
+        return node_id, output, return_serialized, return_path, project_id, return_data
+    
     def get(self, request, *args, **kwargs):
         try:
-            node_id = request.query_params.get("node_id")
-            output = request.query_params.get('output', "0")
-            return_serialized = request.query_params.get('return_serialized', '0') == '1'
-            return_path = not return_serialized
-            project_id = request.query_params.get('project_id')
-            retrun_data = request.query_params.get('return_data', '0') == '1'
+            # Extract query parameters
+            node_id, output, return_serialized, return_path, project_id, return_data = self.get_query_params(request)
 
             if not node_id:
                 return Response({"error": "'node_id' is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -44,7 +49,7 @@ class NodeQueryMixin:
             if output.isdigit() and int(output) > 0:
                 depth = int(output)
                 try:
-                    success, current_node = NodeLoader(return_path=return_path, return_data=retrun_data)(node_id=node_id, project_id=project_id)
+                    success, current_node = NodeLoader(return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
                     if success:
                         children = current_node.get("children", [])
                         if len(current_node.get("children")) > 1:
@@ -74,8 +79,8 @@ class NodeQueryMixin:
                                 break
                         node_id = str(current_node.get("node_id", node_id))
 
-            success, payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=retrun_data)(node_id=node_id, project_id=project_id)
-            
+            success, payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
+
             # Filter by project_id if provided
             if project_id and payload:
                 if str(payload.get('project_id')) != str(project_id):
@@ -231,7 +236,7 @@ class DataLoaderAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data, *args, **kwargs):
         return DataLoader(
             dataset_name=validated_data.get("params", {}).get("dataset_name"),
-            dataset_path=validated_data.get('dataset_path'),
+            dataset_path=validated_data.get("params", {}).get("dataset_path"),
             **kwargs
         )
 
@@ -310,8 +315,8 @@ class PredictAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data, *args, **kwargs):
         return Predict(
             X=validated_data.get('X'),
-            model=validated_data.get('model'),
-            model_path=validated_data.get('model_path'),
+            model=validated_data.get('fitted_model'),
+            model_path=validated_data.get('fitted_model_path'),
             **kwargs
         )
 
@@ -371,8 +376,8 @@ class TransformAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data, *args, **kwargs):
         return Transform(
             data=validated_data.get('data'),
-            preprocessor=validated_data.get('preprocessor'),
-            preprocessor_path=validated_data.get('preprocessor_path'),
+            preprocessor=validated_data.get('fitted_preprocessor'),
+            preprocessor_path=validated_data.get('fitted_preprocessor_path'),
             **kwargs
         )
 
@@ -538,10 +543,10 @@ class NetModelFitterAPIView(BaseNodeAPIView):
 
 class NodeLoaderAPIView(APIView, NodeQueryMixin):
 
-    def get_serialized_payload(self, node_id, path, return_serialized, project_id):
+    def get_serialized_payload(self, path, return_serialized, project_id):
         """Loads a node, saves it, and optionally serializes it."""
         loader = NodeLoader(from_db=False)
-        success, payload = loader(node_id=node_id, project_id= project_id, path=path)
+        success, payload = loader(project_id= project_id, path=path)
         node_name = payload.get("message").split(" ")[1]
         uid = Component.objects.get(node_name="node_loader").uid
         payload.update({"node_name":node_name,
@@ -559,8 +564,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                node_id = serializer.validated_data.get("node_id")
-                path = serializer.validated_data.get('node_path')
+                path = serializer.validated_data.get('params', {}).get('node_path')
                 return_serialized = request.query_params.get("return_serialized") == "1"
                 project_id = request.query_params.get('project_id')
 
@@ -569,7 +573,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                 except :
                     project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
                 
-                payload = self.get_serialized_payload(node_id, path, return_serialized, project_id)
+                payload = self.get_serialized_payload(path, return_serialized, project_id)
                 return Response(payload, status=status.HTTP_200_OK)
             
             except ValueError as e:
@@ -581,8 +585,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         serializer = NodeLoaderSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                node_id = serializer.validated_data.get("node_id")
-                path = serializer.validated_data.get('node_path')
+                path = serializer.validated_data.get("params", {}).get('node_path')
                 return_serialized = request.query_params.get("return_serialized") == "1"
                 project_id = request.query_params.get('project_id')
 
@@ -591,7 +594,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                 except :
                     project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
 
-                payload = self.get_serialized_payload(node_id, path, return_serialized, project_id)
+                payload = self.get_serialized_payload(path, return_serialized, project_id)
                 node_id = request.query_params.get("node_id", None)
                 success, message = NodeUpdater(return_serialized)(node_id, project_id, payload)
 
@@ -1213,9 +1216,77 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        project_id = instance.id
+    
+        # Delete all associated nodes first
+        node_count = Node.objects.filter(project_id=project_id).delete()[0]
         self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({
+            "success": True,
+            "message": f"Project deleted successfully with {node_count} associated nodes",
+        }, status=status.HTTP_200_OK)
 
+class BulkProjectDeleteAPIView(APIView):
+    """API view for deleting multiple projects at once."""
+    
+    def delete(self, request):
+        try:
+            # Extract project IDs from request data
+            project_ids = request.data.get('project_ids', [])
+            
+            if not project_ids:
+                return Response({"error": "No project IDs provided"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            if not isinstance(project_ids, list):
+                return Response({"error": "project_ids must be a list"}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            # Track deletion results
+            deleted_count = 0
+            not_found_ids = []
+            error_ids = []
+            
+            # Process each project ID
+            for project_id in project_ids:
+                try:
+                    project = Project.objects.get(id=project_id)
+                    
+                    # Delete associated nodes first
+                    node_count = Node.objects.filter(project_id=project_id).delete()[0]
+                    
+                    # Delete the project
+                    project.delete()
+                    deleted_count += 1
+                    
+                except Project.DoesNotExist:
+                    not_found_ids.append(project_id)
+                except Exception as e:
+                    error_ids.append({"id": project_id, "error": str(e)})
+            
+            # Prepare response data
+            response_data = {
+                "success": True,
+                "deleted_count": deleted_count,
+                "total_requested": len(project_ids)
+            }
+            
+            if not_found_ids:
+                response_data["not_found_ids"] = not_found_ids
+            
+            if error_ids:
+                response_data["errors"] = error_ids
+                
+            # Return appropriate status code
+            if deleted_count == 0:
+                if not_found_ids and not error_ids:
+                    return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ChatbotAPIView(APIView):

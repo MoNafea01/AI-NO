@@ -21,7 +21,8 @@ class CompileModel(BaseNode):
     def _compile(self):
         if isinstance(self.nn_model, (dict, int, str)):
             return self._compile_from_dict(self.nn_model)
-        elif isinstance(rf"{self.model_path}", str):
+        
+        elif self.nn_model_path and isinstance(self.nn_model_path, str):
             return self._compile_from_path(self.nn_model_path)
         else:
             return "Invalid model or path provided."
@@ -30,7 +31,7 @@ class CompileModel(BaseNode):
         try:
             model = NodeDataExtractor()(model_id, project_id=self.project_id)
             if isinstance(model, str):
-                return "Failed to load model. Please check the provided ID."
+                return "Failed to load nn model. Please check the provided ID."
             return self._compile_handler(model)
         except Exception as e:
             return f"Error Compiling model by ID: {e}"
@@ -39,20 +40,17 @@ class CompileModel(BaseNode):
         try:
             model = NodeDataExtractor()(path=nn_model_path, project_id=self.project_id)
             if isinstance(model, str):
-                return "Failed to load model. Please check the provided path."
+                return "Failed to load nn model. Please check the provided path."
             return self._compile_handler(model)
         except Exception as e:
             return f"Error Compiling model from path: {e}"
 
     def _compile_handler(self, model:Sequential):
         try:
-            if self.loss and self.optimizer:
-                model.compile(loss=self.loss, optimizer=self.optimizer, metrics=self.metrics)
-                if isinstance(model, str):
-                    return f"Model compilation failed. {model}"
-            else:
+            if not all([self.loss, self.optimizer, self.metrics]):
                 return "Loss, optimizer, and metrics must be provided for compilation."
-
+            
+            model.compile(loss=self.loss, optimizer=self.optimizer, metrics=self.metrics)
             payload = PayloadBuilder.build_payload("Model Compiled", model, "model_compiler", task="compile_model", node_type="compiler",
                                                        params={"loss": self.loss, "optimizer": self.optimizer, "metrics": self.metrics},
                                                        uid=self.uid)

@@ -36,7 +36,7 @@ class NodeUpdater:
             folder_path = os.path.dirname(node.node_data)
             original_id = payload.get("node_id") # id for new node
             
-            is_multi_channel = node.node_name in MULTI_CHANNEL_NODES
+            is_multi_channel = payload.get("node_name") in MULTI_CHANNEL_NODES
             payload["node_data"] = NodeDataExtractor()(original_id, project_id=project_id)
 
             if is_multi_channel:
@@ -48,13 +48,12 @@ class NodeUpdater:
 
                 for o_id in o_ids:
                     success, config = NodeLoader()(o_id, project_id=project_id)
+                    if not success:
+                        return False, f"Failed to load config for node {o_id}: {config}"
                     configs.append(config)
-
-                for i in range(2):
-                    tmp_id = o_ids[i]
-                    new_id = new_ids[i]
+                
+                for i, (tmp_id, new_id) in enumerate(zip(o_ids, new_ids)):
                     data = NodeDataExtractor()(tmp_id, project_id=project_id)
-                    
                     new_payload = payload.copy()
                     new_payload.update(**configs[i])
                     new_payload.update({"node_id":new_id, "node_data": data})

@@ -3,10 +3,10 @@ from core.nodes.configs.preprocessors import PREPROCESSORS
 from django.conf import settings
 
 # these nodes are in json format and are used to be input to other nodes
-DICT_NODES = ['data', 'data_1', 'data_2', 
-              'X', 'y', 'model', 'y_true', 
-              'y_pred', 'preprocessor', 'prev_node', 
-              'layer', 'node', 'compiled_model', 'nn_model']
+DICT_NODES = ['data', 'data_1', 'data_2', 'X', 
+              'y', 'model', 'y_true', 'y_pred', 
+              'preprocessor', 'prev_node', 'layer', 'node', 
+              'compiled_model', 'nn_model', 'fitted_model', 'fitted_preprocessor']
 
 # these are layers names
 PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer"]

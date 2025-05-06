@@ -66,7 +66,7 @@ params = [{'alpha': 1.0,},
     {'n_neighbors': 5,},
 
     {"model": "model_id", "X": "X_id", "y": "y_id"},
-    {"model": "model_id", "X": "X_id"},
+    {"fitted_model": "fitted_model_id", "X": "X_id"},
     {"y_true": "y_true_id", "y_pred": "y_pred", "params": {"metric": "mse"}},
 
     {},
@@ -83,7 +83,7 @@ params = [{'alpha': 1.0,},
     {'threshold': 0.0},
     
     {"preprocessor": "preprocessor_id", "data": "data_id"},
-    {"preprocessor": "preprocessor_id", "data": "data_id"},
+    {"fitted_preprocessor": "fitted_preprocessor_id", "data": "data_id"},
     {"preprocessor": "preprocessor_id", "data": "data_id"},
 
     {"params": {"dataset_name": "iris"}},

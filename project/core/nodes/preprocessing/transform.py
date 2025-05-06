@@ -25,7 +25,7 @@ class Transform(BaseNode):
         err = None
         self.data = NodeDataExtractor()(data, project_id=project_id)
         if isinstance(self.data, str):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load data. Please check the provided ID."
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
 
@@ -37,26 +37,26 @@ class Transform(BaseNode):
         
         if isinstance(self.preprocessor, (dict, int, str)):
             return self._transform_from_id()
-        elif isinstance(rf"{self.preprocessor}", str):
+        elif self.preprocessor_path and isinstance(self.preprocessor_path, str):
             return self._transform_from_path()
         else:
             return "Invalid preprocessor or path provided."
 
     def _transform_from_id(self):
         try:
-            prepocessor = NodeDataExtractor()(self.preprocessor, project_id=self.project_id)
-            if isinstance(prepocessor, str):
+            preprocessor = NodeDataExtractor()(self.preprocessor, project_id=self.project_id)
+            if isinstance(preprocessor, str):
                 return "Failed to load preprocessor. Please check the provided ID."
-            return self._transform_handler(prepocessor)
+            return self._transform_handler(preprocessor)
         except Exception as e:
             return f"Error transformation using preprocessor by ID: {e}"
 
     def _transform_from_path(self):
         try:
-            prepocessor = NodeDataExtractor()(self.preprocessor_path, project_id=self.project_id)
-            if isinstance(prepocessor, str):
+            preprocessor = NodeDataExtractor()(self.preprocessor_path, project_id=self.project_id)
+            if isinstance(preprocessor, str):
                 return "Failed to load preprocessor. Please check the provided path."
-            return self._transform_handler(prepocessor)
+            return self._transform_handler(preprocessor)
         except Exception as e:
             return f"Error transformation using preprocessor by path: {e}"
     
