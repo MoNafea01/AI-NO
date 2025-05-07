@@ -1,14 +1,12 @@
 import 'package:ai_gen/core/reusable_widgets/custom_button.dart';
 import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/core/themes/asset_paths.dart';
-import 'package:ai_gen/features/HomeScreen/home_screen.dart';
-import 'package:ai_gen/features/node_view/presentation/widgets/menu_actions.dart';
+import 'package:ai_gen/features/node_view/presentation/widgets/custom_fab.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 import '../cubit/grid_node_view_cubit.dart';
+import 'widgets/menu_actions.dart';
 import 'widgets/node_properties_widget/node_properties_card.dart';
 import 'widgets/node_selector_sidebar/node_selector_sidebar.dart';
 import 'widgets/run_button.dart';
@@ -65,7 +63,7 @@ class _GridNodeViewState extends State<GridNodeView> {
           Positioned(
             bottom: screenHeight / 50,
             right: screenWidth / 100,
-            child: const ExpandableMenuActions(),
+            child: const CustomFAB(),
           ),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 500),
@@ -76,7 +74,7 @@ class _GridNodeViewState extends State<GridNodeView> {
           const Positioned(
             bottom: 10,
             left: 10,
-            child: Text("V0.8.0+2"),
+            child: Text("V0.8.1"),
           ),
         ],
       ),
@@ -85,8 +83,8 @@ class _GridNodeViewState extends State<GridNodeView> {
 
   AppBar _appBar(GridNodeViewCubit gridNodeViewCubit) {
     return AppBar(
-      backgroundColor: AppColors.grey50,
-      surfaceTintColor: AppColors.grey50,
+      backgroundColor: AppColors.grey100,
+      surfaceTintColor: AppColors.grey100,
       title: Text(gridNodeViewCubit.projectModel.name ?? "Project Name"),
       elevation: 1,
       shadowColor: Colors.black,
@@ -97,24 +95,10 @@ class _GridNodeViewState extends State<GridNodeView> {
           setState(() => isSidebarVisible = !isSidebarVisible);
         },
       ),
-      actions: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 8,
-          children: [
-            CustomButton(
-              onTap: () => context.read<GridNodeViewCubit>().clearNodes(),
-              child: SvgPicture.asset(AssetsPaths.refreshIcon, height: 18),
-            ),
-            CustomButton(
-              onTap: () =>
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => const DashboardScreen(),
-              )),
-              child: const Icon(Icons.home),
-            ),
-            const SizedBox(),
-          ],
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: 8.0),
+          child: MenuButton(),
         )
       ],
     );

@@ -108,7 +108,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
         },
       );
 
-      _updateProjectNodes();
+      saveProjectNodes();
       emit(NodeViewSuccess());
     } catch (e) {
       results = ("Wrong parameter type").split(",");
@@ -116,7 +116,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     }
   }
 
-  Future _updateProjectNodes() async {
+  Future saveProjectNodes() async {
     List<Map<String, dynamic>> nodes = nodeManager.mySerializeNodes();
     await _nodeServerCalls.updateProjectNodes(nodes, projectModel.id!);
   }
