@@ -26,7 +26,9 @@ class VSNodeOutputState extends State<VSNodeOutput> {
   void initState() {
     _anchor = GlobalKey();
     super.initState();
-    updateRenderBox();
+    Future.delayed(Duration.zero).then((_) {
+      if (mounted) updateRenderBox();
+    });
   }
 
   @override
