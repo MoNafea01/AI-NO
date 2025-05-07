@@ -12,10 +12,10 @@ class ServerManager {
     if (_isServerRunning) return;
 
     String projectPath = Directory.current.path;
-    String pathEldemy = '$projectPath\\..\\backend\\run_server.bat';
-    // String pathShaltoot = "D:\\GraduationProject\\backend\\run_server.bat";
+    //String pathEldemy = '$projectPath\\..\\backend\\run_server.bat';
+    String pathShaltoot = "D:\\GraduationProject\\backend\\run_server.bat";
     try {
-      String batchFilePath = pathEldemy;
+      String batchFilePath = pathShaltoot;
 
       await _killExistingServers();
 

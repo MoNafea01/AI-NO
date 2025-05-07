@@ -1,4 +1,5 @@
 import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -23,7 +24,8 @@ class VSModelInputData extends VSAINOGeneralInputData {
   IconData get inputIcon => Icons.square_outlined;
 
   @override
-  List<Type> get acceptedTypes => [VSModelOutputData, VSNetworkOutputData];
+  List<Type> get acceptedTypes =>
+      [VSModelOutputData, VSNetworkOutputData, VSFitterOutputData];
 
   @override
   Color get interfaceColor => _interfaceColor;

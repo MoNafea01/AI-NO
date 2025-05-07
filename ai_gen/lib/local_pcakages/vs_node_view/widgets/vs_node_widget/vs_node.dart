@@ -1,4 +1,7 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/core/reusable_widgets/custom_menu_item.dart';
+import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
@@ -90,17 +93,40 @@ class _VSNodeState extends State<VSNode> {
 
   void _popMenu(details) {
     showMenu(
+      color: AppColors.grey100,
       context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      surfaceTintColor: AppColors.grey100,
+      elevation: 8,
+      menuPadding: const EdgeInsets.all(4),
       position: RelativeRect.fromLTRB(
         details.globalPosition.dx,
         details.globalPosition.dy,
         details.globalPosition.dx,
         details.globalPosition.dy,
       ),
-      items: const [
-        PopupMenuItem(value: 'properties', child: Text('Properties')),
-        PopupMenuItem(value: 'rename', child: Text('Rename')),
-        PopupMenuItem(value: 'delete', child: Text('Delete')),
+      items: [
+        _buildCustomMenuItem('properties', onTap: () {
+          context
+              .read<GridNodeViewCubit>()
+              .updateActiveNodePropertiesCard(widget.data.node);
+        }),
+        _buildCustomMenuItem('rename', onTap: () {
+          setState(() => widget.data.isRenaming = true);
+        }),
+        _buildCustomMenuItem('delete', onTap: () {
+          final NodeServerCalls nodeServerCalls =
+              GetIt.I.get<NodeServerCalls>();
+          NodeModel? nodeModel = widget.data.node;
+          if (nodeModel?.nodeId != null) nodeServerCalls.deleteNode(nodeModel!);
+          widget.data.deleteNode?.call();
+
+          nodeProvider.removeNodes([widget.data]);
+          setState(() {});
+        }),
+        // PopupMenuItem(value: 'properties', child: Text('Properties')),
+        // PopupMenuItem(value: 'rename', child: Text('Rename')),
+        // PopupMenuItem(value: 'delete', child: Text('Delete')),
       ],
     ).then(
       (value) {
@@ -123,4 +149,12 @@ class _VSNodeState extends State<VSNode> {
       },
     );
   }
+
+  CustomMenuItem _buildCustomMenuItem(String value, {VoidCallback? onTap}) =>
+      CustomMenuItem(
+        value,
+        onTap: onTap,
+        childAlignment: Alignment.centerLeft,
+        child: Text(value, style: AppTextStyles.black14Bold),
+      );
 }

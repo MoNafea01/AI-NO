@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class AppColors {
+  static const Color primaryColor = Color(0xFF0169CB);
   static const Color bluePrimaryColor = Color(0xFF349CFE);
   static const Color appBackgroundColor = Colors.white;
   static const Color grey50 = Color(0xFFF2F2F2);
@@ -10,6 +11,7 @@ abstract class AppColors {
   static const Color nodeInterfaceIconColor = Color(0xffD9D9D9);
   static const Color textSecondary = Color(0xFF666666);
   static const Color blackText = Color(0xFF000000);
+  static const Color blackText2 = Color(0xFF1A1A1A);
 
   static List<Color> get nodesColors => [
         Colors.blue,

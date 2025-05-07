@@ -181,11 +181,15 @@ class VSNodeSerializationManager {
         final VSNodeData? nodeData =
             _nodeBuilders[value["node_name"]]?.call(Offset.zero, null);
 
-        if (nodeData == null ||
-            (value["location_x"] == 0 && value["location_y"] == 0)) {
-          //ignore: avoid_print
+        if (nodeData == null) {
           print(
             "A node ${value["node_id"]} was serialized but the builder for its type is missing.",
+          );
+          onBuilderMissing?.call(value);
+          return;
+        } else if ((value["location_x"] == 0 && value["location_y"] == 0)) {
+          print(
+            "A node ${value["node_id"]} was serialized with location 0,0",
           );
           onBuilderMissing?.call(value);
           return;
@@ -194,7 +198,7 @@ class VSNodeSerializationManager {
         NodeModel? nodeModel = nodeData.node;
         if (nodeModel == null) return;
 
-        nodeModel = _createNewNodeInstance(nodeModel, value);
+        updateNode(nodeModel, value);
 
         nodeData.setBaseData(
           nodeModel.nodeId.toString(),
@@ -207,7 +211,6 @@ class VSNodeSerializationManager {
       },
     );
 
-    print("decoded: $decoded");
     data.forEach(
       (key, value) {
         final inputData = value["input_ports"] as List<dynamic>;
@@ -233,26 +236,25 @@ class VSNodeSerializationManager {
     return decoded;
   }
 
-  NodeModel _createNewNodeInstance(NodeModel nodeModel, value) {
-    return nodeModel.copyWith(
-      projectId: value["project"],
-      nodeId: value["node_id"],
-      offset: Offset(value["location_x"] ?? 350, value["location_y"] ?? 350),
-      params: nodeModel.params.map(
-        (param) {
-          if (value["params"] is List && value["params"].isNotEmpty) {
-            var matchingParam = value["params"].firstWhere(
-              (p) => p[param.name] != null,
-              orElse: () => null,
-            );
+  void updateNode(NodeModel nodeModel, value) {
+    nodeModel.projectId = value["project"];
+    nodeModel.nodeId = value["node_id"];
+    nodeModel.offset =
+        Offset(value["location_x"] ?? 350, value["location_y"] ?? 350);
+    nodeModel.params = nodeModel.params.map(
+      (param) {
+        if (value["params"] is List && value["params"].isNotEmpty) {
+          var matchingParam = value["params"].firstWhere(
+            (p) => p[param.name] != null,
+            orElse: () => null,
+          );
 
-            if (matchingParam != null) {
-              return param.copyWith(value: matchingParam[param.name]);
-            }
+          if (matchingParam != null) {
+            return param.copyWith(value: matchingParam[param.name]);
           }
-          return param.copyWith();
-        },
-      ).toList(),
-    );
+        }
+        return param.copyWith();
+      },
+    ).toList();
   }
 }
