@@ -4,7 +4,7 @@ import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.da
 import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:bloc/bloc.dart';
-import 'package:dio/src/response.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -13,45 +13,51 @@ part 'node_view_state.dart';
 class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   GridNodeViewCubit({required this.projectModel})
       : showGrid = true,
+        isSidebarVisible = true,
         super(GridNodeViewInitial());
 
+  // Models and Data
   ProjectModel projectModel;
-
-  late VSNodeDataProvider nodeDataProvider;
-  Iterable<String?>? results;
-  late bool showGrid;
   NodeModel? activePropertiesNode;
-  late VSNodeManager nodeManager;
 
+  // Node Management
+  late VSNodeDataProvider nodeDataProvider;
+  late VSNodeManager nodeManager;
+  Iterable<String?>? results;
+
+  // UI State
+  late bool showGrid;
+  bool isSidebarVisible;
+
+  // Services
   final NodeServerCalls _nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+
+  // UI State Management
   void toggleGrid() {
     showGrid = !showGrid;
     emit(NodeViewSuccess());
   }
 
-  Future loadNodeView() async {
+  void toggleSidebar() {
+    isSidebarVisible = !isSidebarVisible;
+    emit(NodeViewSuccess());
+  }
+
+  // Node View Initialization
+  Future<void> loadNodeView() async {
     try {
       emit(GridNodeViewLoading());
-      await _loadOrCreateProject();
-
-      final List<Object> nodeBuilder =
-          await NodeBuilder(projectId: projectModel.id!).buildNodesMenu();
-      nodeManager = VSNodeManager(nodeBuilders: nodeBuilder);
-
+      await _initializeProject();
+      await _initializeNodeManager();
       await _loadProjectNodes();
-
-      nodeDataProvider = VSNodeDataProvider(
-        nodeManager: nodeManager,
-        withAppbar: true,
-      );
-
+      _initializeNodeDataProvider();
       emit(NodeViewSuccess());
     } catch (e) {
       emit(NodeViewFailure(e.toString()));
     }
   }
 
-  Future<void> _loadOrCreateProject() async {
+  Future<void> _initializeProject() async {
     if (projectModel.id == null) {
       projectModel = await _nodeServerCalls.createProject(
         projectModel.name ?? "project Name",
@@ -62,70 +68,100 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     }
   }
 
+  Future<void> _initializeNodeManager() async {
+    final List<Object> nodeBuilder =
+        await NodeBuilder(projectId: projectModel.id!).buildNodesMenu();
+    nodeManager = VSNodeManager(nodeBuilders: nodeBuilder);
+  }
+
+  void _initializeNodeDataProvider() {
+    nodeDataProvider = VSNodeDataProvider(
+      nodeManager: nodeManager,
+      withAppbar: true,
+    );
+  }
+
+  // Node Operations
   Future<void> _loadProjectNodes() async {
     Response responseProjectNodes =
         await _nodeServerCalls.loadProjectNodes(projectModel.id!);
-
     nodeManager.myDeSerializedNodes(responseProjectNodes);
   }
 
-  Future clearNodes() async {
+  Future<void> clearNodes() async {
     try {
       emit(GridNodeViewLoading());
-      _closeActiveNodePropertiesCard();
-      _closeRunMenu();
-
+      _resetUIState();
       nodeManager.clearNodes();
-
       emit(NodeViewSuccess());
     } catch (e) {
       emit(NodeViewFailure(e.toString()));
     }
   }
 
-  void runNodes() async {
+  void _resetUIState() {
+    _closeActiveNodePropertiesCard();
+    _closeRunMenu();
+  }
+
+  Future<void> runNodes() async {
     try {
       _closeActiveNodePropertiesCard();
-      results = ("Running nodes...").split(",");
-      emit(NodeViewSuccess());
+      _updateRunningStatus();
 
-      List<MapEntry<String, dynamic>> entries = [];
+      final entries = await _evaluateOutputNodes();
+      _processNodeResults(entries);
 
-      for (VSOutputNode vsOutputNode
-          in nodeDataProvider.nodeManager.getOutputNodes) {
-        MapEntry<String, dynamic> nodeOutput = await vsOutputNode.evaluate();
-        dynamic asyncOutput = await nodeOutput.value;
-        nodeOutput = MapEntry(nodeOutput.key, asyncOutput);
-        entries.add(nodeOutput);
-      }
-
-      results = entries.map(
-        (output) {
-          if (output.value != null) {
-            return "${output.key}: ${output.value}".replaceAll(",", ",\n");
-          }
-          return null;
-        },
-      );
-
-      saveProjectNodes();
+      await saveProjectNodes();
       emit(NodeViewSuccess());
     } catch (e) {
-      results = ("Wrong parameter type").split(",");
-      emit(NodeViewSuccess());
+      _handleRunError();
     }
   }
 
-  Future saveProjectNodes() async {
+  void _updateRunningStatus() {
+    results = ("Running nodes...").split(",");
+    emit(NodeViewSuccess());
+  }
+
+  Future<List<MapEntry<String, dynamic>>> _evaluateOutputNodes() async {
+    List<MapEntry<String, dynamic>> entries = [];
+    for (VSOutputNode vsOutputNode
+        in nodeDataProvider.nodeManager.getOutputNodes) {
+      MapEntry<String, dynamic> nodeOutput = await vsOutputNode.evaluate();
+      dynamic asyncOutput = await nodeOutput.value;
+      entries.add(MapEntry(nodeOutput.key, asyncOutput));
+    }
+    return entries;
+  }
+
+  void _processNodeResults(List<MapEntry<String, dynamic>> entries) {
+    results = entries.map(
+      (output) {
+        if (output.value != null) {
+          return "${output.key}: ${output.value}".replaceAll(",", ",\n");
+        }
+        return null;
+      },
+    );
+  }
+
+  void _handleRunError() {
+    results = ("Wrong parameter type").split(",");
+    emit(NodeViewSuccess());
+  }
+
+  Future<void> saveProjectNodes() async {
     List<Map<String, dynamic>> nodes = nodeManager.mySerializeNodes();
     await _nodeServerCalls.updateProjectNodes(nodes, projectModel.id!);
   }
 
+  // UI State Management
   void _closeRunMenu() {
     results = null;
   }
 
-  void closeRunMenu() async {
+  void closeRunMenu() {
     _closeRunMenu();
     emit(NodeViewSuccess());
   }
