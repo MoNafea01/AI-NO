@@ -880,9 +880,10 @@ class ExportProjectAPIView(APIView):
             save_path = os.path.join(save_path, f'{file_name}.{format_type}')
             # encrypt = serializer.validated_data.get('encrypt', False)
             password = serializer.validated_data.get('password')
-            encrypt = not(password == None)
             if not password:
                 password = ''
+
+            encrypt = not( password == '')
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
             if not project_id:
