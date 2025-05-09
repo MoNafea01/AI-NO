@@ -1,4 +1,6 @@
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/reusable_widgets/custom_dialog.dart';
+import 'package:ai_gen/core/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 
@@ -10,13 +12,11 @@ class CreateNewProjectDialog extends StatefulWidget {
 }
 
 class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
-  late final GlobalKey<FormState> _formKey;
   late final TextEditingController _projectNameController;
   late final TextEditingController _projectDescriptionController;
 
   @override
   void initState() {
-    _formKey = GlobalKey<FormState>();
     _projectNameController = TextEditingController();
     _projectDescriptionController = TextEditingController();
     super.initState();
@@ -30,8 +30,6 @@ class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
   }
 
   void _onCreatePressed() {
-    if (!_formKey.currentState!.validate()) return;
-
     final String projectName = _projectNameController.text;
     final String projectDescription = _projectDescriptionController.text;
 
@@ -55,69 +53,25 @@ class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 350,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 24,
-          children: [
-            const Text(
-              'New project',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            CustomTextField(
-              projectNameController: _projectNameController,
-              labelText: 'Project name',
-            ),
-            CustomTextField(
-              projectNameController: _projectDescriptionController,
-              labelText: 'Project description',
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: _onCancelPressed,
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: _onCreatePressed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Create',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return CustomDialog(
+      dialogTitle: "New project",
+      submitButtonText: "Create",
+      cancelButtonText: "Cancel",
+      onSubmit: _onCreatePressed,
+      onCancel: _onCancelPressed,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 24,
+        children: [
+          CustomTextFormField(
+            controller: _projectNameController,
+            labelText: 'Project Name',
+          ),
+          CustomTextFormField(
+            controller: _projectDescriptionController,
+            labelText: 'Project Description',
+          ),
+        ],
       ),
     );
   }

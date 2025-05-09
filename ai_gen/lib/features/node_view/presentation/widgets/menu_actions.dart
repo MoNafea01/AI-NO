@@ -3,6 +3,7 @@ import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
+import 'package:ai_gen/features/screens/HomeScreen/widgets/export_project_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,7 +26,19 @@ class MenuButton extends StatelessWidget {
           "Save Project",
           onTap: gridNodeViewCubit.saveProjectNodes,
         ),
-        _buildCustomMenuItem('Export', onTap: () {}),
+        _buildCustomMenuItem(
+          'Export',
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => Dialog(
+                child: ExportProjectDialog(
+                  projectModel: gridNodeViewCubit.projectModel,
+                ),
+              ),
+            );
+          },
+        ),
         _buildCustomMenuItem(
           'Exit',
           onTap: () {

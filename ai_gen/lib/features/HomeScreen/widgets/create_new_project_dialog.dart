@@ -2,14 +2,31 @@ import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 
-class CreateNewProjectDialog extends StatefulWidget {
-  const CreateNewProjectDialog({super.key});
+class CustomDialog extends StatefulWidget {
+  const CustomDialog({
+    this.dialogTitle,
+    this.submitButtonText,
+    this.cancelButtonText,
+    this.onSubmit,
+    this.onCancel,
+    this.onDispose,
+    this.dialogContent,
+    super.key,
+  });
+
+  final String? dialogTitle;
+  final String? submitButtonText;
+  final String? cancelButtonText;
+  final VoidCallback? onSubmit;
+  final VoidCallback? onCancel;
+  final VoidCallback? onDispose;
+  final Widget? dialogContent;
 
   @override
-  State<CreateNewProjectDialog> createState() => _CreateNewProjectDialogState();
+  State<CustomDialog> createState() => _CustomDialogState();
 }
 
-class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
+class _CustomDialogState extends State<CustomDialog> {
   late final GlobalKey<FormState> _formKey;
   late final TextEditingController _projectNameController;
   late final TextEditingController _projectDescriptionController;
@@ -26,11 +43,14 @@ class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
   void dispose() {
     _projectNameController.dispose();
     _projectDescriptionController.dispose();
+    widget.onDispose?.call();
     super.dispose();
   }
 
   void _onCreatePressed() {
+    if (!mounted) return;
     if (!_formKey.currentState!.validate()) return;
+    widget.onSubmit?.call();
 
     final String projectName = _projectNameController.text;
     final String projectDescription = _projectDescriptionController.text;
@@ -50,7 +70,9 @@ class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
   }
 
   void _onCancelPressed() {
-    if (mounted) Navigator.pop(context);
+    if (!mounted) return;
+    widget.onCancel?.call();
+    Navigator.pop(context);
   }
 
   @override
@@ -71,14 +93,15 @@ class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
           children: [
             const Text(
               'New project',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-            CustomTextField(
-              projectNameController: _projectNameController,
+            widget.dialogContent ?? const SizedBox(),
+            CustomTextFormField(
+              controller: _projectNameController,
               labelText: 'Project name',
             ),
-            CustomTextField(
-              projectNameController: _projectDescriptionController,
+            CustomTextFormField(
+              controller: _projectDescriptionController,
               labelText: 'Project description',
             ),
             const SizedBox(height: 8),
@@ -123,11 +146,11 @@ class _CreateNewProjectDialogState extends State<CreateNewProjectDialog> {
   }
 }
 
-class CustomTextField extends StatelessWidget {
-  const CustomTextField(
-      {required this.projectNameController, this.labelText, super.key});
+class CustomTextFormField extends StatelessWidget {
+  const CustomTextFormField(
+      {required this.controller, this.labelText, super.key});
 
-  final TextEditingController projectNameController;
+  final TextEditingController controller;
 
   final String? labelText;
   @override
@@ -135,7 +158,7 @@ class CustomTextField extends StatelessWidget {
     return TextFormField(
       validator: (value) =>
           value != null && value.isEmpty ? 'Please enter a $labelText' : null,
-      controller: projectNameController,
+      controller: controller,
       decoration: InputDecoration(
         label: Padding(
           padding: const EdgeInsets.only(bottom: 20.0),
