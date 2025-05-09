@@ -1,6 +1,6 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
+import 'package:ai_gen/core/services/app_services.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:bloc/bloc.dart';
@@ -30,12 +30,16 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   bool isSidebarVisible;
 
   // Services
-  final NodeServerCalls _nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+  final AppServices _appServices = GetIt.I.get<AppServices>();
 
   // UI State Management
   void toggleGrid() {
     showGrid = !showGrid;
     emit(NodeViewSuccess());
+  }
+
+  Future<void> exportProject() async {
+    // await _nodeServerCalls.exportProject(projectModel.id!);
   }
 
   void toggleSidebar() {
@@ -59,12 +63,12 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
 
   Future<void> _initializeProject() async {
     if (projectModel.id == null) {
-      projectModel = await _nodeServerCalls.createProject(
+      projectModel = await _appServices.createProject(
         projectModel.name ?? "project Name",
         projectModel.description ?? "project Description",
       );
     } else {
-      projectModel = await _nodeServerCalls.getProject(projectModel.id!);
+      projectModel = await _appServices.getProject(projectModel.id!);
     }
   }
 
@@ -84,7 +88,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   // Node Operations
   Future<void> _loadProjectNodes() async {
     Response responseProjectNodes =
-        await _nodeServerCalls.loadProjectNodes(projectModel.id!);
+        await _appServices.loadProjectNodes(projectModel.id!);
     nodeManager.myDeSerializedNodes(responseProjectNodes);
   }
 
@@ -153,7 +157,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
 
   Future<void> saveProjectNodes() async {
     List<Map<String, dynamic>> nodes = nodeManager.mySerializeNodes();
-    await _nodeServerCalls.updateProjectNodes(nodes, projectModel.id!);
+    await _appServices.updateProjectNodes(nodes, projectModel.id!);
   }
 
   // UI State Management

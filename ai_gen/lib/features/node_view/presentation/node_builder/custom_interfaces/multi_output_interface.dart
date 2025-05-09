@@ -1,4 +1,4 @@
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
+import 'package:ai_gen/core/services/app_services.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -44,7 +44,7 @@ class MultiOutputOutputData extends VSAINOGeneralOutputData {
   Future<Map<String, dynamic>> Function(Map<String, dynamic> p1)
       get outputFunction {
     return (inputData) async {
-      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
       if (index == 0) {
         final Map<String, dynamic> apiBody = {};
 

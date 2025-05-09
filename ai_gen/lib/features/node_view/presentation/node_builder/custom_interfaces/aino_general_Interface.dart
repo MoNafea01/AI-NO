@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
+import 'package:ai_gen/core/services/app_services.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -51,7 +51,7 @@ class VSAINOGeneralOutputData extends VSOutputData {
         apiBody[input.key] = await input.value;
       }
 
-      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
 
       Map<String, dynamic> response =
           await nodeServerCalls.runNode(node, apiBody);

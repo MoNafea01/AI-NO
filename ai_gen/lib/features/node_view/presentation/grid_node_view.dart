@@ -73,6 +73,7 @@ class _GridNodeViewState extends State<GridNodeView> {
       top: 32,
       right: screenWidth / 100,
       child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           RunButton(),
           SizedBox(height: 20),

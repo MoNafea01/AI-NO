@@ -4,7 +4,7 @@ class ApiErrorHandler {
   static Map<String, dynamic> dioHandler(DioException e) {
     if (e.response != null) {
       return {
-        'Error':
+        'Error': e.response!.data["message"] ??
             '${e.response?.statusMessage}, Status Code: ${e.response?.statusCode},${e.response?.data}'
       };
     } else {

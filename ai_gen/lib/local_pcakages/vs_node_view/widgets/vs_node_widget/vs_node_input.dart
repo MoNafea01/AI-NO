@@ -27,7 +27,9 @@ class _VSNodeInputState extends State<VSNodeInput> {
   @override
   void initState() {
     super.initState();
-    updateRenderBox();
+    Future.delayed(Duration.zero, () {
+      updateRenderBox();
+    });
   }
 
   @override
@@ -42,6 +44,7 @@ class _VSNodeInputState extends State<VSNodeInput> {
 
   void updateRenderBox() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       renderBox = findAndUpdateWidgetPosition(
         widgetAnchor: _anchor,
         context: context,

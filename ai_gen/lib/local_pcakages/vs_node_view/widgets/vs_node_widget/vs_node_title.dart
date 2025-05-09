@@ -28,6 +28,8 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
   void didUpdateWidget(covariant VSNodeTitle oldWidget) {
     super.didUpdateWidget(oldWidget);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
       if (widget.data.isRenaming) {
         focusNode.requestFocus();
       } else {
@@ -42,10 +44,8 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
       toolTip: widget.data.toolTip,
       child: IntrinsicWidth(
         child: GestureDetector(
-          onDoubleTap: () => setState(() => widget.data.isRenaming = true),
           child: TextField(
-            contextMenuBuilder: _textFieldMenuBuilder,
-            readOnly: !widget.data.isRenaming,
+            enabled: widget.data.isRenaming,
             controller: titleController,
             focusNode: focusNode,
             textAlign: TextAlign.center,
@@ -77,21 +77,6 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _textFieldMenuBuilder(_, editableTextState) {
-    return AdaptiveTextSelectionToolbar.buttonItems(
-      anchors: editableTextState.contextMenuAnchors,
-      buttonItems: [
-        ContextMenuButtonItem(
-          onPressed: () => setState(() {
-            widget.data.isRenaming = true;
-            editableTextState.hideToolbar();
-          }),
-          label: 'Rename',
-        ),
-      ],
     );
   }
 }

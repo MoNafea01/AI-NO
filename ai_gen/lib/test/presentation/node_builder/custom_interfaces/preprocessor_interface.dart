@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
+import 'package:ai_gen/core/services/app_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -39,7 +39,7 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
         "preprocessor_type": node.type,
         "params": node.paramsToJson,
       };
-      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
       return await nodeServerCalls.runNode(node, apiBody);
     };
   }

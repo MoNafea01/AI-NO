@@ -1,4 +1,5 @@
 // Search and Actions Row Widget
+import 'package:ai_gen/features/screens/HomeScreen/widgets/export_project_dialog.dart';
 import 'package:flutter/material.dart';
 
 import 'create_new_project_dialog.dart';
@@ -47,7 +48,14 @@ class SearchAndActionsRow extends StatelessWidget {
           backgroundColor: const Color(0xfff2f2f2),
           textColor: const Color.fromARGB(255, 15, 14, 14),
           iconColor: const Color.fromARGB(255, 7, 7, 7),
-          onTap: () {},
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => const Dialog(
+                child: ExportProjectDialog(),
+              ),
+            );
+          },
         ),
         CustomIconTextButton(
           text: "New Project",

@@ -45,6 +45,7 @@ class VSNodeOutputState extends State<VSNodeOutput> {
 
   void updateRenderBox() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       renderBox = findAndUpdateWidgetPosition(
         widgetAnchor: _anchor,
         context: context,

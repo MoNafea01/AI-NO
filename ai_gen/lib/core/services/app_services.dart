@@ -5,7 +5,7 @@ import 'package:ai_gen/core/network/network_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
-class NodeServerCalls {
+class AppServices {
   final String _baseURL = NetworkConstants.baseURL;
   final String _allComponentsEndPoint = NetworkConstants.allComponentsEndPoint;
   final String _projectEndPoint = NetworkConstants.projectEndPoint;
@@ -68,6 +68,32 @@ class NodeServerCalls {
       );
 
       ApiErrorHandler.checkResponseStatus(response);
+    } on DioException catch (e) {
+      throw ApiErrorHandler.dioHandler(e);
+    } catch (e) {
+      throw ApiErrorHandler.handleGeneral(e as Exception);
+    }
+  }
+
+  Future<String> exportProject({
+    required int projectId,
+    required String fileName,
+    required String filePath,
+    String? password,
+    String format = "ainoprj",
+  }) async {
+    try {
+      final response = await _dio.post(
+        "$_baseURL/export-project/?project_id=$projectId",
+        data: {
+          "folder_path": filePath,
+          "file_name": fileName,
+          "format": format,
+          "password": password ?? ""
+        },
+      );
+      ApiErrorHandler.checkResponseStatus(response);
+      return response.data["message"];
     } on DioException catch (e) {
       throw ApiErrorHandler.dioHandler(e);
     } catch (e) {
