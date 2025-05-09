@@ -874,15 +874,18 @@ class ExportProjectAPIView(APIView):
             
             # Extract validated data
             default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'exports')
-            save_path = serializer.validated_data.get('folder_path', default_path)
+            folder_path = serializer.validated_data.get('folder_path', default_path)
             file_name = serializer.validated_data.get('file_name', 'exported_project')
             format_type = serializer.validated_data.get('format', 'ainoprj').lower()
-            save_path = os.path.join(save_path, f'{file_name}.{format_type}')
+            save_path = os.path.join(folder_path, f'{file_name}.{format_type}')
             # encrypt = serializer.validated_data.get('encrypt', False)
             password = serializer.validated_data.get('password')
             if not password:
                 password = ''
 
+            if not(os.path.abspath(folder_path) == os.path.abspath(folder_path).split('.')[-1]):
+                return Response({"error": "Folder path must be a directory, not a file."}, status=status.HTTP_400_BAD_REQUEST)
+            
             encrypt = not( password == '')
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
