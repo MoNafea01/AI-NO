@@ -16,3 +16,6 @@ project/exports/*
 project/core/saved/*
 project/core/exports/*
 chatbot/credentials/*
+
+#Ignore environment folder
+backend/*

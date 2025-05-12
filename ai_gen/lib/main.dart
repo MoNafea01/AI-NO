@@ -1,28 +1,18 @@
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
-import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'core/di/get_it_initialize.dart';
 import 'core/helper/my_windows_manager.dart';
 import 'core/network/server_manager/server_manager.dart';
+import 'features/splashScreen/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeGetIt();
   await initializeWindowsManager();
-
-  // Create ServerManager
-  // ServerManager serverManager = GetIt.I.get<ServerManager>();
-
-  // Stop any existing servers
-  // await serverManager.stopServer();
-
-  // Start server and wait for it to be fully operational
-  // if (true) {
-  //   await serverManager.startServer();
-  // }
 
   runApp(ChangeNotifierProvider(
       create: (context) => AuthProvider(), child: const MyApp()));
@@ -38,40 +28,18 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  final ServerManager _serverManager = GetIt.I.get<ServerManager>();
-
+class _MyAppState extends State<MyApp> with WindowListener {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    windowManager.addListener(this);
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-
-    // Stop the server when the app is closing
-    _serverManager.stopServer();
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        // Restart server if it's not running
-        // _serverManager.startServer();
-        break;
-      case AppLifecycleState.paused:
-      case AppLifecycleState.inactive:
-        // _serverManager.stopServer();
-        break;
-      case AppLifecycleState.detached:
-      case AppLifecycleState.hidden:
-        // Do nothing or handle as needed
-        break;
-    }
+  void onWindowClose() async {
+    await GetIt.I.get<ServerManager>().stopServer();
+    windowManager.removeListener(this);
+    windowManager.destroy();
   }
 
   @override
@@ -81,7 +49,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       debugShowCheckedModeBanner: false,
       title: 'AI Gen',
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

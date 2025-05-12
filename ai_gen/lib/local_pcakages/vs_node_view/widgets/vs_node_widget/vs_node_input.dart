@@ -1,5 +1,4 @@
 import 'package:ai_gen/core/themes/textstyles.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/vs_text_input_data.dart';
 import 'package:flutter/material.dart';
 
 import '../../common.dart';
@@ -92,13 +91,29 @@ class _VSNodeInputState extends State<VSNodeInput> {
             updateConnectedNode(details.data);
           },
         ),
-        if (widget.data is! VsTextInputData)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: Text(widget.data.title,
-                style: AppTextStyles.nodeInterfaceTextStyle),
-          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: Text(widget.data.title,
+              style: AppTextStyles.nodeInterfaceTextStyle),
+        ),
       ],
+    );
+  }
+}
+
+class HiddenVSNodeInput extends StatelessWidget {
+  const HiddenVSNodeInput({required this.data, super.key});
+
+  final VSInputData data;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      child: Text(
+        data.title,
+        style: AppTextStyles.nodeInterfaceTextStyle
+            .copyWith(color: Colors.transparent),
+      ),
     );
   }
 }

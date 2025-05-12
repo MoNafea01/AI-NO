@@ -25,17 +25,22 @@ class NodeContent extends StatefulWidget {
 class _NodeContentState extends State<NodeContent> {
   final List<GlobalKey<VSNodeOutputState>> _outputKeys = [];
   final List<Widget> inputWidgets = [];
+  final List<Widget> hiddenInputWidgets = [];
   final List<Widget> outputWidgets = [];
+  final List<Widget> hiddenOutputWidgets = [];
 
   @override
   void initState() {
     for (final value in widget.data.inputData) {
       inputWidgets.add(VSNodeInput(data: value));
+      hiddenInputWidgets.add(HiddenVSNodeInput(data: value));
     }
+
     for (final value in widget.data.outputData) {
       final GlobalKey<VSNodeOutputState> key = GlobalKey<VSNodeOutputState>();
       _outputKeys.add(key);
       outputWidgets.add(VSNodeOutput(data: value, key: key));
+      hiddenOutputWidgets.add(HiddenVsNodeOutput(data: value));
     }
     super.initState();
   }
@@ -48,19 +53,41 @@ class _NodeContentState extends State<NodeContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Stack(
       key: widget.anchor,
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      decoration: _nodeDecoration(),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        spacing: 8,
-        children: [
-          _InterfaceWidget(inputWidgets),
-          VSNodeTitle(data: widget.data, onTitleChange: _updateOutputs),
-          _InterfaceWidget(outputWidgets),
-        ],
-      ),
+      children: [
+        Row(
+          children: [
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              decoration: _nodeDecoration(),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: 16,
+                children: [
+                  _InterfaceWidget(hiddenInputWidgets),
+                  VSNodeTitle(data: widget.data, onTitleChange: _updateOutputs),
+                  _InterfaceWidget(hiddenOutputWidgets),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+        Positioned(
+          left: 0,
+          top: 0,
+          bottom: 0,
+          child: _InterfaceWidget(inputWidgets),
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: _InterfaceWidget(outputWidgets),
+        ),
+      ],
     );
   }
 

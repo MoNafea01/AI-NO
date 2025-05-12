@@ -1,6 +1,7 @@
-import 'package:ai_gen/features/HomeScreen/home_screen.dart';
+import 'package:ai_gen/core/network/server_manager/server_manager.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,18 +15,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        // Check if the widget is still mounted
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-         // MaterialPageRoute(builder: (context) => const DashboardScreen()), // will go to signup screen
-        );
-        // ignore: avoid_print
-        print("Navigating to GridLoader...");
-      }
-    });
+    loadServer();
+  }
+
+  void loadServer() async {
+    await GetIt.I.get<ServerManager>().startServer();
+
+    if (mounted) {
+      // Check if the widget is still mounted
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        // MaterialPageRoute(builder: (context) => const DashboardScreen()), // will go to signup screen
+      );
+    }
   }
 
   @override

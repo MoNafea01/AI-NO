@@ -1,9 +1,9 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_menu_item.dart';
+import 'package:ai_gen/core/services/app_services.dart';
 import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
-import 'package:ai_gen/core/services/app_services.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -65,6 +65,7 @@ class _VSNodeState extends State<VSNode> {
         child: Material(
           key: _key2,
           borderRadius: BorderRadius.circular(12),
+          color: Colors.transparent,
           child: NodeContent(
             nodeProvider: nodeProvider,
             data: widget.data,
@@ -106,45 +107,33 @@ class _VSNodeState extends State<VSNode> {
         details.globalPosition.dy,
       ),
       items: [
-        _buildCustomMenuItem('properties', onTap: () {
-          context
-              .read<GridNodeViewCubit>()
-              .updateActiveNodePropertiesCard(widget.data.node);
-        }),
-        _buildCustomMenuItem('rename', onTap: () {
-          setState(() => widget.data.isRenaming = true);
-        }),
-        _buildCustomMenuItem('delete', onTap: () {
-          final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
-          NodeModel? nodeModel = widget.data.node;
-          if (nodeModel?.nodeId != null) nodeServerCalls.deleteNode(nodeModel!);
-          widget.data.deleteNode?.call();
+        _buildCustomMenuItem(
+          'properties',
+          onTap: () {
+            context
+                .read<GridNodeViewCubit>()
+                .updateActiveNodePropertiesCard(widget.data.node);
+          },
+        ),
+        _buildCustomMenuItem(
+          'rename',
+          onTap: () => setState(() => widget.data.isRenaming = true),
+        ),
+        _buildCustomMenuItem(
+          'delete',
+          onTap: () {
+            final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
+            NodeModel? nodeModel = widget.data.node;
+            if (nodeModel?.nodeId != null) {
+              nodeServerCalls.deleteNode(nodeModel!);
+            }
+            widget.data.deleteNode?.call();
 
-          nodeProvider.removeNodes([widget.data]);
-          setState(() {});
-        }),
-        // PopupMenuItem(value: 'properties', child: Text('Properties')),
-        // PopupMenuItem(value: 'rename', child: Text('Rename')),
-        // PopupMenuItem(value: 'delete', child: Text('Delete')),
+            nodeProvider.removeNodes([widget.data]);
+            setState(() {});
+          },
+        ),
       ],
-    ).then(
-      (value) {
-        if (value == 'properties') {
-          context
-              .read<GridNodeViewCubit>()
-              .updateActiveNodePropertiesCard(widget.data.node);
-        } else if (value == 'rename') {
-          setState(() => widget.data.isRenaming = true);
-        } else if (value == 'delete') {
-          final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
-          NodeModel? nodeModel = widget.data.node;
-          if (nodeModel?.nodeId != null) nodeServerCalls.deleteNode(nodeModel!);
-          widget.data.deleteNode?.call();
-
-          nodeProvider.removeNodes([widget.data]);
-          setState(() {});
-        }
-      },
     );
   }
 

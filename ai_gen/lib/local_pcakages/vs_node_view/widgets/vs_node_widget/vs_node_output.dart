@@ -5,7 +5,6 @@ import '../../common.dart';
 import '../../data/vs_interface.dart';
 import '../../data/vs_node_data_provider.dart';
 import '../../special_nodes/vs_list_node.dart';
-import '../../special_nodes/vs_widget_node.dart';
 import '../line_drawer/gradiant_line_drawer.dart';
 
 class VSNodeOutput extends StatefulWidget {
@@ -71,12 +70,10 @@ class VSNodeOutputState extends State<VSNodeOutput> {
   }
 
   Widget outputTitle() {
-    return widget.data.nodeData is VSWidgetNode
-        ? (widget.data.nodeData as VSWidgetNode).child
-        : Text(
-            widget.data.title,
-            style: AppTextStyles.nodeInterfaceTextStyle,
-          );
+    return Text(
+      widget.data.title,
+      style: AppTextStyles.nodeInterfaceTextStyle,
+    );
   }
 
   CustomPaint outputIcon(BuildContext context) {
@@ -116,6 +113,21 @@ class VSNodeOutputState extends State<VSNodeOutput> {
       endPoint: dragPos,
       startColor: widget.data.interfaceColor,
       endColor: widget.data.interfaceColor,
+    );
+  }
+}
+
+class HiddenVsNodeOutput extends StatelessWidget {
+  const HiddenVsNodeOutput({required this.data, super.key});
+
+  final VSOutputData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      data.title,
+      style: AppTextStyles.nodeInterfaceTextStyle
+          .copyWith(color: Colors.transparent),
     );
   }
 }
