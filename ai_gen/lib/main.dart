@@ -1,12 +1,10 @@
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'core/di/get_it_initialize.dart';
 import 'core/helper/my_windows_manager.dart';
-import 'core/network/server_manager/server_manager.dart';
 import 'features/splashScreen/splash_screen.dart';
 
 void main() async {
@@ -29,18 +27,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WindowListener {
-  @override
-  void initState() {
-    super.initState();
-    windowManager.addListener(this);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   windowManager.addListener(this);
+  // }
 
-  @override
-  void onWindowClose() async {
-    await GetIt.I.get<ServerManager>().stopServer();
-    windowManager.removeListener(this);
-    windowManager.destroy();
-  }
+  // @override
+  // void onWindowClose() async {
+  //   await GetIt.I.get<ServerManager>().stopServer();
+  //   windowManager.removeListener(this);
+  //   windowManager.destroy();
+  // }
 
   @override
   Widget build(BuildContext context) {
