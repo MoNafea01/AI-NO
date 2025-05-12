@@ -1,6 +1,6 @@
 // Projects Table Widget
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,4 @@
-import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomMenuItem extends PopupMenuEntry<String> {

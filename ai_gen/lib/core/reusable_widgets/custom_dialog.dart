@@ -1,5 +1,7 @@
-import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/core/themes/textstyles.dart';
+import 'dart:async';
+
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:flutter/material.dart';
 
 class CustomDialog extends StatefulWidget {
@@ -17,7 +19,7 @@ class CustomDialog extends StatefulWidget {
   final Widget child;
   final String? submitButtonText;
   final String? cancelButtonText;
-  final VoidCallback? onSubmit;
+  final FutureOr<void> Function()? onSubmit;
   final VoidCallback? onCancel;
 
   @override
@@ -26,6 +28,8 @@ class CustomDialog extends StatefulWidget {
 
 class _CustomDialogState extends State<CustomDialog> {
   late final GlobalKey<FormState> _formKey;
+  bool _loading = false;
+  AutovalidateMode? _autoValidateMode;
 
   @override
   void initState() {
@@ -39,15 +43,22 @@ class _CustomDialogState extends State<CustomDialog> {
     super.dispose();
   }
 
-  void _onSubmitPressed() {
-    if (!mounted) return;
+  Future<void> _onSubmitPressed() async {
+    if (!mounted || _loading) return;
+    setState(() => _autoValidateMode = AutovalidateMode.always);
     if (!_formKey.currentState!.validate()) return;
-    widget.onSubmit?.call();
+
+    setState(() => _loading = true);
+
+    await widget.onSubmit?.call();
+
+    setState(() => _loading = false);
   }
 
   void _onCancelPressed() {
-    if (!mounted) return;
+    if (!mounted || _loading) return;
     widget.onCancel?.call();
+    Navigator.pop(context);
   }
 
   @override
@@ -61,6 +72,8 @@ class _CustomDialogState extends State<CustomDialog> {
       padding: const EdgeInsets.all(24),
       child: Form(
         key: _formKey,
+        canPop: !_loading,
+        autovalidateMode: _autoValidateMode,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

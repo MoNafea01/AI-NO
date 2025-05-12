@@ -1,5 +1,5 @@
-import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/core/themes/textstyles.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:flutter/material.dart';
 
 import '../data/vs_node_data_provider.dart';

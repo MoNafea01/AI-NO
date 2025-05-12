@@ -2,7 +2,7 @@ import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_dialog.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/core/services/app_services.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:ai_gen/core/utils/helper/helper.dart';
 import 'package:flutter/material.dart';
 
 class ExportProjectDialog extends StatefulWidget {
@@ -14,11 +14,13 @@ class ExportProjectDialog extends StatefulWidget {
   State<ExportProjectDialog> createState() => _ExportProjectDialogState();
 }
 
-class _ExportProjectDialogState extends State<ExportProjectDialog> {
+class _ExportProjectDialogState extends State<ExportProjectDialog>
+    with SingleTickerProviderStateMixin {
   late final TextEditingController _projectPathController;
   late final TextEditingController _projectFormatController;
   late final TextEditingController _projectNameController;
   late final TextEditingController _projectPasswordController;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -42,6 +44,10 @@ class _ExportProjectDialogState extends State<ExportProjectDialog> {
   }
 
   void _onExportPressed() async {
+    if (_isLoading) return;
+
+    setState(() => _isLoading = true);
+
     try {
       final String message = await AppServices().exportProject(
         projectId: widget.projectModel!.id!,
@@ -51,47 +57,54 @@ class _ExportProjectDialogState extends State<ExportProjectDialog> {
         password: _projectPasswordController.text,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-      Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+        Navigator.pop(context);
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
-  }
-
-  void _onCancelPressed() {
-    if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomDialog(
       dialogTitle: "Export Project",
-      submitButtonText: "Export",
-      cancelButtonText: "Cancel",
+      submitButtonText: _isLoading ? "Exporting..." : "Export",
       onSubmit: _onExportPressed,
-      onCancel: _onCancelPressed,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomTextFormField(
             controller: _projectNameController,
             labelText: 'File Name',
+            enabled: !_isLoading,
           ),
           const SizedBox(height: 24),
           CustomTextFormField(
             controller: _projectPathController,
             labelText: 'Export Location',
-            suffixIcon: _pickFileIcon(),
+            suffixIcon: _isLoading ? null : _pickFolderIcon(),
+            enabled: !_isLoading,
           ),
           const SizedBox(height: 10),
-          FormatDropdownMenu(controller: _projectFormatController),
+          ProjectFormatDropdownMenu(
+            controller: _projectFormatController,
+            enabled: !_isLoading,
+          ),
           _projectFormatController.text == "ainoprj"
               ? Column(
                   children: [
@@ -101,6 +114,7 @@ class _ExportProjectDialogState extends State<ExportProjectDialog> {
                       labelText: 'Optional Password',
                       isRequired: false,
                       hintText: "No recovery (we don't have time)",
+                      enabled: !_isLoading,
                     ),
                   ],
                 )
@@ -110,12 +124,13 @@ class _ExportProjectDialogState extends State<ExportProjectDialog> {
     );
   }
 
-  IconButton _pickFileIcon() {
+  Widget _pickFolderIcon() {
     return IconButton(
       onPressed: () async {
-        await _pickFile();
+        await _pickDirectory();
       },
       style: IconButton.styleFrom(
+        backgroundColor: Colors.grey[300],
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
@@ -124,28 +139,30 @@ class _ExportProjectDialogState extends State<ExportProjectDialog> {
     );
   }
 
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      lockParentWindow: true,
-    );
+  Future<void> _pickDirectory() async {
+    String? selectedDirectory = await Helper.pickDirectory();
 
-    if (result != null) {
-      PlatformFile file = result.files.first;
-
-      _projectPathController.text = file.path ?? '';
+    if (selectedDirectory != null) {
+      _projectPathController.text = selectedDirectory;
     }
   }
 }
 
-class FormatDropdownMenu extends StatefulWidget {
-  const FormatDropdownMenu({required this.controller, super.key});
+class ProjectFormatDropdownMenu extends StatefulWidget {
+  const ProjectFormatDropdownMenu({
+    required this.controller,
+    this.enabled = true,
+    super.key,
+  });
 
   final TextEditingController controller;
+  final bool enabled;
   @override
-  State<FormatDropdownMenu> createState() => _FormatDropdownMenuState();
+  State<ProjectFormatDropdownMenu> createState() =>
+      _ProjectFormatDropdownMenuState();
 }
 
-class _FormatDropdownMenuState extends State<FormatDropdownMenu> {
+class _ProjectFormatDropdownMenuState extends State<ProjectFormatDropdownMenu> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -180,10 +197,12 @@ class _FormatDropdownMenuState extends State<FormatDropdownMenu> {
                     child: Text(value.toString()),
                   );
                 }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue == null) return;
-                  setState(() => widget.controller.text = newValue);
-                },
+                onChanged: widget.enabled
+                    ? (String? newValue) {
+                        if (newValue == null) return;
+                        setState(() => widget.controller.text = newValue);
+                      }
+                    : null,
               ),
             ),
           ),

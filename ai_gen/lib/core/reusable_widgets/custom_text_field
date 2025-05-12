@@ -1,44 +1,24 @@
 import 'package:flutter/material.dart';
 
-class CustomTextFormField extends StatelessWidget {
-  const CustomTextFormField({
-    required this.controller,
-    this.labelText,
-    this.isRequired = true,
-    this.suffixIcon,
-    this.hintText,
-    this.enabled = true,
-    super.key,
-  });
+class CustomTextField extends StatelessWidget {
+  const CustomTextField(
+      {required this.projectNameController, this.labelText, super.key});
 
-  final TextEditingController controller;
+  final TextEditingController projectNameController;
   final String? labelText;
-  final String? hintText;
-  final bool isRequired;
-  final Widget? suffixIcon;
-  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      enabled: enabled,
-      validator: (value) {
-        if (isRequired && value != null && value.isEmpty) {
-          return 'Please enter $labelText';
-        }
-        return null;
-      },
-      controller: controller,
+      validator: (value) =>
+          value != null && value.isEmpty ? 'Please enter a $labelText' : null,
+      controller: projectNameController,
       decoration: InputDecoration(
-        suffixIcon: suffixIcon,
-        isDense: true,
-        alignLabelWithHint: true,
         label: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.only(bottom: 20.0),
           child: Text(labelText ?? ""),
         ),
         labelStyle: TextStyle(color: Colors.grey[700]),
-        hintText: hintText,
         filled: true,
         fillColor: Colors.grey[200],
         contentPadding: const EdgeInsets.symmetric(

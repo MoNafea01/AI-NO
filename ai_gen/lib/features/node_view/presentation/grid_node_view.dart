@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/reusable_widgets/custom_button.dart';
-import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/custom_fab.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';

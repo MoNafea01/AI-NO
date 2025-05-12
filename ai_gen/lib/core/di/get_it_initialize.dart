@@ -16,19 +16,6 @@ initializeGetIt() {
     maxRedirects: 5,
   ));
 
-  // Add logging interceptor
-  dio.interceptors.add(LogInterceptor(
-    request: true,
-    requestHeader: true,
-    requestBody: true,
-    responseHeader: true,
-    responseBody: true,
-    error: true,
-    logPrint: (object) {
-      print('DIO LOG: $object');
-    },
-  ));
-
   GetIt.I.registerSingleton<Dio>(dio);
   GetIt.I.registerSingleton<ServerManager>(ServerManager());
   GetIt.I.registerSingleton<AppServices>(AppServices());

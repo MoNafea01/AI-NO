@@ -56,6 +56,8 @@ dependencies:
   provider: ^6.1.2
   #the node view package that is localized and used in this project
   vs_node_view: ^2.1.1
+  toggle_switch: ^2.3.0
+  font_awesome_flutter: ^10.8.0
 
 
 

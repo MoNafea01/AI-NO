@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/themes/app_colors.dart';
+import '../../core/utils/themes/app_colors.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
   final String email;

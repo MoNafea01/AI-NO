@@ -1,8 +1,8 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_menu_item.dart';
 import 'package:ai_gen/core/services/app_services.dart';
-import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/core/themes/textstyles.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';

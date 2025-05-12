@@ -1,4 +1,4 @@
-import 'package:ai_gen/core/themes/textstyles.dart';
+import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:flutter/material.dart';
 
 import '../../common.dart';

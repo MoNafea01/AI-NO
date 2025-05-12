@@ -1,4 +1,4 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:ai_gen/core/utils/helper/helper.dart';
 import 'package:flutter/material.dart';
 
 class PickfileTextField extends StatefulWidget {
@@ -19,11 +19,6 @@ class PickfileTextField extends StatefulWidget {
 }
 
 class _PickfileTextFieldState extends State<PickfileTextField> {
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
@@ -66,16 +61,11 @@ class _PickfileTextFieldState extends State<PickfileTextField> {
   }
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowedExtensions: widget.allowedExtensions,
-      type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
-      lockParentWindow: true,
-    );
+    String? file =
+        await Helper.pickFile(allowedExtensions: widget.allowedExtensions);
 
-    if (result != null) {
-      PlatformFile file = result.files.first;
-
-      widget.controller.text = file.path ?? '';
+    if (file != null) {
+      widget.controller.text = file;
       widget.onFilePicked?.call();
     }
   }

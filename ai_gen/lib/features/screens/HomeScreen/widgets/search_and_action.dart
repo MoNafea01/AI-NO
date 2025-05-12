@@ -1,5 +1,5 @@
 // Search and Actions Row Widget
-import 'package:ai_gen/features/screens/HomeScreen/widgets/export_project_dialog.dart';
+import 'package:ai_gen/features/node_view/presentation/widgets/export_project_dialog.dart';
 import 'package:flutter/material.dart';
 
 import 'create_new_project_dialog.dart';
