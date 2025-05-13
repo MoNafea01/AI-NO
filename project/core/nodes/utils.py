@@ -1,5 +1,5 @@
 import os, re, cv2, numpy as np
-from ai_operations.models import Node
+from api.models import Node
 from core.nodes.configs.const_ import (
     MODELS_TASKS, PREPROCESSORS_TASKS, NN_TASKS, DATA_HANDLER_TASKS, NN_NAMES, MODELS_NAMES, PREPROCESSORS_NAMES, DATA_HANDLER_NAMES)
 from .configs.const_ import MODELS_NAMES, PREPROCESSORS_NAMES
@@ -121,8 +121,9 @@ class FolderHandler:
 
 def delete_node(node: Node):
     node_path = node.node_data
-    if os.path.exists(node_path):
-        os.remove(node_path)
+    if node_path is not None:
+        if os.path.exists(node_path):
+            os.remove(node_path)
     node.delete()
 
 
