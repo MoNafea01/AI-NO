@@ -11,11 +11,29 @@ import 'package:get_it/get_it.dart';
 
 import 'node_content.dart';
 
+/// A widget that represents a node in the visual scripting interface.
+///
+/// This widget handles the visual representation and interaction of a node,
+/// including dragging, context menu, and node operations. It supports:
+/// - Dragging nodes to reposition them
+/// - Double-tap to edit node properties
+/// - Right-click context menu for additional operations
+/// - Custom node title rendering
 class VSNode extends StatefulWidget {
-  const VSNode({required this.data, this.nodeTitleBuilder, super.key});
+  /// Creates a new [VSNode] instance.
+  ///
+  /// [data] is required and contains the node's data and state.
+  /// [nodeTitleBuilder] is optional and can be used to customize the node's title.
+  const VSNode({
+    required this.data,
+    this.nodeTitleBuilder,
+    super.key,
+  });
 
+  /// The data associated with this node
   final VSNodeData data;
 
+  /// Optional builder for customizing the node title
   final Widget Function(BuildContext context, VSNodeData nodeData)?
       nodeTitleBuilder;
 
@@ -23,76 +41,98 @@ class VSNode extends StatefulWidget {
   State<VSNode> createState() => _VSNodeState();
 }
 
-class _VSNodeState extends State<VSNode> {
-  late final GlobalKey _anchor;
-  late final GlobalKey _key2;
-  late final VSNodeDataProvider nodeProvider;
+class _VSNodeState extends State<VSNode> with AutomaticKeepAliveClientMixin {
+  /// Key for the node's anchor point
+  late final GlobalKey _nodeAnchorKey;
+
+  /// Key for the dragged node's material
+  late final GlobalKey _draggedNodeKey;
+
+  /// The provider that manages node data and state
+  late final VSNodeDataProvider _nodeProvider;
+
+  /// Cache for menu items to avoid rebuilding
+  List<PopupMenuEntry>? _cachedMenuItems;
 
   @override
+  bool get wantKeepAlive => true;
+  late Widget nodeContent;
+  @override
   void initState() {
-    _anchor = GlobalKey();
-    _key2 = GlobalKey();
-    nodeProvider = VSNodeDataProvider.of(context);
     super.initState();
+    _nodeAnchorKey = GlobalKey();
+    _draggedNodeKey = GlobalKey();
+    _nodeProvider = VSNodeDataProvider.of(context);
+    nodeContent = NodeContent(
+      nodeProvider: _nodeProvider,
+      data: widget.data,
+      anchor: _nodeAnchorKey,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Draggable(
-      onDragUpdate: _moveNode,
+    super.build(context);
+    return Draggable<VSNodeData>(
+      data: widget.data,
+      onDragUpdate: _handleNodeDrag,
       childWhenDragging: const SizedBox.shrink(),
-      feedback: _draggedNode(),
-      child: _node(),
+      feedback: _buildDraggedNode(),
+      child: _buildNode(),
     );
   }
 
-  void _moveNode(details) {
-    if (!mounted || _anchor.currentContext == null) return;
+  /// Handles node movement during drag operations
+  void _handleNodeDrag(DragUpdateDetails details) {
+    if (!mounted || _nodeAnchorKey.currentContext == null) return;
 
+    // Find the NodeContent state and trigger output update
+    final nodeContentState = _nodeAnchorKey.currentContext
+        ?.findAncestorStateOfType<NodeContentState>();
+
+    nodeContentState?.updateOutputs();
     final RenderBox renderBox =
-        _anchor.currentContext?.findRenderObject() as RenderBox;
-    Offset newPosition = renderBox.localToGlobal(Offset.zero);
-    nodeProvider.moveNode(widget.data, newPosition);
+        _nodeAnchorKey.currentContext?.findRenderObject() as RenderBox;
+    final Offset newPosition = renderBox.localToGlobal(Offset.zero);
+    _nodeProvider.moveNode(widget.data, newPosition);
   }
 
-  Widget _draggedNode() {
+  /// Builds the node's visual representation when being dragged
+  Widget _buildDraggedNode() {
     if (!mounted) return const SizedBox.shrink();
 
     return InheritedNodeDataProvider(
-      provider: nodeProvider,
+      provider: _nodeProvider,
       child: Transform.scale(
-        scale: 1 / nodeProvider.viewportScale,
+        scale: 1 / _nodeProvider.viewportScale,
         child: Material(
-          key: _key2,
+          key: _draggedNodeKey,
           borderRadius: BorderRadius.circular(12),
           color: Colors.transparent,
-          child: NodeContent(
-            nodeProvider: nodeProvider,
-            data: widget.data,
-            anchor: _anchor,
-          ),
+          child: nodeContent,
         ),
       ),
     );
   }
 
-  GestureDetector _node() {
+  /// Builds the node's main visual representation
+  Widget _buildNode() {
     return GestureDetector(
-      onDoubleTap: () {
-        context
-            .read<GridNodeViewCubit>()
-            .updateActiveNodePropertiesCard(widget.data.node);
-      },
-      onSecondaryTapUp: _popMenu,
-      child: NodeContent(
-        nodeProvider: nodeProvider,
-        data: widget.data,
-        anchor: _anchor,
-      ),
+      onDoubleTap: _handleNodeProperties,
+      onSecondaryTapUp: _showContextMenu,
+      child: nodeContent,
     );
   }
 
-  void _popMenu(details) {
+  /// Handles double-tap to edit node properties
+  void _handleNodeProperties() {
+    context
+        .read<GridNodeViewCubit>()
+        .updateActiveNodePropertiesCard(widget.data.node);
+  }
+
+  /// Shows the node's context menu
+  void _showContextMenu(TapUpDetails details) {
     showMenu(
       color: AppColors.grey100,
       context: context,
@@ -106,38 +146,44 @@ class _VSNodeState extends State<VSNode> {
         details.globalPosition.dx,
         details.globalPosition.dy,
       ),
-      items: [
-        _buildCustomMenuItem(
-          'properties',
-          onTap: () {
-            context
-                .read<GridNodeViewCubit>()
-                .updateActiveNodePropertiesCard(widget.data.node);
-          },
-        ),
-        _buildCustomMenuItem(
-          'rename',
-          onTap: () => setState(() => widget.data.isRenaming = true),
-        ),
-        _buildCustomMenuItem(
-          'delete',
-          onTap: () {
-            final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
-            NodeModel? nodeModel = widget.data.node;
-            if (nodeModel?.nodeId != null) {
-              nodeServerCalls.deleteNode(nodeModel!);
-            }
-            widget.data.deleteNode?.call();
-
-            nodeProvider.removeNodes([widget.data]);
-            setState(() {});
-          },
-        ),
-      ],
+      items: _getMenuItems(),
     );
   }
 
-  CustomMenuItem _buildCustomMenuItem(String value, {VoidCallback? onTap}) =>
+  /// Gets the list of menu items for the context menu
+  List<PopupMenuEntry> _getMenuItems() {
+    return _cachedMenuItems ??= [
+      _buildMenuItem(
+        'properties',
+        onTap: _handleNodeProperties,
+      ),
+      _buildMenuItem(
+        'rename',
+        onTap: () => setState(() => widget.data.isRenaming = true),
+      ),
+      _buildMenuItem(
+        'delete',
+        onTap: _handleNodeDeletion,
+      ),
+    ];
+  }
+
+  /// Handles node deletion
+  void _handleNodeDeletion() {
+    final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
+    final NodeModel? nodeModel = widget.data.node;
+
+    if (nodeModel?.nodeId != null) {
+      nodeServerCalls.deleteNode(nodeModel!);
+    }
+
+    widget.data.deleteNode?.call();
+    _nodeProvider.removeNodes([widget.data]);
+    setState(() {});
+  }
+
+  /// Builds a custom menu item for the context menu
+  CustomMenuItem _buildMenuItem(String value, {VoidCallback? onTap}) =>
       CustomMenuItem(
         value,
         onTap: onTap,

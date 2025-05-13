@@ -16,23 +16,7 @@ class ParamDropDownMenu extends StatefulWidget {
 
 class _ParamDropDownMenuState extends State<ParamDropDownMenu>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
   bool _isExpanded = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -9,10 +9,23 @@ import 'vs_context_menu.dart';
 import 'vs_node_widget/vs_node.dart';
 import 'vs_selection_area.dart';
 
+/// A widget that displays and manages a visual scripting interface.
+///
+/// This widget provides the main view for interacting with nodes, including:
+/// - Displaying nodes and their connections
+/// - Handling node selection and movement
+/// - Managing the context menu
+/// - Supporting node creation and deletion
 class VSNodeView extends StatelessWidget {
-  ///The base node widget
+  /// Creates a new [VSNodeView] instance.
   ///
-  ///Display and interact with nodes to build node trees
+  /// [nodeDataProvider] is required and manages the node data and state.
+  /// [contextMenuBuilder] can be used to customize the context menu.
+  /// [nodeBuilder] can be used to customize individual node widgets.
+  /// [nodeTitleBuilder] can be used to customize node titles.
+  /// [enableSelectionArea] determines if node selection is enabled.
+  /// [selectionAreaBuilder] can be used to customize the selection area.
+  /// [gestureDetectorBuilder] can be used to customize gesture handling.
   const VSNodeView({
     required this.nodeDataProvider,
     this.contextMenuBuilder,
@@ -24,47 +37,37 @@ class VSNodeView extends StatelessWidget {
     super.key,
   });
 
-  ///The provider that will be used to controll the UI
+  /// The provider that manages node data and state
   final VSNodeDataProvider nodeDataProvider;
 
-  ///Can be used to take control over the building of the nodes
-  ///
-  ///See [VSNode] for reference
+  /// Optional builder for customizing individual node widgets
   final Widget Function(
     BuildContext context,
     VSNodeData data,
   )? nodeBuilder;
 
-  ///Can be used to take control over the building of the context menu
-  ///
-  ///See [VSContextMenu] for reference
+  /// Optional builder for customizing the context menu
   final Widget Function(
     BuildContext context,
     Map<String, dynamic> nodeBuildersMap,
   )? contextMenuBuilder;
 
-  ///Can be used to take control over the building of the nodes titles
-  ///
-  ///See [VSNodeTitle] for reference
+  /// Optional builder for customizing node titles
   final Widget Function(
     BuildContext context,
     VSNodeData nodeData,
   )? nodeTitleBuilder;
 
-  ///If [VSSelectionArea] or [selectionAreaBuilder] will be inserted to the widget tree
+  /// Whether to enable node selection functionality
   final bool enableSelectionArea;
 
-  ///Can be used to take control over the building of the selection area
-  ///
-  ///See [VSSelectionArea] for reference
+  /// Optional builder for customizing the selection area
   final Widget Function(
     BuildContext context,
     Widget view,
   )? selectionAreaBuilder;
 
-  ///Can be used to override the GestureDetector
-  ///
-  ///See [VSNodeDataProvider.closeContextMenu], [VSNodeDataProvider.openContextMenu] and [VSNodeDataProvider.selectedNodes]
+  /// Optional builder for customizing gesture handling
   final GestureDetector Function(
     BuildContext context,
     VSNodeDataProvider nodeDataProvider,
@@ -77,69 +80,92 @@ class VSNodeView extends StatelessWidget {
       child: ListenableBuilder(
         listenable: nodeDataProvider,
         builder: (context, _) {
-          final nodes = nodeDataProvider.nodes.values.map(
-            (VSNodeData value) {
-              return Positioned(
-                left: value.widgetOffset.dx,
-                top: value.widgetOffset.dy,
-                child: nodeBuilder?.call(context, value) ??
-                    VSNode(
-                      key: ValueKey(value.id),
-                      data: value,
-                      nodeTitleBuilder: nodeTitleBuilder,
-                    ),
-              );
-            },
-          );
-
-          final view = Stack(
-            children: [
-              gestureDetectorBuilder?.call(context, nodeDataProvider) ??
-                  GestureDetector(
-                    onTapDown: (details) {
-                      nodeDataProvider.closeContextMenu();
-                      nodeDataProvider.selectedNodes = {};
-                    },
-                    onSecondaryTapUp: (details) =>
-                        nodeDataProvider.openContextMenu(
-                      position: details.globalPosition,
-                    ),
-                    onLongPressStart: (details) =>
-                        nodeDataProvider.openContextMenu(
-                      position: details.globalPosition,
-                    ),
-                  ),
-              ...nodes,
-              CustomPaint(
-                foregroundPainter: MultiGradientLinePainter(
-                  data: nodeDataProvider.nodes.values
-                      .expand<VSInputData>((element) => element.inputData)
-                      .toList(),
-                ),
-              ),
-              if (nodeDataProvider.contextMenuContext != null)
-                Positioned(
-                  left: nodeDataProvider.contextMenuContext!.offset.dx,
-                  top: nodeDataProvider.contextMenuContext!.offset.dy,
-                  child: contextMenuBuilder?.call(
-                        context,
-                        nodeDataProvider.nodeBuildersMap,
-                      ) ??
-                      VSContextMenu(
-                        nodeBuilders: nodeDataProvider.nodeBuildersMap,
-                      ),
-                ),
-            ],
-          );
-
-          if (enableSelectionArea) {
-            return selectionAreaBuilder?.call(context, view) ??
-                VSSelectionArea(child: view);
-          } else {
-            return view;
-          }
+          return _buildNodeView(context);
         },
       ),
     );
+  }
+
+  /// Builds the main node view with all its components
+  Widget _buildNodeView(BuildContext context) {
+    final nodes = _buildNodes(context);
+    final view = Stack(
+      children: [
+        _buildGestureDetector(context),
+        ...nodes,
+        _buildConnectionLines(),
+        if (nodeDataProvider.contextMenuContext != null)
+          _buildContextMenu(context),
+      ],
+    );
+
+    return enableSelectionArea ? _buildWithSelectionArea(context, view) : view;
+  }
+
+  /// Builds the list of positioned node widgets
+  Iterable<Widget> _buildNodes(BuildContext context) {
+    return nodeDataProvider.nodes.values.map(
+      (VSNodeData value) {
+        return Positioned(
+          left: value.widgetOffset.dx,
+          top: value.widgetOffset.dy,
+          child: nodeBuilder?.call(context, value) ??
+              VSNode(
+                key: ValueKey(value.id),
+                data: value,
+                nodeTitleBuilder: nodeTitleBuilder,
+              ),
+        );
+      },
+    );
+  }
+
+  /// Builds the gesture detector for handling user interactions
+  Widget _buildGestureDetector(BuildContext context) {
+    return gestureDetectorBuilder?.call(context, nodeDataProvider) ??
+        GestureDetector(
+          onTapDown: (_) {
+            nodeDataProvider.closeContextMenu();
+            nodeDataProvider.selectedNodes = {};
+          },
+          onSecondaryTapUp: (details) => nodeDataProvider.openContextMenu(
+            position: details.globalPosition,
+          ),
+          onLongPressStart: (details) => nodeDataProvider.openContextMenu(
+            position: details.globalPosition,
+          ),
+        );
+  }
+
+  /// Builds the connection lines between nodes
+  Widget _buildConnectionLines() {
+    return CustomPaint(
+      foregroundPainter: MultiGradientLinePainter(
+        data: nodeDataProvider.nodes.values
+            .expand<VSInputData>((element) => element.inputData)
+            .toList(),
+      ),
+    );
+  }
+
+  /// Builds the context menu widget
+  Widget _buildContextMenu(BuildContext context) {
+    return Positioned(
+      left: nodeDataProvider.contextMenuContext!.offset.dx,
+      top: nodeDataProvider.contextMenuContext!.offset.dy,
+      child: contextMenuBuilder?.call(
+            context,
+            nodeDataProvider.nodeBuildersMap,
+          ) ??
+          VSContextMenu(
+            nodeBuilders: nodeDataProvider.nodeBuildersMap,
+          ),
+    );
+  }
+
+  /// Wraps the view with a selection area if enabled
+  Widget _buildWithSelectionArea(BuildContext context, Widget view) {
+    return selectionAreaBuilder?.call(context, view) ??
+        VSSelectionArea(child: view);
   }
 }
