@@ -1,3 +1,5 @@
+import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/themes/textstyles.dart';
 import 'package:flutter/material.dart';
 
 import '../data/vs_node_data_provider.dart';
@@ -46,15 +48,22 @@ class _VSContextMenuState extends State<VSContextMenu> {
       if (entry.value is Map) {
         widgets.add(
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.blackText,
+              iconColor: AppColors.blackText,
+            ),
             onPressed: () => setState(() {
               nodeBuilders = entry.value;
             }),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(entry.key),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 12,
+                  color: Colors.black,
+                ),
                 const SizedBox(width: 12),
-                const Icon(Icons.arrow_forward_ios, size: 20),
+                Text(entry.key, style: AppTextStyles.black14Normal),
               ],
             ),
           ),
@@ -67,7 +76,7 @@ class _VSContextMenuState extends State<VSContextMenu> {
             dataProvider.createNodeFromContext(entry.value);
             dataProvider.closeContextMenu();
           },
-          child: Text(entry.key),
+          child: Text(entry.key, style: AppTextStyles.black14Normal),
         ));
       }
       if (entry.key != entries.last.key) {
@@ -77,6 +86,9 @@ class _VSContextMenuState extends State<VSContextMenu> {
 
     return GestureDetector(
       child: Card(
+        color: AppColors.grey100,
+        surfaceTintColor: AppColors.grey100,
+        elevation: 8,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: IntrinsicWidth(

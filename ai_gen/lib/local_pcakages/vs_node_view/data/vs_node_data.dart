@@ -80,7 +80,7 @@ class VSNodeData {
   Map<String, dynamic> toJson() {
     return {
       ...node?.toJson() ?? {},
-      'id': id,
+      // 'id': id,
       'type': type,
       'title': _title,
       'widgetOffset': widgetOffset.toJson(),

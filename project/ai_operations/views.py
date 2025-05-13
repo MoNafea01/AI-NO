@@ -874,15 +874,19 @@ class ExportProjectAPIView(APIView):
             
             # Extract validated data
             default_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'exports')
-            save_path = serializer.validated_data.get('folder_path', default_path)
+            folder_path = serializer.validated_data.get('folder_path', default_path)
             file_name = serializer.validated_data.get('file_name', 'exported_project')
             format_type = serializer.validated_data.get('format', 'ainoprj').lower()
-            save_path = os.path.join(save_path, f'{file_name}.{format_type}')
+            save_path = os.path.join(folder_path, f'{file_name}.{format_type}')
             # encrypt = serializer.validated_data.get('encrypt', False)
             password = serializer.validated_data.get('password')
-            encrypt = not(password == None)
             if not password:
                 password = ''
+
+            if not(os.path.abspath(folder_path) == os.path.abspath(folder_path).split('.')[-1]):
+                return Response({"error": "Folder path must be a directory, not a file."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            encrypt = not( password == '')
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
             if not project_id:
@@ -1049,6 +1053,14 @@ class ImportProjectAPIView(APIView):
             
             # Extract validated data
             file_path = serializer.validated_data['path']
+
+            if os.path.abspath(file_path) == os.path.abspath(file_path).split('.')[-1]:
+                return Response({"error": "File path must be a file path, not a directory."}, status=status.HTTP_400_BAD_REQUEST)
+
+            name = os.path.basename(file_path).split('.')[0]
+
+            project_name = serializer.validated_data.get('project_name', name)
+            project_description = serializer.validated_data.get('project_description', name)
             format_type = serializer.validated_data.get('format', 'auto')
             password = serializer.validated_data.get('password')
             encrypt = "1" if password else "0"
@@ -1059,14 +1071,14 @@ class ImportProjectAPIView(APIView):
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
             if not project_id:
-                project_id = Project.objects.create(project_name="Imported Project").id
+                project_id = Project.objects.create(project_name=project_name, project_description=project_description).id
                 
             # Check if project exists
             try:
                 project = Project.objects.get(id=project_id)
             except Project.DoesNotExist:
                 # Project doesn't exist, create a new one
-                project = Project.objects.create(project_name="Imported Project")
+                project = Project.objects.create(project_name=project_name, project_description=project_description)
                 project_id = project.id
                 
             
@@ -1143,7 +1155,7 @@ class ImportProjectAPIView(APIView):
                         os.unlink(temp_json_path)
                     error_msg = e.stderr if e.stderr else str(e)
                     return Response({
-                        "error": f"Converter script failed: {error_msg}"
+                        "error": f"Converter script failed: Password is incorrect."
                     }, status=status.HTTP_400_BAD_REQUEST)
                 except Exception as e:
                     if os.path.exists(temp_json_path):
@@ -1360,5 +1372,3 @@ class CLIAPIView(APIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-

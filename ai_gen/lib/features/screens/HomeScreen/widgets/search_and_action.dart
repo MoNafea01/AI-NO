@@ -10,6 +10,7 @@ class SearchAndActionsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 10,
       children: [
         Expanded(
           child: TextField(
@@ -32,7 +33,6 @@ class SearchAndActionsRow extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 10),
         CustomIconTextButton(
           text: "Import",
           icon: Icons.upload,
@@ -41,7 +41,6 @@ class SearchAndActionsRow extends StatelessWidget {
           iconColor: const Color.fromARGB(255, 7, 7, 7),
           onTap: () {},
         ),
-        const SizedBox(width: 10),
         CustomIconTextButton(
           text: "Export",
           icon: Icons.download,
@@ -50,7 +49,6 @@ class SearchAndActionsRow extends StatelessWidget {
           iconColor: const Color.fromARGB(255, 7, 7, 7),
           onTap: () {},
         ),
-        const SizedBox(width: 10),
         CustomIconTextButton(
           text: "New Project",
           icon: Icons.add,

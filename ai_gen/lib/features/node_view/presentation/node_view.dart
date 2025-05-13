@@ -9,7 +9,6 @@ import 'grid_node_view.dart';
 
 class NodeView extends StatelessWidget {
   const NodeView({required this.projectModel, super.key});
-
   final ProjectModel projectModel;
 
   @override
