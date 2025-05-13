@@ -176,6 +176,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                     project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
                 
                 validated_data['project_id'] = project_id
+            
             processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
             BaseNodeAPIView.cur_id += 1
 
@@ -219,7 +220,6 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             success, message = NodeUpdater(return_serialized)(node_id, project_id, processor())
             if isinstance(message, str):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
-            
             message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
             
             status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
@@ -1161,7 +1161,7 @@ class ImportProjectAPIView(APIView):
                     if os.path.exists(temp_json_path):
                         os.unlink(temp_json_path)
                     return Response({
-                        "error": f"Failed to convert AINOPRJ file: {str(e)}"
+                        "error": f"Failed to convert AINOPRJ file: Password is incorrect."
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             # Process the imported data
@@ -1180,13 +1180,14 @@ class ImportProjectAPIView(APIView):
                 # Clear existing nodes for the project
                 Node.objects.filter(project_id=project_id).delete()
             # Prepare nodes for import by setting the project_id
+
             for node in nodes_data:
+                [node.pop(i, None) for i in ['project', 'node_data', 'project_id']]
                 node['project_id'] = project_id
-                [node.pop(i, None) for i in ['project', 'node_data']]
                 
-            
             # Create the nodes in the database
             node_serializer = NodeSerializer(data=nodes_data, many=True)
+            
             if node_serializer.is_valid():
                 created_nodes = node_serializer.save()
                 return Response({
