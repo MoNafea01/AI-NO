@@ -1060,6 +1060,7 @@ class ImportProjectAPIView(APIView):
             name = os.path.basename(file_path).split('.')[0]
 
             project_name = serializer.validated_data.get('project_name', name)
+            project_description = serializer.validated_data.get('project_description', name)
             format_type = serializer.validated_data.get('format', 'auto')
             password = serializer.validated_data.get('password')
             encrypt = "1" if password else "0"
@@ -1070,14 +1071,14 @@ class ImportProjectAPIView(APIView):
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
             if not project_id:
-                project_id = Project.objects.create(project_name=project_name).id
+                project_id = Project.objects.create(project_name=project_name, project_description=project_description).id
                 
             # Check if project exists
             try:
                 project = Project.objects.get(id=project_id)
             except Project.DoesNotExist:
                 # Project doesn't exist, create a new one
-                project = Project.objects.create(project_name=project_name)
+                project = Project.objects.create(project_name=project_name, project_description=project_description)
                 project_id = project.id
                 
             
@@ -1371,5 +1372,3 @@ class CLIAPIView(APIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
