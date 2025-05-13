@@ -4,7 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from core.nodes.configs.const_ import PARENT_NODES, MULTI_CHANNEL_NODES
 from core.repositories.operations import NodeSaver, NodeLoader, NodeDeleter
 from core.repositories.node_repository import NodeDataExtractor
-
+from core.nodes.utils import FolderHandler
+from core.nodes.configs.const_ import SAVING_DIR
 
 class NodeUpdater:
     """
@@ -33,9 +34,17 @@ class NodeUpdater:
         try:
             # take the <old> node (by its id)
             node = Node.objects.get(node_id=node_id, project_id=project_id) # get node from database
-            folder_path = os.path.dirname(node.node_data)
-            original_id = payload.get("node_id") # id for new node
+
+            folder_path = None
+            if node.node_data is None:
+                folder_name = FolderHandler.get_folder_by_node_name(node.node_name)
+                project_path = f"{project_id}/" if project_id else ""
+                folder_path = os.path.join(f'{SAVING_DIR}/{project_path}', folder_name)
+
+            if not folder_path:
+                folder_path = os.path.dirname(node.node_data)
             
+            original_id = payload.get("node_id") # id for new node
             is_multi_channel = payload.get("node_name") in MULTI_CHANNEL_NODES
             payload["node_data"] = NodeDataExtractor()(original_id, project_id=project_id)
 
