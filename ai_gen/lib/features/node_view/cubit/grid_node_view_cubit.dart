@@ -92,6 +92,16 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     nodeManager.myDeSerializedNodes(responseProjectNodes);
   }
 
+  // used in importing other files
+  Future<void> updateNodes() async {
+    try {
+      await _loadProjectNodes();
+      emit(NodeViewSuccess());
+    } catch (e) {
+      emit(NodeViewFailure(e.toString()));
+    }
+  }
+
   Future<void> clearNodes() async {
     try {
       emit(GridNodeViewLoading());

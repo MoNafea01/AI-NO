@@ -12,7 +12,7 @@ class CreateNewProjectButton extends StatelessWidget {
         showDialog(
           context: context,
           builder: (context) => const Dialog(
-            child: CustomDialog(),
+            child: CreateNewProjectDialog(),
           ),
         );
       },

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomTextFormField extends StatelessWidget {
+class CustomTextFormField extends StatefulWidget {
   const CustomTextFormField({
     required this.controller,
     this.labelText,
@@ -8,6 +8,7 @@ class CustomTextFormField extends StatelessWidget {
     this.suffixIcon,
     this.hintText,
     this.enabled = true,
+    this.isPassword = false,
     super.key,
   });
 
@@ -17,28 +18,61 @@ class CustomTextFormField extends StatelessWidget {
   final bool isRequired;
   final Widget? suffixIcon;
   final bool enabled;
+  final bool isPassword;
+
+  @override
+  State<CustomTextFormField> createState() => _CustomTextFormFieldState();
+}
+
+class _CustomTextFormFieldState extends State<CustomTextFormField> {
+  late bool isPasswordVisible;
+
+  @override
+  void initState() {
+    super.initState();
+    isPasswordVisible = widget.isPassword;
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      enabled: enabled,
+      enabled: widget.enabled,
+      obscureText: isPasswordVisible,
       validator: (value) {
-        if (isRequired && value != null && value.isEmpty) {
-          return 'Please enter $labelText';
+        if (widget.isRequired && value != null && value.isEmpty) {
+          return 'Please enter ${widget.labelText}';
         }
         return null;
       },
-      controller: controller,
+      controller: widget.controller,
       decoration: InputDecoration(
-        suffixIcon: suffixIcon,
+        suffixIcon: widget.suffixIcon ??
+            (widget.isPassword
+                ? IconButton(
+                    onPressed: () {
+                      setState(() => isPasswordVisible = !isPasswordVisible);
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                    ),
+                    icon: Icon(
+                      isPasswordVisible
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                  )
+                : null),
         isDense: true,
         alignLabelWithHint: true,
         label: Padding(
           padding: const EdgeInsets.only(bottom: 20),
-          child: Text(labelText ?? ""),
+          child: Text(widget.labelText ?? ""),
         ),
         labelStyle: TextStyle(color: Colors.grey[700]),
-        hintText: hintText,
+        hintText: widget.hintText,
         filled: true,
         fillColor: Colors.grey[200],
         contentPadding: const EdgeInsets.symmetric(

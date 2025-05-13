@@ -1,8 +1,8 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_dialog.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_text_form_field.dart';
+import 'package:ai_gen/core/reusable_widgets/pick_folder_icon.dart';
 import 'package:ai_gen/core/services/app_services.dart';
-import 'package:ai_gen/core/utils/helper/helper.dart';
 import 'package:flutter/material.dart';
 
 class ExportProjectDialog extends StatefulWidget {
@@ -96,8 +96,16 @@ class _ExportProjectDialogState extends State<ExportProjectDialog>
           const SizedBox(height: 24),
           CustomTextFormField(
             controller: _projectPathController,
-            labelText: 'Export Location',
-            suffixIcon: _isLoading ? null : _pickFolderIcon(),
+            labelText: 'Export Directory',
+            suffixIcon: _isLoading
+                ? null
+                : PickFileOrFolderIcon(
+                    onFilePicked: (filePath) {
+                      if (filePath != null) {
+                        _projectPathController.text = filePath;
+                      }
+                    },
+                  ),
             enabled: !_isLoading,
           ),
           const SizedBox(height: 10),
@@ -115,6 +123,7 @@ class _ExportProjectDialogState extends State<ExportProjectDialog>
                       isRequired: false,
                       hintText: "No recovery (we don't have time)",
                       enabled: !_isLoading,
+                      isPassword: true,
                     ),
                   ],
                 )
@@ -122,29 +131,6 @@ class _ExportProjectDialogState extends State<ExportProjectDialog>
         ],
       ),
     );
-  }
-
-  Widget _pickFolderIcon() {
-    return IconButton(
-      onPressed: () async {
-        await _pickDirectory();
-      },
-      style: IconButton.styleFrom(
-        backgroundColor: Colors.grey[300],
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-        ),
-      ),
-      icon: const Icon(Icons.folder_open, color: Colors.black),
-    );
-  }
-
-  Future<void> _pickDirectory() async {
-    String? selectedDirectory = await Helper.pickDirectory();
-
-    if (selectedDirectory != null) {
-      _projectPathController.text = selectedDirectory;
-    }
   }
 }
 

@@ -32,7 +32,6 @@ class VSNodeInput extends StatefulWidget {
 /// This state class manages the input port's position, connection state, and rendering.
 class _VSNodeInputState extends State<VSNodeInput> {
   /// The render box for positioning calculations
-  RenderBox? _renderBox;
 
   /// The key used to anchor the input port in the widget tree
   final GlobalKey _anchor = GlobalKey();
@@ -67,7 +66,7 @@ class _VSNodeInputState extends State<VSNodeInput> {
   void _updateRenderBox() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _renderBox = findAndUpdateWidgetPosition(
+      findAndUpdateWidgetPosition(
         widgetAnchor: _anchor,
         context: context,
         data: widget.data,

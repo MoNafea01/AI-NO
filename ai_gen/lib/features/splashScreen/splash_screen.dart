@@ -1,7 +1,5 @@
-import 'package:ai_gen/core/network/server_manager/server_manager.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,7 +17,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void loadServer() async {
-    await GetIt.I.get<ServerManager>().startServer();
+    // await GetIt.I.get<ServerManager>().startServer();
+
+    await Future.delayed(Duration.zero);
 
     if (mounted) {
       // Check if the widget is still mounted

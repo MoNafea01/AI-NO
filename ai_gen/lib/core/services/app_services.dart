@@ -9,6 +9,8 @@ class AppServices {
   final String _baseURL = NetworkConstants.baseURL;
   final String _allComponentsEndPoint = NetworkConstants.allComponentsEndPoint;
   final String _projectEndPoint = NetworkConstants.projectEndPoint;
+  final String _importProjectEndPoint = NetworkConstants.importProjectEndPoint;
+  final String _exportProjectEndPoint = NetworkConstants.exportProjectEndPoint;
   final String _nodesEndPoint = NetworkConstants.nodesEndPoint;
   final Dio _dio = GetIt.I.get<Dio>();
 
@@ -75,6 +77,33 @@ class AppServices {
     }
   }
 
+  Future<String> importProject({
+    required String filePath,
+    String? password,
+    int? projectId,
+    int? replace = 0,
+    String? projectName,
+    String? projectDescription,
+  }) async {
+    try {
+      final response = await _dio.get(
+        "$_baseURL/$_importProjectEndPoint/?project_id=${projectId ?? ""}&replace=$replace",
+        data: {
+          "path": filePath,
+          "password": password ?? "",
+          "project_name": projectName ?? "",
+          "project_description": projectDescription ?? "",
+        },
+      );
+      ApiErrorHandler.checkResponseStatus(response);
+      return response.data["message"];
+    } on DioException catch (e) {
+      throw ApiErrorHandler.dioHandler(e);
+    } catch (e) {
+      throw ApiErrorHandler.handleGeneral(e as Exception);
+    }
+  }
+
   Future<String> exportProject({
     required int projectId,
     required String fileName,
@@ -84,7 +113,7 @@ class AppServices {
   }) async {
     try {
       final response = await _dio.post(
-        "$_baseURL/export-project/?project_id=$projectId",
+        "$_baseURL/$_exportProjectEndPoint/?project_id=$projectId",
         data: {
           "folder_path": filePath,
           "file_name": fileName,

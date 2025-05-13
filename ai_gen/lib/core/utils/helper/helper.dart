@@ -1,4 +1,5 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 
 abstract class Helper {
   static List<num> parseIntList(dynamic text) {
@@ -26,6 +27,16 @@ abstract class Helper {
   static Future<String?> pickDirectory() async {
     return await FilePicker.platform.getDirectoryPath(
       lockParentWindow: true,
+    );
+  }
+
+  static Future<dynamic> showDialogHelper(
+    BuildContext context,
+    Widget customDialog,
+  ) {
+    return showDialog(
+      context: context,
+      builder: (context) => Dialog(child: customDialog),
     );
   }
 }
