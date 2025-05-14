@@ -22,15 +22,11 @@ class NodeContent extends StatefulWidget {
   const NodeContent({
     required this.nodeProvider,
     required this.data,
-    required this.anchor,
     super.key,
   });
 
   /// The data associated with this node
   final VSNodeData data;
-
-  /// The key used to anchor the node in the widget tree
-  final GlobalKey anchor;
 
   /// The provider that manages node data and state
   final VSNodeDataProvider nodeProvider;
@@ -58,10 +54,16 @@ class NodeContentState extends State<NodeContent> {
   /// Widgets for hidden output ports
   final List<Widget> _hiddenOutputWidgets = [];
 
+  final GlobalKey<VSNodeTitleState> _titleKey = GlobalKey<VSNodeTitleState>();
+
   @override
   void initState() {
     super.initState();
     _initializePorts();
+  }
+
+  void focusTitle() {
+    _titleKey.currentState?.updateFocus();
   }
 
   /// Initializes the input and output ports
@@ -74,9 +76,17 @@ class NodeContentState extends State<NodeContent> {
 
     // Initialize output ports
     for (final outputData in widget.data.outputData) {
-      final GlobalKey<VSNodeOutputState> key = GlobalKey<VSNodeOutputState>();
-      _outputKeys.add(key);
-      _outputWidgets.add(VSNodeOutput(data: outputData, outputKey: key));
+      final GlobalKey outputKey = GlobalKey();
+      final GlobalKey<VSNodeOutputState> updatingKey =
+          GlobalKey<VSNodeOutputState>();
+
+      _outputKeys.add(updatingKey);
+      _outputWidgets.add(VSNodeOutput(
+        data: outputData,
+        outputKey: outputKey,
+        key: updatingKey,
+      ));
+
       _hiddenOutputWidgets.add(HiddenVsNodeOutput(data: outputData));
     }
   }
@@ -87,7 +97,7 @@ class NodeContentState extends State<NodeContent> {
       if (key.currentState != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            key.currentState?.setState(() {});
+            key.currentState?.updateRenderBox();
           }
         });
       }
@@ -97,7 +107,6 @@ class NodeContentState extends State<NodeContent> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      key: widget.anchor,
       children: [
         _buildMainContent(),
         _buildInputPorts(),
@@ -119,7 +128,11 @@ class NodeContentState extends State<NodeContent> {
             spacing: 16,
             children: [
               _InterfaceWidget(_hiddenInputWidgets),
-              VSNodeTitle(data: widget.data, onTitleChange: updateOutputs),
+              VSNodeTitle(
+                key: _titleKey,
+                data: widget.data,
+                onTitleChange: updateOutputs,
+              ),
               _InterfaceWidget(_hiddenOutputWidgets),
             ],
           ),

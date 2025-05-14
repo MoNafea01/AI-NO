@@ -43,7 +43,7 @@ class VSNode extends StatefulWidget {
 
 class _VSNodeState extends State<VSNode> with AutomaticKeepAliveClientMixin {
   /// Key for the node's anchor point
-  late final GlobalKey _nodeAnchorKey;
+  late final GlobalKey<NodeContentState> _nodeAnchorKey;
 
   /// Key for the dragged node's material
   late final GlobalKey _draggedNodeKey;
@@ -57,17 +57,22 @@ class _VSNodeState extends State<VSNode> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
   late Widget nodeContent;
+
   @override
   void initState() {
     super.initState();
-    _nodeAnchorKey = GlobalKey();
+    _nodeAnchorKey = GlobalKey<NodeContentState>();
     _draggedNodeKey = GlobalKey();
     _nodeProvider = VSNodeDataProvider.of(context);
     nodeContent = NodeContent(
       nodeProvider: _nodeProvider,
       data: widget.data,
-      anchor: _nodeAnchorKey,
+      key: _nodeAnchorKey,
     );
+  }
+
+  void focusTitle() {
+    _nodeAnchorKey.currentState?.focusTitle();
   }
 
   @override
@@ -159,7 +164,10 @@ class _VSNodeState extends State<VSNode> with AutomaticKeepAliveClientMixin {
       ),
       _buildMenuItem(
         'rename',
-        onTap: () => setState(() => widget.data.isRenaming = true),
+        onTap: () => setState(() {
+          widget.data.isRenaming = true;
+          focusTitle();
+        }),
       ),
       _buildMenuItem(
         'delete',

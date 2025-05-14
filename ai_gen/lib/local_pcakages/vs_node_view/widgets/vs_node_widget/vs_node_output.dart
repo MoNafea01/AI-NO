@@ -55,7 +55,7 @@ class VSNodeOutputState extends State<VSNodeOutput> {
     super.didUpdateWidget(oldWidget);
 
     if (_shouldUpdateRenderBox(oldWidget)) {
-      _updateRenderBox();
+      updateRenderBox();
     }
   }
 
@@ -70,12 +70,12 @@ class VSNodeOutputState extends State<VSNodeOutput> {
   /// Schedules an initial render box update
   void _scheduleRenderBoxUpdate() {
     Future.delayed(Duration.zero).then((_) {
-      if (mounted) _updateRenderBox();
+      if (mounted) updateRenderBox();
     });
   }
 
   /// Updates the render box for positioning calculations
-  void _updateRenderBox() {
+  void updateRenderBox() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _renderBox = findAndUpdateWidgetPosition(

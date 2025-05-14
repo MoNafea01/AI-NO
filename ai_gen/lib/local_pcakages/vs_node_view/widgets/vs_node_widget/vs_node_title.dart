@@ -30,13 +30,13 @@ class VSNodeTitle extends StatefulWidget {
   final VoidCallback? onTitleChange;
 
   @override
-  State<VSNodeTitle> createState() => _VSNodeTitleState();
+  State<VSNodeTitle> createState() => VSNodeTitleState();
 }
 
 /// The state for the [VSNodeTitle] widget.
 ///
 /// This state class manages the title's editing state, focus, and text input.
-class _VSNodeTitleState extends State<VSNodeTitle> {
+class VSNodeTitleState extends State<VSNodeTitle> {
   /// Controller for managing the title text field
   late final TextEditingController _titleController;
 
@@ -57,34 +57,26 @@ class _VSNodeTitleState extends State<VSNodeTitle> {
     super.dispose();
   }
 
-  @override
-  void didUpdateWidget(covariant VSNodeTitle oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _handleRenamingStateChange();
-  }
-
-  /// Handles changes to the renaming state
-  void _handleRenamingStateChange() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      if (widget.data.isRenaming) {
-        _focusNode.requestFocus();
-      } else {
-        _focusNode.unfocus();
-      }
-    });
+  /// Requests focus on the title text field
+  void updateFocus() {
+    if (!mounted) return;
+    if (widget.data.isRenaming) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _focusNode.requestFocus();
+        }
+      });
+    } else {
+      _focusNode.unfocus();
+    }
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return wrapWithToolTip(
       toolTip: widget.data.toolTip,
-      child: IntrinsicWidth(
-        child: GestureDetector(
-          child: _buildTitleTextField(),
-        ),
-      ),
+      child: IntrinsicWidth(child: _buildTitleTextField()),
     );
   }
 
