@@ -148,7 +148,10 @@ class NodeContentState extends State<NodeContent> {
       left: 0,
       top: 0,
       bottom: 0,
-      child: _InterfaceWidget(_inputWidgets),
+      child: _InterfaceWidget(
+        _inputWidgets,
+        crossAxisAlignment: CrossAxisAlignment.start,
+      ),
     );
   }
 
@@ -189,17 +192,19 @@ class _InterfaceWidget extends StatelessWidget {
   /// Creates a new [_InterfaceWidget] instance.
   ///
   /// [children] is required and contains the list of widgets to display.
-  const _InterfaceWidget(this.children);
+  const _InterfaceWidget(this.children,
+      {this.crossAxisAlignment = CrossAxisAlignment.end});
 
   /// The list of widgets to display in the interface
   final List<Widget> children;
+  final CrossAxisAlignment crossAxisAlignment;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       spacing: 4,
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: crossAxisAlignment,
       children: children,
     );
   }

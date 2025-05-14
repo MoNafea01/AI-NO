@@ -152,15 +152,16 @@ class NodeBuilder {
   }
 
   List<MultiOutputOutputData> multiOutputNodes(NodeModel node) {
-    Map<String, dynamic> response = {};
     final List<MultiOutputOutputData> outputData = [];
+    final outputState = OutputState();
+
     for (int i = 0; i < node.outputDots!.length; i++) {
       outputData.add(
         MultiOutputOutputData(
           index: i,
           node: node,
-          response: response,
           type: node.outputDots![i],
+          outputState: outputState,
         ),
       );
     }

@@ -172,7 +172,8 @@ class AppServices {
   }
 
   Future<Map<String, dynamic>> runNode(NodeModel node, dynamic apiBody) async {
-    print("Running node: ${node.name} with body $apiBody");
+    print(
+        "Running node: ${node.name}: $_baseURL/${node.endPoint}?node_id=${node.nodeId}&project_id=${node.projectId}  \nwith body $apiBody");
     return await _apiCall(
       node,
       () async => node.nodeId == null

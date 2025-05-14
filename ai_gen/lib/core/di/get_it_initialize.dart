@@ -5,9 +5,6 @@ import 'package:get_it/get_it.dart';
 
 initializeGetIt() {
   final dio = Dio(BaseOptions(
-    connectTimeout: const Duration(seconds: 30),
-    receiveTimeout: const Duration(seconds: 30),
-    sendTimeout: const Duration(seconds: 30),
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
