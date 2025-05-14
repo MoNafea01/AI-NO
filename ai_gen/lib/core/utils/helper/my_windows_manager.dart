@@ -14,5 +14,5 @@ Future<void> initializeWindowsManager() async {
 
   // // Set the initial size to match the constraints
 
-  windowManager.setAlwaysOnTop(true);
+  // windowManager.setAlwaysOnTop(true);
 }
