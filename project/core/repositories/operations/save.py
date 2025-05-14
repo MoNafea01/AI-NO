@@ -50,6 +50,7 @@ class NodeSaver:
         if self.to_db:
             Node.objects.update_or_create(
                 node_id=node_id,
+                project_id=project_id,
                 defaults={
                     'node_name': node_name,
                     'message': message,
