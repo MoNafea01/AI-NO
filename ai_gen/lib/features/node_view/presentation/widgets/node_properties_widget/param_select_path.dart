@@ -11,7 +11,6 @@ class ParamSelectPath extends StatefulWidget {
   const ParamSelectPath({required this.parameter, super.key});
 
   final ParameterModel parameter;
-
   @override
   State<ParamSelectPath> createState() => _ParamSelectPathState();
 }

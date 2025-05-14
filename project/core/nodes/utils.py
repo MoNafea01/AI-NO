@@ -121,8 +121,9 @@ class FolderHandler:
 
 def delete_node(node: Node):
     node_path = node.node_data
-    if os.path.exists(node_path):
-        os.remove(node_path)
+    if node_path is not None:
+        if os.path.exists(node_path):
+            os.remove(node_path)
     node.delete()
 
 
