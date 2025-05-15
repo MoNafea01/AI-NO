@@ -189,7 +189,7 @@ class NodeLoaderSerializer(serializers.Serializer):
 
 class NodeSaverSerializer(serializers.Serializer):
     node = JSONOrIntField(required=True)
-    node_path = serializers.CharField(required=True)
+    params = serializers.JSONField(required=True)
 
 
 class ComponentSerializer(serializers.ModelSerializer):

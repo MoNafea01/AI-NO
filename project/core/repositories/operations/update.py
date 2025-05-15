@@ -23,13 +23,13 @@ class NodeUpdater:
 
     def __call__(self, node_id: int, project_id: int, payload: dict) -> tuple:
         if not node_id:
-            raise ValueError("Node ID must be provided.")
+            return False, "Node ID must be provided."
         
         node_id = int(node_id) if node_id else None
         project_id = int(project_id) if project_id else None
 
         if not isinstance(payload, dict):
-            raise ValueError("Payload must be a dictionary.")
+            return False, "Payload must be a dictionary."
         
         try:
             # take the <old> node (by its id)
@@ -73,12 +73,12 @@ class NodeUpdater:
             payload["node_id"] = node_id
             if payload['node_name'] not in PARENT_NODES:
                 payload['children'] = node.children
-                
+            
             NodeSaver()(payload, path=folder_path)
             NodeDeleter(is_multi_channel)(original_id, project_id=project_id)
             
             # this part to delete node if its name isn't same as new one's name
-            if node.node_name != payload.get("node_name"):
+            if node.node_name != payload.get("node_name") and node.node_name != "node_loader":
                 node_path = node.node_data
                 if os.path.exists(node_path):
                     os.remove(node_path)

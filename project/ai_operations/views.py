@@ -157,7 +157,6 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 uid = Component.objects.get(node_name=node_name).uid
             except Component.DoesNotExist:
                 return Response({"error": f"Component with name {node_name} not found"}, status=status.HTTP_404_NOT_FOUND), None, None, None
-
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
@@ -546,7 +545,7 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
     def get_serialized_payload(self, path, return_serialized, project_id):
         """Loads a node, saves it, and optionally serializes it."""
         loader = NodeLoader(from_db=False)
-        success, payload = loader(project_id= project_id, path=path)
+        success, payload = loader(project_id = project_id, path=path)
         node_name = payload.get("message").split(" ")[1]
         uid = Component.objects.get(node_name="node_loader").uid
         payload.update({"node_name":node_name,
@@ -614,7 +613,12 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
     def process_node_save(self, request):
         """Handles node saving logic for both POST and PUT requests."""
         payload = request.data.get("node")
-        path = request.data.get("node_path")  # Optional path parameter
+        path = request.data.get('params', {}).get("node_path")  # Optional path parameter
+        if not payload:
+            return Response({"error": "Node data is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not path:
+            return Response({"error": "Path is required."}, status=status.HTTP_400_BAD_REQUEST)
         project_id = request.query_params.get('project_id')
         return_serialized = request.query_params.get("return_serialized") == "1"
         uid = Component.objects.get(node_name="node_saver").uid
@@ -652,7 +656,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request):
-        serializer, project_id = NodeSaverSerializer(data=request.data)
+        serializer = NodeSaverSerializer(data=request.data)
         if serializer.is_valid():
             response = self.process_node_save(request)
             response_data = response.data
