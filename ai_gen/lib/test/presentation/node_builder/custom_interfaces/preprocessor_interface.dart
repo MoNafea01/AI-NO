@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ai_gen/core/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 

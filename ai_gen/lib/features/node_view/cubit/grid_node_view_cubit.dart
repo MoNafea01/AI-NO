@@ -1,7 +1,7 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/services/interfaces/node_services_interface.dart';
-import 'package:ai_gen/core/services/interfaces/project_services_interface.dart';
+import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:bloc/bloc.dart';

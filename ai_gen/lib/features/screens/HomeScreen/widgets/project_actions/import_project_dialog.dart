@@ -2,7 +2,7 @@ import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_dialog.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/core/reusable_widgets/pick_folder_icon.dart';
-import 'package:ai_gen/core/services/interfaces/project_services_interface.dart';
+import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';

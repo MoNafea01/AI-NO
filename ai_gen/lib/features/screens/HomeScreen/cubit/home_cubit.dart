@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/services/interfaces/project_services_interface.dart';
+import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
 import 'package:bloc/bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';

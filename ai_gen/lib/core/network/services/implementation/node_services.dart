@@ -1,7 +1,7 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/network/api_error_handler.dart';
 import 'package:ai_gen/core/network/network_constants.dart';
-import 'package:ai_gen/core/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
 import 'package:dio/dio.dart';
 
 class NodeServices implements INodeServices {
@@ -17,13 +17,12 @@ class NodeServices implements INodeServices {
   Future<Map<int, NodeModel>> loadNodesComponents() async {
     try {
       final response = await _dio.get("$_baseURL/$_allComponentsEndPoint");
-      ApiErrorHandler.checkResponseStatus(response);
 
       Map<int, NodeModel> nodesDictionary = {};
       if (response.data != null) {
         for (var nodeData in response.data) {
           NodeModel node = NodeModel.fromJson(nodeData);
-          if (nodeData['uid'] != null) {
+          if (nodeData['uid'] != null && nodeData['uid'] is int) {
             nodesDictionary[nodeData['uid']] = node;
           }
         }
@@ -32,23 +31,11 @@ class NodeServices implements INodeServices {
     } on DioException catch (e) {
       throw ApiErrorHandler.dioHandler(e);
     } catch (e) {
-      throw ApiErrorHandler.handleGeneral(e as Exception);
-    }
-  }
-
-  @override
-  Future<void> saveProjectNodes(List<Map> nodes, int projectId) async {
-    try {
-      final response = await _dio.put(
-        "$_baseURL/$_nodesEndPoint/?project_id=$projectId",
-        data: nodes,
-      );
-
-      ApiErrorHandler.checkResponseStatus(response);
-    } on DioException catch (e) {
-      throw ApiErrorHandler.dioHandler(e);
-    } catch (e) {
-      throw ApiErrorHandler.handleGeneral(e as Exception);
+      if (e is Exception) {
+        throw ApiErrorHandler.handleGeneral(e);
+      } else {
+        throw Exception('Unknown error: $e');
+      }
     }
   }
 
@@ -57,13 +44,34 @@ class NodeServices implements INodeServices {
     try {
       final response =
           await _dio.get("$_baseURL/$_nodesEndPoint/?project_id=$projectId");
-      ApiErrorHandler.checkResponseStatus(response);
 
       return response;
     } on DioException catch (e) {
       throw ApiErrorHandler.dioHandler(e);
     } catch (e) {
-      throw ApiErrorHandler.handleGeneral(e as Exception);
+      if (e is Exception) {
+        throw ApiErrorHandler.handleGeneral(e);
+      } else {
+        throw Exception('Unknown error: $e');
+      }
+    }
+  }
+
+  @override
+  Future<void> saveProjectNodes(List<Map> nodes, int projectId) async {
+    try {
+      await _dio.put(
+        "$_baseURL/$_nodesEndPoint/?project_id=$projectId",
+        data: nodes,
+      );
+    } on DioException catch (e) {
+      throw ApiErrorHandler.dioHandler(e);
+    } catch (e) {
+      if (e is Exception) {
+        throw ApiErrorHandler.handleGeneral(e);
+      } else {
+        throw Exception('Unknown error: $e');
+      }
     }
   }
 
@@ -99,13 +107,14 @@ class NodeServices implements INodeServices {
   }
 
   @override
-  Future<Map<String, dynamic>> getNode(NodeModel node, int outputChannel,
-      {Map<String, dynamic>? apiBody}) async {
+  Future<Map<String, dynamic>> getNode(
+    NodeModel node,
+    int outputChannel,
+  ) async {
     return _apiCall(
       node,
       () => _dio.get(
         "$_baseURL/${node.endPoint}?node_id=${node.nodeId}&output=$outputChannel&project_id=${node.projectId}",
-        data: apiBody,
         options: Options(contentType: Headers.jsonContentType),
       ),
     );
@@ -129,7 +138,6 @@ class NodeServices implements INodeServices {
   }) async {
     try {
       final response = await apiCall();
-      ApiErrorHandler.checkResponseStatus(response);
 
       Map<String, dynamic> mapResponse = response.data != null
           ? Map<String, dynamic>.from(response.data)
@@ -138,9 +146,13 @@ class NodeServices implements INodeServices {
       if (onResponseSuccess != null) onResponseSuccess(mapResponse);
       return mapResponse;
     } on DioException catch (e) {
-      return ApiErrorHandler.dioHandler(e);
+      return {"error": ApiErrorHandler.extractMessage(e)};
     } catch (e) {
-      throw ApiErrorHandler.handleGeneral(e as Exception);
+      if (e is Exception) {
+        throw ApiErrorHandler.handleGeneral(e);
+      } else {
+        throw Exception('Unknown error: $e');
+      }
     }
   }
 }

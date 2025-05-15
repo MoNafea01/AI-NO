@@ -1,7 +1,7 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/network/api_error_handler.dart';
 import 'package:ai_gen/core/network/network_constants.dart';
-import 'package:ai_gen/core/services/interfaces/project_services_interface.dart';
+import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
 import 'package:dio/dio.dart';
 
 class ProjectServices implements IProjectServices {
@@ -17,7 +17,6 @@ class ProjectServices implements IProjectServices {
   Future<List<ProjectModel>> getAllProjects() async {
     try {
       final response = await _dio.get("$_baseURL/$_projectEndPoint/");
-      ApiErrorHandler.checkResponseStatus(response);
 
       if (response.data != null) {
         return List<ProjectModel>.from(
@@ -45,8 +44,6 @@ class ProjectServices implements IProjectServices {
         },
       );
 
-      ApiErrorHandler.checkResponseStatus(response);
-
       return ProjectModel.fromJson(response.data);
     } on DioException catch (e) {
       throw ApiErrorHandler.dioHandler(e);
@@ -60,7 +57,6 @@ class ProjectServices implements IProjectServices {
     try {
       final response =
           await _dio.get("$_baseURL/$_projectEndPoint/$projectId/");
-      ApiErrorHandler.checkResponseStatus(response);
       return ProjectModel.fromJson(response.data);
     } on DioException catch (e) {
       throw ApiErrorHandler.dioHandler(e);
@@ -88,7 +84,7 @@ class ProjectServices implements IProjectServices {
           "project_description": projectDescription ?? "",
         },
       );
-      ApiErrorHandler.checkResponseStatus(response);
+
       return response.data["message"];
     } on DioException catch (e) {
       throw ApiErrorHandler.dioHandler(e);
@@ -115,7 +111,7 @@ class ProjectServices implements IProjectServices {
           "password": password ?? ""
         },
       );
-      ApiErrorHandler.checkResponseStatus(response);
+
       return response.data["message"];
     } on DioException catch (e) {
       throw ApiErrorHandler.dioHandler(e);

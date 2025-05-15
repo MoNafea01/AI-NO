@@ -1,6 +1,6 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_menu_item.dart';
-import 'package:ai_gen/core/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
