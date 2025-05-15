@@ -1,9 +1,9 @@
-import 'package:ai_gen/core/services/app_services.dart';
+import 'package:ai_gen/core/services/interfaces/node_services_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import 'aino_general_Interface.dart';
+import 'aino_general_interface.dart';
 import 'interface_colors.dart';
 import 'network_interface.dart';
 
@@ -47,7 +47,8 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
         "task": node.task,
         "params": node.paramsToJson,
       };
-      final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
+
+      final INodeServices nodeServerCalls = GetIt.I.get<INodeServices>();
       return await nodeServerCalls.runNode(node, apiBody);
     };
   }

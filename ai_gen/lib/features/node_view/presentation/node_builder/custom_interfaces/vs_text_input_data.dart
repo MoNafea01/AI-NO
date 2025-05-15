@@ -7,9 +7,9 @@ class VsTextInputData extends VSInputData {
   ///Basic int input interface
   VsTextInputData({
     required super.type,
+    required this.controller,
     super.interfaceIconBuilder,
     super.title = "xx",
-    required this.controller,
     super.initialConnection,
   }) {
     super.interfaceIconBuilder = (context, anchor, data) {

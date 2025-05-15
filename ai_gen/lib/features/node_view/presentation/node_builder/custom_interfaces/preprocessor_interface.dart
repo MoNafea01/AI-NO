@@ -1,10 +1,13 @@
 import 'dart:async';
 
-import 'package:ai_gen/core/services/app_services.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
+import 'package:ai_gen/core/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+
+import 'network_interface.dart';
 
 Color _interfaceColor = NodeTypes.preprocessors.color;
 
@@ -19,7 +22,8 @@ class VSPreprocessorInputData extends VSAINOGeneralInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [VSPreprocessorOutputData];
+  List<Type> get acceptedTypes =>
+      [VSPreprocessorOutputData, VSFitterOutputData, VSNetworkOutputData];
 
   @override
   // TODO: implement inputIcon
@@ -48,7 +52,7 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
         "params": node.paramsToJson,
       };
 
-      final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
+      final nodeServerCalls = GetIt.I.get<INodeServices>();
       return await nodeServerCalls.runNode(node, apiBody);
     };
   }

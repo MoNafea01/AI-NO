@@ -1,16 +1,13 @@
-import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/core/services/app_services.dart';
-import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/base/base_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/multi_output_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/network_interface.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import 'interface_colors.dart';
-import 'multi_output_interface.dart';
-import 'network_interface.dart';
 
 Color _interfaceColor = NodeTypes.general.color;
 
-class VSAINOGeneralInputData extends VSInputData {
+class VSAINOGeneralInputData extends BaseInputData {
   ///Basic List input interface
   VSAINOGeneralInputData({
     required super.type,
@@ -23,45 +20,25 @@ class VSAINOGeneralInputData extends VSInputData {
   });
 
   @override
-  List<Type> get acceptedTypes =>
-      [VSAINOGeneralOutputData, MultiOutputOutputData, VSNetworkOutputData];
+  List<Type> get acceptedTypes => [
+        VSAINOGeneralOutputData,
+        MultiOutputOutputData,
+        VSNetworkOutputData,
+      ];
 
   @override
   Color get interfaceColor => _interfaceColor;
 }
 
-class VSAINOGeneralOutputData extends VSOutputData {
+class VSAINOGeneralOutputData extends BaseOutputData {
   ///Basic List output interface
   VSAINOGeneralOutputData({
     required super.type,
-    required this.node,
+    required super.node,
     super.outputFunction,
     super.interfaceIconBuilder,
     super.outputIcon,
   });
-
-  final NodeModel node;
-  Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
-      get _outputFunction {
-    return (data) async {
-      final Map<String, dynamic> apiBody = {};
-      apiBody["params"] = node.paramsToJson;
-
-      for (var input in data.entries) {
-        apiBody[input.key] = await input.value;
-      }
-
-      final AppServices nodeServerCalls = GetIt.I.get<AppServices>();
-
-      Map<String, dynamic> response =
-          await nodeServerCalls.runNode(node, apiBody);
-      return response;
-    };
-  }
-
-  @override
-  Future<dynamic> Function(Map<String, dynamic> data) get outputFunction =>
-      _outputFunction;
 
   @override
   Color get interfaceColor => node.color;

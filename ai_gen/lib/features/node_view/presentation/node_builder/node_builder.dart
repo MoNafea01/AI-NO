@@ -6,7 +6,7 @@ import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../main.dart';
-import 'custom_interfaces/aino_general_Interface.dart';
+import 'custom_interfaces/aino_general_interface.dart';
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
 import 'custom_interfaces/preprocessor_interface.dart';

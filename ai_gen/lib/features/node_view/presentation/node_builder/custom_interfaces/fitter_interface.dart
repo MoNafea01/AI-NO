@@ -1,4 +1,4 @@
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_interface.dart';
 import 'package:flutter/material.dart';
 
 import 'interface_colors.dart';

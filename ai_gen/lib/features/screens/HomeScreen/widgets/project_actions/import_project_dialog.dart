@@ -2,13 +2,14 @@ import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_dialog.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/core/reusable_widgets/pick_folder_icon.dart';
-import 'package:ai_gen/core/services/app_services.dart';
+import 'package:ai_gen/core/services/interfaces/project_services_interface.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get_it/get_it.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class ImportProjectDialog extends StatefulWidget {
@@ -51,9 +52,10 @@ class _ImportProjectDialogState extends State<ImportProjectDialog> {
     if (_isLoading) return;
 
     setState(() => _isLoading = true);
+    final IProjectServices projectServices = GetIt.I.get<IProjectServices>();
 
     try {
-      final String message = await AppServices().importProject(
+      final String message = await projectServices.importProject(
         filePath: _projectpathController.text,
         password: _projectPasswordController.text,
         projectId: widget.projectModel?.id,

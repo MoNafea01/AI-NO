@@ -1,7 +1,6 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/core/services/interfaces/node_services_interface.dart';
 import 'package:get_it/get_it.dart';
-
-import '../../../../core/services/app_services.dart';
 
 class NodeSerializer {
   static Map<int, NodeModel> nodesDictionary = {};
@@ -9,7 +8,7 @@ class NodeSerializer {
   Future<Map<String, Map<String, Map<String, List<NodeModel>>>>>
       categorizeNodes() async {
     try {
-      AppServices serverCalls = GetIt.I.get<AppServices>();
+      INodeServices serverCalls = GetIt.I.get<INodeServices>();
       // read the nodes from the server
       nodesDictionary = await serverCalls.loadNodesComponents();
 

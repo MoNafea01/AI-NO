@@ -1,19 +1,18 @@
-import 'package:ai_gen/core/network/server_manager/server_manager.dart';
-import 'package:ai_gen/core/services/app_services.dart';
-import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
-initializeGetIt() {
-  final dio = Dio(BaseOptions(
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    followRedirects: true,
-    maxRedirects: 5,
-  ));
+import 'network_module.dart';
+import 'service_module.dart';
 
-  GetIt.I.registerSingleton<Dio>(dio);
-  GetIt.I.registerSingleton<ServerManager>(ServerManager());
-  GetIt.I.registerSingleton<AppServices>(AppServices());
+/// Initialize all dependencies using GetIt
+Future<void> initializeGetIt() async {
+  final getIt = GetIt.instance;
+
+  // Initialize all modules
+  NetworkModule.init(getIt);
+  ServiceModule.init(getIt);
+}
+
+/// Reset all dependencies
+Future<void> resetGetIt() async {
+  await GetIt.instance.reset();
 }

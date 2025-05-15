@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/services/app_services.dart';
+import 'package:ai_gen/core/services/interfaces/project_services_interface.dart';
 import 'package:bloc/bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
@@ -9,7 +9,7 @@ part 'home_state.dart';
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(HomeInitial());
 
-  final AppServices _appServices = GetIt.I.get<AppServices>();
+  final IProjectServices _appServices = GetIt.I.get<IProjectServices>();
 
   loadHomePage() async {
     try {

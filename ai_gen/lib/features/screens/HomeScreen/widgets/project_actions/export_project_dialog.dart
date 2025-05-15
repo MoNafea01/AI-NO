@@ -2,8 +2,9 @@ import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_dialog.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/core/reusable_widgets/pick_folder_icon.dart';
-import 'package:ai_gen/core/services/app_services.dart';
+import 'package:ai_gen/core/services/interfaces/project_services_interface.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class ExportProjectDialog extends StatefulWidget {
   const ExportProjectDialog({this.projectModel, super.key});
@@ -48,8 +49,9 @@ class _ExportProjectDialogState extends State<ExportProjectDialog>
 
     setState(() => _isLoading = true);
 
+    final IProjectServices projectServices = GetIt.I.get<IProjectServices>();
     try {
-      final String message = await AppServices().exportProject(
+      final String message = await projectServices.exportProject(
         projectId: widget.projectModel!.id!,
         fileName: _projectNameController.text,
         filePath: _projectPathController.text,
