@@ -1,17 +1,18 @@
 import 'dart:async';
 
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
+import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-Color _interfaceColor = NodeTypes.preprocessors.color;
+import 'base/base_interface.dart';
+import 'network_interface.dart';
 
-class VSPreprocessorInputData extends VSAINOGeneralInputData {
+class VSPreprocessorInputData extends BaseInputData {
   ///Basic List input interface
   VSPreprocessorInputData({
     required super.type,
+    required super.node,
     super.title,
     super.toolTip,
     super.initialConnection,
@@ -19,20 +20,18 @@ class VSPreprocessorInputData extends VSAINOGeneralInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [VSPreprocessorOutputData];
+  List<Type> get acceptedTypes =>
+      [VSPreprocessorOutputData, VSFitterOutputData, VSNetworkOutputData];
 
   @override
-  // TODO: implement inputIcon
+  // implement inputIcon
   IconData get inputIcon => Icons.square_outlined;
 
   @override
   IconData get connectedInputIcon => Icons.square_rounded;
-
-  @override
-  Color get interfaceColor => _interfaceColor;
 }
 
-class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
+class VSPreprocessorOutputData extends BaseOutputData {
   ///Basic List output interface
   VSPreprocessorOutputData({
     required super.type,
@@ -48,7 +47,7 @@ class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
         "params": node.paramsToJson,
       };
 
-      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      final nodeServerCalls = GetIt.I.get<INodeServices>();
       return await nodeServerCalls.runNode(node, apiBody);
     };
   }

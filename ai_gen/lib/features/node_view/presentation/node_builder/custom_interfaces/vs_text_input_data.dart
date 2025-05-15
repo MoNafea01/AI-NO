@@ -1,15 +1,17 @@
 import 'package:ai_gen/local_pcakages/vs_node_view/data/standard_interfaces/vs_int_interface.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/data/standard_interfaces/vs_num_interface.dart';
-import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
 
-class VsTextInputData extends VSInputData {
+import 'base/base_interface.dart';
+
+class VsTextInputData extends BaseInputData {
   ///Basic int input interface
   VsTextInputData({
     required super.type,
+    required super.node,
+    required this.controller,
     super.interfaceIconBuilder,
     super.title = "xx",
-    required this.controller,
     super.initialConnection,
   }) {
     super.interfaceIconBuilder = (context, anchor, data) {
@@ -27,8 +29,4 @@ class VsTextInputData extends VSInputData {
   final TextEditingController controller;
   @override
   List<Type> get acceptedTypes => [VSIntOutputData, VSNumOutputData];
-
-  final Color _interfaceColor = Colors.yellow;
-  @override
-  Color get interfaceColor => _interfaceColor;
 }

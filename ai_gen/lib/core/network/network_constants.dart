@@ -4,5 +4,7 @@ abstract class NetworkConstants {
   static const String projectEndPoint = "projects";
   static const String nodesEndPoint = "nodes";
   static const String allComponentsApi = "components";
+  static const String importProjectEndPoint = "import-project";
+  static const String exportProjectEndPoint = "export-project";
   static const String apiAuthBaseUrl = "https://lucky0wl.pythonanywhere.com";
 }

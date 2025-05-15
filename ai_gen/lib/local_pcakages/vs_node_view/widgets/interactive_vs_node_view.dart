@@ -74,28 +74,29 @@ class _InteractiveVSNodeViewState extends State<InteractiveVSNodeView> {
 
   @override
   void initState() {
-    controller = widget.controller ?? TransformationController();
-    widget.nodeDataProvider.transformationController = controller;
     super.initState();
 
+    controller = widget.controller ?? TransformationController();
+    widget.nodeDataProvider.transformationController = controller;
+
     //Needs to be done with a listener to assure inertia doesnt messup the offset
-    controller.addListener(
-      () {
-        widget.nodeDataProvider.viewportScale =
-            1 / controller.value.getMaxScaleOnAxis();
+    controller.addListener(() {
+      widget.nodeDataProvider.viewportScale =
+          1 / controller.value.getMaxScaleOnAxis();
 
-        widget.nodeDataProvider.viewportOffset = Offset(
-          controller.value.getTranslation().x,
-          controller.value.getTranslation().y,
-        );
-      },
-    );
-  }
+      widget.nodeDataProvider.viewportOffset = Offset(
+        controller.value.getTranslation().x,
+        controller.value.getTranslation().y,
+      );
+    });
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final Size screenSize = MediaQuery.of(context).size;
+      final double x = (screenSize.width - widget.width) / 2;
+      final double y = (screenSize.height - widget.height) / 2;
+
+      controller.value = Matrix4.identity()..translate(x, y);
+    });
   }
 
   @override

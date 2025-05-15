@@ -235,11 +235,10 @@ class PipeLineTest(APITestCase):
     #     data = self.client.post(f"/api/train_test_split/", {"X": X, "y": y, "params": {"test_size": 0.2, "random_state": 42}}, format="json")
 
     #     data = self.client.get(f"/api/train_test_split/", format="json", query_params={"node_id":data.data.get("node_id"), "return_data": 1})
-    #     X, y = data.data.get("children")
     #     (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
-        
-    #     model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
 
+       
+    #     model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
     #     model = self.client.post(f"/api/fit_model/", {"X": X_train, "y": y_train, "model": model}, format="json").data.get("node_id")
 
     #     y_pred = self.client.post(f"/api/predict/", {"X": X_test, "fitted_model": model}, format="json").data.get("node_id")
@@ -248,11 +247,13 @@ class PipeLineTest(APITestCase):
     #     y_train, y_test = data.data.get("children")
     #     # POST
     #     for data in _requests_['post']:
-    #         data.update({"y_pred": y_pred, "y_true": y_test})
+    #         if not data.get("fitted_model_path"):
+    #             data.update({"fitted_model":model})
 
+    #         data.update({"X": X_test})
     #         post_response = self.client.post(url, data, format="json")
     #         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
-    #         self.assertEqual(post_response.data.get("node_name"), "evaluator")
+    #         self.assertEqual(post_response.data.get("node_name"), "predictor")
     #         node_id = post_response.data.get("node_id")
     #         ids.append(node_id)
     #         self.assertIsNotNone(node_id)
@@ -266,14 +267,16 @@ class PipeLineTest(APITestCase):
 
     #     # PUT
     #     for data in _requests_['put']:
-    #         data.update({"y_pred": y_pred, "y_true": y_test})
+    #         if not data.get("fitted_model_path"):
+    #             data.update({"fitted_model_path":model})
 
+    #         data.update({"X": X_test})
     #         for i in range(len(ids)):
     #             put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i]})
     #             self.assertEqual(put_response.status_code, status.HTTP_200_OK)
     #             # Verify updated model details
     #             put_response = self.client.get(url, format="json", query_params={"node_id":ids[i]})
-    #             self.assertEqual(put_response.data.get("node_name"), "evaluator")
+    #             self.assertEqual(put_response.data.get("node_name"), "predictor")
 
     #     # DELETE
     #     for node_id in ids:
@@ -287,10 +290,10 @@ class PipeLineTest(APITestCase):
     #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
-# class PipelineIntegrationTest(APITestCase):
-#     @classmethod
-#     def setUp(self):
-#         super().setUpClass()
+class PipelineIntegrationTest(APITestCase):
+    @classmethod
+    def setUp(self):
+        super().setUpClass()
 
 #     def test_07_logistic_regression_pipeline_with_iris(self):
 #         # Step 1: Load Iris Data
