@@ -1,10 +1,23 @@
 import '../data/vs_interface.dart';
 import '../data/vs_node_data.dart';
 
+/// A specialized node that bundles multiple inputs into a single output.
+///
+/// This node type is useful for combining multiple input values into a single
+/// output value. It dynamically manages its input ports based on connections.
 class VSListNode extends VSNodeData {
-  ///List Node
+  /// Creates a new [VSListNode] instance.
   ///
-  ///Can be used to add a node that bundles multiple inputs into one output
+  /// [id] is an optional unique identifier for the node.
+  /// [type] is required and specifies the type of the node.
+  /// [widgetOffset] is required and determines the node's position.
+  /// [inputBuilder] is required and used to build input interfaces.
+  /// [outputData] is required and contains the node's output interfaces.
+  /// [nodeWidth] is optional and specifies the node's width.
+  /// [title] is optional and sets the node's display title.
+  /// [toolTip] is optional and provides additional information.
+  /// [onUpdatedConnection] is optional and called when connections change.
+  /// [referenceConnection] is optional and sets the initial connection.
   VSListNode({
     super.id,
     required super.type,
@@ -15,8 +28,6 @@ class VSListNode extends VSNodeData {
     super.title,
     super.toolTip,
     Function(VSInputData interfaceData)? super.onUpdatedConnection,
-
-    ///Can be used to set the initial connection of the first created input
     VSOutputData? referenceConnection,
   }) : super(
           inputData: [
@@ -28,17 +39,18 @@ class VSListNode extends VSNodeData {
     }
   }
 
-  ///Used to build the nodes inputs dynamically
+  /// Used to build the node's inputs dynamically.
   ///
-  ///[index] is the current index of this input in the [inputData] of this node
-  ///
-  ///Make sure to pass [connection] to [initialConnection] of your input interface
-  VSInputData Function(int index, VSOutputData? connection) inputBuilder;
+  /// [index] is the current index of this input in the [inputData] of this node.
+  /// [connection] is the initial connection for this input.
+  final VSInputData Function(int index, VSOutputData? connection) inputBuilder;
 
   @override
   Function(VSInputData interfaceData)? get onUpdatedConnection => _updateInputs;
 
-  ///The inputs of this [VSListNode] without [VSInputData] that have no connectedInterface
+  /// Gets the inputs of this [VSListNode] that have connected interfaces.
+  ///
+  /// Returns a list of [VSInputData] that have non-null [connectedInterface].
   List<VSInputData> getCleanInputs() {
     return inputData
         .where(
@@ -47,6 +59,7 @@ class VSListNode extends VSNodeData {
         .toList();
   }
 
+  /// Updates the input list when a connection changes.
   void _updateInputs(VSInputData interfaceData) {
     final cleanInputData = getCleanInputs();
     _setInputs(cleanInputData.map((e) => e.connectedInterface));
@@ -54,25 +67,27 @@ class VSListNode extends VSNodeData {
     super.onUpdatedConnection?.call(interfaceData);
   }
 
+  /// Sets the input list based on the provided connections.
   void _setInputs(Iterable<VSOutputData?> connectedInterface) {
     final List<VSInputData> newInputData = [];
-    connectedInterface = [...connectedInterface, null];
+    final interfaces = [...connectedInterface, null];
 
-    for (int i = 0; i < connectedInterface.length; i++) {
+    for (int i = 0; i < interfaces.length; i++) {
       final currentInput = inputBuilder(
         i,
-        connectedInterface.elementAtOrNull(i),
+        interfaces.elementAtOrNull(i),
       );
       currentInput.nodeData = this;
       newInputData.add(currentInput);
     }
 
+    // Update the input data list
     inputData = newInputData;
   }
 
-  ///Used for deserializing
+  /// Used for deserializing node data.
   ///
-  ///Reconstructs list connections based on index
+  /// Reconstructs list connections based on the provided input references.
   @override
   void setRefData(Map<String, VSOutputData?> inputRefs) {
     _setInputs(inputRefs.values);

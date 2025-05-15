@@ -12,22 +12,32 @@ class ServerManager {
     if (_isServerRunning) return;
 
     String projectPath = Directory.current.path;
-    //String pathEldemy = '$projectPath\\..\\backend\\run_server.bat';
-    String pathShaltoot = "D:\\GraduationProject\\backend\\run_server.bat";
+    String backendPath = '${projectPath.replaceAll('\\ai_gen', '')}\\backend';
     try {
-      String batchFilePath = pathShaltoot;
-
+      print('Starting server from path: $backendPath');
       await _killExistingServers();
 
-      _serverProcess = await Process.start(batchFilePath, []);
+      // Change to the backend directory first
+      Directory.current = backendPath;
+
+      // Start the server process
+      _serverProcess = await Process.start('cmd', ['/c', 'run_server.bat']);
       _isServerRunning = true;
 
       _serverProcess!.stdout.listen((data) {
-        print(String.fromCharCodes(data));
+        String output = String.fromCharCodes(data);
+        // Only print if it's not a standard Django request log
+        if (!output.contains('"GET /api/') && !output.contains('"POST /api/')) {
+          print('Server output: $output');
+        }
       });
 
       _serverProcess!.stderr.listen((data) {
-        print('Server Manager Error: ${String.fromCharCodes(data)}');
+        String error = String.fromCharCodes(data);
+        // Only print if it's not a standard Django request log
+        if (!error.contains('"GET /api/') && !error.contains('"POST /api/')) {
+          print('Server error: $error');
+        }
       });
 
       _serverProcess!.exitCode.then((exitCode) {
@@ -36,11 +46,14 @@ class ServerManager {
         _serverProcess = null;
       });
 
-      // Wait and verify server is running
+      // Wait and verify server is running with increased timeout and retries
       await _waitForServerToStart();
     } catch (e) {
       print('Failed to start backend server: $e');
       _isServerRunning = false;
+    } finally {
+      // Restore the original directory
+      Directory.current = projectPath;
     }
   }
 
@@ -50,28 +63,47 @@ class ServerManager {
 
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        final response = await _dio.get('http://localhost:8000',
+        print(
+            'Attempting to connect to server (attempt $attempt of $maxAttempts)...');
+
+        // First try the base URL with increased timeout
+        final response = await _dio.get('http://127.0.0.1:8000/api/projects/',
             options: Options(
-              sendTimeout: Duration(seconds: 5),
-              receiveTimeout: Duration(seconds: 5),
-              validateStatus: (status) => status != null && status < 500,
+              sendTimeout: const Duration(seconds: 30),
+              receiveTimeout: const Duration(seconds: 30),
+              validateStatus: (status) =>
+                  status != null && (status >= 200 || status <= 301),
+              followRedirects: true,
             ));
 
-        if (response.statusCode == 200) {
-          print('Server is up and running');
+        if (response.statusCode != null &&
+            response.statusCode! >= 200 &&
+            response.statusCode! <= 301) {
+          print('Server is up and running successfully');
           return;
         }
+        print('Server responded with status code: ${response.statusCode}');
       } catch (e) {
-        print('Waiting for server to start... Attempt $attempt');
+        print('Connection attempt $attempt failed: $e');
+        if (e is DioException) {
+          print('DioError type: ${e.type}');
+          print('DioError message: ${e.message}');
+        }
+      }
+
+      if (attempt < maxAttempts) {
+        print(
+            'Waiting ${waitBetweenAttempts.inSeconds} seconds before next attempt...');
         await Future.delayed(waitBetweenAttempts);
       }
     }
-
-    throw Exception('Could not start server after $maxAttempts attempts');
+    print(
+        'Failed to start server after $maxAttempts attempts. Please check if the backend server is properly configured and running.');
   }
 
   Future<void> _killExistingServers() async {
     try {
+      print('Attempting to kill existing servers...');
       // Kill all Python processes and processes on port 8000
       if (Platform.isWindows) {
         await Process.run('taskkill', ['/F', '/IM', 'python.exe']);
@@ -79,31 +111,25 @@ class ServerManager {
           '/c',
           'for /f "tokens=5" %a in (\'netstat -ano ^| findstr :8000\') do taskkill /PID %a /F'
         ]);
+        print('Successfully killed existing servers');
       } else {
         await Process.run('pkill', ['-f', 'python']);
         await Process.run('fuser', ['-k', '8000/tcp']);
+        print('Successfully killed existing servers');
       }
     } catch (e) {
       print('Error killing existing servers: $e');
+      // Don't rethrow here, as we want to continue even if killing fails
     }
   }
 
   Future<void> stopServer() async {
     if (_serverProcess != null) {
-      try {
-        // Kill all Python processes
-        if (Platform.isWindows) {
-          await Process.run('taskkill', ['/F', '/IM', 'python.exe']);
-        } else {
-          await Process.run('pkill', ['-f', 'python']);
-        }
-
-        _isServerRunning = false;
-        _serverProcess = null;
-        print('Server process terminated');
-      } catch (e) {
-        print('Error stopping server: $e');
-      }
+      print('Stopping server...');
+      await _killExistingServers();
+      _isServerRunning = false;
+      _serverProcess = null;
+      print('Server stopped');
     }
   }
 }

@@ -14,18 +14,22 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        // Check if the widget is still mounted
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-         // MaterialPageRoute(builder: (context) => const DashboardScreen()), // will go to signup screen
-        );
-        // ignore: avoid_print
-        print("Navigating to GridLoader...");
-      }
-    });
+    loadServer();
+  }
+
+  void loadServer() async {
+    // await GetIt.I.get<ServerManager>().startServer();
+
+    await Future.delayed(Duration.zero);
+
+    if (mounted) {
+      // Check if the widget is still mounted
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        // MaterialPageRoute(builder: (context) => const DashboardScreen()), // will go to signup screen
+      );
+    }
   }
 
   @override

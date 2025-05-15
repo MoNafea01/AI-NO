@@ -134,8 +134,8 @@
 //   }
 // }
 
-import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/core/themes/asset_paths.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/outlinedPrimaryButton.dart';

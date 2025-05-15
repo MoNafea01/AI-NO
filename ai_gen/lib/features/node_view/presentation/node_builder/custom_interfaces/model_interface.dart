@@ -1,18 +1,16 @@
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
+import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import 'aino_general_Interface.dart';
-import 'interface_colors.dart';
+import 'base/base_interface.dart';
 import 'network_interface.dart';
 
-Color _interfaceColor = NodeTypes.models.color;
-
-class VSModelInputData extends VSAINOGeneralInputData {
+class VSModelInputData extends BaseInputData {
   ///Basic List input interface
   VSModelInputData({
     required super.type,
+    required super.node,
     super.title,
     super.toolTip,
     super.initialConnection,
@@ -26,12 +24,9 @@ class VSModelInputData extends VSAINOGeneralInputData {
   @override
   List<Type> get acceptedTypes =>
       [VSModelOutputData, VSNetworkOutputData, VSFitterOutputData];
-
-  @override
-  Color get interfaceColor => _interfaceColor;
 }
 
-class VSModelOutputData extends VSAINOGeneralOutputData {
+class VSModelOutputData extends BaseOutputData {
   ///Basic List output interface
   VSModelOutputData({required super.type, required super.node});
 
@@ -47,7 +42,8 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
         "task": node.task,
         "params": node.paramsToJson,
       };
-      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+
+      final INodeServices nodeServerCalls = GetIt.I.get<INodeServices>();
       return await nodeServerCalls.runNode(node, apiBody);
     };
   }
@@ -55,7 +51,4 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
   @override
   Future<dynamic> Function(Map<String, dynamic> data) get outputFunction =>
       _outputFunction;
-
-  @override
-  Color get interfaceColor => node.color;
 }

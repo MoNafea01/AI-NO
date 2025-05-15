@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
+import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -147,8 +147,8 @@ class NodeBuilder {
                   apiBody[input.key] = await input.value;
                 }
               }
-              final NodeServerCalls nodeServerCalls =
-                  GetIt.I.get<NodeServerCalls>();
+              final INodeServices nodeServerCalls =
+                  GetIt.I.get<INodeServices>();
               postResponse = await nodeServerCalls.runNode(node, apiBody);
 
               node.nodeId = postResponse!["node_id"];
@@ -167,8 +167,7 @@ class NodeBuilder {
             }
 
             node.id = postResponse!["node_id"];
-            final NodeServerCalls nodeServerCalls =
-                GetIt.I.get<NodeServerCalls>();
+            final INodeServices nodeServerCalls = GetIt.I.get<INodeServices>();
             return await nodeServerCalls.getNode(node, 2);
           },
         ),
