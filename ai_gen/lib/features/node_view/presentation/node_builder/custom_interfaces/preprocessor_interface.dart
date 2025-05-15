@@ -1,20 +1,18 @@
 import 'dart:async';
 
 import 'package:ai_gen/core/services/interfaces/node_services_interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import 'base/base_interface.dart';
 import 'network_interface.dart';
 
-Color _interfaceColor = NodeTypes.preprocessors.color;
-
-class VSPreprocessorInputData extends VSAINOGeneralInputData {
+class VSPreprocessorInputData extends BaseInputData {
   ///Basic List input interface
   VSPreprocessorInputData({
     required super.type,
+    required super.node,
     super.title,
     super.toolTip,
     super.initialConnection,
@@ -26,17 +24,14 @@ class VSPreprocessorInputData extends VSAINOGeneralInputData {
       [VSPreprocessorOutputData, VSFitterOutputData, VSNetworkOutputData];
 
   @override
-  // TODO: implement inputIcon
+  // implement inputIcon
   IconData get inputIcon => Icons.square_outlined;
 
   @override
   IconData get connectedInputIcon => Icons.square_rounded;
-
-  @override
-  Color get interfaceColor => _interfaceColor;
 }
 
-class VSPreprocessorOutputData extends VSAINOGeneralOutputData {
+class VSPreprocessorOutputData extends BaseOutputData {
   ///Basic List output interface
   VSPreprocessorOutputData({
     required super.type,

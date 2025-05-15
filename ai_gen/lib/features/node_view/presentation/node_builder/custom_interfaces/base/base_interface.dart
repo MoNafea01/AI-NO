@@ -42,6 +42,7 @@ abstract class BaseOutputData extends VSOutputData {
 abstract class BaseInputData extends VSInputData {
   BaseInputData({
     required super.type,
+    required this.node,
     super.title,
     super.toolTip,
     super.initialConnection,
@@ -49,7 +50,8 @@ abstract class BaseInputData extends VSInputData {
     super.connectedInputIcon,
     super.interfaceIconBuilder,
   });
+  NodeModel? node;
 
   @override
-  Color get interfaceColor => NodeTypes.general.color;
+  Color get interfaceColor => node?.color ?? NodeTypes.general.color;
 }

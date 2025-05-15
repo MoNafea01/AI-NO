@@ -9,6 +9,7 @@ class OutputState {
 
 class MultiOutputInputInterface extends BaseInputData {
   MultiOutputInputInterface({
+    required super.node,
     required super.type,
     super.title,
     super.toolTip,

@@ -3,16 +3,14 @@ import 'package:ai_gen/features/node_view/presentation/node_builder/custom_inter
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import 'aino_general_interface.dart';
-import 'interface_colors.dart';
+import 'base/base_interface.dart';
 import 'network_interface.dart';
 
-Color _interfaceColor = NodeTypes.models.color;
-
-class VSModelInputData extends VSAINOGeneralInputData {
+class VSModelInputData extends BaseInputData {
   ///Basic List input interface
   VSModelInputData({
     required super.type,
+    required super.node,
     super.title,
     super.toolTip,
     super.initialConnection,
@@ -26,12 +24,9 @@ class VSModelInputData extends VSAINOGeneralInputData {
   @override
   List<Type> get acceptedTypes =>
       [VSModelOutputData, VSNetworkOutputData, VSFitterOutputData];
-
-  @override
-  Color get interfaceColor => _interfaceColor;
 }
 
-class VSModelOutputData extends VSAINOGeneralOutputData {
+class VSModelOutputData extends BaseOutputData {
   ///Basic List output interface
   VSModelOutputData({required super.type, required super.node});
 
@@ -56,7 +51,4 @@ class VSModelOutputData extends VSAINOGeneralOutputData {
   @override
   Future<dynamic> Function(Map<String, dynamic> data) get outputFunction =>
       _outputFunction;
-
-  @override
-  Color get interfaceColor => node.color;
 }

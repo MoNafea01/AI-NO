@@ -115,12 +115,15 @@ class NodeBuilder {
   VSInputData _inputDots(
       NodeModel node, String inputDot, VSOutputData<dynamic>? ref) {
     if (inputDot == "model" || inputDot == "fitted_model") {
-      return VSModelInputData(type: inputDot, initialConnection: ref);
+      return VSModelInputData(
+          type: inputDot, initialConnection: ref, node: node);
     }
     if (inputDot == "preprocessor" || inputDot == "fitted_preprocessor") {
-      return VSPreprocessorInputData(type: inputDot, initialConnection: ref);
+      return VSPreprocessorInputData(
+          type: inputDot, initialConnection: ref, node: node);
     }
-    return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
+    return VSAINOGeneralInputData(
+        type: inputDot, initialConnection: ref, node: node);
   }
 
   List<VSOutputData> _buildOutputData(NodeModel node) {
