@@ -75,7 +75,7 @@ class NodeLoader:
                 if node_path and os.path.exists(node_path):
                     node_data = joblib.load(node_path)
                 else:
-                    print(Warning(f"Node data file not found at path: {node_path}"))
+                    print(Warning(f"\tWarning Node data file not found at path: {node_path}"))
                     node_data = None
                     
             except Exception as e:

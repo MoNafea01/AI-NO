@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from .models import Component, Node, Project
 import base64
-import time
+import time, uuid
 
 class JSONOrIntField(serializers.Field):
     def to_internal_value(self, data):
@@ -232,7 +232,7 @@ class NodeSerializer(serializers.ModelSerializer):
         
         # Generate a unique node_id if not provided
         if 'node_id' not in validated_data:
-            validated_data["node_id"] = int(time.time() * 1000)
+            validated_data["node_id"] =  uuid.uuid1().int & ((1 << 63) - 1)
                 
         return super().create(validated_data)
     
@@ -280,9 +280,24 @@ class NodeSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    content = serializers.SerializerMethodField()
+
     class Meta:
         model = Project
         fields = '__all__'
+    
+    def get_content(self, obj):
+        """Return all nodes related to this project if requested."""
+        # Check if nodes should be included
+        request = self.context.get('request')
+        include_nodes = request and request.query_params.get('include_nodes', '0') == '1'
+        
+        if not include_nodes:
+            return []
+        
+        nodes = Node.objects.filter(project_id=obj.id)
+        serializer = NodeSerializer(nodes, many=True, context=self.context)
+        return serializer.data
 
 
 def validate(data, keys):

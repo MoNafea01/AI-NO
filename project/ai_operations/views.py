@@ -854,6 +854,8 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
                     item['project_id'] = project_id
                 if item.get('project'):
                     item.pop('project')
+                if not item.get('node_id'):
+                    item['node_id'] = uuid.uuid1().int & ((1 << 63) - 1)
                     
             serializer = self.get_serializer(data=data, many=True)
         else:
@@ -885,6 +887,8 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
             for item in request.data:
                 node_id = item.get('node_id')
                 if not node_id:
+                    # node_id = uuid.uuid1().int & ((1 << 63) - 1)
+                    # item['node_id'] = node_id
                     continue
                 
                 try:
@@ -901,8 +905,24 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
                         
                     instance.save()
                     updated_nodes.append(self.get_serializer(instance).data)
+                    
                 except Node.DoesNotExist:
-                    continue
+                    create_data = item.copy()
+                    if project_id:
+                        create_data['project_id'] = project_id
+
+                    create_serializer = self.get_serializer(data=create_data)
+                    
+                    if create_serializer.is_valid():
+                        new_node = create_serializer.save()
+                        updated_nodes.append(self.get_serializer(new_node).data)
+                    else:
+                        # Add validation errors to response
+                        updated_nodes.append({
+                            "node_id": node_id,
+                            "errors": create_serializer.errors,
+                            "status": "failed_validation"
+                        })
                     
             return Response(updated_nodes, status=status.HTTP_200_OK)
         else:
@@ -913,8 +933,13 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
         """Filter nodes by project if project_id is provided in query params"""
         queryset = Node.objects.all()
         project_id = self.request.query_params.get('project_id', None)
-        if project_id:
+        node_id = self.request.query_params.get('node_id', None)
+        if project_id and node_id:
+            queryset = queryset.filter(project_id=project_id, node_id=node_id)
+        elif project_id:
             queryset = queryset.filter(project_id=project_id)
+        elif node_id:
+            queryset = queryset.filter(node_id=node_id)
         
         return queryset
 
@@ -1301,6 +1326,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "success": True,
             "message": f"Project deleted successfully with {node_count} associated nodes",
         }, status=status.HTTP_200_OK)
+    
 
 class BulkProjectDeleteAPIView(APIView):
     """API view for deleting multiple projects at once."""
@@ -1358,6 +1384,55 @@ class BulkProjectDeleteAPIView(APIView):
                 if not_found_ids and not error_ids:
                     return Response(response_data, status=status.HTTP_404_NOT_FOUND)
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class EmptyProjectsDeleteAPIView(APIView):
+    """API view for deleting projects that have no associated nodes."""
+    
+    def delete(self, request):
+        try:
+            # Find projects with no associated nodes
+            all_projects = Project.objects.all()
+            empty_projects = []
+            
+            for project in all_projects:
+                node_count = Node.objects.filter(project_id=project.id).count()
+                if node_count == 0:
+                    empty_projects.append(project.id)
+            
+            if not empty_projects:
+                return Response({
+                    "message": "No empty projects found",
+                    "deleted_count": 0
+                }, status=status.HTTP_200_OK)
+            
+            # Track deletion results
+            deleted_count = 0
+            error_ids = []
+            
+            # Process each empty project
+            for project_id in empty_projects:
+                try:
+                    project = Project.objects.get(id=project_id)
+                    project.delete()
+                    deleted_count += 1
+                except Exception as e:
+                    error_ids.append({"id": project_id, "error": str(e)})
+            
+            # Prepare response data
+            response_data = {
+                "success": True,
+                "message": f"Successfully deleted {deleted_count} empty projects",
+                "deleted_count": deleted_count,
+                "total_empty_projects": len(empty_projects)
+            }
+            
+            if error_ids:
+                response_data["errors"] = error_ids
             
             return Response(response_data, status=status.HTTP_200_OK)
             
