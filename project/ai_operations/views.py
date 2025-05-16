@@ -180,7 +180,6 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
 
         project_id = None if project_id == "" else project_id
         node_id = request.query_params.get("node_id", None)
-
         if settings.TESTING:
             uid = 0
             default_name = "default"
@@ -224,8 +223,9 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 success, output_ports = self.get_output_ports(component_id = uid)
                 if not success:
                     return output_ports, None, None, None, None
-
-            displayed_name = request.query_params.get('displayed_name', default_name)
+            displayed_name = request.data.get('displayed_name', None)
+            if not displayed_name:
+                displayed_name = request.query_params.get('displayed_name', default_name)
             processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid, 
                                            input_ports=input_ports, output_ports=output_ports, displayed_name=displayed_name)
             BaseNodeAPIView.cur_id += 1
