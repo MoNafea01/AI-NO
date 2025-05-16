@@ -1,3 +1,5 @@
+import uuid
+
 class PayloadBuilder:
     """Constructs payloads for saving and response."""
     @staticmethod
@@ -5,12 +7,15 @@ class PayloadBuilder:
         payload = {
             "message": message,
             "params": {},
-            "node_id": id(nn),
+            "node_id": uuid.uuid1().int & ((1 << 63) - 1),
             "node_name": node_name,
             "node_data": nn,
             "task":"neural_network",
             "children": [],
-            "node_type": "nn_layer"
+            "parent": [],
+            "node_type": "nn_layer",
         }
+        params = kwargs.get("params", {})
+        kwargs['params'] = [{k: v} for k, v in params.items()]
         payload.update(kwargs)
         return payload

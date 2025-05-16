@@ -42,11 +42,15 @@ class BaseNode:
                         payload.update({'children':[self.children]})
                     except Exception as e:
                         return f"Error updating node's children: {e}"
+                if self.parent:
+                    try:
+                        payload.update({'parent':[self.parent]})
+                    except Exception as e:
+                        return f"Error updating node's parent: {e}"
 
             except Exception as e:
                 pass
 
-            # Add project_id to payload if it exists
             if hasattr(self, 'project_id') and self.project_id:
                 payload['project_id'] = self.project_id
             

@@ -14,6 +14,7 @@ class Project(models.Model):
 class Node(models.Model):
     id = models.AutoField(primary_key=True)
     node_id = models.BigIntegerField()
+    displayed_name = models.CharField(max_length=255, default="")
     node_name = models.CharField(max_length=255)
     message = models.CharField(max_length=255, default="Done")
     node_data = models.CharField(max_length=500, null=True, blank=True)
@@ -23,6 +24,7 @@ class Node(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='nodes', null=True, blank=True)
     uid = models.BigIntegerField(null=True, blank=True)
     children = models.JSONField(null=True, blank=True, default=list)
+    parent = models.JSONField(null=True, blank=True, default=list)
     location_x = models.FloatField(default=0.0)
     location_y = models.FloatField(default=0.0)
     input_ports = models.JSONField(default=list)  # List of node_ids for input connections

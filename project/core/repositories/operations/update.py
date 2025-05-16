@@ -28,6 +28,9 @@ class NodeUpdater:
         node_id = int(node_id) if node_id else None
         project_id = int(project_id) if project_id else None
 
+        if isinstance(payload, str):
+            return False, payload
+
         if not isinstance(payload, dict):
             return False, "Payload must be a dictionary."
         

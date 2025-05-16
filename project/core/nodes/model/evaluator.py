@@ -14,6 +14,9 @@ class Evaluator(BaseNode):
         self.metric = metric
         self.project_id=project_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.evaluate(self.y_true, self.y_pred, err)
 
     def evaluate(self, y_true, y_pred, err=None):
@@ -39,9 +42,8 @@ class Evaluator(BaseNode):
                 return f"Error calculating metric: {output}"
             
             payload = PayloadBuilder.build_payload(f"{self.metric} score", output, "evaluator", node_type="metric", task="evaluate",
-                                                   uid=self.uid)
-            if self.project_id:
-                payload['project_id'] = self.project_id
+                                                   uid=self.uid, output_ports=self.output_ports, input_ports=self.input_ports, project_id=self.project_id,
+                                                   displayed_name=self.displayed_name)
             
             project_path = f"{self.project_id}/" if self.project_id else ""
             NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}model")

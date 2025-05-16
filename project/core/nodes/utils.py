@@ -1,5 +1,6 @@
 import os, re, cv2, numpy as np
 from ai_operations.models import Node
+import uuid
 from core.nodes.configs.const_ import (
     MODELS_TASKS, PREPROCESSORS_TASKS, NN_TASKS, DATA_HANDLER_TASKS, NN_NAMES, MODELS_NAMES, PREPROCESSORS_NAMES, DATA_HANDLER_NAMES)
 from .configs.const_ import MODELS_NAMES, PREPROCESSORS_NAMES
@@ -25,11 +26,12 @@ class PayloadBuilder:
     def build_payload(message, node_data, node_name, **kwargs):
         payload = {
             "message": message,
-            "node_id": id(node_data),
+            "node_id": uuid.uuid1().int & ((1 << 63) - 1),
             "node_name": node_name,
             "node_data": node_data,
             "task": "custom",
             "children": [],
+            "parent": [],
         }
         if node_name in MODELS_NAMES:
             payload["params"] = ModelAttributeExtractor.get_attributes(node_data)
@@ -37,7 +39,9 @@ class PayloadBuilder:
             payload["params"] = PreprocessorAttributeExtractor.get_attributes(node_data)
         else:
             payload["params"] = NodeAttributeExtractor.get_attributes(node_data)
-            
+        
+        params = kwargs.get("params", {})
+        kwargs['params'] = [{k: v} for k, v in params.items()]
         payload.update(kwargs)
         return payload
 

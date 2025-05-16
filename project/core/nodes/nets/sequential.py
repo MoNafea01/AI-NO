@@ -15,6 +15,9 @@ class SequentialNet(BaseLayer):
 
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         super().__init__(project_id=project_id, err=err)
 
     
@@ -64,4 +67,7 @@ class SequentialNet(BaseLayer):
             "message": "Sequential model created",
             "node_name": "sequential_model",
             "uid": self.uid,
+            "input_ports": self.input_ports,
+            "output_ports": self.output_ports,
+            "displayed_name": self.displayed_name,
         }

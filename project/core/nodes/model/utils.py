@@ -11,6 +11,9 @@ class PayloadBuilder:
             "node_name": node_name,
             "node_data": model,
             "children": [],
+            "parent": [],
         }
+        params = kwargs.get("params", {})
+        kwargs['params'] = [{k: v} for k, v in params.items()]
         payload.update(kwargs)
         return payload

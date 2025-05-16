@@ -19,6 +19,9 @@ class Preprocessor(BaseNode):
 
         self.params = default_params
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
 
         super().__init__(project_id=project_id)
 
@@ -43,6 +46,10 @@ class Preprocessor(BaseNode):
             "node_type": self.get_type,
             "node_name": self.node_name,
             "uid": self.uid,
+            "input_ports": self.input_ports,
+            "output_ports": self.output_ports,
+            "displayed_name": self.displayed_name,
+            "project_id": self.project_id,
         }
 
     def get_params(self):

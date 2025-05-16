@@ -16,6 +16,9 @@ class Conv2DLayer(BaseLayer):
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         super().__init__(project_id=project_id)
 
     @property
@@ -43,6 +46,9 @@ class Conv2DLayer(BaseLayer):
             "message": "Conv2D layer created",
             "node_name": "conv2d_layer",
             "uid": self.uid,
+            "input_ports": self.input_ports,
+            "output_ports": self.output_ports,
+            "displayed_name": self.displayed_name,
         }
 
 
@@ -59,6 +65,9 @@ class MaxPool2DLayer(BaseLayer):
         self.prev_node = self.load_args(prev_node, attr="node_id")
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         super().__init__(project_id=project_id)
     
     @property
@@ -84,4 +93,7 @@ class MaxPool2DLayer(BaseLayer):
             "message": "MaxPooling2D layer created",
             "node_name": "maxpool2d_layer",
             "uid": self.uid,
+            "input_ports": self.input_ports,
+            "output_ports": self.output_ports,
+            "displayed_name": self.displayed_name,
         }

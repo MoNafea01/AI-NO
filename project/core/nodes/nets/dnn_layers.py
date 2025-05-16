@@ -13,6 +13,9 @@ class DenseLayer(BaseLayer):
         self.layer_path = path
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
 
         self.prev_node = self.load_args(prev_node, attr="node_id")
         super().__init__(project_id=project_id)
@@ -40,6 +43,9 @@ class DenseLayer(BaseLayer):
             "message": "Dense layer created",
             "node_name": "dense_layer",
             "uid": self.uid,
+            "input_ports": self.input_ports,
+            "output_ports": self.output_ports,
+            "displayed_name": self.displayed_name,
         }
 
 
@@ -52,6 +58,9 @@ class DropoutLayer(BaseLayer):
         self.name = name
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
 
         self.prev_node = self.load_args(prev_node, attr="node_id")
         super().__init__(project_id=project_id)
@@ -77,4 +86,7 @@ class DropoutLayer(BaseLayer):
             "message": "Dropout layer created",
             "node_name": "dropout_layer",
             "uid": self.uid,
+            "input_ports": self.input_ports,
+            "output_ports": self.output_ports,
+            "displayed_name": self.displayed_name,
         }

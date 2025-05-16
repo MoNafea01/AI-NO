@@ -5,6 +5,7 @@ from io import BytesIO
 from ai_operations.models import Node
 from django.core.exceptions import ObjectDoesNotExist
 from core.nodes.utils import NodeNameHandler
+import uuid
 
 
 class NodeLoader:
@@ -47,8 +48,11 @@ class NodeLoader:
             project_id: int = None,
             path: str = None, 
             ) -> dict:
+        
         node_id = int(node_id) if node_id else None
         project_id = int(project_id) if project_id else None
+
+        
         if not (node_id  or path):
             return False, "Either(node_id and project_id) or path must be provided."
         
@@ -91,12 +95,13 @@ class NodeLoader:
             payload = {
                     "message": f"Node {name} Loaded.",
                     "node_name": "node_loader",
-                    "node_id": id(self),
+                    "node_id": uuid.uuid1().int & ((1 << 63) - 1),
                     "params": {},
                     "task": "load_node",
                     "node_type": "loader",
                     "project": project_id,
                     "children": [],
+                    "parent": [],
                 }
             
                 

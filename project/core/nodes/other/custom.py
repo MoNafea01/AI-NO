@@ -16,6 +16,9 @@ class Joiner(BaseNode):
             err = "Failed to load Nodes (data_1, data_2) at least one of them. Please check the provided IDs."
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.join(err)
     
     def join(self, err = None):
@@ -24,7 +27,7 @@ class Joiner(BaseNode):
         try:
             joined_data = (self.data_1, self.data_2)
             payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join", project_id=self.project_id,
-                                                   uid=self.uid)
+                                                   uid=self.uid, input_ports=self.input_ports, output_ports=self.output_ports, displayed_name=self.displayed_name)
             
             project_path = f"{self.project_id}/" if self.project_id else ""
             NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}other")
@@ -49,6 +52,9 @@ class Splitter:
         if isinstance(self.data, str):
             err = "Failed to load data. Please check the provided ID."
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.split(err)
 
     def split(self, err=None):
@@ -58,10 +64,13 @@ class Splitter:
             out1, out2 = self.data
 
             payload = []
-            payload.append(PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split", project_id=self.project_id, uid=self.uid))
+            payload.append(PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split", project_id=self.project_id, uid=self.uid,
+                                                        location_x=self.get_location()[0], location_y=self.get_location()[1], input_ports=self.input_ports, output_ports=self.output_ports,
+                                                        displayed_name=self.displayed_name))
             
             for i in range(1, 3):
-                payload.append(PayloadBuilder.build_payload(f"data_{i}", [out1, out2][i-1], "splitter", node_type="custom", task="split", project_id=self.project_id, uid=self.uid))
+                payload.append(PayloadBuilder.build_payload(f"data_{i}", [out1, out2][i-1], "splitter", node_type="custom", task="split", project_id=self.project_id, uid=self.uid,
+                                                            parent=[payload[0]['node_id']]))
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
@@ -73,6 +82,21 @@ class Splitter:
         except Exception as e:
             return f"Error splitting data: {e}"
     
+    def get_location(self):
+        in_ports = self.input_ports
+        in_ports_names = [port.get("connectedNode").get("name") for port in in_ports]
+        if "X" in in_ports_names:
+            X_location, y_location = 500.0, 500.0
+        elif "X_Split" in in_ports_names:
+            X_location, y_location = 600.0, 500.0
+        elif "y" in in_ports_names:
+            X_location, y_location = 500.0, 300.0
+        elif "y_Split" in in_ports_names:
+            X_location, y_location = 600.0, 300.0
+        else:
+            X_location, y_location = 500.0, 400.0
+        return X_location, y_location
+
     def __str__(self):
         return f"data: {self.payload}"
     
