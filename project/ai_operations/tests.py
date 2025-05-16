@@ -168,126 +168,123 @@ class PipeLineTest(APITestCase):
             self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
 
 
-    # def test_05_model_predictor(self, url='/api/predict/', _requests_=_requests_['predict_model']):
-    #     ids = []
-    #     data = self.client.post(f"/api/data_loader/",{"params": {"dataset_name":"iris"}}, format="json")
-    #     node_id = data.data.get("node_id")
+    def test_05_model_predictor(self, url='/api/predict/', _requests_=_requests_['predict_model']):
+        ids = []
+        data = self.client.post(f"/api/data_loader/",{"params": {"dataset_name":"iris"}}, format="json")
+        node_id = data.data.get("node_id")
 
-    #     data = self.client.get(f"/api/data_loader/", format="json", query_params={"node_id":node_id, "return_data": 1})
-    #     X, y = data.data.get("children")
+        data = self.client.get(f"/api/data_loader/", format="json", query_params={"node_id":node_id, "return_data": 1})
+        X, y = data.data.get("children")
 
-    #     data = self.client.post(f"/api/train_test_split/", {"X": X, "y": y, "params": {"test_size": 0.2, "random_state": 42}}, format="json")
+        data = self.client.post(f"/api/train_test_split/", {"X": X, "y": y, "params": {"test_size": 0.2, "random_state": 42}}, format="json")
 
-    #     data = self.client.get(f"/api/train_test_split/", format="json", query_params={"node_id":data.data.get("node_id"), "return_data": 1})
-    #     (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
-
-       
-    #     model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
-    #     model = self.client.post(f"/api/fit_model/", {"X": X_train, "y": y_train, "model": model}, format="json").data.get("node_id")
-
-    #     # POST
-    #     for data in _requests_['post']:
-    #         if not data.get("fitted_model_path"):
-    #             data.update({"fitted_model":model})
-
-    #         data.update({"X": X_test})
-    #         post_response = self.client.post(url, data, format="json")
-    #         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
-    #         self.assertEqual(post_response.data.get("node_name"), "predictor")
-    #         node_id = post_response.data.get("node_id")
-    #         ids.append(node_id)
-    #         self.assertIsNotNone(node_id)
-
-    #     # GET
-    #     for query in _query_set_['get']:
-    #         for value in query['values']:
-    #             for i in range(len(ids)):
-    #                 get_response = self.client.get(url, format="json", query_params={"node_id":ids[i], query['name']:value})
-    #                 self.assertEqual(get_response.status_code, status.HTTP_200_OK)
-
-    #     # PUT
-    #     for data in _requests_['put']:
-    #         if not data.get("fitted_model_path"):
-    #             data.update({"fitted_model_path":model})
-
-    #         data.update({"X": X_test})
-    #         for i in range(len(ids)):
-    #             put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i]})
-    #             self.assertEqual(put_response.status_code, status.HTTP_200_OK)
-    #             # Verify updated model details
-    #             put_response = self.client.get(url, format="json", query_params={"node_id":ids[i]})
-    #             self.assertEqual(put_response.data.get("node_name"), "predictor")
-
-    #     # DELETE
-    #     for node_id in ids:
-    #         delete_response = self.client.delete(url, format="json", query_params={"node_id":node_id})
-    #         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
-
-
-    # def test_06_evaluate(self, url='/api/evaluate/', _requests_=_requests_['evaluate_model']):
-    #     ids = []
-    #     data = self.client.post(f"/api/data_loader/",{"params": {"dataset_name":"iris"}}, format="json")
-    #     node_id = data.data.get("node_id")
-
-    #     data = self.client.get(f"/api/data_loader/", format="json", query_params={"node_id":node_id, "return_data": 1})
-    #     X, y = data.data.get("children")
-
-    #     data = self.client.post(f"/api/train_test_split/", {"X": X, "y": y, "params": {"test_size": 0.2, "random_state": 42}}, format="json")
-
-    #     data = self.client.get(f"/api/train_test_split/", format="json", query_params={"node_id":data.data.get("node_id"), "return_data": 1})
-    #     (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
+        data = self.client.get(f"/api/train_test_split/", format="json", query_params={"node_id":data.data.get("node_id"), "return_data": 1})
+        (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
 
        
-    #     model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
-    #     model = self.client.post(f"/api/fit_model/", {"X": X_train, "y": y_train, "model": model}, format="json").data.get("node_id")
+        model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
+        model = self.client.post(f"/api/fit_model/", {"X": X_train, "y": y_train, "model": model}, format="json").data.get("node_id")
 
-    #     y_pred = self.client.post(f"/api/predict/", {"X": X_test, "fitted_model": model}, format="json").data.get("node_id")
+        # POST
+        for data in _requests_['post']:
+            if not data.get("fitted_model_path"):
+                data.update({"fitted_model":model})
 
-    #     data = self.client.post(f"/api/splitter/", {"data": y} , format="json")
-    #     y_train, y_test = data.data.get("children")
-    #     # POST
-    #     for data in _requests_['post']:
-    #         if not data.get("fitted_model_path"):
-    #             data.update({"fitted_model":model})
+            data.update({"X": X_test})
+            post_response = self.client.post(url, data, format="json")
+            self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(post_response.data.get("node_name"), "predictor")
+            node_id = post_response.data.get("node_id")
+            ids.append(node_id)
+            self.assertIsNotNone(node_id)
 
-    #         data.update({"X": X_test})
-    #         post_response = self.client.post(url, data, format="json")
-    #         self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
-    #         self.assertEqual(post_response.data.get("node_name"), "predictor")
-    #         node_id = post_response.data.get("node_id")
-    #         ids.append(node_id)
-    #         self.assertIsNotNone(node_id)
+        # GET
+        for query in _query_set_['get']:
+            for value in query['values']:
+                for i in range(len(ids)):
+                    get_response = self.client.get(url, format="json", query_params={"node_id":ids[i], query['name']:value})
+                    self.assertEqual(get_response.status_code, status.HTTP_200_OK)
 
-    #     # GET
-    #     for query in _query_set_['get']:
-    #         for value in query['values']:
-    #             for i in range(len(ids)):
-    #                 get_response = self.client.get(url, format="json", query_params={"node_id":ids[i], query['name']:value})
-    #                 self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+        # PUT
+        for data in _requests_['put']:
+            if not data.get("fitted_model_path"):
+                data.update({"fitted_model_path":model})
 
-    #     # PUT
-    #     for data in _requests_['put']:
-    #         if not data.get("fitted_model_path"):
-    #             data.update({"fitted_model_path":model})
+            data.update({"X": X_test})
+            for i in range(len(ids)):
+                put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i]})
+                self.assertEqual(put_response.status_code, status.HTTP_200_OK)
+                # Verify updated model details
+                put_response = self.client.get(url, format="json", query_params={"node_id":ids[i]})
+                self.assertEqual(put_response.data.get("node_name"), "predictor")
 
-    #         data.update({"X": X_test})
-    #         for i in range(len(ids)):
-    #             put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i]})
-    #             self.assertEqual(put_response.status_code, status.HTTP_200_OK)
-    #             # Verify updated model details
-    #             put_response = self.client.get(url, format="json", query_params={"node_id":ids[i]})
-    #             self.assertEqual(put_response.data.get("node_name"), "predictor")
-
-    #     # DELETE
-    #     for node_id in ids:
-    #         delete_response = self.client.delete(url, format="json", query_params={"node_id":node_id})
-    #         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        # DELETE
+        for node_id in ids:
+            delete_response = self.client.delete(url, format="json", query_params={"node_id":node_id})
+            self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
 
 
-    # def test_08_clear_nodes(self, url='/api/clear_nodes/'):
-    #     # Clear all nodes
-    #     response = self.client.delete(url, format="json")
-    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    def test_06_evaluate(self, url='/api/evaluate/', _requests_=_requests_['evaluate_model']):
+        ids = []
+        data = self.client.post(f"/api/data_loader/",{"params": {"dataset_name":"iris"}}, format="json")
+        node_id = data.data.get("node_id")
+
+        data = self.client.get(f"/api/data_loader/", format="json", query_params={"node_id":node_id, "return_data": 1})
+        X, y = data.data.get("children")
+
+        data = self.client.post(f"/api/train_test_split/", {"X": X, "y": y, "params": {"test_size": 0.2, "random_state": 42}}, format="json")
+
+        data = self.client.get(f"/api/train_test_split/", format="json", query_params={"node_id":data.data.get("node_id"), "return_data": 1})
+        X, y = data.data.get("children")
+        (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
+        
+        model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
+
+        model = self.client.post(f"/api/fit_model/", {"X": X_train, "y": y_train, "model": model}, format="json").data.get("node_id")
+
+        y_pred = self.client.post(f"/api/predict/", {"X": X_test, "fitted_model": model}, format="json").data.get("node_id")
+
+        data = self.client.post(f"/api/splitter/", {"data": y} , format="json")
+        y_train, y_test = data.data.get("children")
+        # POST
+        for data in _requests_['post']:
+            data.update({"y_pred": y_pred, "y_true": y_test})
+
+            post_response = self.client.post(url, data, format="json")
+            self.assertEqual(post_response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(post_response.data.get("node_name"), "evaluator")
+            node_id = post_response.data.get("node_id")
+            ids.append(node_id)
+            self.assertIsNotNone(node_id)
+
+        # GET
+        for query in _query_set_['get']:
+            for value in query['values']:
+                for i in range(len(ids)):
+                    get_response = self.client.get(url, format="json", query_params={"node_id":ids[i], query['name']:value})
+                    self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+
+        # PUT
+        for data in _requests_['put']:
+            data.update({"y_pred": y_pred, "y_true": y_test})
+
+            for i in range(len(ids)):
+                put_response = self.client.put(url, data, format="json", query_params={"node_id":ids[i]})
+                self.assertEqual(put_response.status_code, status.HTTP_200_OK)
+                # Verify updated model details
+                put_response = self.client.get(url, format="json", query_params={"node_id":ids[i]})
+                self.assertEqual(put_response.data.get("node_name"), "evaluator")
+
+        # DELETE
+        for node_id in ids:
+            delete_response = self.client.delete(url, format="json", query_params={"node_id":node_id})
+            self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+    def test_08_clear_nodes(self, url='/api/clear_nodes/'):
+        # Clear all nodes
+        response = self.client.delete(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 class PipelineIntegrationTest(APITestCase):
@@ -295,151 +292,120 @@ class PipelineIntegrationTest(APITestCase):
     def setUp(self):
         super().setUpClass()
 
-#     def test_07_logistic_regression_pipeline_with_iris(self):
-#         # Step 1: Load Iris Data
-#         url = reverse('data_loader')  # make sure to define your URL names accordingly
+    def test_07_logistic_regression_pipeline_with_iris(self):
+        # Step 1: Load Iris Data
+        url = reverse('data_loader')  # make sure to define your URL names accordingly
 
-#         data = {"params": {"dataset_name": "diabetes"}}
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         response = self.client.put(url, {"params":{"dataset_name":"iris"}}, format='json', query_params={"node_id":response.data.get('node_id'), "project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         data_loader_X, data_loader_y = response.data.get('children')
-#         self.assertIsNotNone(data_loader_X)
-#         self.assertIsNotNone(data_loader_y)
+        data = {"params": {"dataset_name": "iris"}}
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response = self.client.put(url, {"params":{"dataset_name":"iris"}}, format='json', query_params={"node_id":response.data.get('node_id'), "project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data_loader_X, data_loader_y = response.data.get('children')
+        self.assertIsNotNone(data_loader_X)
+        self.assertIsNotNone(data_loader_y)
 
-#         # Step 2: Split the Data
-#         url = reverse('train_test_split')
-#         data = {
-#             "X": data_loader_X,
-#             "y": data_loader_y,
-#             "params":{"test_size": 0.3, "random_state": 42}
-#         }
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         X, y = response.data.get('children')
-#         self.assertIsNotNone(X)
-#         self.assertIsNotNone(y)
+        # Step 2: Split the Data
+        url = reverse('train_test_split')
+        data = {
+            "X": data_loader_X,
+            "y": data_loader_y,
+            "params":{"test_size": 0.3, "random_state": 42}
+        }
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        X, y = response.data.get('children')
+        self.assertIsNotNone(X)
+        self.assertIsNotNone(y)
         
 
-#         data = self.client.get(reverse('train_test_split'), format="json", query_params={"node_id":response.data.get("node_id"), "return_data": 1, "project_id": 1})
-#         (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
+        data = self.client.get(reverse('train_test_split'), format="json", query_params={"node_id":response.data.get("node_id"), "return_data": 1, "project_id": 1})
+        (X_train, X_test),(y_train, y_test) = data.data.get("node_data")
 
-#         # Step 3: Create Scaler Preprocessor
-#         url = reverse('create_preprocessor')
-#         data = {
-#             "preprocessor_name": "standard_scaler",
-#             "preprocessor_type": "scaler"
-#         }
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         preprocessor_id = response.data.get('node_id')
-#         self.assertIsNotNone(preprocessor_id)
+        # Step 3: Create Scaler Preprocessor
+        url = reverse('create_preprocessor')
+        data = {
+            "preprocessor_name": "standard_scaler",
+            "preprocessor_type": "scaler"
+        }
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        preprocessor_id = response.data.get('node_id')
+        self.assertIsNotNone(preprocessor_id)
 
-#         # Step 4: Fit the Preprocessor
-#         url = reverse('fit_transform')
-#         data = {
-#             "data": X_train,
-#             "preprocessor": preprocessor_id
-#         }
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         fitted_preprocessor_id, X_train = response.data.get('children')
-#         self.assertIsNotNone(fitted_preprocessor_id)
-#         self.assertIsNotNone(X_train)
+        # Step 4: Fit the Preprocessor
+        url = reverse('fit_transform')
+        data = {
+            "data": X_train,
+            "preprocessor": preprocessor_id
+        }
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        fitted_preprocessor_id, X_train = response.data.get('children')
+        self.assertIsNotNone(fitted_preprocessor_id)
+        self.assertIsNotNone(X_train)
         
-#         url = reverse('transform')
-#         data = {
-#             "data": X_test,
-#             "fitted_preprocessor": fitted_preprocessor_id
-#         }
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         X_test = response.data.get('node_id')
-#         self.assertIsNotNone(X_test)
+        url = reverse('transform')
+        data = {
+            "data": X_test,
+            "fitted_preprocessor": fitted_preprocessor_id
+        }
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        X_test = response.data.get('node_id')
+        self.assertIsNotNone(X_test)
 
-#         # Step 6: Create Logistic Regression Model
-#         url = reverse('create_model')
-#         data = {
-#             "model_name": "logistic_regression",
-#             "model_type": "linear_models",
-#             "task": "classification"
-#         }
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         model_id = response.data.get('node_id')
-#         self.assertIsNotNone(model_id)
-
-
-#         # Step 7: Fit the Model
-#         url = reverse('fit_model')
-#         data = {
-#             "X": X_train,
-#             "y": y_train,
-#             "model": model_id
-#         }
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         fitted_model_id = response.data.get('node_id')
-#         self.assertIsNotNone(fitted_model_id)
-
-#         # Step 8: Generate Predictions
-#         url = reverse('predict_model')
-#         data = {
-#             "X": X_test,
-#             "fitted_model": fitted_model_id
-#         }
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         predictions_id = response.data.get('node_id')
-#         self.assertIsNotNone(predictions_id)
-
-#         # Step 9: Evaluate the Results
-#         url = reverse('evaluate')
-#         data = {
-#             "params": {"metric": "accuracy"},
-#             "y_true": y_test,
-#             "y_pred": predictions_id
-#         }
-#         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         response = self.client.get(url, query_params={"node_id":response.data.get('node_id'), 'return_data':1, "project_id": 1})
-#         score = response.data.get('node_data')
-#         self.assertIsNotNone(score)
-
-#         print(f"SCORE: {score*100} %") 
-
-#         self.client.delete(reverse('clear_nodes'), query_params={"test":1, "project_id": 1})
-
-# class Testing_Functions(APITestCase):
-    # @classmethod
-    # def setUp(self):
-    #     super().setUpClass()
-
-    # def test_01_test_function(self):
-
-    #     def update_child(node:dict):
-    #         l = []
-    #         children_ids = node.get('children')
-    #         if len(children_ids) >= 1:
-    #             for i, child_id in enumerate(node.get('children')):
-    #                 child = self.client.get('/api/create_model/', query_params={"node_id":child_id}).data
-    #                 child['node_id'] = id(child)
-    #                 node['children'][i] = child['node_id']
-    #                 print(f"child {i}: {child.get('node_id')}")
-    #                 l.append(child['node_id'])
-    #                 update_child(child)
-    #         node.update({"children": l, "node_id": id(node)})
-    #         return node
+        # Step 6: Create Logistic Regression Model
+        url = reverse('create_model')
+        data = {
+            "model_name": "logistic_regression",
+            "model_type": "linear_models",
+            "task": "classification"
+        }
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        model_id = response.data.get('node_id')
+        self.assertIsNotNone(model_id)
 
 
-    #     node = self.client.post('/api/create_input/', {'params':{'shape': [4]}}, format='json').data
-    #     print(f"input_layer_id: {node.get('node_id')}")
-    #     node = self.client.post('/api/dense/', {'prev_node': node.get('node_id')}, format='json').data
-    #     print(f"dense__id: {node.get('node_id')}")
-    #     node = self.client.post('/api/dense/', {'prev_node': node.get('node_id')}, format='json').data
-    #     print(f"dense_2_id: {node.get('node_id')}")
+        # Step 7: Fit the Model
+        url = reverse('fit_model')
+        data = {
+            "X": X_train,
+            "y": y_train,
+            "model": model_id
+        }
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        fitted_model_id = response.data.get('node_id')
+        self.assertIsNotNone(fitted_model_id)
 
-    #     update_child(node)
-    #     # print(l)
-    #     print(node)
+        # Step 8: Generate Predictions
+        url = reverse('predict_model')
+        data = {
+            "X": X_test,
+            "fitted_model": fitted_model_id
+        }
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        predictions_id = response.data.get('node_id')
+        self.assertIsNotNone(predictions_id)
+
+        # Step 9: Evaluate the Results
+        url = reverse('evaluate')
+        data = {
+            "params": {"metric": "accuracy"},
+            "y_true": y_test,
+            "y_pred": predictions_id
+        }
+        response = self.client.post(url, data, format='json', query_params={"project_id": 1})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response = self.client.get(url, query_params={"node_id":response.data.get('node_id'), 'return_data':1, "project_id": 1})
+        score = response.data.get('node_data')
+        self.assertIsNotNone(score)
+
+        print(f"\nSCORE: {score*100} %") 
+
+        self.client.delete(reverse('clear_nodes'), query_params={"test":1, "project_id": 1})
+
+
