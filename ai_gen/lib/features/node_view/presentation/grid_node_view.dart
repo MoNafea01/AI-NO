@@ -4,7 +4,6 @@ import 'package:ai_gen/features/node_view/presentation/widgets/custom_fab.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 
 import '../cubit/grid_node_view_cubit.dart';
 import 'widgets/menu_actions.dart';
@@ -36,7 +35,7 @@ class _GridNodeViewState extends State<GridNodeView> {
   @override
   void dispose() {
     nodeDataProvider.dispose();
-    GetIt.I.get<GridNodeViewCubit>().onDispose();
+    // GetIt.I.get<GridNodeViewCubit>().onDispose();
     super.dispose();
   }
 
@@ -108,7 +107,7 @@ class _GridNodeViewState extends State<GridNodeView> {
     return const Positioned(
       bottom: 10,
       left: 10,
-      child: Text("V0.8.8+4"),
+      child: Text("V0.8.8+5"),
     );
   }
 

@@ -1,7 +1,5 @@
-import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import 'base/base_interface.dart';
 import 'model_interface.dart';
@@ -47,7 +45,7 @@ class VSNodeTemplateSaverOutputData extends BaseOutputData {
     return (Map<String, dynamic> data) async {
       await runNodeWithData(data);
 
-      GetIt.I.get<GridNodeViewCubit>().loadNodeView();
+      // GetIt.I.get<GridNodeViewCubit>().loadNodeView();
     };
   }
 
