@@ -83,7 +83,7 @@ class ParameterModel {
         return ParameterType.listString;
       case 'bool':
         return ParameterType.boolean;
-      case 'path':
+      case 'path' || "path_file" || "path_folder":
         return ParameterType.path;
       default:
         return ParameterType.string;

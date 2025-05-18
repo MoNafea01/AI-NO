@@ -9,6 +9,7 @@ import '../../../../main.dart';
 import 'custom_interfaces/aino_general_interface.dart';
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
+import 'custom_interfaces/node_template_saver_interface.dart';
 import 'custom_interfaces/preprocessor_interface.dart';
 
 class NodeBuilder {
@@ -122,6 +123,11 @@ class NodeBuilder {
       return VSPreprocessorInputData(
           type: inputDot, initialConnection: ref, node: node);
     }
+    if (node.name == "node_template_saver") {
+      return VSNodeTemplateSaverInputData(
+          type: inputDot, initialConnection: ref, node: node);
+    }
+
     return VSAINOGeneralInputData(
         type: inputDot, initialConnection: ref, node: node);
   }
@@ -151,6 +157,10 @@ class NodeBuilder {
         )
       ];
     }
+    if (node.name == "node_template_saver") {
+      return [VSNodeTemplateSaverOutputData(type: outputDot, node: node)];
+    }
+
     return [VSAINOGeneralOutputData(type: outputDot, node: node)];
   }
 

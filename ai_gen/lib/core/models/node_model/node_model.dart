@@ -8,6 +8,7 @@ class NodeModel {
   dynamic nodeId;
   int? projectId;
   int? index;
+  int? order;
   String name;
   String? displayName;
   String? description;
@@ -23,6 +24,7 @@ class NodeModel {
   NodeModel({
     required this.id,
     this.index,
+    this.order,
     this.name = "Node",
     this.displayName,
     this.description,
@@ -42,6 +44,7 @@ class NodeModel {
     required int projectId,
     int? id,
     dynamic nodeId,
+    int? order,
     int? index,
     String? name,
     String? displayName,
@@ -72,6 +75,7 @@ class NodeModel {
       outputDots: outputDots ?? this.outputDots,
       endPoint: endPoint ?? this.endPoint,
       offset: offset ?? this.offset,
+      order: order ?? this.order,
     );
   }
 
@@ -141,6 +145,7 @@ class NodeModel {
     json['location_y'] = offset?.dy;
     json['project'] = projectId;
     json['node_id'] = nodeId;
+    json['order'] = order;
     return json;
   }
 
