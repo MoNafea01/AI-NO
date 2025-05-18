@@ -29,7 +29,7 @@ class InputLayer(BaseLayer):
         return f"input_layer_{self.cur_id}"
     
     def get_params(self):
-        return {"shape": self.shape, "name": self.name}
+        return {"shape": self.shape}
     
     def payload_configs(self):
         return {

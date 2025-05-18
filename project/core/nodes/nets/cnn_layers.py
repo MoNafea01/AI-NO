@@ -37,8 +37,7 @@ class Conv2DLayer(BaseLayer):
                 "kernel_size": self.kernel_size, 
                 "strides": self.strides, 
                 "padding": self.padding, 
-                "activation": self.activation, 
-                "name": self.name,
+                "activation": self.activation
                 }
     
     def payload_configs(self):
@@ -84,8 +83,7 @@ class MaxPool2DLayer(BaseLayer):
     def get_params(self):
         return {"pool_size": self.pool_size, 
                 "strides": self.strides, 
-                "padding": self.padding, 
-                "name": self.name,
+                "padding": self.padding
                 }
 
     def payload_configs(self):

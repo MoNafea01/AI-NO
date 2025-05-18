@@ -125,7 +125,6 @@ class PipeLineTest(APITestCase):
         node_id = data.data.get("node_id")
 
         data = self.client.get(f"/api/data_loader/", format="json", query_params={"node_id":node_id, "return_data": 1})
-
         X, y = data.data.get("children")
         model = self.client.post(f"/api/create_model/", {"model_name": "logistic_regression","model_type": "linear_models","task": "classification"}, format="json").data.get("node_id")
 
@@ -300,6 +299,7 @@ class PipelineIntegrationTest(APITestCase):
         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.put(url, {"params":{"dataset_name":"iris"}}, format='json', query_params={"node_id":response.data.get('node_id'), "project_id": 1})
+        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data_loader_X, data_loader_y = response.data.get('children')
         self.assertIsNotNone(data_loader_X)

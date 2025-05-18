@@ -24,4 +24,4 @@ router:
 clarification:
   model: gemini-1.5-flash
   prompt_template: file:clarification_template.txt
-  node_mapping: res/node_mapping.json
+  data_mapping: res/data_mapping.json

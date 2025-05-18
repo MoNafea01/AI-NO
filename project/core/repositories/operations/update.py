@@ -37,7 +37,7 @@ class NodeUpdater:
         try:
             # take the <old> node (by its id)
             node = Node.objects.get(node_id=node_id, project_id=project_id) # get node from database
-
+            
             folder_path = None
             if node.node_data is None:
                 folder_name = FolderHandler.get_folder_by_node_name(node.node_name)
@@ -77,14 +77,31 @@ class NodeUpdater:
             if payload['node_name'] not in PARENT_NODES:
                 payload['children'] = node.children
             
+
+            if payload.get("node_name") in PARENT_NODES:
+                payload['parent'] = node.parent
+
+                # Compatability with old versions
+                if not payload.get('parent'):
+                    payload['parent'] = node.children
+
+                # this part updates the parent node's children to get the current node
+                if len(payload['parent']) == 1:
+                    Node.objects.filter(node_id=payload['parent'][0], project_id=project_id).update(children=[node.node_id])
+            
+            if payload.get("node_name") in MULTI_CHANNEL_NODES:
+                for child in payload.get("children"):
+                    Node.objects.filter(node_id=child, project_id=project_id).update(parent=[node.node_id])
+            
             NodeSaver()(payload, path=folder_path)
             NodeDeleter(is_multi_channel)(original_id, project_id=project_id)
             
             # this part to delete node if its name isn't same as new one's name
             if node.node_name != payload.get("node_name") and node.node_name != "node_loader":
-                node_path = node.node_data
-                if os.path.exists(node_path):
-                    os.remove(node_path)
+                if node.task != "template":
+                    node_path = node.node_data
+                    if node_path and os.path.exists(node_path):
+                        os.remove(node_path)
 
             # serialization part
             success, out_node = NodeLoader(return_serialized=self.return_serialized)(node_id, project_id=project_id)

@@ -34,8 +34,7 @@ class DenseLayer(BaseLayer):
     def get_params(self):
         return {
             "units": self.units, 
-            "activation": self.activation, 
-            "name": self.name,
+            "activation": self.activation
         }
     
     def payload_configs(self):
@@ -77,8 +76,7 @@ class DropoutLayer(BaseLayer):
         return f"dropout_{self.cur_id}"
     
     def get_params(self):
-        return {"rate": self.rate, 
-                "name": self.name,
+        return {"rate": self.rate
                 }
     
     def payload_configs(self):

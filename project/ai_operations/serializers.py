@@ -182,6 +182,12 @@ class NetModelFitterSerializer(serializers.Serializer):
     def validate(self, data):
         return validate(data, (('compiled_model', 'params', 'X', 'y'), 'path'))
 
+class NodeTemplateSaverSerializer(serializers.Serializer):
+    node = JSONOrIntField(required=True)
+    params = serializers.JSONField(required=True)
+
+class NodeTemplateLoaderSerializer(serializers.Serializer):
+    pass
 
 class NodeLoaderSerializer(serializers.Serializer):
     params = serializers.JSONField(required=True)

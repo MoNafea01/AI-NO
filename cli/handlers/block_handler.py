@@ -1,7 +1,12 @@
 from data_store import get_data_store
-from utils.mapper import mapper
 from utils.defaults import default_data, Models, Preprocessors
 import re, json, requests
+import json, os
+
+mapper_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils', 'mapper.json'))
+with open(mapper_dir, 'r') as f:
+    mapper = json.load(f)
+
 
 def handle_block_command(sub_cmd, args):
 

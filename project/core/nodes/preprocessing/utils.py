@@ -15,7 +15,9 @@ class PayloadBuilder:
             "children": [],
             "parent": [],
         }
+        
         params = kwargs.get("params", {})
-        kwargs['params'] = [{k: v} for k, v in params.items()]
+        if isinstance(params, dict):
+            kwargs['params'] = [{"name":k, "default": v, "type": v.__class__.__name__} for k, v in params.items()]
         payload.update(kwargs)
         return payload

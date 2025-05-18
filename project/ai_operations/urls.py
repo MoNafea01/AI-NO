@@ -54,8 +54,11 @@ urlpatterns = [
     path('sequential/', SequentialAPIView.as_view(), name='sequential'),
     path('compile/', ModelCompilerAPIView.as_view(), name='compile'),
     path('fit_net/', NetModelFitterAPIView.as_view(), name='fit_net'),
+    path('save_template/', NodeTemplateSaverAPIView.as_view(), name='save_template'),
+    path('template/', NodeTemplateLoaderAPIView.as_view(), name='template'),
     
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
+    path('update_components/', UpdateComponentsAPIView.as_view(), name='update-components'),
     path('export-project/', ExportProjectAPIView.as_view(), name='export-project'),
     path('import-project/', ImportProjectAPIView.as_view(), name='import-project'),
 

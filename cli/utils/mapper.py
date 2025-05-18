@@ -1,34 +1,23 @@
 from __init__ import *
+import os
+import pandas as pd
+import json
 
-models = ["create_model/"] * 31
-preprocessors = ["create_preprocessor/"] * 12
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+schema_dir = os.path.join(base_dir, 'project', 'core', 'schema.xlsx')
 
-nodes = ['ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net', 'sgd_classifier', 
- 'ridge_classifier', 'logistic_regression', 'rbf_svr', 'linear_svr', 'poly_svr', 'sigmoid_svr', 
- 'rbf_svc', 'linear_svc', 'poly_svc', 'sigmoid_svc', 'bagging_regressor', 'adaboost_regressor', 
- 'gradient_boosting_regressor', 'decision_tree_regressor', 'random_forest_regressor', 'bagging_classifier', 
- 'adaboost_classifier', 'gradient_boosting_classifier', 'decision_tree_classifier', 'random_forest_classifier', 
- 'gaussian_nb', 'bernoulli_nb', 'multinomial_nb', 'knn_regressor', 'knn_classifier',
+def create_mapper():
+    """
+    Create a mapper.json file from the schema.xlsx file.
+    The mapper.json file contains a mapping of node names to API calls.
+    """
+    schema = pd.read_excel(schema_dir, sheet_name="Sheet1")
+    nodes, api_ref = schema[['node_name', 'api_call']].values.T
+    jsonb = json.dumps(dict(zip(nodes, api_ref)), indent=4)
+    with open(os.path.join(base_dir, 'cli', 'utils', 'mapper.json'), 'w') as f:
+        f.write(jsonb)
 
- 'model_fitter', 'predictor', 'evaluator', 
 
- 'maxabs_scaler', 'normalizer', 'minmax_scaler', 'robust_scaler', 
- 'standard_scaler', 'label_encoder', 'onehot_encoder', 'ordinal_encoder', 
- 'label_binarizer', 'knn_imputer', 'simple_imputer', 'binarizer',
-
- 'preprocessor_fitter', 'transformer', 'fitter_transformer', 
-
- "data_loader", "splitter", "joiner", "train_test_split",
-
- 'input_layer', 'conv2d_layer', 'maxpool2d_layer', 'flatten_layer', 'dense_layer', 
- 'dropout_layer', 'sequential_model', 'nn_fitter','model_compiler', 'node_saver', 'node_loader'
- ]
-
-api_ref = [
-    *models, "fit_model/", "predict/", "evaluate/",
-    *preprocessors, "fit_preprocessor/", "transform/", "fit_transform/",
-    "data_loader/", "splitter/", "joiner/", "train_test_split/", 
-    "create_input/", "conv2d/", "maxpool2d/", "flatten/", "dense/", "dropout/", "sequential/", 
-    "fit_net/", "compile/", "save_node/", "load_node/"
-]
-mapper = dict(zip(nodes, api_ref))
+if __name__ == '__main__':
+    create_mapper()
+    print("Mapper created successfully.")

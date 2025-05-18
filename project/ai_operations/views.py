@@ -2,6 +2,8 @@ from __init__ import *
 import json, datetime, tempfile, subprocess, random, pandas as pd
 import uuid
 
+import requests
+
 from rest_framework import status, viewsets
 from rest_framework.views import APIView, Response
 from rest_framework.parsers import MultiPartParser
@@ -14,7 +16,10 @@ from core.repositories import *
 from core.nodes.configs.const_ import get_node_name_by_api_ref
 
 from chatbot.app import sync_generate_cli
+from chatbot.res.defaults import create_data_mapping
+
 from cli.call_cli import call_script
+from cli.utils.mapper import create_mapper
 
 class NodeQueryMixin:
     """
@@ -46,36 +51,67 @@ class NodeQueryMixin:
             if node.node_name not in DATA_NODES:
                 return_data = False
 
-            # get chain of nodes using "output" query_param, specific for layer nodes
-            if output.isdigit() and int(output) > 0:
+            
+            if output.lstrip('-').isdigit():
                 depth = int(output)
                 success, current_node = NodeLoader(return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
+
+                # get children of multi-channel nodes
                 if node.node_name in MULTI_CHANNEL_NODES:
                     if success:
                         children = current_node.get("children", [])
-                        if len(current_node.get("children")) > 1:
+                        if len(current_node.get("children")) > 1 and depth > 0:
                             child_id = children[int(output) - 1] if len(children) >= int(output) else None
                             if isinstance(child_id, int):
                                 success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
                                 node_id = str(child_id)
                     else:
                         return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
-            
+                    
+                # chain of nodes for viewing NN layers
                 else:  
-                    for i in range(depth):
-                        child = current_node.get("children", [])
-                        if child:
-                            child_id = child[0]
-                            try:
-                                success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
-                                if not success:
-                                    return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
-                            except Exception as e:
-                                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                    if int(output) < 0:
+                        for i in range(depth * -1):
+                            parent = current_node.get("parent", [])
+                            child = current_node.get("children", [])
+                            if parent:
+                                parent_id = parent[0]
+                                try:
+                                    success, current_node = NodeLoader(return_path=return_path)(node_id=str(parent_id), project_id=project_id)
+                                    if not success:
+                                        return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
+                                except Exception as e:
+                                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
                             
-                        else:
-                            break
-                    node_id = str(current_node.get("node_id", node_id))
+                            # Compatability with old version of backend
+                            elif child:
+                                child_id = child[0]
+                                try:
+                                    success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
+                                    if not success:
+                                        return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
+                                except Exception as e:
+                                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                                
+                            else:
+                                break
+                        node_id = str(current_node.get("node_id", node_id))
+
+                    elif int(output) > 0:
+                        for i in range(depth):
+                            child = current_node.get("children", [])
+                            if child:
+                                child_id = child[0]
+                                try:
+                                    success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
+                                    if not success:
+                                        return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
+                                except Exception as e:
+                                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                                
+                            else:
+                                break
+                        node_id = str(current_node.get("node_id", node_id))
 
             success, payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
 
@@ -147,11 +183,11 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 success, loaded = NodeLoader(return_path=True)(node_id=node_id, project_id=project_id)
                 if not success:
                     return False, Response({"error": loaded}, status=status.HTTP_400_BAD_REQUEST)
-                if len(loaded.get('parent')) == 1:
+                if (len(loaded.get('parent')) == 1) and (loaded.get('node_name') not in PARENT_NODES):
                     out_name = loaded.get("message")
                     node_id = loaded.get("parent")[0]
                 
-                elif len(loaded.get('parent')) == 0:
+                elif (len(loaded.get('parent')) == 0) or (loaded.get('node_name') in PARENT_NODES):
                     prev_node_name = loaded.get("node_name")
                     out_name = Component.objects.get(node_name=prev_node_name).output_channels
                     
@@ -177,6 +213,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         # return the node_data as hashed object for serialization
         return_serialized = request.query_params.get('return_serialized', '0') == '1'
         project_id = request.query_params.get('project_id') 
+        template_id = request.query_params.get('template_id', None)
 
         project_id = None if project_id == "" else project_id
         node_id = request.query_params.get("node_id", None)
@@ -226,15 +263,34 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             displayed_name = request.data.get('displayed_name', None)
             if not displayed_name:
                 displayed_name = request.query_params.get('displayed_name', default_name)
+
             processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid, 
-                                           input_ports=input_ports, output_ports=output_ports, displayed_name=displayed_name)
+                                           input_ports=input_ports, output_ports=output_ports, displayed_name=displayed_name,
+                                           template_id=template_id)
             BaseNodeAPIView.cur_id += 1
+            
+            if request.path == '/api/save_template/':
+                response = self.update_components()
+                if response.status_code == 200:
+                    print("Schema updated successfully.")
+                else:
+                    return Response({"error": response}, status=status.HTTP_400_BAD_REQUEST), None, None, None, None
             return processor, return_serialized, output_channel, node_id, project_id
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST), None, None, None, None
 
-    def post(self, request):
+    def update_components(self):
+        url = "http://127.0.0.1:8000/api/update_components/"
+        path = str(os.path.join(settings.BASE_DIR, 'core', 'schema.xlsx')).replace("\\", r"\\")
 
+        response = requests.request("PUT", url, json={"file_path": path})
+        if response.status_code == 200:
+            print("Schema updated successfully.")
+            create_mapper(), create_data_mapping()
+
+        return response
+    
+    def post(self, request):
         result = self.get_processor_and_args(request)
         if isinstance(result[0], Response):
             return result[0]
@@ -599,6 +655,31 @@ class NetModelFitterAPIView(BaseNodeAPIView):
         )
 
 
+class NodeTemplateSaverAPIView(BaseNodeAPIView):
+
+    def get_serializer_class(self):
+        return NodeTemplateSaverSerializer
+
+    def get_processor(self, validated_data, *args, **kwargs):
+        return NodeTemplateSaver(
+            node=validated_data.get("node"),
+            name = validated_data.get('params',{}).get("name"),
+            description = validated_data.get('params',{}).get("description"),
+            **kwargs
+        )
+
+class NodeTemplateLoaderAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return NodeTemplateLoaderSerializer
+
+    def get_processor(self, validated_data, *args, **kwargs):
+        return NodeTemplateLoader(
+            **kwargs
+        )
+        
+    
+
+
 class NodeLoaderAPIView(APIView, NodeQueryMixin):
 
     def get_serialized_payload(self, path, return_serialized, project_id):
@@ -822,10 +903,41 @@ class ExcelUploadAPIView(APIView):
             'skipped': skipped_count,
             'errors': errors
             }    
+            create_data_mapping(), create_mapper()
             return Response(response, status=status.HTTP_201_CREATED)
             
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateComponentsAPIView(APIView):
+    def put(self, request):
+        try:
+            url1 = "http://127.0.0.1:8000/api/clear_components/"
+            url2 = "http://127.0.0.1:8000/api/upload_excel/"
+            path = request.data.get("file_path")
+
+            if not path:
+                    return Response({"error": "file_path is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            response1 = requests.request("DELETE", url1, headers={}, data={})
+            with open(path, 'rb') as file:
+                
+                files=[('file',('schema.xlsx', file,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))]
+                
+                response2 = requests.request("POST", url2, headers={}, data={}, files=files)
+            
+            if response1.status_code == 204 and response2.status_code == 201:
+                return Response({"message": "Components updated successfully"}, status=status.HTTP_200_OK)
+
+            else:
+                return Response({
+                        "error": "Failed to update components",
+                        "clear_status": response1.status_code,
+                        "upload_status": response2.status_code,
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
@@ -1059,6 +1171,7 @@ class ExportProjectAPIView(APIView):
                             "error": f"Converter script not found at path: {converter_path}"
                         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     
+                    print(f"Saved Password: {password}")
                     python_executable = sys.executable
                     # Run converter script
                     result = subprocess.run([

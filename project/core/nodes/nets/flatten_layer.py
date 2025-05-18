@@ -28,7 +28,7 @@ class FlattenLayer(BaseLayer):
         return f"flatten_{self.cur_id}"
     
     def get_params(self):
-        return {"name": self.name}
+        return {}
     
     def payload_configs(self):
         return {

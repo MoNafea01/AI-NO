@@ -46,6 +46,8 @@ class NodeSaver:
         save_path = None
         if path and self.to_path:
             save_path = rf"{path}/{node_name}_{node_id}.pkl"
+            if task == "save_template":
+                save_path = rf"{path}/{node_name}.pkl"
             nodes_dir = os.path.dirname(save_path)
             os.makedirs(nodes_dir, exist_ok=True)
             joblib.dump(node, save_path)

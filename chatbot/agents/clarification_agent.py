@@ -16,7 +16,7 @@ class ClarificationAgent(Agent):
             | self.model 
             | StrOutputParser()
             )
-        self.node_params = load_json_file(config['clarification']['node_mapping'])
+        self.node_params = load_json_file(config['clarification']['data_mapping'])
 
     async def execute(self, input_data, context=None):
         query = input_data["query"]
