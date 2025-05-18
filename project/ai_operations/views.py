@@ -188,8 +188,8 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                     node_id = loaded.get("parent")[0]
                 
                 elif (len(loaded.get('parent')) == 0) or (loaded.get('node_name') in PARENT_NODES):
-                    prev_node_name = loaded.get("node_name")
-                    out_name = Component.objects.get(node_name=prev_node_name).output_channels
+                    prev_node_uid = loaded.get("uid")
+                    out_name = Component.objects.get(uid=prev_node_uid).output_channels
                     
                 attr = {"name": key, "connectedNode": {"name": out_name, "nodeData": int(node_id)}}
                 input_ports.append(attr)
