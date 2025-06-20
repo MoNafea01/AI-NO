@@ -1,7 +1,8 @@
 import 'package:ai_gen/core/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_state.dart';
-import 'package:ai_gen/features/HomeScreen/home_screen.dart';
+import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
+
 import 'package:ai_gen/features/HomeScreen/widgets/build_profile_info.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/edit_profile_dialog.dart';
 

@@ -44,24 +44,26 @@ class UserTestimonial extends StatelessWidget {
               child: const Icon(Icons.person, color: Colors.white),
             ),
             const SizedBox(width: 12),
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Maria Rodriguez',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Maria Rodriguez',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  'Data Scientist @ GreenTech Solutions',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
+                  Text(
+                    'Data Scientist @ GreenTech Solutions',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

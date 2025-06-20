@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
-import 'package:ai_gen/features/HomeScreen/home_screen.dart';
+
+
+import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
-import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as storage;
 import 'package:shared_preferences/shared_preferences.dart';

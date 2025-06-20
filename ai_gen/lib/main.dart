@@ -3,6 +3,7 @@ import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
+import 'package:ai_gen/features/settings_screen/cubits/settings_cubit.dart';
 import 'package:ai_gen/features/splashScreen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -82,10 +83,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileCubit(
-        context.read<AuthProvider>(),
-      ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ProfileCubit(
+            context.read<AuthProvider>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => SettingsCubit(),
+        ),
+      ],
       child: MaterialApp(
         scaffoldMessengerKey: scaffoldMessengerKey,
         debugShowCheckedModeBanner: false,

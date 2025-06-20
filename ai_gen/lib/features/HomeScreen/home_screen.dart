@@ -1,6 +1,7 @@
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +16,15 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   bool isExpanded = true;
+int _selectedIndex = 0;
+final int exploreIndex = 0;
+final int architecturesIndex = 1;
+final int modelsIndex = 2; 
+final int datasetsIndex = 3; 
+final int projectsIndex = 4; 
+final int learnIndex = 5; 
+  final int settingsIndex = 6; 
+
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +33,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           // Left Sidebar
           Container(
-            width: isExpanded ? 200 : 90,
+            width: isExpanded ? 220 : 90,
             color: Colors.blue.shade100,
             child: Column(
               children: [
@@ -72,13 +82,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            _sidebarItem(Icons.explore, 'Explore', true),
-            _sidebarItem(Icons.architecture, 'Architectures', false),
-            _sidebarItem(Icons.model_training, 'Models', false),
-            _sidebarItem(Icons.dataset, 'Datasets', false),
-            _sidebarItem(Icons.school, 'Learn', false),
-            _sidebarItem(Icons.description, 'Docs', false),
-            _sidebarItem(Icons.settings, 'Settings', false),
+            _sidebarItem(Icons.explore, 'Explore', _selectedIndex == exploreIndex,
+                () {
+              setState(() {
+                _selectedIndex = exploreIndex;
+              });
+            }),
+
+            _sidebarItem(Icons.architecture, 'Architectures',
+                _selectedIndex == architecturesIndex, () {
+              setState(() {
+                _selectedIndex = architecturesIndex;
+              });
+            }),
+
+
+
+            _sidebarItem(Icons.model_training, 'Models', _selectedIndex == modelsIndex,
+                () {
+              setState(() {
+                _selectedIndex = modelsIndex;
+              });
+            }),
+
+            _sidebarItem(Icons.dataset, 'Datasets',  _selectedIndex == datasetsIndex, () {
+              setState(() {
+                _selectedIndex =  datasetsIndex;
+              });
+            }),
+            _sidebarItem(Icons.school, 'Learn', _selectedIndex == learnIndex,
+                () {
+              setState(() {
+                _selectedIndex = learnIndex;
+              });
+            }),
+            _sidebarItem(Icons.description, 'Docs',  _selectedIndex == projectsIndex, () {
+              setState(() {
+                _selectedIndex = projectsIndex;
+              });
+            }),
+           _sidebarItem(Icons.settings, 'Settings', _selectedIndex == settingsIndex, () {
+  setState(() {
+    _selectedIndex = settingsIndex;
+  });
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
+  );
+}),
             const Spacer(),
             const ProfileWidget(),
             const SizedBox(height: 10),
@@ -89,7 +141,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _sidebarItem(IconData icon, String label, bool isActive) {
+  Widget _sidebarItem(
+      IconData icon, String label, bool isActive, VoidCallback onTap) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
@@ -108,26 +161,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
             : null,
         minLeadingWidth: 20,
         dense: true,
-        onTap: () {},
+        onTap: onTap, // ✅ Use onTap here
       ),
     );
   }
 
-  Widget _logoutButton() {
-    return InkWell(
-      onTap: () {
-        Provider.of<AuthProvider>(context, listen: false).logout(context);
 
-      },
+ Widget _logoutButton() {
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    return InkWell(
+      onTap:
+          authProvider.isLoggingOut ? null : () => authProvider.logout(context),
       child: Row(
         children: [
-          const Icon(Icons.logout, color: Colors.red),
+          Icon(Icons.logout,
+              color: authProvider.isLoggingOut ? Colors.grey : Colors.red),
           if (isExpanded) const SizedBox(width: 8),
           if (isExpanded)
-            const Text(
-              'Log out',
+            Text(
+              authProvider.isLoggingOut ? 'Logging out...' : 'Log out',
               style: TextStyle(
-                color: Colors.red,
+                color: authProvider.isLoggingOut ? Colors.grey : Colors.red,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -135,6 +190,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
 }
 
 class ProfileWidget extends StatelessWidget {
@@ -144,19 +200,18 @@ class ProfileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProfile = context.watch<AuthProvider>().userProfile;
     //final authProvider = Provider.of<AuthProvider>(context);
-    final userName = userProfile?.username ;
+    final userName = userProfile?.username;
     // final firstName = userProfile?.firstName;
     final email = userProfile?.email;
-   
-
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-         Padding(
+        Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
-          child: InkWell(child: const Text("profile"),
-          onTap: () {
+          child: InkWell(
+            child: const Text("profile"),
+            onTap: () {
               context.read<ProfileCubit>().loadProfile();
               Navigator.push(
                 context,
@@ -167,18 +222,18 @@ class ProfileWidget extends StatelessWidget {
         ),
         Row(
           children: [
-             const CircleAvatar(
+            const CircleAvatar(
               backgroundColor: Colors.blue,
               radius: 16,
-              child: Text( '',
-                  style: TextStyle(fontSize: 12, color: Colors.white)),
+              child:
+                  Text('', style: TextStyle(fontSize: 12, color: Colors.white)),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 Text(
+                  Text(
                     userName ?? 'username',
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
