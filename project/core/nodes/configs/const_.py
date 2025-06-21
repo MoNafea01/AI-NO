@@ -93,14 +93,18 @@ def get_node_name_by_api_ref(ref, request):
         template_id = template_id[0] if template_id else None
     
     try:
-
+        node_name = None
         schema = pd.read_excel(schema_dir, sheet_name="Sheet1")
-        node = schema[schema['api_call'] == ref].iloc[0]
-        node_name = node['node_name']
+        if ref == 'create_model/':
+            node_name = request.data.get('model_name')
+        elif ref == 'create_preprocessor/':
+            node_name = request.data.get('preprocessor_name')
+        else:
+            node = schema[schema['api_call'] == ref].iloc[0]
+            node_name = node['node_name']
     
-        if node_name:
-            return node_name
-        return None
+        return node_name
+
     
     except Exception as e:
         print(f"Error: {e}")

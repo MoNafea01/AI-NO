@@ -24,16 +24,16 @@ class SequentialNet(BaseLayer):
     def get_layers(self, project_id):
         cur_id = self.layer
         if not self.layer:
-            return [], []
+            return [], [], None
         
         layers_ids = [cur_id]
         while True:
             success, cur_node = NodeLoader()(cur_id, project_id=project_id)
             if not success:
-                return [], []
+                return [], [], None
             task = cur_node.get("task")
             if task != "neural_network":
-                return [], []
+                return [], [], None
             
             parent = cur_node.get("parent", [])
             cur_id = parent[0] if len(parent) == 1 else None

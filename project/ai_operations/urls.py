@@ -17,7 +17,8 @@ urlpatterns = [
     path('projects/<int:pk>/', ProjectViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='project-detail'),
     path('projects/bulk-delete/', BulkProjectDeleteAPIView.as_view(), name='bulk-project-delete'),
     path('projects/delete-empty-projects/', EmptyProjectsDeleteAPIView.as_view(), name='delete-empty-projects'),
-
+    path('multi-project-nodes/', MultiProjectNodeAPIView.as_view(), name='multi-project-nodes'),
+    
     path('nodes/', NodeAPIViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update', 'delete': 'destroy'}), name='node-list'),
     path('nodes/<int:pk>/', NodeAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='node-detail'),
     path('nodes/clear-project/', NodeAPIViewSet.as_view({'delete': 'clear_project_nodes'}), name='clear-project-nodes'),

@@ -1440,6 +1440,92 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "message": f"Project deleted successfully with {node_count} associated nodes",
         }, status=status.HTTP_200_OK)
     
+    
+
+
+class MultiProjectNodeAPIView(APIView):
+    """API view for bulk operations on nodes across multiple projects."""
+    
+    def post(self, request):
+        """Create or update nodes across multiple projects."""
+        try:
+            # Extract the data structure: {project_id: [node1, node2, ...], ...}
+            projects_data = request.data
+            
+            if not isinstance(projects_data, list):
+                return Response({"error": "Request body must be a dictionary with project IDs as keys"},
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            results = {}
+            
+            for project_obj in projects_data:
+                if not isinstance(project_obj, dict):
+                    continue
+
+                project_id = project_obj.get('id')
+                nodes = project_obj.get('content', [])
+
+                if not project_id:
+                    continue
+                
+                if not isinstance(nodes, list):
+                    results[project_id] = {"error": "Project content must be provided as a list"}
+                    continue
+            
+                # Verify project exists or create it
+                try:
+                    project = Project.objects.get(id=project_id)
+                except Project.DoesNotExist:
+                    # Create a new project with default name
+                    project_name = project_obj.get('project_name', f'Project_{project_id}')
+                    project_description = project_obj.get('project_description', 'No description provided')
+                    
+                    project = Project.objects.create(
+                        project_name=project_name,
+                        project_description=project_description
+                    )
+                
+                # Process nodes for this project
+                project_results = []
+                for node_data in nodes:
+                    # Ensure node has a node_id
+                    if not node_data.get('node_id'):
+                        node_data['node_id'] = uuid.uuid1().int & ((1 << 63) - 1)
+                    
+                    if 'project' in node_data:
+                        node_data.pop('project')
+                    
+                    if 'node_data' in node_data:
+                        node_data.pop('node_data')
+
+                    # Set the project_id in the node data
+                    node_data['project_id'] = project.id
+                    # Create or update the node
+                    serializer = NodeSerializer(data=node_data)
+                    if serializer.is_valid():
+                        node = serializer.save()
+                        project_results.append({
+                            "node_id": node.node_id,
+                            "status": "created" 
+                        })
+                    else:
+                        project_results.append({
+                            "node_id": node_data.get('node_id'),
+                            "errors": serializer.errors,
+                            "status": "failed"
+                        })
+                
+                results[project_id] = {
+                    "project_name": project.project_name,
+                    "nodes_processed": len(project_results),
+                    "results": project_results
+                }
+            
+            return Response(results, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class BulkProjectDeleteAPIView(APIView):
     """API view for deleting multiple projects at once."""
@@ -1450,18 +1536,24 @@ class BulkProjectDeleteAPIView(APIView):
             project_ids = request.data.get('project_ids', [])
             
             if not project_ids:
-                return Response({"error": "No project IDs provided"}, 
-                              status=status.HTTP_400_BAD_REQUEST)
+                url = "http://127.0.0.1:8000/api/projects/"
+                response = requests.get(url)
+
+                if response.status_code == 200:
+                    projects = response.json()
+                    project_ids = [project['id'] for project in projects]
+                else:
+                    return Response({"error": "Failed to fetch projects"}, 
+                                  status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             if not isinstance(project_ids, list):
                 return Response({"error": "project_ids must be a list"}, 
                               status=status.HTTP_400_BAD_REQUEST)
             
             # Track deletion results
-            deleted_count = 0
+            deleted_count, node_count = 0, 0
             not_found_ids = []
             error_ids = []
-            
             # Process each project ID
             for project_id in project_ids:
                 try:
@@ -1469,6 +1561,11 @@ class BulkProjectDeleteAPIView(APIView):
                     
                     # Delete associated nodes first
                     node_count = Node.objects.filter(project_id=project_id).delete()[0]
+                    url = f"http://127.0.0.1:8000/api/clear_nodes/?project_id={project_id}"
+                    response = requests.delete(url)
+                    if response.status_code != 204:
+                        raise Exception(f"Failed to delete project {project_id}: {response.text}")
+
                     
                     # Delete the project
                     project.delete()
@@ -1483,7 +1580,8 @@ class BulkProjectDeleteAPIView(APIView):
             response_data = {
                 "success": True,
                 "deleted_count": deleted_count,
-                "total_requested": len(project_ids)
+                "total_requested": len(project_ids),
+                "node_count": node_count,
             }
             
             if not_found_ids:

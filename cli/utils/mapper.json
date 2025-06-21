@@ -64,5 +64,7 @@
     "model_compiler": "compile/",
     "nn_fitter": "fit_net/",
     "node_template_saver": "save_template/",
-    "nafea_template": "template/"
+    "nafea_template": "template/",
+    "testing_template": "template/",
+    "test_1": "template/"
 }

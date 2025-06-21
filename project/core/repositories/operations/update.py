@@ -6,7 +6,7 @@ from core.repositories.operations import NodeSaver, NodeLoader, NodeDeleter
 from core.repositories.node_repository import NodeDataExtractor
 from core.nodes.utils import FolderHandler
 from core.nodes.configs.const_ import SAVING_DIR
-
+from copy import deepcopy
 class NodeUpdater:
     """
     ### This Class can only be called   
@@ -36,7 +36,7 @@ class NodeUpdater:
         
         try:
             # take the <old> node (by its id)
-            node = Node.objects.get(node_id=node_id, project_id=project_id) # get node from database
+            node = Node.objects.filter(node_id=node_id, project_id=project_id).first() # get node from database
             
             folder_path = None
             if node.node_data is None:
@@ -66,7 +66,7 @@ class NodeUpdater:
                 
                 for i, (tmp_id, new_id) in enumerate(zip(o_ids, new_ids)):
                     data = NodeDataExtractor()(tmp_id, project_id=project_id)
-                    new_payload = payload.copy()
+                    new_payload = deepcopy(payload)
                     new_payload.update(**configs[i])
                     new_payload.update({"node_id":new_id, "node_data": data})
                     payload["node_data"].append(data)
@@ -79,7 +79,7 @@ class NodeUpdater:
             
 
             if payload.get("node_name") in PARENT_NODES:
-                payload['parent'] = node.parent
+                payload['parent'] = [payload.get('input_ports')[0].get('connectedNode').get('nodeData')]
 
                 # Compatability with old versions
                 if not payload.get('parent'):
