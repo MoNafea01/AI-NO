@@ -9,7 +9,6 @@ class MultiGradientLinePainter extends CustomPainter {
   });
 
   final List<VSInputData> data;
-
   @override
   void paint(Canvas canvas, Size size) {
     for (var input in data) {
@@ -22,7 +21,9 @@ class MultiGradientLinePainter extends CustomPainter {
       final endPoint = input.connectedInterface!.widgetOffset! +
           input.connectedInterface!.nodeData!.widgetOffset;
 
-      final paint = Paint()..strokeWidth = 2.0;
+      final paint = Paint()
+        ..strokeWidth = 2.0
+        ..style = PaintingStyle.stroke;
 
       var colors = [
         input.connectedInterface?.interfaceColor ?? Colors.grey,
@@ -37,7 +38,42 @@ class MultiGradientLinePainter extends CustomPainter {
 
       paint.shader = gradient;
 
-      canvas.drawLine(startPoint, endPoint, paint);
+      // Cubic Bézier curve
+      final path = Path();
+      path.moveTo(startPoint.dx, startPoint.dy);
+
+      late final Offset controlPoint1;
+      late final Offset controlPoint2;
+      if (endPoint.dx > startPoint.dx) {
+        controlPoint1 = Offset(
+          startPoint.dx + (endPoint.dx - startPoint.dx) * -.8,
+          startPoint.dy,
+        );
+        controlPoint2 = Offset(
+          endPoint.dx + (endPoint.dx - startPoint.dx) * 0.8,
+          endPoint.dy,
+        );
+      } else {
+        controlPoint1 = Offset(
+          startPoint.dx + (endPoint.dx - startPoint.dx) * 0.6,
+          startPoint.dy,
+        );
+        controlPoint2 = Offset(
+          startPoint.dx + (endPoint.dx - startPoint.dx) * 0.4,
+          endPoint.dy,
+        );
+      }
+
+      path.cubicTo(
+        controlPoint1.dx,
+        controlPoint1.dy,
+        controlPoint2.dx,
+        controlPoint2.dy,
+        endPoint.dx,
+        endPoint.dy,
+      );
+
+      canvas.drawPath(path, paint);
     }
   }
 

@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/project_list_item_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/create_new_project_button.dart';
@@ -7,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../core/themes/asset_paths.dart';
+
 
 import 'data/project_items.dart';
 

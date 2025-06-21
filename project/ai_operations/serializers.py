@@ -17,10 +17,7 @@ class JSONOrIntField(serializers.Field):
 
 
 class DataLoaderSerializer(serializers.Serializer):
-    params = serializers.JSONField(required=False)
-    dataset_path = serializers.CharField(required=False)
-    def validate(self, data):
-        return validate(data, ('params', 'dataset_path'))
+    params = serializers.JSONField(required=True)
 
 
 class TrainTestSplitSerializer(serializers.Serializer):
@@ -187,10 +184,7 @@ class NetModelFitterSerializer(serializers.Serializer):
 
 
 class NodeLoaderSerializer(serializers.Serializer):
-    node_id = serializers.IntegerField(required=False)
-    node_path = serializers.CharField(required=False)
-    def validate(self, data):
-        return validate(data, ("node_id", 'node_path'))
+    params = serializers.JSONField(required=True)
 
 
 class NodeSaverSerializer(serializers.Serializer):
@@ -325,4 +319,5 @@ class ImportProjectSerializer(serializers.Serializer):
                                    help_text="Format of the import file (auto will detect based on extension)")
     password = serializers.CharField(required=False, allow_blank=True, 
                                    help_text="Password for encrypted AINOPRJ files")
-    
+    project_name = serializers.CharField(required=False, allow_blank=True, help_text="Name for the imported project")
+    project_description = serializers.CharField(required=False, allow_blank=True, help_text="Description for the imported project")

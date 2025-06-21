@@ -9,7 +9,7 @@ class Evaluator(BaseNode):
         self.y_true, self.y_pred = NodeDataExtractor()(y_true, y_pred, project_id=project_id)
         err = None
         if any(isinstance(i, str) for i in [self.y_true, self.y_pred]):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load Nodes (y_true, y_pred) at least one of them. Please check the provided IDs."
         
         self.metric = metric
         self.project_id=project_id
@@ -23,15 +23,18 @@ class Evaluator(BaseNode):
             if self.metric not in metrics.keys():
                 return f"Unsupported metric: {self.metric}"
             
-
             if len(y_pred.shape) > 1:
-                if y_pred.shape[1] > 1:
-                    y_pred = np.argmax(y_pred, axis=1)
+                if self.metric in ["f1", "precision", "recall", "accuracy"]:
+                    if y_pred.shape[1] > 1:
+                        y_pred = np.argmax(y_pred, axis=1)
+                    else:
+                        y_pred = y_pred.flatten()
                 else:
-                    y_pred = np.round(y_pred, 3).astype(int).flatten()
+                    y_pred = y_pred.flatten()
             
             output = metrics[self.metric](y_true, y_pred)
             output = round(output,3)
+            
             if isinstance(output, str):
                 return f"Error calculating metric: {output}"
             
@@ -45,4 +48,4 @@ class Evaluator(BaseNode):
             payload.pop("node_data", None)
             return payload
         except Exception as e:
-            return f"Error evaluating model: {e}"
+            return f"Error creating evaluation payload: {e}"

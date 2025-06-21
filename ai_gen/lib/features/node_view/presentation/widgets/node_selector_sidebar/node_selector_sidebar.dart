@@ -1,4 +1,5 @@
-import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
@@ -112,7 +113,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
             color: Colors.black,
           ),
           const SizedBox(width: 12),
-          Text(entry.key, style: const TextStyle(color: Colors.black)),
+          Text(entry.key, style: AppTextStyles.black14Normal),
         ],
       ),
     );

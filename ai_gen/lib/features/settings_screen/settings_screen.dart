@@ -1,4 +1,4 @@
-import 'package:ai_gen/core/themes/app_colors.dart';
+
 //import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
 import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
 import 'package:ai_gen/features/settings_screen/appearence_screen.dart';

@@ -4,14 +4,29 @@ import 'package:flutter/material.dart';
 import '../common.dart';
 import 'offset_extension.dart';
 import 'vs_interface.dart';
-import 'vs_node_manager.dart';
 
+/// Represents the data model for a node in the visual scripting interface.
+///
+/// This class holds all the necessary data for rendering and managing a node,
+/// including its position, connections, and visual properties.
 class VSNodeData {
-  ///Holds all relevant node data
+  /// Creates a new [VSNodeData] instance.
+  ///
+  /// [type] is the type identifier for the node.
+  /// [widgetOffset] is the position of the node in the viewport.
+  /// [inputData] and [outputData] are the input and output interfaces.
+  /// [node] is an optional model representing the node's data.
+  /// [deleteNode] is an optional callback for node deletion.
+  /// [id] is an optional unique identifier (generated if not provided).
+  /// [nodeWidth] is the optional width of the node.
+  /// [onUpdatedConnection] is called when input connections are updated.
+  /// [nodeColor] is the color of the node (defaults to light blue).
+  /// [toolTip] is an optional tooltip text.
+  /// [title] is an optional display title.
   VSNodeData({
     required this.type,
     required this.widgetOffset,
-    required this.inputData,
+    required List<VSInputData> inputData,
     required this.outputData,
     this.node,
     this.deleteNode,
@@ -23,64 +38,70 @@ class VSNodeData {
     String? title,
     this.isRenaming = false,
   })  : _id = id ?? getRandomString(10),
-        _title = title ?? "" {
-    for (var value in inputData) {
-      value.nodeData = this;
+        _title = title ?? "",
+        _inputData = inputData {
+    // Initialize node references for all interfaces
+    for (final input in inputData) {
+      input.nodeData = this;
     }
-    for (var value in outputData) {
-      value.nodeData = this;
+    for (final output in outputData) {
+      output.nodeData = this;
     }
   }
 
+  /// The underlying node model
   NodeModel? node;
 
-  ///The nodes ID
-  ///
-  ///Used inside [VSNodeManager] as a key for nodes
+  /// Unique identifier for the node
   String get id => _id;
   String _id;
 
+  /// Callback for node deletion
   final VoidCallback? deleteNode;
-  bool isRenaming = false;
 
-  ///The type of this node
-  ///
-  ///Important for deserialization
+  /// Whether the node is currently being renamed
+  bool isRenaming;
+
+  /// The type identifier of the node
   final String type;
 
-  ///The current offset of the widget from the origin (Top-Left corner)
+  /// The current position of the node in the viewport
   Offset widgetOffset;
 
-  ///The width this node will have in the UI
+  /// The width of the node in the UI
   final double? nodeWidth;
 
-  ///The input interfaces of this node
-  Iterable<VSInputData> inputData;
+  /// The list of input data for this node.
+  List<VSInputData> get inputData => _inputData;
+  set inputData(List<VSInputData> value) {
+    _inputData = value;
+  }
 
-  ///The output interfaces of this node
-  Iterable<VSOutputData> outputData;
+  List<VSInputData> _inputData;
 
+  /// The output interfaces of the node
+  final Iterable<VSOutputData> outputData;
+
+  /// The color of the node
   final Color nodeColor;
 
-  ///The title displayed on the node
+  /// The display title of the node
   ///
-  ///Usefull for localization
+  /// If empty, falls back to the node type
   String get title => _title.isNotEmpty ? _title : type;
   set title(String data) => _title = data;
-  String _title = "";
+  String _title;
 
-  ///A tooltip displayed on the widget
+  /// Optional tooltip text for the node
   final String? toolTip;
 
-  ///This function gets called when any input interface updates its connected node
-  ///
-  ///The interface in question is passed to the function call
+  /// Callback triggered when input connections are updated
   final Function(VSInputData interfaceData)? onUpdatedConnection;
 
+  /// Converts the node data to a JSON representation
   Map<String, dynamic> toJson() {
     return {
       ...node?.toJson() ?? {},
-      // 'id': id,
       'type': type,
       'title': _title,
       'widgetOffset': widgetOffset.toJson(),
@@ -89,9 +110,12 @@ class VSNodeData {
     };
   }
 
-  ///Used for deserializing
+  /// Sets the base data for the node during deserialization
   ///
-  ///Sets base node data id and offset
+  /// [id] is the unique identifier
+  /// [title] is the display title
+  /// [widgetOffset] is the position in the viewport
+  /// [nodeModel] is an optional node model
   void setBaseData(
     String id,
     String title,
@@ -101,21 +125,52 @@ class VSNodeData {
     _id = id;
     _title = title;
     this.widgetOffset = widgetOffset;
-    if (nodeModel != null) this.node = nodeModel;
+    if (nodeModel != null) {
+      node = nodeModel;
+    }
   }
 
-  ///Used for deserializing
+  /// Reconstructs node connections during deserialization
   ///
-  ///Reconstructs connections
-  ///
-  ///Maps inputRefs to the corresponding connection inside this node
+  /// [inputRefs] maps input types to their corresponding output connections
   void setRefData(Map<String, VSOutputData?> inputRefs) {
-    Map<String, VSInputData> inputMap = {
-      for (final element in inputData) element.type: element
-    };
+    final inputMap = {for (final element in inputData) element.type: element};
 
     for (final ref in inputRefs.entries) {
       inputMap[ref.key]?.connectedInterface = ref.value;
     }
+  }
+
+  /// Creates a copy of this node data with optional modifications
+  VSNodeData copyWith({
+    String? type,
+    Offset? widgetOffset,
+    List<VSInputData>? inputData,
+    Iterable<VSOutputData>? outputData,
+    NodeModel? node,
+    VoidCallback? deleteNode,
+    String? id,
+    double? nodeWidth,
+    Function(VSInputData)? onUpdatedConnection,
+    Color? nodeColor,
+    String? toolTip,
+    String? title,
+    bool? isRenaming,
+  }) {
+    return VSNodeData(
+      type: type ?? this.type,
+      widgetOffset: widgetOffset ?? this.widgetOffset,
+      inputData: inputData ?? this.inputData,
+      outputData: outputData ?? this.outputData,
+      node: node ?? this.node,
+      deleteNode: deleteNode ?? this.deleteNode,
+      id: id ?? this.id,
+      nodeWidth: nodeWidth ?? this.nodeWidth,
+      onUpdatedConnection: onUpdatedConnection ?? this.onUpdatedConnection,
+      nodeColor: nodeColor ?? this.nodeColor,
+      toolTip: toolTip ?? this.toolTip,
+      title: title ?? this.title,
+      isRenaming: isRenaming ?? this.isRenaming,
+    );
   }
 }

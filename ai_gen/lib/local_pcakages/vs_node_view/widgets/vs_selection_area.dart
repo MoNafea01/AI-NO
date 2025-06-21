@@ -3,183 +3,182 @@ import 'package:flutter/services.dart';
 
 import '../data/vs_node_data_provider.dart';
 
+/// A widget that provides a selection area for nodes in the visual scripting interface.
+///
+/// This widget allows users to select multiple nodes by drawing a selection rectangle
+/// while holding the Alt key. The selection area is visually represented by a semi-transparent
+/// blue rectangle, and nodes within this area can be selected or deselected.
 class VSSelectionArea extends StatefulWidget {
-  ///The base selection area
+  /// Creates a new [VSSelectionArea] instance.
   ///
-  ///Used inside [VSNodeView] to add a selction area to the node view
-  ///
-  ///Hold "Alt" to select items or unselect seleted items
+  /// [child] is required and represents the content that will be selectable.
   const VSSelectionArea({
     required this.child,
     super.key,
   });
 
+  /// The widget that will be wrapped with selection functionality
   final Widget child;
 
   @override
   State<VSSelectionArea> createState() => _VSSelectionAreaState();
 }
 
+/// The state for the [VSSelectionArea] widget.
+///
+/// This state class manages the selection area's position, state, and interaction.
 class _VSSelectionAreaState extends State<VSSelectionArea> {
-  //If selectionMode is active
-  bool selectionMode = false;
+  /// Whether the selection mode is currently active
+  bool _isSelectionModeActive = false;
 
-  //Raw input as delivered by  user
-  Offset? startPos;
-  Offset? endPos;
+  /// The starting position of the selection rectangle
+  Offset? _selectionStart;
 
-  //Inputs normalized to always have smalest values as top left and biggest as bottom right
-  Offset? topLeftPos;
-  Offset? bottomRightPos;
+  /// The current position of the selection rectangle
+  Offset? _selectionEnd;
 
-  late VSNodeDataProvider provider;
+  /// The normalized top-left position of the selection rectangle
+  Offset? _selectionTopLeft;
+
+  /// The normalized bottom-right position of the selection rectangle
+  Offset? _selectionBottomRight;
+
+  /// The provider that manages node data and selection state
+  late final VSNodeDataProvider _provider;
+
+  /// The color of the selection rectangle
+  static const Color _selectionColor = Color.fromARGB(115, 0, 204, 255);
 
   @override
   void initState() {
     super.initState();
-
-    provider = VSNodeDataProvider.of(context);
-    HardwareKeyboard.instance.addHandler(handleKeyInput);
+    _provider = VSNodeDataProvider.of(context);
+    HardwareKeyboard.instance.addHandler(_handleKeyInput);
   }
 
   @override
   void dispose() {
+    HardwareKeyboard.instance.removeHandler(_handleKeyInput);
     super.dispose();
-    HardwareKeyboard.instance.removeHandler(handleKeyInput);
   }
 
-  ///Takes keyboard input and sets [mode] accordingly
-  bool handleKeyInput(KeyEvent input) {
+  /// Handles keyboard input to toggle selection mode
+  bool _handleKeyInput(KeyEvent input) {
     if (HardwareKeyboard.instance.isAltPressed) {
-      setState(() {
-        selectionMode = true;
-      });
+      setState(() => _isSelectionModeActive = true);
     } else {
-      resetState();
+      _resetSelectionState();
     }
-
     return false;
   }
 
-  ///Takes user input and sets [topLeftPos] an [bottomRightPos] accordingly
-  void setNormedPositions() {
-    late double startPosX;
-    late double startPosY;
+  /// Normalizes the selection rectangle coordinates
+  void _normalizeSelectionCoordinates() {
+    if (_selectionStart == null || _selectionEnd == null) return;
 
-    late double endPosX;
-    late double endPosY;
+    final startX = _selectionStart!.dx;
+    final startY = _selectionStart!.dy;
+    final endX = _selectionEnd!.dx;
+    final endY = _selectionEnd!.dy;
 
-    if (startPos!.dx < endPos!.dx) {
-      startPosX = startPos!.dx;
-      endPosX = endPos!.dx;
-    } else {
-      startPosX = endPos!.dx;
-      endPosX = startPos!.dx;
-    }
+    _selectionTopLeft = Offset(
+      startX < endX ? startX : endX,
+      startY < endY ? startY : endY,
+    );
 
-    if (startPos!.dy < endPos!.dy) {
-      startPosY = startPos!.dy;
-      endPosY = endPos!.dy;
-    } else {
-      startPosY = endPos!.dy;
-      endPosY = startPos!.dy;
-    }
-
-    topLeftPos = Offset(startPosX, startPosY);
-    bottomRightPos = Offset(endPosX, endPosY);
+    _selectionBottomRight = Offset(
+      startX < endX ? endX : startX,
+      startY < endY ? endY : startY,
+    );
   }
 
-  ///Resets state to default values
-  void resetState() {
-    setState(
-      () {
-        topLeftPos = null;
-        bottomRightPos = null;
-        startPos = null;
-        endPos = null;
-        selectionMode = false;
-      },
-    );
+  /// Resets the selection state to its initial values
+  void _resetSelectionState() {
+    setState(() {
+      _selectionTopLeft = null;
+      _selectionBottomRight = null;
+      _selectionStart = null;
+      _selectionEnd = null;
+      _isSelectionModeActive = false;
+    });
+  }
+
+  /// Handles the end of a selection gesture
+  void _handleSelectionEnd() {
+    if (_selectionTopLeft == null || _selectionBottomRight == null) return;
+
+    final selectedNodeIds = _provider
+        .findNodesInsideSelectionArea(
+          _selectionTopLeft!,
+          _selectionBottomRight!,
+        )
+        .map((node) => node.id)
+        .toList();
+
+    if (_isSelectionModeActive) {
+      final alreadySelectedNodes = <String>{};
+
+      // Remove nodes that are already selected
+      selectedNodeIds.removeWhere((nodeId) {
+        if (_provider.selectedNodes.contains(nodeId)) {
+          alreadySelectedNodes.add(nodeId);
+          return true;
+        }
+        return false;
+      });
+
+      _provider.removeSelectedNodes(alreadySelectedNodes);
+      _provider.addSelectedNodes(selectedNodeIds);
+    }
+
+    _resetSelectionState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> children = [];
+    if (!_isSelectionModeActive) {
+      return widget.child;
+    }
 
-    if (startPos != null && endPos != null) {
-      setNormedPositions();
+    final List<Widget> children = [widget.child];
 
-      children.add(
+    if (_selectionStart != null && _selectionEnd != null) {
+      _normalizeSelectionCoordinates();
+
+      children.insert(
+        0,
         Positioned(
-          left: topLeftPos!.dx,
-          top: topLeftPos!.dy,
+          left: _selectionTopLeft!.dx,
+          top: _selectionTopLeft!.dy,
           child: Container(
             decoration: const BoxDecoration(
-              color: Color.fromARGB(
-                115,
-                0,
-                204,
-                255,
-              ),
+              color: _selectionColor,
             ),
-            width: bottomRightPos!.dx - topLeftPos!.dx,
-            height: bottomRightPos!.dy - topLeftPos!.dy,
+            width: _selectionBottomRight!.dx - _selectionTopLeft!.dx,
+            height: _selectionBottomRight!.dy - _selectionTopLeft!.dy,
           ),
         ),
       );
     }
 
-    children.add(widget.child);
-
-    return selectionMode == false
-        ? widget.child
-        : GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onPanStart: (details) {
-              setState(
-                () => startPos = provider.applyViewPortTransfrom(
-                  details.globalPosition,
-                ),
-              );
-            },
-            onPanUpdate: (details) {
-              setState(
-                () => endPos = provider.applyViewPortTransfrom(
-                  details.globalPosition,
-                ),
-              );
-            },
-            onPanEnd: (details) {
-              final nodes = provider
-                  .findNodesInsideSelectionArea(
-                    topLeftPos!,
-                    bottomRightPos!,
-                  )
-                  .map((e) => e.id)
-                  .toList();
-
-              if (selectionMode) {
-                final Set<String> alreadySelected = {};
-
-                nodes.removeWhere(
-                  (node) {
-                    if (provider.selectedNodes.contains(node)) {
-                      alreadySelected.add(node);
-                      return true;
-                    }
-                    return false;
-                  },
-                );
-
-                provider.removeSelectedNodes(alreadySelected);
-                provider.addSelectedNodes(nodes);
-              }
-
-              resetState();
-            },
-            child: Stack(
-              children: children,
-            ),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onPanStart: (details) {
+        setState(() {
+          _selectionStart = _provider.applyViewPortTransfrom(
+            details.globalPosition,
           );
+        });
+      },
+      onPanUpdate: (details) {
+        setState(() {
+          _selectionEnd = _provider.applyViewPortTransfrom(
+            details.globalPosition,
+          );
+        });
+      },
+      onPanEnd: (_) => _handleSelectionEnd(),
+      child: Stack(children: children),
+    );
   }
 }

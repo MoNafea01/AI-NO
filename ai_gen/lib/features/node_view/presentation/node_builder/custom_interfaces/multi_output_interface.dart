@@ -1,15 +1,15 @@
-import 'package:ai_gen/features/node_view/data/api_services/node_server_calls.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
-import 'package:flutter/material.dart';
+import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/base/base_interface.dart';
 import 'package:get_it/get_it.dart';
 
-import 'interface_colors.dart';
+/// A class to hold shared state for output data
+class OutputState {
+  bool isRunning = false;
+}
 
-Color _interfaceColor = NodeTypes.general.color;
-
-class MultiOutputInputInterface extends VSAINOGeneralInputData {
-  ///Basic List input interface
+class MultiOutputInputInterface extends BaseInputData {
   MultiOutputInputInterface({
+    required super.node,
     required super.type,
     super.title,
     super.toolTip,
@@ -19,50 +19,42 @@ class MultiOutputInputInterface extends VSAINOGeneralInputData {
 
   @override
   List<Type> get acceptedTypes => [MultiOutputOutputData];
-
-  @override
-  Color get interfaceColor => _interfaceColor;
 }
 
-class MultiOutputOutputData extends VSAINOGeneralOutputData {
-  ///Basic List output interface
+class MultiOutputOutputData extends BaseOutputData {
   MultiOutputOutputData({
     required this.index,
-    required this.response,
     required super.type,
     required super.node,
+    required this.outputState,
     super.outputFunction,
   });
 
   final int index;
-  Map<String, dynamic> response;
+  final OutputState outputState;
 
   @override
-  Color get interfaceColor => node.color;
-
-  @override
-  Future<Map<String, dynamic>> Function(Map<String, dynamic> p1)
+  Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
       get outputFunction {
     return (inputData) async {
-      final NodeServerCalls nodeServerCalls = GetIt.I.get<NodeServerCalls>();
+      final nodeServices = GetIt.I.get<INodeServices>();
       if (index == 0) {
-        final Map<String, dynamic> apiBody = {};
-
-        apiBody["params"] = node.paramsToJson;
-
-        for (var input in inputData.entries) {
-          apiBody[input.key] = await input.value;
-        }
-
-        response = await nodeServerCalls.runNode(node, apiBody);
-        node.nodeId = response["node_id"] ?? node.nodeId ?? "Null ID";
+        outputState.isRunning = true;
+        await runNodeWithData(inputData);
+        outputState.isRunning = false;
       } else {
+        int x = 0;
         while (node.nodeId == null) {
           await Future.delayed(const Duration(milliseconds: 100));
+          x++;
+          if (x == 20 && !outputState.isRunning) {
+            await runNodeWithData(inputData);
+            break;
+          }
         }
       }
 
-      return await nodeServerCalls.getNode(node, index + 1);
+      return await nodeServices.getNode(node, index + 1);
     };
   }
 }

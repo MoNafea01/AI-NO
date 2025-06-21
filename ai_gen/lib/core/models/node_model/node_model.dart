@@ -122,6 +122,7 @@ class NodeModel {
     );
   }
 
+  // used in serialization
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = <String, dynamic>{};
     json['uid'] = id;

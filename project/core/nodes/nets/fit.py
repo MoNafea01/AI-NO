@@ -13,7 +13,7 @@ class Fit(BaseNode):
         self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
         err = None
         if any(isinstance(i, str) for i in [self.X, self.y]):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load Nodes (X, y) at least one of them. Please check the provided IDs."
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
         self.payload = self._fit(err)
@@ -24,28 +24,29 @@ class Fit(BaseNode):
             return err
         if isinstance(self.model, (dict, int, str)):
             return self._fit_from_dict()
-        elif isinstance(rf"{self.model_path}", str):
+        
+        elif self.model_path and isinstance(self.model_path, str):
             return self._fit_from_path()
         else:
-            return "Invalid model or path provided."
+            return "Invalid nn model or path provided."
 
     def _fit_from_dict(self):
         try:
             model = NodeDataExtractor()(self.model, project_id=self.project_id)
             if isinstance(model, str):
-                return "Failed to load model. Please check the provided ID."
+                return "Failed to load nn model. Please check the provided ID."
             return self._fit_handler(model)
         except Exception as e:
-            return f"Error fitting model by ID: {e}"
+            return f"Error fitting nn model by ID: {e}"
 
     def _fit_from_path(self):
         try:
             model = NodeDataExtractor()(self.model_path, project_id=self.project_id)
             if isinstance(model, str):
-                return "Failed to load model. Please check the provided path."
+                return "Failed to load nn model. Please check the provided path."
             return self._fit_handler(model)
         except Exception as e:
-            return f"Error fitting model by path: {e}"
+            return f"Error fitting nn model by path: {e}"
     
 
     def _fit_handler(self, model):
@@ -66,4 +67,4 @@ class Fit(BaseNode):
             payload.pop("node_data", None)
             return payload
         except Exception as e:
-            return f"Error fitting model: {e}"
+            return f"Error creating nn fitter payload: {e}"

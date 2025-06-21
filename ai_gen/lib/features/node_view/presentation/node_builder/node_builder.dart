@@ -6,7 +6,7 @@ import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../main.dart';
-import 'custom_interfaces/aino_general_Interface.dart';
+import 'custom_interfaces/aino_general_interface.dart';
 import 'custom_interfaces/model_interface.dart';
 import 'custom_interfaces/multi_output_interface.dart';
 import 'custom_interfaces/preprocessor_interface.dart';
@@ -115,12 +115,15 @@ class NodeBuilder {
   VSInputData _inputDots(
       NodeModel node, String inputDot, VSOutputData<dynamic>? ref) {
     if (inputDot == "model" || inputDot == "fitted_model") {
-      return VSModelInputData(type: inputDot, initialConnection: ref);
+      return VSModelInputData(
+          type: inputDot, initialConnection: ref, node: node);
     }
     if (inputDot == "preprocessor" || inputDot == "fitted_preprocessor") {
-      return VSPreprocessorInputData(type: inputDot, initialConnection: ref);
+      return VSPreprocessorInputData(
+          type: inputDot, initialConnection: ref, node: node);
     }
-    return VSAINOGeneralInputData(type: inputDot, initialConnection: ref);
+    return VSAINOGeneralInputData(
+        type: inputDot, initialConnection: ref, node: node);
   }
 
   List<VSOutputData> _buildOutputData(NodeModel node) {
@@ -152,15 +155,16 @@ class NodeBuilder {
   }
 
   List<MultiOutputOutputData> multiOutputNodes(NodeModel node) {
-    Map<String, dynamic> response = {};
     final List<MultiOutputOutputData> outputData = [];
+    final outputState = OutputState();
+
     for (int i = 0; i < node.outputDots!.length; i++) {
       outputData.add(
         MultiOutputOutputData(
           index: i,
           node: node,
-          response: response,
           type: node.outputDots![i],
+          outputState: outputState,
         ),
       );
     }

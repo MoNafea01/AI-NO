@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:ai_gen/core/themes/asset_paths.dart';
+
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

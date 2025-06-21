@@ -14,7 +14,7 @@ class PreprocessorFitterTransformer:
             self.preprocessor.fit(self.data)
             output = self.preprocessor.transform(self.data)
         except Exception as e:
-            return f"Error fitting and transforming preprocessor: {e}"
+            return f"Error fitting and transforming preprocessor: {e}", None
         return (self.preprocessor, output)
 
 
@@ -26,7 +26,7 @@ class FitTransform:
         self.data = NodeDataExtractor()(data, project_id=project_id)
         err = None
         if isinstance(self.data, str):
-            err = "Failed to load Nodes. Please check the provided IDs."
+            err = "Failed to load data. Please check the provided ID."
 
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
@@ -38,7 +38,7 @@ class FitTransform:
             return err
         if isinstance(self.preprocessor, (dict, int, str)):
             return self._fit_transform_from_id()
-        elif isinstance(rf"{self.preprocessor_path}", str):
+        elif self.preprocessor_path and isinstance(self.preprocessor_path, str):
             return self._fit_transform_from_path()
         else:
             return "Invalid preprocessor or path provided."
@@ -48,6 +48,7 @@ class FitTransform:
             preprocessor = NodeDataExtractor()(self.preprocessor, project_id=self.project_id)
             if isinstance(preprocessor, str):
                 return "Failed to load preprocessor. Please check the provided ID."
+            
             return self._fit_transform_handler(preprocessor)
         except Exception as e:
             return f"Error fitting and transforming preprocessor by ID: {e}"

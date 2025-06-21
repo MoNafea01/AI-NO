@@ -3,25 +3,36 @@ import 'package:flutter/material.dart';
 import '../common.dart';
 import '../vs_node_view.dart';
 
-///Small data class to keep track of where the context menu is in 2D space
+/// Represents the context for a context menu in the node view.
 ///
-///Also knows if it was opend through a reference
+/// This class keeps track of where the context menu is positioned in 2D space
+/// and whether it was opened through a node reference.
 class ContextMenuContext {
   ContextMenuContext({
     required this.offset,
     this.reference,
   });
 
-  Offset offset;
-  VSOutputData? reference;
+  /// The position of the context menu in the viewport
+  final Offset offset;
+
+  /// Optional reference to the output data that triggered the context menu
+  final VSOutputData? reference;
 }
 
+/// A provider class that manages the state and interactions of nodes in the visual scripting interface.
+///
+/// This class wraps [VSNodeManager] to provide UI interaction capabilities and state management.
+/// It handles node creation, movement, selection, and context menu operations.
 class VSNodeDataProvider extends ChangeNotifier {
-  ///Wraps VSNodeManager to allow UI interaction and updates
+  /// Creates a new [VSNodeDataProvider].
+  ///
+  /// [nodeManager] is required and manages the actual node data.
+  /// [historyManager] is optional and provides undo/redo functionality.
+  /// [withAppbar] determines if the view includes an app bar.
+  /// [appbarHeight] specifies the height of the app bar if enabled.
   VSNodeDataProvider({
     required this.nodeManager,
-
-    ///Set this to false if you dont want undo functionality
     this.historyManager,
     this.withAppbar = false,
     this.appbarHeight = 56,
@@ -31,76 +42,63 @@ class VSNodeDataProvider extends ChangeNotifier {
       historyManager!.updateHistory();
     }
   }
+
+  /// Whether the view includes an app bar
   final bool withAppbar;
+
+  /// The height of the app bar if enabled
   final double appbarHeight;
 
-  late TransformationController transformationController;
+  /// Controller for viewport transformations
+  late final TransformationController transformationController;
 
-  ///Gets the closest [VSNodeDataProvider] from the widget tree
+  /// Gets the closest [VSNodeDataProvider] from the widget tree
   static VSNodeDataProvider of(BuildContext context) {
     return context
         .findAncestorWidgetOfExactType<InheritedNodeDataProvider>()!
         .provider;
   }
 
-  ///Instance of [VSNodeManager] representing the current nodes
-  ///
-  ///Holds all the data and is used as an "API" to modify data
+  /// The node manager instance that holds all node data
   final VSNodeManager nodeManager;
 
-  ///Instance of [VSHistoryManger]
-  ///
-  ///Holds and updates a history of the nodes
-  ///
-  ///Has undo and redo functions
+  /// Optional history manager for undo/redo functionality
   final VSHistoryManger? historyManager;
 
-  ///A map of all nodeBuilders can be used to build a context menu.
-  ///
-  ///Is in this format:
-  ///
-  ///{
-  /// Subgroup:{
-  ///   nodeName: NodeBuilder
-  /// },
-  /// nodeName: NodeBuilder
-  ///}
+  /// Map of all available node builders
   Map<String, dynamic> get nodeBuildersMap => nodeManager.nodeBuildersMap;
 
-  ///Node data map in this format: {NodeData.id: NodeData}
+  /// Map of all current nodes indexed by their IDs
   Map<String, VSNodeData> get nodes => nodeManager.nodes;
 
-  ///Loades nodes from string and replaces current nodes
-  ///
-  ///Notifies listeners to this provider
+  /// Loads nodes from a serialized string and replaces current nodes
   void loadSerializedNodes(String serializedNodes) {
     nodeManager.loadLocalSerializedNodes(serializedNodes);
     notifyListeners();
   }
 
-  ///Updates existing nodes or creates them
-  ///
-  ///Notifies listeners to this provider
-  void updateOrCreateNodes(
+  /// Updates existing nodes or creates new ones
+  Future<void> updateOrCreateNodes(
     List<VSNodeData> nodeDatas, {
     bool updateHistory = true,
   }) async {
     nodeManager.updateOrCreateNodes(nodeDatas);
-    if (updateHistory) historyManager?.updateHistory();
+    if (updateHistory) {
+      historyManager?.updateHistory();
+    }
     notifyListeners();
   }
 
-  ///Used to move one or mulitple nodes
-  ///
-  ///Offset will be applied to all nodes based on the offset from the moved nodes original position
+  /// Moves one or multiple nodes based on the provided offset
   void moveNode(VSNodeData nodeData, Offset offset) {
-    nodeData.node?.offset =
-        transformationController.toScene(offset); //update node object offset
+    // Update the node's offset in the scene
+    nodeData.node?.offset = transformationController.toScene(offset);
 
     final movedOffset = applyViewPortTransfrom(offset) - nodeData.widgetOffset;
     final List<VSNodeData> modifiedNodes = [];
 
     if (selectedNodes.contains(nodeData.id)) {
+      // Move all selected nodes
       for (final nodeId in selectedNodes) {
         final currentNode = nodes[nodeId]!;
         modifiedNodes.add(
@@ -108,6 +106,7 @@ class VSNodeDataProvider extends ChangeNotifier {
         );
       }
     } else {
+      // Move only the specified node
       modifiedNodes.add(
         nodeData..widgetOffset = nodeData.widgetOffset + movedOffset,
       );
@@ -116,49 +115,47 @@ class VSNodeDataProvider extends ChangeNotifier {
     updateOrCreateNodes(modifiedNodes);
   }
 
-  ///Removes multiple nodes
-  ///
-  ///Notifies listeners to this provider
-  void removeNodes(List<VSNodeData> nodeDatas) async {
+  /// Removes multiple nodes from the view
+  Future<void> removeNodes(List<VSNodeData> nodeDatas) async {
     nodeManager.removeNodes(nodeDatas);
     historyManager?.updateHistory();
     notifyListeners();
   }
 
-  ///Cleares all nodes
-  ///
-  ///Notifies listeners to this provider
-  void clearNodes() async {
+  /// Clears all nodes from the view
+  Future<void> clearNodes() async {
     nodeManager.clearNodes();
     historyManager?.updateHistory();
     notifyListeners();
   }
 
-  ///Creates a node based on the builder and the current [_contextMenuContext]
-  ///
-  ///Notifies listeners to this provider
+  /// Creates a new node based on the builder and current context menu position
   void createNodeFromContext(VSNodeDataBuilder builder) {
-    VSNodeData _builder = builder(
+    if (_contextMenuContext == null) return;
+
+    final nodeData = builder(
       _contextMenuContext!.offset,
       _contextMenuContext!.reference,
     );
 
-    _builder.node?.offset =
+    nodeData.node?.offset =
         transformationController.toScene(_contextMenuContext!.offset);
-
-    updateOrCreateNodes([_builder]);
+    updateOrCreateNodes([nodeData]);
   }
 
-  void createNodeFromSidebar(VSNodeDataBuilder builder,
-      {Offset offset = const Offset(250, 250)}) {
-    final Offset movedOffset = applyViewPortTransfrom(offset);
-    VSNodeData nodeData = builder(movedOffset, null);
+  /// Creates a new node from the sidebar at a specified position
+  void createNodeFromSidebar(
+    VSNodeDataBuilder builder, {
+    Offset offset = const Offset(250, 250),
+  }) {
+    final movedOffset = applyViewPortTransfrom(offset);
+    final nodeData = builder(movedOffset, null);
     nodeData.node?.offset = transformationController.toScene(offset);
 
     updateOrCreateNodes([nodeData]);
   }
 
-  ///Set of currently selected node ids
+  /// Set of currently selected node IDs
   Set<String> get selectedNodes => _selectedNodes;
   Set<String> _selectedNodes = {};
 
@@ -167,21 +164,18 @@ class VSNodeDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  ///Adds an [Iterable] of type [String] to the currently selected nodes
+  /// Adds nodes to the current selection
   void addSelectedNodes(Iterable<String> data) {
     selectedNodes = selectedNodes..addAll(data);
   }
 
-  ///Removes an [Iterable] of type [String] from the currently selected nodes
+  /// Removes nodes from the current selection
   void removeSelectedNodes(Iterable<String> data) {
-    selectedNodes = selectedNodes
-        .where(
-          (element) => !data.contains(element),
-        )
-        .toSet();
+    selectedNodes =
+        selectedNodes.where((element) => !data.contains(element)).toSet();
   }
 
-  ///Returns a set of all nodes that fall into the are between the supplied start and end
+  /// Finds all nodes that fall within a selection area
   Set<VSNodeData> findNodesInsideSelectionArea(Offset start, Offset end) {
     final Set<VSNodeData> inside = {};
     for (final node in nodeManager.nodes.values) {
@@ -196,36 +190,30 @@ class VSNodeDataProvider extends ChangeNotifier {
     return inside;
   }
 
+  /// Current context menu context
   ContextMenuContext? _contextMenuContext;
   ContextMenuContext? get contextMenuContext => _contextMenuContext;
 
-  ///Used to offset the UI by a given value
-  ///
-  ///Usefull if you want to wrap [VSNodeView] in an [InteractiveViewer] or the sorts,
-  ///to assure context menu and node interactions work as planned
+  /// Viewport offset for UI positioning
   Offset viewportOffset = Offset.zero;
 
-  ///Used to offset the UI by a given value
-  ///
-  ///Usefull if you want to wrap [VSNodeView] in an [InteractiveViewer] or the sorts,
-  ///to assure context menu and node interactions work as planned
+  /// Current viewport scale
   double get viewportScale => _viewportScale;
   double _viewportScale = 1;
-  set viewportScale(value) {
+
+  set viewportScale(double value) {
     _viewportScale = value;
     notifyListeners();
   }
 
-  ///Helper function to apply [viewportOffset] and [viewportScale] to a Offset
-  Offset applyViewPortTransfrom(Offset inital) {
+  /// Applies viewport transformation to a position
+  Offset applyViewPortTransfrom(Offset initial) {
     return withAppbar
-        ? (inital - Offset(0, appbarHeight) - viewportOffset) * viewportScale
-        : (inital - viewportOffset) * viewportScale;
+        ? (initial - Offset(0, appbarHeight) - viewportOffset) * viewportScale
+        : (initial - viewportOffset) * viewportScale;
   }
 
-  ///Opens the context menu at a given postion
-  ///
-  ///If the context menu was opened through a reference it will also be passed
+  /// Opens the context menu at the specified position
   void openContextMenu({
     required Offset position,
     VSOutputData? outputData,
@@ -237,9 +225,15 @@ class VSNodeDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  ///Closes the context menu
+  /// Closes the context menu
   void closeContextMenu() {
     _contextMenuContext = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    transformationController.dispose();
+    super.dispose();
   }
 }

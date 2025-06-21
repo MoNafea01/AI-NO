@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/change_password_screen/presntation/widgets/build_password_field.dart';
 
 import 'package:flutter/material.dart';

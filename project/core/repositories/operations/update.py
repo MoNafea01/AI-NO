@@ -4,7 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from core.nodes.configs.const_ import PARENT_NODES, MULTI_CHANNEL_NODES
 from core.repositories.operations import NodeSaver, NodeLoader, NodeDeleter
 from core.repositories.node_repository import NodeDataExtractor
-
+from core.nodes.utils import FolderHandler
+from core.nodes.configs.const_ import SAVING_DIR
 
 class NodeUpdater:
     """
@@ -33,10 +34,18 @@ class NodeUpdater:
         try:
             # take the <old> node (by its id)
             node = Node.objects.get(node_id=node_id, project_id=project_id) # get node from database
-            folder_path = os.path.dirname(node.node_data)
-            original_id = payload.get("node_id") # id for new node
+
+            folder_path = None
+            if node.node_data is None:
+                folder_name = FolderHandler.get_folder_by_node_name(node.node_name)
+                project_path = f"{project_id}/" if project_id else ""
+                folder_path = os.path.join(f'{SAVING_DIR}/{project_path}', folder_name)
+
+            if not folder_path:
+                folder_path = os.path.dirname(node.node_data)
             
-            is_multi_channel = node.node_name in MULTI_CHANNEL_NODES
+            original_id = payload.get("node_id") # id for new node
+            is_multi_channel = payload.get("node_name") in MULTI_CHANNEL_NODES
             payload["node_data"] = NodeDataExtractor()(original_id, project_id=project_id)
 
             if is_multi_channel:
@@ -48,13 +57,12 @@ class NodeUpdater:
 
                 for o_id in o_ids:
                     success, config = NodeLoader()(o_id, project_id=project_id)
+                    if not success:
+                        return False, f"Failed to load config for node {o_id}: {config}"
                     configs.append(config)
-
-                for i in range(2):
-                    tmp_id = o_ids[i]
-                    new_id = new_ids[i]
+                
+                for i, (tmp_id, new_id) in enumerate(zip(o_ids, new_ids)):
                     data = NodeDataExtractor()(tmp_id, project_id=project_id)
-                    
                     new_payload = payload.copy()
                     new_payload.update(**configs[i])
                     new_payload.update({"node_id":new_id, "node_data": data})

@@ -1,5 +1,6 @@
-import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/core/themes/asset_paths.dart';
+
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/data/enum_app_screens.dart';
 //import 'package:ai_gen/features/HomeScreen/home_screen.dart';

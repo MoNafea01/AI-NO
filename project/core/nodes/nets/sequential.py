@@ -22,19 +22,18 @@ class SequentialNet(BaseLayer):
         cur_id = self.layer
         if not self.layer:
             return [], []
+        
         layers_ids = [cur_id]
         while True:
-            success, task = NodeLoader()(cur_id, project_id=project_id)
+            success, cur_node = NodeLoader()(cur_id, project_id=project_id)
             if not success:
                 return [], []
-            task = task.get("task")
+            task = cur_node.get("task")
             if task != "neural_network":
                 return [], []
-            try:
-                success, cur_id = NodeLoader()(cur_id, project_id=project_id)
-                cur_id = cur_id.get("children")[0]
-            except IndexError:
-                cur_id = None
+            
+            children = cur_node.get("children", [])
+            cur_id = children[0] if len(children) == 1 else None
                 
             if not cur_id:
                 break

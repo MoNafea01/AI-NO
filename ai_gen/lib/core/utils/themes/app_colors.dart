@@ -11,6 +11,7 @@ abstract class AppColors {
   static const Color nodeInterfaceIconColor = Color(0xffD9D9D9);
   static const Color textSecondary = Color(0xFF666666);
   static const Color blackText = Color(0xFF000000);
+  static const Color blackText2 = Color(0xFF1A1A1A);
 
   static List<Color> get nodesColors => [
         Colors.blue,

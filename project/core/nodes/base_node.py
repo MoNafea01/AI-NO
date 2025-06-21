@@ -19,6 +19,7 @@ class BaseNode:
             node = self.node_class(**self.node_params())
             if isinstance(node, str):
                 return "Failed to create node. Please check the provided parameters."
+            
             return self.load_handler(node)
         except Exception as e:
             return f"Error creating node from json: {e}"
@@ -40,7 +41,7 @@ class BaseNode:
                     try:
                         payload.update({'children':[self.children]})
                     except Exception as e:
-                        return f"Error updating children: {e}"
+                        return f"Error updating node's children: {e}"
 
             except Exception as e:
                 pass
