@@ -22,6 +22,7 @@ abstract class AssetsPaths {
     static const String settingIcon = "${baseAssetPath}settings_icon.svg";
     static const String addIcon = "${baseAssetPath}add_icon.svg";
     static const String importIcon = "${baseAssetPath}import_icon.svg";
+    static const String expandedIcon = "${baseAssetPath}expanded_icon.svg";
 
 
 

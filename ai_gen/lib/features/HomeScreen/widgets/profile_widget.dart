@@ -1,5 +1,7 @@
-import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit.dart';
-import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
+import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
+
 import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
@@ -21,40 +23,37 @@ class ProfileWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isExpanded)
-            InkWell(
-              onTap: () {
-                context.read<ProfileCubit>().loadProfile();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ProfileScreen()),
-                );
-              },
-              child: const Padding(
+            const InkWell(
+              // onTap: () {
+              //   context.read<ProfileCubit>().loadProfile();
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => const ProfileScreen()),
+              //   );
+              // },
+              child: Padding(
                 padding: EdgeInsets.only(bottom: 8.0),
                 child: Text(
                   "Profile",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.blue,
+                    color: Colors.black,
                     fontWeight: FontWeight.w500,
+                    fontSize: 16,
                   ),
                 ),
               ),
             ),
           Row(
             children: [
-              CircleAvatar(
-                backgroundColor: Colors.blue.shade100,
-                radius: 16,
-                child: Text(
-                  userName?.isNotEmpty == true
-                      ? userName![0].toUpperCase()
-                      : '',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
+              const CircleAvatar(
+                backgroundColor: Color(0xFFF5F5F5),
+                radius: 26,
+                child: Icon(
+                  Icons.person,
+                  color: AppColors.primaryColor,
+                  size: 35,
                 ),
               ),
               if (isExpanded) const SizedBox(width: 8),

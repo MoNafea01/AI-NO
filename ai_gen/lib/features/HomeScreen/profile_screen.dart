@@ -1,9 +1,8 @@
 import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit.dart';
-import 'package:ai_gen/features/HomeScreen/cubit/user_profile_state.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_state.dart';
 import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
 
-import 'package:ai_gen/features/HomeScreen/widgets/build_profile_info.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/edit_profile_dialog.dart';
 
 import 'package:flutter/material.dart';
@@ -14,138 +13,154 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fullNameFirstController = TextEditingController();
+    final fullNameLastController = TextEditingController();
+    final usernameController = TextEditingController();
+    final emailController = TextEditingController();
+
+    final bioController = TextEditingController();
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
         if (state is ProfileLoading) {
           return const Scaffold(
             body: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: AppColors.primaryColor,
+              ),
             ),
           );
         } else if (state is ProfileLoaded) {
           final profile = state.profile;
+          fullNameFirstController.text = profile.firstName;
+          fullNameLastController.text = profile.lastName;
+          usernameController.text = profile.username;
+          emailController.text = profile.email;
           return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: AppColors.appBackgroundColor,
-              title: const Text('User Profile'),
-              elevation: 2,
-              centerTitle: false,
-              actions: [
-                Tooltip(
-                  message: 'Edit Profile',
-                  child: TextButton.icon(
-                    icon: const Icon(Icons.edit),
-                    label: const Text('Edit Profile'),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) =>
-                            EditProfileDialog(profile: profile),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Tooltip(
-                  message: 'Back to Home',
-                  child: TextButton.icon(
-                    icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                    label: const Text('Back to Home'),
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DashboardScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+            backgroundColor: const Color(0xFFF5F5F5),
+            // appBar: AppBar(
+            //   automaticallyImplyLeading: false,
+            //   backgroundColor: AppColors.appBackgroundColor,
+            //   title: const Text('User Profile'),
+            //   elevation: 2,
+            //   centerTitle: false,
+            //   actions: [
+            //     Tooltip(
+            //       message: 'Edit Profile',
+            //       child: TextButton.icon(
+            //         icon: const Icon(Icons.edit),
+            //         label: const Text('Edit Profile'),
+            //         onPressed: () {
+            //           showDialog(
+            //             context: context,
+            //             builder: (context) =>
+            //                 EditProfileDialog(profile: profile),
+            //           );
+            //         },
+            //       ),
+            //     ),
+            //     const SizedBox(width: 16),
+            //     Tooltip(
+            //       message: 'Back to Home',
+            //       child: TextButton.icon(
+            //         icon: const Icon(Icons.arrow_back_ios_new_outlined),
+            //         label: const Text('Back to Home'),
+            //         onPressed: () {
+            //           Navigator.pushReplacement(
+            //             context,
+            //             MaterialPageRoute(
+            //               builder: (context) => const DashboardScreen(),
+            //             ),
+            //           );
+            //         },
+            //       ),
+            //     ),
+            //   ],
+            // ),
             body: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: Card(
-                  elevation: 4,
-                  margin: const EdgeInsets.all(24),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Header section with avatar placeholder
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 48,
-                              backgroundColor: Colors.grey.shade200,
-                              child: Text(
-                                '${profile.firstName[0]}${profile.lastName[0]}',
-                                style: const TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 10),
+                      const Text("Name:", style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField(
+                              controller: fullNameFirstController,
+                              hintText: 'First name',
+                              icon: Icons.person,
                             ),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${profile.firstName} ${profile.lastName}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium,
-                                  ),
-                                  Text(
-                                    '@${profile.username}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          color: Colors.grey.shade600,
-                                        ),
-                                  ),
-                                ],
-                              ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: CustomTextField(
+                              controller: fullNameLastController,
+                              hintText: 'Last name',
+                              icon: Icons.person,
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      const Text("Username:", style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 8),
+                      CustomTextField(
+                        controller: usernameController,
+                        icon: Icons.person,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text("Email Address:",
+                          style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 8),
+                      CustomTextField(
+                        controller: emailController,
+                        icon: Icons.email,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text("Bio:", style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: bioController,
+                        maxLines: 4,
+                        decoration: InputDecoration(
+                          hintText: 'Write about yourself',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.all(16),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-
-                        const SizedBox(height: 32),
-                        const Divider(),
-                        const SizedBox(height: 16),
-
-                        // Profile details section
-                        Text(
-                          'Account Information',
-                          style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 30),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 14),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  EditProfileDialog(profile: profile),
+                            );
+                          },
+                          child: const Text("Save changes",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white)),
                         ),
-                        const SizedBox(height: 16),
-
-                        // Using a more structured grid for profile details
-                        GridView.count(
-                          crossAxisCount: 2,
-                          shrinkWrap: true,
-                          childAspectRatio: 4,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          children: [
-                            buildInfoTile(context, 'Email', profile.email),
-                            buildInfoTile(
-                                context, 'Username', profile.username),
-                            buildInfoTile(
-                                context, 'First Name', profile.firstName),
-                            buildInfoTile(
-                                context, 'Last Name', profile.lastName),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -184,14 +199,53 @@ class ProfileScreen extends StatelessWidget {
         return Scaffold(
           body: Center(
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              ),
               onPressed: () {
                 context.read<ProfileCubit>().loadProfile();
               },
-              child: const Text('Load Profile'),
+              child: const Text('Load Profile',
+                  style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class CustomTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String? hintText;
+  final IconData? icon;
+
+  const CustomTextField({
+    required this.controller,
+    super.key,
+    this.hintText,
+    this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintText ?? controller.text,
+        prefixIcon: icon != null ? Icon(icon) : null,
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.all(16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
     );
   }
 }

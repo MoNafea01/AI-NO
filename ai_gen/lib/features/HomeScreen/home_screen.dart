@@ -1,8 +1,11 @@
-import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit.dart';
+import 'package:ai_gen/core/themes/asset_paths.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import 'widgets/create_new_project_button.dart';
@@ -16,15 +19,14 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   bool isExpanded = true;
-int _selectedIndex = 0;
-final int exploreIndex = 0;
-final int architecturesIndex = 1;
-final int modelsIndex = 2; 
-final int datasetsIndex = 3; 
-final int projectsIndex = 4; 
-final int learnIndex = 5; 
-  final int settingsIndex = 6; 
-
+  int _selectedIndex = 0;
+  final int exploreIndex = 0;
+  final int architecturesIndex = 1;
+  final int modelsIndex = 2;
+  final int datasetsIndex = 3;
+  final int projectsIndex = 4;
+  final int learnIndex = 5;
+  final int settingsIndex = 6;
 
   @override
   Widget build(BuildContext context) {
@@ -82,32 +84,29 @@ final int learnIndex = 5;
               ],
             ),
             const SizedBox(height: 20),
-            _sidebarItem(Icons.explore, 'Explore', _selectedIndex == exploreIndex,
-                () {
+            _sidebarItem(
+                Icons.explore, 'Explore', _selectedIndex == exploreIndex, () {
               setState(() {
                 _selectedIndex = exploreIndex;
               });
             }),
-
             _sidebarItem(Icons.architecture, 'Architectures',
                 _selectedIndex == architecturesIndex, () {
               setState(() {
                 _selectedIndex = architecturesIndex;
               });
             }),
-
-
-
-            _sidebarItem(Icons.model_training, 'Models', _selectedIndex == modelsIndex,
+            _sidebarItem(
+                Icons.model_training, 'Models', _selectedIndex == modelsIndex,
                 () {
               setState(() {
                 _selectedIndex = modelsIndex;
               });
             }),
-
-            _sidebarItem(Icons.dataset, 'Datasets',  _selectedIndex == datasetsIndex, () {
+            _sidebarItem(
+                Icons.dataset, 'Datasets', _selectedIndex == datasetsIndex, () {
               setState(() {
-                _selectedIndex =  datasetsIndex;
+                _selectedIndex = datasetsIndex;
               });
             }),
             _sidebarItem(Icons.school, 'Learn', _selectedIndex == learnIndex,
@@ -116,21 +115,24 @@ final int learnIndex = 5;
                 _selectedIndex = learnIndex;
               });
             }),
-            _sidebarItem(Icons.description, 'Docs',  _selectedIndex == projectsIndex, () {
+            _sidebarItem(
+                Icons.description, 'Docs', _selectedIndex == projectsIndex, () {
               setState(() {
                 _selectedIndex = projectsIndex;
               });
             }),
-           _sidebarItem(Icons.settings, 'Settings', _selectedIndex == settingsIndex, () {
-  setState(() {
-    _selectedIndex = settingsIndex;
-  });
+            _sidebarItem(
+                Icons.settings, 'Settings', _selectedIndex == settingsIndex,
+                () {
+              setState(() {
+                _selectedIndex = settingsIndex;
+              });
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
-  );
-}),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
+              );
+            }),
             const Spacer(),
             const ProfileWidget(),
             const SizedBox(height: 10),
@@ -166,8 +168,7 @@ final int learnIndex = 5;
     );
   }
 
-
- Widget _logoutButton() {
+  Widget _logoutButton() {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return InkWell(
@@ -190,7 +191,6 @@ final int learnIndex = 5;
       ),
     );
   }
-
 }
 
 class ProfileWidget extends StatelessWidget {
@@ -223,10 +223,13 @@ class ProfileWidget extends StatelessWidget {
         Row(
           children: [
             const CircleAvatar(
-              backgroundColor: Colors.blue,
+              backgroundColor: Color.fromARGB(255, 241, 234, 234),
               radius: 16,
-              child:
-                  Text('', style: TextStyle(fontSize: 12, color: Colors.white)),
+              child: Icon(
+                Icons.person,
+                color: Colors.blue,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 8),
             Expanded(

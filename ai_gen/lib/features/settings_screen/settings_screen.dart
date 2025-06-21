@@ -1,8 +1,12 @@
+import 'package:ai_gen/core/themes/app_colors.dart';
+//import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
+import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
+import 'package:ai_gen/features/settings_screen/appearence_screen.dart';
 import 'package:ai_gen/features/settings_screen/widgets/build_tap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
-import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
+//import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
 import 'package:ai_gen/features/settings_screen/cubits/settings_cubit.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -26,11 +30,12 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
+              const Text(
                 'Manage your account settings',
                 style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+                  fontSize: 18,
+                  color: Color(0xff666666),
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 24),
@@ -43,19 +48,32 @@ class SettingsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Tabs
-                        Row(
-                          children: [
-                            buildTab(context, 'Profile', 0, currentTab),
-                            buildTab(context, 'Account', 1, currentTab),
-                          ],
+                        Container(
+                          color: Colors.grey.shade200,
+                          // decoration: BoxDecoration(
+
+                          //   border: Border(
+                          //     bottom: BorderSide(
+                          //       color: Colors.grey.shade300,
+                          //       width: 1,
+                          //     ),
+                          //   ),
+                          // ),
+                          child: Row(
+                            children: [
+                              buildTab(context, 'Profile', 0, currentTab),
+                              buildTab(context, 'Account', 1, currentTab),
+                              buildTab(context, 'Appearance', 2, currentTab),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Container(
                           height: 1,
-                          color: Colors.grey[300],
+                          color: Colors.transparent,
                         ),
                         const SizedBox(height: 32),
-                    
+
                         // Tab Content
                         Expanded(
                           child: IndexedStack(
@@ -63,6 +81,7 @@ class SettingsScreen extends StatelessWidget {
                             children: const [
                               ProfileScreen(),
                               ChangePasswordScreen(),
+                              PreferenceModeSelector()
                             ],
                           ),
                         ),
@@ -77,6 +96,4 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-
-
 }

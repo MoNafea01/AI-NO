@@ -70,3 +70,39 @@ class SearchAndActionsRow extends StatelessWidget {
     );
   }
 }
+
+// shaltoot
+Widget buildSearchBar(BuildContext context) {
+  return Row(
+    children: [
+      Expanded(
+        child: SizedBox(
+          height: 40,
+          child: TextField(
+            onChanged: (query) {
+              
+            },
+            decoration: InputDecoration(
+              hintText: 'Find a project',
+              hintStyle: TextStyle(color: Colors.grey.shade500),
+              prefixIcon:
+                  Icon(Icons.search, size: 20, color: Colors.grey.shade600),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(color: Colors.blue.shade300),
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 0),
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(width: 8),
+    ],
+  );
+}

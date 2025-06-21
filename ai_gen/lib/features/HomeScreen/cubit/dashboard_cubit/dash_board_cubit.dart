@@ -1,6 +1,9 @@
 // lib/features/dashboard/presentation/cubit/dashboard_cubit.dart
+import 'package:ai_gen/features/HomeScreen/data/enum_app_screens.dart';
 import 'package:ai_gen/features/HomeScreen/home_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+
 
 
 
@@ -8,7 +11,7 @@ class DashboardCubit extends Cubit<DashboardState> {
   DashboardCubit()
       : super(DashboardState(
           isExpanded: true,
-          selectedIndex: 0,
+          selectedScreen: AppScreen.explore, // Start with ExploreScreen
           searchQuery: '',
           currentPage: 1,
           filteredProjects: [],
@@ -18,8 +21,8 @@ class DashboardCubit extends Cubit<DashboardState> {
     emit(state.copyWith(isExpanded: !state.isExpanded));
   }
 
-  void selectNavigationItem(int index) {
-    emit(state.copyWith(selectedIndex: index));
+  void selectNavigationItem(AppScreen screen) {
+    emit(state.copyWith(selectedScreen: screen));
   }
 
   void searchProjects(String query, List<ProjectItem> allProjects) {
@@ -43,14 +46,14 @@ class DashboardCubit extends Cubit<DashboardState> {
 
 class DashboardState {
   final bool isExpanded;
-  final int selectedIndex;
+  final AppScreen selectedScreen;
   final String searchQuery;
   final int currentPage;
   final List<ProjectItem> filteredProjects;
 
   DashboardState({
     required this.isExpanded,
-    required this.selectedIndex,
+    required this.selectedScreen,
     required this.searchQuery,
     required this.currentPage,
     required this.filteredProjects,
@@ -58,14 +61,14 @@ class DashboardState {
 
   DashboardState copyWith({
     bool? isExpanded,
-    int? selectedIndex,
+    AppScreen? selectedScreen,
     String? searchQuery,
     int? currentPage,
     List<ProjectItem>? filteredProjects,
   }) {
     return DashboardState(
       isExpanded: isExpanded ?? this.isExpanded,
-      selectedIndex: selectedIndex ?? this.selectedIndex,
+      selectedScreen: selectedScreen ?? this.selectedScreen,
       searchQuery: searchQuery ?? this.searchQuery,
       currentPage: currentPage ?? this.currentPage,
       filteredProjects: filteredProjects ?? this.filteredProjects,

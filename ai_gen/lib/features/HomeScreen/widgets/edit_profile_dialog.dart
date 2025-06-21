@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/themes/app_colors.dart';
-import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,6 +56,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
           );
 
       // Refresh Cubit
+      // ignore: use_build_context_synchronously
       context.read<ProfileCubit>().loadProfile();
 
       if (mounted) {
@@ -101,9 +102,9 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
       // icon: const Icon(Icons.edit, color: Colors.black),
 
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
       ),
-      backgroundColor: Colors.blueGrey[50],
+      backgroundColor: const Color(0xFFF5F5F5),
       contentPadding: const EdgeInsets.symmetric(
         vertical: 20,
         horizontal: 24,
@@ -114,7 +115,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
-      title: const Text('Edit Profile'),
+      title: const Text('Save Profile Changes'),
       content: _isLoading
           ? const SizedBox(
               height: 100, child: Center(child: CircularProgressIndicator()))
@@ -129,6 +130,8 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                       TextFormField(
                         controller: _usernameController,
                         decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
                             labelText: 'Username',
                             border: OutlineInputBorder()),
                         validator: (value) =>
@@ -138,6 +141,8 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                       TextFormField(
                         controller: _firstNameController,
                         decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
                             labelText: 'First Name',
                             border: OutlineInputBorder()),
                         validator: (value) =>
@@ -147,6 +152,8 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                       TextFormField(
                         controller: _lastNameController,
                         decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
                             labelText: 'Last Name',
                             border: OutlineInputBorder()),
                         validator: (value) =>
@@ -156,7 +163,10 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                       TextFormField(
                         controller: _emailController,
                         decoration: const InputDecoration(
-                            labelText: 'Email', border: OutlineInputBorder()),
+                            filled: true,
+                            fillColor: Colors.white,
+                            labelText: 'Email',
+                            border: OutlineInputBorder()),
                         validator: _validateEmail,
                       ),
                     ],
@@ -171,7 +181,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             foregroundColor: AppColors.primaryColor,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(4),
             ),
             //  fixedSize: const Size(100, 40),
           ),
@@ -183,7 +193,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             backgroundColor: AppColors.primaryColor,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(4),
             ),
             //fixedSize: const Size(100, 40),
           ),
