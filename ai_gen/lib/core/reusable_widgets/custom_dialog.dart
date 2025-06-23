@@ -96,14 +96,14 @@ class _CustomDialogState extends State<CustomDialog> {
     return ElevatedButton(
       onPressed: _onSubmitPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.primaryColor,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(
           horizontal: 24,
           vertical: 12,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(4),
         ),
       ),
       child: Text(
@@ -116,10 +116,21 @@ class _CustomDialogState extends State<CustomDialog> {
   TextButton _cancelButton() {
     return TextButton(
       onPressed: _onCancelPressed,
+      style: ElevatedButton.styleFrom(
+        // backgroundColor: AppColors.primaryColor,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 12,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
       child: Text(
         widget.cancelButtonText ?? 'Cancel',
-        style: AppTextStyles.black16w400
-            .copyWith(color: AppColors.bluePrimaryColor),
+        style:
+            AppTextStyles.black16w400.copyWith(color: AppColors.primaryColor),
       ),
     );
   }

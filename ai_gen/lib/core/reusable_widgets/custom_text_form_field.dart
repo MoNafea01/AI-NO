@@ -71,7 +71,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           padding: const EdgeInsets.only(bottom: 20),
           child: Text(widget.labelText ?? ""),
         ),
-        labelStyle: TextStyle(color: Colors.grey[700]),
+        labelStyle: const TextStyle(color: Color(0xff333333)),
         hintText: widget.hintText,
         filled: true,
         fillColor: Colors.grey[200],

@@ -1,11 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 
 import 'package:ai_gen/features/HomeScreen/project_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_side_bar_dashboard.dart';
 
 import 'package:ai_gen/features/architecturesScreen/architecture_screen.dart';
+import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:ai_gen/features/screens/HomeScreen/widgets/project_table.dart';
@@ -34,6 +36,12 @@ class DashboardScreen extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => HomeCubit()..loadHomePage(),
+        ),
+        BlocProvider(
+          create: (context) => ProfileCubit(
+            context.read<AuthProvider>(),
+          )..loadProfile(
+          ),
         ),
       ],
       child: const _DashboardView(),

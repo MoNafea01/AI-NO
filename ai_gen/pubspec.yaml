@@ -44,6 +44,7 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   get_it: ^8.0.3
   http: ^1.3.0
+  intl: ^0.20.2
   provider: ^6.1.2
   toggle_switch: ^2.3.0
   vs_node_view: ^2.1.1

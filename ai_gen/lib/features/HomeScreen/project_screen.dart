@@ -360,27 +360,27 @@ Widget buildHeader(BuildContext context) {
           ),
         ],
       ),
-      Row(
-        children: [
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: SvgPicture.asset(
-              AssetsPaths.importIcon,
-              width: 16,
-              height: 16,
-              color: Colors.blue,
-            ),
-            label: const Text('Import'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.blue,
-              side: BorderSide(color: Colors.blue.shade200),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-          ),
-          const SizedBox(width: 12),
-          const CreateNewProjectButton(),
-        ],
-      ),
+      // Row(
+      //   children: [
+      //     OutlinedButton.icon(
+      //       onPressed: () {},
+      //       icon: SvgPicture.asset(
+      //         AssetsPaths.importIcon,
+      //         width: 16,
+      //         height: 16,
+      //         color: Colors.blue,
+      //       ),
+      //       label: const Text('Import'),
+      //       style: OutlinedButton.styleFrom(
+      //         foregroundColor: Colors.blue,
+      //         side: BorderSide(color: Colors.blue.shade200),
+      //         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      //       ),
+      //     ),
+      //     const SizedBox(width: 12),
+      //     const CreateNewProjectButton(),
+      //   ],
+      // ),
     ],
   );
 }

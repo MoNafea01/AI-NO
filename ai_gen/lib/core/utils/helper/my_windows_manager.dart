@@ -6,7 +6,7 @@ Future<void> initializeWindowsManager() async {
   await windowManager.ensureInitialized();
 
   // Set the minimum window size (e.g., 800x500)
-  windowManager.setMinimumSize(const Size(800, 650));
+  windowManager.setMinimumSize(const Size(870, 650));
   windowManager.setSize(const Size(800, 650), animate: true);
 
   windowManager.center(animate: true);

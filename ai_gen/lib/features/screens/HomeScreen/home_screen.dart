@@ -37,8 +37,8 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       // HeaderSection(), // old header section
                       buildHeader(context),
-                      //const SearchAndActionsRow(), old search and actions row
-                      buildSearchBar(context),
+                      const SearchAndActionsRow(), //old search and actions row
+                      // buildSearchBar(context),
                       const Expanded(child: _Content()),
                     ],
                   ),
