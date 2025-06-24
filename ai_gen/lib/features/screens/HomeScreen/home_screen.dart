@@ -69,10 +69,10 @@ class _Content extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.search_off,
                   size: 64,
-                  color: Colors.grey.shade400,
+                  color: AppColors.primaryColor,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -100,6 +100,9 @@ class _Content extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
                     foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                   child: const Text('Show All Projects'),
                 ),

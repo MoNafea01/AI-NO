@@ -228,7 +228,6 @@ class ProjectsTable extends StatelessWidget {
     );
   }
 
-  
   Widget _highlightSearchText(
       String text, String searchQuery, TextStyle baseStyle) {
     if (searchQuery.isEmpty || text.isEmpty) {
@@ -260,7 +259,7 @@ class ProjectsTable extends StatelessWidget {
       spans.add(TextSpan(
         text: text.substring(index, index + searchQuery.length),
         style: baseStyle.copyWith(
-          backgroundColor: AppColors.primaryColor,
+          backgroundColor: Colors.yellow.shade100,
           fontWeight: FontWeight.bold,
         ),
       ));
@@ -278,7 +277,9 @@ class ProjectsTable extends StatelessWidget {
     }
 
     return RichText(
-      text: TextSpan(children: spans ,),
+      text: TextSpan(
+        children: spans,
+      ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );

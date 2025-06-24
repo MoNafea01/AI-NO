@@ -39,6 +39,7 @@ class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
       context.read<HomeCubit>().searchProjects(query);
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -57,10 +58,12 @@ class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
               ),
               hintText: "Search for projects",
               hintStyle: const TextStyle(color: Colors.black),
-              prefixIcon: const Icon(Icons.search, color: Colors.black),
+              prefixIcon:
+                  const Icon(Icons.search, color: AppColors.primaryColor),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.black),
+                      icon: const Icon(Icons.clear,
+                          color: AppColors.primaryColor),
                       onPressed: () {
                         _searchController.clear();
                         context.read<HomeCubit>().searchProjects('');
