@@ -1,4 +1,4 @@
-// Projects Table Widget
+// Updated Projects Table Widget with Search Highlighting
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
@@ -141,14 +141,15 @@ class ProjectsTable extends StatelessWidget {
                                   _projectName(context, project),
                                   if (project.description != null &&
                                       project.description!.isNotEmpty)
-                                    Text(
+                                    _highlightSearchText(
                                       project.description!,
-                                      style: const TextStyle(
+                                      context
+                                          .read<HomeCubit>()
+                                          .currentSearchQuery,
+                                      const TextStyle(
                                         fontSize: 12,
                                         color: Color(0xFF6B7280),
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                 ],
                               ),
@@ -159,14 +160,13 @@ class ProjectsTable extends StatelessWidget {
                       // Description column
                       Expanded(
                         flex: 2,
-                        child: Text(
+                        child: _highlightSearchText(
                           project.description ?? "",
-                          style: const TextStyle(
+                          context.read<HomeCubit>().currentSearchQuery,
+                          const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF374151),
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       // Created At column
@@ -216,16 +216,71 @@ class ProjectsTable extends StatelessWidget {
           ),
         );
       },
-      child: Text(
+      child: _highlightSearchText(
         project.name ?? "Project Name",
-        style: const TextStyle(
+        context.read<HomeCubit>().currentSearchQuery,
+        const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: Color(0xFF111827),
         ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
       ),
+    );
+  }
+
+  
+  Widget _highlightSearchText(
+      String text, String searchQuery, TextStyle baseStyle) {
+    if (searchQuery.isEmpty || text.isEmpty) {
+      return Text(
+        text,
+        style: baseStyle,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    final List<TextSpan> spans = [];
+    final String lowerText = text.toLowerCase();
+    final String lowerQuery = searchQuery.toLowerCase();
+
+    int start = 0;
+    int index = lowerText.indexOf(lowerQuery);
+
+    while (index != -1) {
+      // Add text before match
+      if (index > start) {
+        spans.add(TextSpan(
+          text: text.substring(start, index),
+          style: baseStyle,
+        ));
+      }
+
+      // Add highlighted match
+      spans.add(TextSpan(
+        text: text.substring(index, index + searchQuery.length),
+        style: baseStyle.copyWith(
+          backgroundColor: AppColors.primaryColor,
+          fontWeight: FontWeight.bold,
+        ),
+      ));
+
+      start = index + searchQuery.length;
+      index = lowerText.indexOf(lowerQuery, start);
+    }
+
+    // Add remaining text
+    if (start < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(start),
+        style: baseStyle,
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(children: spans ,),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

@@ -12,6 +12,11 @@ final class HomeSuccess extends HomeState {
 
   HomeSuccess({required this.projects});
 }
+final class HomeSearchEmpty extends HomeState {
+  final String query;
+
+  HomeSearchEmpty({required this.query});
+}
 
 final class HomeFailure extends HomeState {
   final String errMsg;

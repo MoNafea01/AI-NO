@@ -1,4 +1,6 @@
 // Search and Actions Row Widget
+import 'dart:async';
+
 import 'package:ai_gen/core/utils/helper/helper.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
@@ -11,9 +13,32 @@ import 'custom_icon_text_button.dart';
 import 'project_actions/create_new_project_dialog.dart';
 import 'project_actions/import_project_dialog.dart';
 
-class SearchAndActionsRow extends StatelessWidget {
+class SearchAndActionsRow extends StatefulWidget {
   const SearchAndActionsRow({super.key});
 
+  @override
+  State<SearchAndActionsRow> createState() => _SearchAndActionsRowState();
+}
+
+class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounceTimer;
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    // Cancel previous timer
+    _debounceTimer?.cancel();
+
+    // Create new timer for debouncing (wait 300ms after user stops typing)
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      context.read<HomeCubit>().searchProjects(query);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -21,6 +46,8 @@ class SearchAndActionsRow extends StatelessWidget {
       children: [
         Expanded(
           child: TextField(
+            controller: _searchController,
+            onChanged: _onSearchChanged,
             decoration: InputDecoration(
               enabledBorder: const OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.black),
@@ -31,6 +58,16 @@ class SearchAndActionsRow extends StatelessWidget {
               hintText: "Search for projects",
               hintStyle: const TextStyle(color: Colors.black),
               prefixIcon: const Icon(Icons.search, color: Colors.black),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.black),
+                      onPressed: () {
+                        _searchController.clear();
+                        context.read<HomeCubit>().searchProjects('');
+                        setState(() {}); // Rebuild to hide clear button
+                      },
+                    )
+                  : null,
               filled: true,
               fillColor: const Color(0x00666666),
               border: OutlineInputBorder(

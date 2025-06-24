@@ -1,5 +1,6 @@
 import 'package:ai_gen/core/reusable_widgets/failure_screen.dart';
 import 'package:ai_gen/core/reusable_widgets/loading_screen.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/project_screen.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +64,48 @@ class _Content extends StatelessWidget {
           return const LoadingScreen();
         } else if (state is HomeSuccess) {
           return const ProjectsTable();
+        } else if (state is HomeSearchEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.search_off,
+                  size: 64,
+                  color: Colors.grey.shade400,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'No projects found for "${state.query}"',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Try searching with different keywords',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    // Clear search and show all projects
+                    context.read<HomeCubit>().searchProjects('');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Show All Projects'),
+                ),
+              ],
+            ),
+          );
         }
         return FailureScreen(
           (state as HomeFailure).errMsg,
