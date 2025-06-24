@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 Widget buildLabel(String text) {
@@ -23,6 +24,14 @@ Widget buildPasswordField(TextEditingController controller, bool visible,
       suffixIcon: IconButton(
         icon: Icon(visible ? Icons.visibility : Icons.visibility_off),
         onPressed: toggleVisibility,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: const BorderSide(color: AppColors.primaryColor, width: 1),
       ),
     ),
   );

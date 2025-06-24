@@ -43,6 +43,11 @@ class DashboardScreen extends StatelessWidget {
           )..loadProfile(
           ),
         ),
+        BlocProvider(
+          create: (context) => ProfileCubit(
+            context.read<AuthProvider>(),
+          )..loadProfile(),
+        ),
       ],
       child: const _DashboardView(),
     );

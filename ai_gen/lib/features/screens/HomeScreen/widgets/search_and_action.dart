@@ -51,10 +51,10 @@ class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
             onChanged: _onSearchChanged,
             decoration: InputDecoration(
               enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black),
+                borderSide: BorderSide(color: AppColors.primaryColor),
               ),
               focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black),
+                borderSide: BorderSide(color: AppColors.primaryColor),
               ),
               hintText: "Search for projects",
               hintStyle: const TextStyle(color: Colors.black),
