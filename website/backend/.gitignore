@@ -1,0 +1,17 @@
+# created by virtualenv automatically
+.env
+
+# Virtual environment
+gpweb
+
+# Database
+db.sqlite3
+
+# Schema
+schema.yml
+
+#Static folder
+/static/
+
+#python cache
+/__pycache__/
