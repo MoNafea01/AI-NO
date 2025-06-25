@@ -67,6 +67,7 @@ INSTALLED_APPS = [
 
 
 
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -101,6 +102,7 @@ AUTHENTICATION_BACKENDS = (
 # Configs Used with JWT
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
+
     'REFRESH_TOKEN_LIFETIME': timedelta(days=50),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -157,6 +159,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR , 'templates')],
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -179,6 +182,7 @@ CHANNEL_LAYERS = {
 }
 CHANNELS_DEV_MODE = True
 ###############################################################################################################
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -238,6 +242,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # MEDIA ( used to store images )
 MEDIA_ROOT = os.path.join(BASE_DIR , 'media')
 MEDIA_URL = 'media/'
+
 
 GRAPH_MODELS = {
   'all_applications': True,

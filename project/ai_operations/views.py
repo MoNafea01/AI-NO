@@ -13,7 +13,7 @@ from .serializers import *
 
 from core.nodes import *
 from core.repositories import *
-from core.nodes.configs.const_ import get_node_name_by_api_ref
+from core.nodes.configs.const_ import get_node_name_by_api_ref, MODELS_NAMES
 
 from chatbot.app import sync_generate_cli
 from chatbot.res.defaults import create_data_mapping
@@ -26,6 +26,42 @@ class NodeQueryMixin:
     A mixin to handle 'get' requests for any ViewSet.
     It extracts "node_id" from request parameters and uses NodeLoader.
     """
+    
+    def delete_project_model(self, project_id, node_name):
+        """
+        Delete the project model based on the node_name.
+        This function is called after creating a new node.
+        """
+        try:
+            project = Project.objects.get(id=project_id)
+            models_names = MODELS_NAMES.copy()
+            models_names.append("sequential_model")
+            models_names = models_names[3:]  # Skip the first three items
+            if node_name in models_names:
+                project.model = None
+                project.save()
+                return True, "Project model updated successfully."
+            else:
+                return False, "Node name does not correspond to a valid model."
+        except Project.DoesNotExist:
+            return False, "Project not found."
+    
+    def delete_project_dataset(self, project_id, data_loader):
+        """
+        Delete the project dataset based on the data_loader_id.
+        This function is called after creating a new data loader node.
+        """
+        try:
+            project = Project.objects.get(id=project_id)
+            if data_loader.get('node_name') == "data_loader":
+                project.dataset = None
+                project.save()
+                return True, "Project dataset updated successfully."
+            else:
+                return False, "Node does not correspond to a valid data loader."
+        except (Project.DoesNotExist, Node.DoesNotExist):
+            return False, "Project or DataLoader node not found."
+    
     def get_query_params(self, request):
         """Extracts query parameters from the request."""
         node_id = request.query_params.get("node_id")
@@ -144,6 +180,9 @@ class NodeQueryMixin:
                 try:
                     success, message = NodeDeleter(is_multi_channel)(node_id, project_id=project_id)
                     if success:
+                        self.delete_project_model(project_id, node_name)
+                        _, msg = self.delete_project_dataset(project_id, node)
+                        print(msg)
                         return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
                     else:
                         return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
@@ -290,11 +329,49 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
 
         return response
     
+    def update_project_model(self, project_id, node_name):
+        """
+        Update the project model based on the node_name.
+        This function is called after creating a new node.
+        """
+        try:
+            project = Project.objects.get(id=project_id)
+            models_names = MODELS_NAMES.copy()
+            models_names.append("sequential_model")
+            models_names = models_names[3:]  # Skip the first three items
+            if node_name in models_names:
+                project.model = node_name
+                project.save()
+                return True, "Project model updated successfully."
+            else:
+                return False, "Node name does not correspond to a valid model."
+        except Project.DoesNotExist:
+            return False, "Project not found."
+    
+    def update_project_dataset(self, project_id, data_loader):
+        """
+        Update the project dataset based on the data_loader_id.
+        This function is called after creating a new data loader node.
+        """
+        try:
+            project = Project.objects.get(id=project_id)
+            if data_loader.get('node_name') == "data_loader":
+                message = data_loader.get('message', '')
+                if not message in ['X', 'y']:
+                    dataset = message.split(':')[-1]
+                project.dataset = dataset
+                project.save()
+                return True, "Project dataset updated successfully."
+            else:
+                return False, "Node does not correspond to a valid data loader."
+        except (Project.DoesNotExist, Node.DoesNotExist):
+            return False, "Project or DataLoader node not found."
+    
     def post(self, request):
         result = self.get_processor_and_args(request)
         if isinstance(result[0], Response):
             return result[0]
-        processor, return_serialized, output_channel, *_ = result
+        processor, return_serialized, output_channel, *_, project_id = result
         if isinstance(processor, str):
             return Response({"error": processor}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -307,7 +384,8 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 return Response({"error": response_data}, status=status.HTTP_400_BAD_REQUEST)
             
             node_id = response_data.get("node_id")
-            project_id = response_data.get("project_id")
+            self.update_project_model(project_id=project_id, node_name=response_data.get("node_name", ""))
+            self.update_project_dataset(project_id=project_id, data_loader=response_data)
 
             # Returns node_data chosen
             response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path = not return_serialized)(node_id, project_id=project_id)
@@ -324,10 +402,12 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
 
         if isinstance(processor, str):
             return Response({"error": processor}, status=status.HTTP_400_BAD_REQUEST)
-
+        
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
+            self.update_project_model(project_id=project_id, node_name=processor().get("node_name", ""))
+            self.update_project_dataset(project_id=project_id, data_loader=processor())
             success, message = NodeUpdater(return_serialized)(node_id, project_id, processor())
             if isinstance(message, str):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
@@ -656,7 +736,6 @@ class NetModelFitterAPIView(BaseNodeAPIView):
 
 
 class NodeTemplateSaverAPIView(BaseNodeAPIView):
-
     def get_serializer_class(self):
         return NodeTemplateSaverSerializer
 
@@ -1533,21 +1612,21 @@ class BulkProjectDeleteAPIView(APIView):
     def delete(self, request):
         try:
             # Extract project IDs from request data
-            project_ids = request.data.get('project_ids', [])
+            projects_ids = request.data.get('projects_ids', [])
             
-            if not project_ids:
+            if not projects_ids:
                 url = "http://127.0.0.1:8000/api/projects/"
                 response = requests.get(url)
 
                 if response.status_code == 200:
                     projects = response.json()
-                    project_ids = [project['id'] for project in projects]
+                    projects_ids = [project['id'] for project in projects]
                 else:
                     return Response({"error": "Failed to fetch projects"}, 
                                   status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            if not isinstance(project_ids, list):
-                return Response({"error": "project_ids must be a list"}, 
+            if not isinstance(projects_ids, list):
+                return Response({"error": "projects_ids must be a list"}, 
                               status=status.HTTP_400_BAD_REQUEST)
             
             # Track deletion results
@@ -1555,12 +1634,13 @@ class BulkProjectDeleteAPIView(APIView):
             not_found_ids = []
             error_ids = []
             # Process each project ID
-            for project_id in project_ids:
+            for project_id in projects_ids:
                 try:
                     project = Project.objects.get(id=project_id)
                     
                     # Delete associated nodes first
-                    node_count = Node.objects.filter(project_id=project_id).delete()[0]
+                    project_node_count = Node.objects.filter(project_id=project_id).delete()[0]
+                    node_count += project_node_count
                     url = f"http://127.0.0.1:8000/api/clear_nodes/?project_id={project_id}"
                     response = requests.delete(url)
                     if response.status_code != 204:
@@ -1580,7 +1660,7 @@ class BulkProjectDeleteAPIView(APIView):
             response_data = {
                 "success": True,
                 "deleted_count": deleted_count,
-                "total_requested": len(project_ids),
+                "total_requested": len(projects_ids),
                 "node_count": node_count,
             }
             

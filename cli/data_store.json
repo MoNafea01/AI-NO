@@ -1227,12 +1227,43 @@
                         "project_id": 38,
                         "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\38\\model\\logistic_regression_3544615485540728832.pkl"
                     }
+                ],
+                "183": [
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 2918052187382808576,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "parent": [],
+                        "params": [
+                            {
+                                "penalty": "l2"
+                            },
+                            {
+                                "C": 0.8
+                            }
+                        ],
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "output_ports": [
+                            {
+                                "name": "model"
+                            }
+                        ],
+                        "input_ports": [],
+                        "displayed_name": "Logistic Regression",
+                        "location_x": 400.0,
+                        "location_y": 600.0,
+                        "project_id": 183,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\183\\model\\logistic_regression_2918052187382808576.pkl"
+                    }
                 ]
             }
         }
     },
     "active_user": "admin",
-    "active_project": "38",
+    "active_project": "183",
     "admin": [
         "admin"
     ]

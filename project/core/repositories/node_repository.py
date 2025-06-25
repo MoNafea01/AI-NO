@@ -56,6 +56,8 @@ class NodeDataExtractor:
 
                 if data is not None:
                     l.append(data)
+                elif data is None:
+                    l.append("Node not found.")
             elif isinstance(arg, int):
                 success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg, project_id=project_id)
                 if success:
@@ -63,6 +65,8 @@ class NodeDataExtractor:
 
                 if data is not None:
                     l.append(data)
+                elif data is None:
+                    l.append("Node not found.")
             elif isinstance(arg, str):
                 if arg.isnumeric():
                     success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(int(arg), project_id=project_id)
@@ -74,6 +78,8 @@ class NodeDataExtractor:
                         data = data.get("node_data")
                 if data is not None:
                     l.append(data)
+                elif data is None:
+                    l.append("Node not found.")
             else:
                 l.append(arg)
         if len(l) == 1:
