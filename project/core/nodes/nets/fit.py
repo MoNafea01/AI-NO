@@ -10,8 +10,9 @@ class Fit(BaseNode):
         self.model_path = model_path
         self.batch_size = batch_size
         self.epochs = epochs
-        self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
         err = None
+        self.X, self.y = NodeDataExtractor()(X, y, project_id=project_id)
+        
         if any(isinstance(i, str) for i in [self.X, self.y]):
             err = "Failed to load Nodes (X, y) at least one of them. Please check the provided IDs."
         self.project_id = project_id

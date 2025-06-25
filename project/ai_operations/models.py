@@ -4,6 +4,8 @@ from django.db import models
 class Project(models.Model):
     project_name = models.CharField(max_length=255)
     project_description = models.TextField()
+    model = models.CharField(max_length=255, null=True, blank=True)
+    dataset = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

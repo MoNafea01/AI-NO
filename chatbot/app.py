@@ -23,7 +23,7 @@ chat_model = get_llm(
     temperature=chat_config['temperature'],
     max_tokens=chat_config['max_tokens'],)
 
-chat_prompt = ChatPromptTemplate.from_template("Answer the following query conversationally:\n{query} use the context if needed:\n{context}")
+chat_prompt = ChatPromptTemplate.from_template("Your name is AINO, Answer the following query conversationally:\n{query} use the context if needed:\n{context}")
 chat_chain = (
     chat_prompt 
     | chat_model 
