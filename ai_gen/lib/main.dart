@@ -1,5 +1,8 @@
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_cubit.dart';
+import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -55,12 +58,23 @@ class _MyAppState extends State<MyApp>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      debugShowCheckedModeBanner: false,
-      title: 'AI Gen',
+    return MultiRepositoryProvider(
+      providers: [
+         BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
+      ],
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context,state){
+          return MaterialApp(
+          scaffoldMessengerKey: scaffoldMessengerKey,
+          debugShowCheckedModeBanner: false,
+          title: 'AI Gen',
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      home: const SplashScreen(),
+      // theme:
+      //           state.isDarkMode ? ThemeCubit.darkTheme : ThemeCubit.lightTheme,
+          home: const SplashScreen(),
+        );
+        },
+      ),
     );
   }
 }

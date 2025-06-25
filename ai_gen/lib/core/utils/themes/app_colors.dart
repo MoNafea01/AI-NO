@@ -12,6 +12,8 @@ abstract class AppColors {
   static const Color textSecondary = Color(0xFF666666);
   static const Color blackText = Color(0xFF000000);
   static const Color blackText2 = Color(0xFF1A1A1A);
+  static const Color black = Color(0xFF000000);
+  static const Color white = Color(0xFFFFFFFF);
 
   static List<Color> get nodesColors => [
         Colors.blue,
