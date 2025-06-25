@@ -15,7 +15,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(_file_).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,11 +40,9 @@ CREATE_SUPERUSER = os.getenv("CREATE_SUPERUSER") == "True"
 # Application definition
 
 INSTALLED_APPS = [
-    
     "daphne",
     # channels
     'channels',
-
     # jazzmin make admin dashboard better
     'jazzmin',
 
@@ -62,13 +60,13 @@ INSTALLED_APPS = [
 
     # our app
     'accounts.apps.AccountsConfig',
-    
     'chat.apps.ChatConfig',
     'userprojects.apps.UserprojectsConfig',
 
-
-
     'django_extensions',
+
+
+
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -103,7 +101,8 @@ AUTHENTICATION_BACKENDS = (
 
 # Configs Used with JWT
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
+
     'REFRESH_TOKEN_LIFETIME': timedelta(days=50),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -159,7 +158,8 @@ ROOT_URLCONF = 'project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR , 'templates')],
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -171,10 +171,17 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'project.wsgi.application'
-
-ASGI_APPLICATION = "project.asgi.application"
+###############################################################################################################
+# WSGI_APPLICATION = 'project.wsgi.application'
+ASGI_APPLICATION = 'project.asgi.application'
+# docker run --name redis -p 6379:6379 -d redis
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+CHANNELS_DEV_MODE = True
+###############################################################################################################
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
