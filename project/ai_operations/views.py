@@ -1,5 +1,5 @@
 from __init__ import *
-import json, datetime, tempfile, subprocess, random, pandas as pd
+import json, datetime, tempfile, subprocess, pandas as pd
 import uuid
 
 import requests
@@ -181,8 +181,7 @@ class NodeQueryMixin:
                     success, message = NodeDeleter(is_multi_channel)(node_id, project_id=project_id)
                     if success:
                         self.delete_project_model(project_id, node_name)
-                        _, msg = self.delete_project_dataset(project_id, node)
-                        print(msg)
+                        self.delete_project_dataset(project_id, node)
                         return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
                     else:
                         return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
@@ -358,7 +357,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             if data_loader.get('node_name') == "data_loader":
                 message = data_loader.get('message', '')
                 if not message in ['X', 'y']:
-                    dataset = message.split(':')[-1]
+                    dataset = message.split(': ')[-1]
                 project.dataset = dataset
                 project.save()
                 return True, "Project dataset updated successfully."
@@ -406,11 +405,13 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            self.update_project_model(project_id=project_id, node_name=processor().get("node_name", ""))
-            self.update_project_dataset(project_id=project_id, data_loader=processor())
             success, message = NodeUpdater(return_serialized)(node_id, project_id, processor())
+            
             if isinstance(message, str):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            
+            self.update_project_model(project_id=project_id, node_name=processor().get("node_name", ""))
+            self.update_project_dataset(project_id=project_id, data_loader=processor())
             message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
             
             status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
@@ -1490,6 +1491,11 @@ class ImportProjectAPIView(APIView):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    
+    def get_queryset(self):
+        """Override to apply filtering based on query parameters."""
+        queryset = Project.objects.all()
+        return ProjectSerializer.get_filtered_queryset(queryset, self.request)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

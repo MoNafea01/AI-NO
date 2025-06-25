@@ -1,4 +1,4 @@
-import os
+import os, copy
 from ai_operations.models import Node
 from django.core.exceptions import ObjectDoesNotExist
 from core.nodes.configs.const_ import PARENT_NODES, MULTI_CHANNEL_NODES
@@ -21,13 +21,14 @@ class NodeUpdater:
     def __init__(self, return_serialized : bool = False):
         self.return_serialized = return_serialized
 
-    def __call__(self, node_id: int, project_id: int, payload: dict) -> tuple:
+    def __call__(self, node_id: int, project_id: int, o_payload: dict) -> tuple:
         if not node_id:
             return False, "Node ID must be provided."
         
         node_id = int(node_id) if node_id else None
         project_id = int(project_id) if project_id else None
 
+        payload = copy.deepcopy(o_payload)
         if isinstance(payload, str):
             return False, payload
 

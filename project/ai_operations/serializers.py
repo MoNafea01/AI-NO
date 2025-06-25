@@ -304,6 +304,23 @@ class ProjectSerializer(serializers.ModelSerializer):
         nodes = Node.objects.filter(project_id=obj.id)
         serializer = NodeSerializer(nodes, many=True, context=self.context)
         return serializer.data
+    
+    @classmethod
+    def get_filtered_queryset(cls, queryset, request):
+        """Filter projects based on query parameters."""
+        if not request:
+            return queryset
+            
+        # Filter by model_name if provided
+        model_name = request.query_params.get('model_name')
+        dataset_name = request.query_params.get('dataset_name')
+
+        if model_name:
+            queryset = queryset.filter(model=model_name)
+        if dataset_name:
+            queryset = queryset.filter(dataset=dataset_name)
+            
+        return queryset
 
 
 def validate(data, keys):

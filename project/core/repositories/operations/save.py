@@ -1,4 +1,4 @@
-import os
+import os, copy
 import joblib
 from ai_operations.models import Node
 
@@ -19,10 +19,11 @@ class NodeSaver:
 
     def __call__(
             self, 
-            payload: dict, 
+            o_payload: dict, 
             path: str = None
             ) -> dict:
         
+        payload = copy.deepcopy(o_payload)
         if not isinstance(payload, dict):
             raise ValueError("Payload must be a dictionary.")
         
