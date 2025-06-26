@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "ai_gen" "\0"
+            VALUE "CompanyName", "AINO Team" "\0"
+            VALUE "FileDescription", "AINO - No-Code AI Platform" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "ai_gen" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "ai_gen.exe" "\0"
-            VALUE "ProductName", "ai_gen" "\0"
+            VALUE "InternalName", "AINO" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 AINO Team. All rights reserved." "\0"
+            VALUE "OriginalFilename", "AINO.exe" "\0"
+            VALUE "ProductName", "AINO" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
