@@ -28,6 +28,9 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
+            mainAxisAlignment: state.isExpanded
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
                 AssetsPaths.projectLogoIcon,
@@ -35,30 +38,32 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                 height: 24,
               ),
               if (state.isExpanded) const SizedBox(width: 8),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SizeTransition(
-                      sizeFactor: animation,
-                      axis: Axis.horizontal,
-                      child: child,
-                    ),
-                  );
-                },
-                child: state.isExpanded
-                    ? const Text(
-                        'Model Craft',
-                        key: ValueKey('expanded'),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+              if (state.isExpanded)
+                Flexible(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SizeTransition(
+                          sizeFactor: animation,
+                          axis: Axis.horizontal,
+                          child: child,
                         ),
-                      )
-                    : const SizedBox.shrink(key: ValueKey('collapsed')),
-              ),
-              const Spacer(),
+                      );
+                    },
+                    child: const Text(
+                      'Model Craft',
+                      key: ValueKey('expanded'),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -78,7 +83,9 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: state.isExpanded
+                          ? MainAxisAlignment.center
+                          : MainAxisAlignment.center,
                       children: [
                         AnimatedRotation(
                           turns: state.isExpanded ? 0 : 0.5,
@@ -90,7 +97,7 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                             color: const Color(0xff666666),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        if (state.isExpanded) const SizedBox(width: 8),
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
                           transitionBuilder:
@@ -125,10 +132,22 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
             ),
           ),
         ),
-        const Divider(),
-        const ProfileWidget(),
+        const Divider(
+          color: Colors.transparent,
+          thickness: 1,
+          height: 1,
+        ),
+        Container(
+          width: double.infinity,
+          alignment: state.isExpanded ? Alignment.centerLeft : Alignment.center,
+          child: const ProfileWidget(),
+        ),
         const SizedBox(height: 8),
-        logoutButton(context, state.isExpanded),
+        Container(
+          width: double.infinity,
+          alignment: state.isExpanded ? Alignment.centerLeft : Alignment.center,
+          child: logoutButton(context, state.isExpanded),
+        ),
         const SizedBox(height: 16),
       ],
     ),
@@ -213,6 +232,8 @@ Widget animatedSidebarItem(
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
+          mainAxisAlignment:
+              isExpanded ? MainAxisAlignment.start : MainAxisAlignment.center,
           children: [
             AnimatedScale(
               scale: isActive ? 1.1 : 1.0,
