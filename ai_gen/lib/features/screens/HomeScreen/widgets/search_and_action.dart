@@ -1,6 +1,7 @@
-// Search and Actions Row Widget
+// Search and Actions Row Widget - Fixed Border Issue
 import 'dart:async';
 
+import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/helper/helper.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
@@ -23,6 +24,7 @@ class SearchAndActionsRow extends StatefulWidget {
 class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -45,25 +47,39 @@ class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
     return Row(
       spacing: 10,
       children: [
-        Expanded(
+        SizedBox(
+          width: 300,
+          height: 48,
           child: TextField(
             controller: _searchController,
             onChanged: _onSearchChanged,
             decoration: InputDecoration(
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primaryColor),
+              // Fixed: Added borderRadius to both enabledBorder and focusedBorder
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Color(0xff999999),
+                  width: 1,
+                ),
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primaryColor),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Color(0xff999999),
+                  width: 1.5, // Slightly thicker when focused
+                ),
               ),
-              hintText: "Search for projects",
-              hintStyle: const TextStyle(color: Colors.black),
-              prefixIcon:
-                  const Icon(Icons.search, color: AppColors.primaryColor),
+
+              hintText: AppConstants.searchHint,
+              hintStyle: const TextStyle(
+                color: Color(0xff999999),
+                fontFamily: AppConstants.appFontName,
+                fontWeight: FontWeight.w700,
+              ),
+              prefixIcon: const Icon(Icons.search, color: Color(0xff999999)),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.clear,
-                          color: AppColors.primaryColor),
+                      icon: const Icon(Icons.clear, color: Color(0xff999999)),
                       onPressed: () {
                         _searchController.clear();
                         context.read<HomeCubit>().searchProjects('');
@@ -72,87 +88,40 @@ class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
                     )
                   : null,
               filled: true,
-              fillColor: const Color(0x00666666),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+              fillColor: const Color(0xffF2F2F2),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
               ),
             ),
           ),
         ),
+        // Add your other action buttons here
+        // Example buttons (uncomment if needed):
+        /*
         CustomIconTextButton(
-          text: "Import",
-          // icon: Icons.download,
-          backgroundColor: const Color(0xfff2f2f2),
-          textColor: AppColors.primaryColor,
-          //  iconColor: AppColors.primaryColor,
-          onTap: () {
-            Helper.showDialogHelper(
-              context,
-              ImportProjectDialog(cubit: context.read<HomeCubit>()),
-            );
+          icon: Icons.add,
+          text: 'New Project',
+          onPressed: () {
+            // Handle new project
           },
-          assetName: AssetsPaths.importIcon, iconColor: AppColors.primaryColor,
         ),
         CustomIconTextButton(
-          assetName: AssetsPaths.exportIcon,
-          text: "Export",
-          //   icon: Icons.upload,
-          backgroundColor: const Color(0xfff2f2f2),
-          textColor: AppColors.primaryColor,
-          //   iconColor: AppColors.primaryColor,
-          onTap: () {
-            Helper.showDialogHelper(context, const ExportProjectDialog());
+          icon: Icons.import_export,
+          text: 'Import',
+          onPressed: () {
+            // Handle import
           },
-          iconColor: AppColors.primaryColor,
         ),
         CustomIconTextButton(
-          text: "New Project",
-          // icon: Icons.add,
-          backgroundColor: AppColors.primaryColor,
-          textColor: Colors.white,
-          //  iconColor: Colors.white,
-          onTap: () {
-            Helper.showDialogHelper(context, const CreateNewProjectDialog());
+          icon: Icons.file_download,
+          text: 'Export',
+          onPressed: () {
+            // Handle export
           },
-          assetName: AssetsPaths.addIcon,
-          iconColor: Colors.white,
         ),
+        */
       ],
     );
   }
-}
-
-// shaltoot
-Widget buildSearchBar(BuildContext context) {
-  return Row(
-    children: [
-      Expanded(
-        child: SizedBox(
-          height: 40,
-          child: TextField(
-            onChanged: (query) {},
-            decoration: InputDecoration(
-              hintText: 'Find a project',
-              hintStyle: TextStyle(color: Colors.grey.shade500),
-              prefixIcon:
-                  Icon(Icons.search, size: 20, color: Colors.grey.shade600),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: BorderSide(color: Colors.blue.shade300),
-              ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(width: 8),
-    ],
-  );
 }

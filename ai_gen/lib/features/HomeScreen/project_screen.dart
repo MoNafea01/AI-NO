@@ -1,14 +1,20 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/helper/helper.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/project_list_item_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/create_new_project_button.dart';
+import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
+import 'package:ai_gen/features/screens/HomeScreen/widgets/custom_icon_text_button.dart';
+import 'package:ai_gen/features/screens/HomeScreen/widgets/project_actions/create_new_project_dialog.dart';
+import 'package:ai_gen/features/screens/HomeScreen/widgets/project_actions/export_project_dialog.dart';
+import 'package:ai_gen/features/screens/HomeScreen/widgets/project_actions/import_project_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-
 
 import 'data/project_items.dart';
 
@@ -147,8 +153,6 @@ class ProjectsScreen extends StatelessWidget {
     );
   }
 
-  
-
   Widget _buildSearchBar(BuildContext context, DashboardState state) {
     return Row(
       children: [
@@ -157,7 +161,9 @@ class ProjectsScreen extends StatelessWidget {
             height: 40,
             child: TextField(
               onChanged: (query) {
-                context.read<DashboardCubit>().searchProjects(query, state.filteredProjects);
+                context
+                    .read<DashboardCubit>()
+                    .searchProjects(query, state.filteredProjects);
               },
               decoration: InputDecoration(
                 hintText: 'Find a project',
@@ -335,52 +341,75 @@ class ProjectsScreen extends StatelessWidget {
   }
 }
 
-
 Widget buildHeader(BuildContext context) {
   return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // mainAxisAlignment: MainAxisAlignment.spaceAround,
     children: [
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Projects',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+      const Padding(
+        padding: EdgeInsets.only(top: 68),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Projects',
+              style: TextStyle(
+                fontFamily: AppConstants.appFontName,
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: Colors.black87,
+              ),
             ),
-          ),
-          Text(
-            'View all your projects',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 14,
+            Text(
+              'View all your projects',
+              style: TextStyle(
+                fontFamily: AppConstants.appFontName,
+                fontWeight: FontWeight.w500,
+                color: Color(0xff666666),
+                fontSize: 16,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      // Row(
-      //   children: [
-      //     OutlinedButton.icon(
-      //       onPressed: () {},
-      //       icon: SvgPicture.asset(
-      //         AssetsPaths.importIcon,
-      //         width: 16,
-      //         height: 16,
-      //         color: Colors.blue,
-      //       ),
-      //       label: const Text('Import'),
-      //       style: OutlinedButton.styleFrom(
-      //         foregroundColor: Colors.blue,
-      //         side: BorderSide(color: Colors.blue.shade200),
-      //         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      //       ),
-      //     ),
-      //     const SizedBox(width: 12),
-      //     const CreateNewProjectButton(),
-      //   ],
-      // ),
+      const Spacer(),
+      CustomIconTextButton(
+        text: "Import",
+        // icon: Icons.download,
+        backgroundColor: const Color(0xfff2f2f2),
+        textColor: AppColors.primaryColor,
+        //  iconColor: AppColors.primaryColor,
+        onTap: () {
+          Helper.showDialogHelper(
+            context,
+            ImportProjectDialog(cubit: context.read<HomeCubit>()),
+          );
+        },
+        assetName: AssetsPaths.importIcon, iconColor: AppColors.primaryColor,
+      ),
+      CustomIconTextButton(
+        assetName: AssetsPaths.exportIcon,
+        text: "Export",
+        //   icon: Icons.upload,
+        backgroundColor: const Color(0xfff2f2f2),
+        textColor: AppColors.primaryColor,
+        //   iconColor: AppColors.primaryColor,
+        onTap: () {
+          Helper.showDialogHelper(context, const ExportProjectDialog());
+        },
+        iconColor: AppColors.primaryColor,
+      ),
+      CustomIconTextButton(
+        text: "New Project",
+        // icon: Icons.add,
+        backgroundColor: AppColors.primaryColor,
+        textColor: Colors.white,
+        //  iconColor: Colors.white,
+        onTap: () {
+          Helper.showDialogHelper(context, const CreateNewProjectDialog());
+        },
+        assetName: AssetsPaths.addIcon,
+        iconColor: Colors.white,
+      ),
     ],
   );
 }

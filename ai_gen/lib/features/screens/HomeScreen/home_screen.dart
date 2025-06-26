@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: const Color(0xfff2f2f2),
         body: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 0.5, vertical: 1),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

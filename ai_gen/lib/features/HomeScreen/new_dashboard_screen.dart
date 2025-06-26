@@ -84,6 +84,7 @@ class _DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       body: BlocBuilder<DashboardCubit, DashboardState>(
         builder: (context, state) {
           return Row(

@@ -65,6 +65,7 @@ class _MyAppState extends State<MyApp>
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context,state){
           return MaterialApp(
+            
           scaffoldMessengerKey: scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           title: 'AI Gen',

@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
@@ -11,7 +10,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 Widget buildSidebar(BuildContext context, DashboardState state) {
-  return Container(
+  return AnimatedContainer(
+    duration: const Duration(milliseconds: 300),
+    curve: Curves.easeInOut,
     width: state.isExpanded ? 230 : 110,
     decoration: BoxDecoration(
       color: Colors.white,
@@ -34,14 +35,29 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                 height: 24,
               ),
               if (state.isExpanded) const SizedBox(width: 8),
-              if (state.isExpanded)
-                const Text(
-                  'Model Craft',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SizeTransition(
+                      sizeFactor: animation,
+                      axis: Axis.horizontal,
+                      child: child,
+                    ),
+                  );
+                },
+                child: state.isExpanded
+                    ? const Text(
+                        'Model Craft',
+                        key: ValueKey('expanded'),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    : const SizedBox.shrink(key: ValueKey('collapsed')),
+              ),
               const Spacer(),
             ],
           ),
@@ -57,74 +73,54 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                   onTap: () {
                     context.read<DashboardCubit>().toggleSidebar();
                   },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(AssetsPaths.expandedIcon,
-                          width: 20,
-                          height: 20,
-                          color: const Color(0xff666666)),
-                      const SizedBox(width: 8),
-                      if (state.isExpanded)
-                        const Text("Collapse",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Color(0xff383838),
-                            )),
-                    ],
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedRotation(
+                          turns: state.isExpanded ? 0 : 0.5,
+                          duration: const Duration(milliseconds: 300),
+                          child: SvgPicture.asset(
+                            AssetsPaths.expandedIcon,
+                            width: 20,
+                            height: 20,
+                            color: const Color(0xff666666),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SizeTransition(
+                                sizeFactor: animation,
+                                axis: Axis.horizontal,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: state.isExpanded
+                              ? const Text(
+                                  "Collapse",
+                                  key: ValueKey('collapse-text'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Color(0xff383838),
+                                  ),
+                                )
+                              : const SizedBox.shrink(key: ValueKey('no-text')),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                sidebarItem(
-                  context,
-                  AssetsPaths.exploreIcon,
-                  'Explore',
-                  AppScreen.explore, // Use enum
-                  state.isExpanded,
-                ),
-                sidebarItem(
-                  context,
-                  AssetsPaths.architectureIcon,
-                  'Architectures',
-                  AppScreen.architectures, // Use enum
-                  state.isExpanded,
-                ),
-                sidebarItem(
-                  context,
-                  AssetsPaths.modelIcon,
-                  'Models',
-                  AppScreen.models, // Use enum
-                  state.isExpanded,
-                ),
-                sidebarItem(
-                  context,
-                  AssetsPaths.dataSetsIcon,
-                  'Datasets',
-                  AppScreen.datasets, // Use enum
-                  state.isExpanded,
-                ),
-                sidebarItem(
-                  context,
-                  AssetsPaths.learnIcon,
-                  'Learn',
-                  AppScreen.learn, // Use enum
-                  state.isExpanded,
-                ),
-                sidebarItem(
-                  context,
-                  AssetsPaths.docsIcon,
-                  'Docs',
-                  AppScreen.docs, // Use enum for Docs
-                  state.isExpanded,
-                ),
-                sidebarItem(
-                  context,
-                  AssetsPaths.settingIcon,
-                  'Settings',
-                  AppScreen.settings, // Use enum
-                  state.isExpanded,
-                ),
+                ...buildAnimatedSidebarItems(context, state),
               ],
             ),
           ),
@@ -139,55 +135,123 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
   );
 }
 
-Widget sidebarItem(
+List<Widget> buildAnimatedSidebarItems(
+    BuildContext context, DashboardState state) {
+  final items = [
+    {
+      'icon': AssetsPaths.exploreIcon,
+      'label': 'Explore',
+      'screen': AppScreen.explore
+    },
+    {
+      'icon': AssetsPaths.architectureIcon,
+      'label': 'Architectures',
+      'screen': AppScreen.architectures
+    },
+    {
+      'icon': AssetsPaths.modelIcon,
+      'label': 'Models',
+      'screen': AppScreen.models
+    },
+    {
+      'icon': AssetsPaths.dataSetsIcon,
+      'label': 'Datasets',
+      'screen': AppScreen.datasets
+    },
+    {
+      'icon': AssetsPaths.learnIcon,
+      'label': 'Learn',
+      'screen': AppScreen.learn
+    },
+    {'icon': AssetsPaths.docsIcon, 'label': 'Docs', 'screen': AppScreen.docs},
+    {
+      'icon': AssetsPaths.settingIcon,
+      'label': 'Settings',
+      'screen': AppScreen.settings
+    },
+  ];
+
+  return items
+      .map((item) => animatedSidebarItem(
+            context,
+            item['icon'] as String,
+            item['label'] as String,
+            item['screen'] as AppScreen,
+            state.isExpanded,
+          ))
+      .toList();
+}
+
+Widget animatedSidebarItem(
   BuildContext context,
   String iconPath,
   String label,
-  AppScreen screenType, // Now takes AppScreen
+  AppScreen screenType,
   bool isExpanded,
 ) {
-  final bool isActive = context.watch<DashboardCubit>().state.selectedScreen ==
-      screenType; // Compare with AppScreen
-  return InkWell(
-    onTap: () {
-      context
-          .read<DashboardCubit>()
-          .selectNavigationItem(screenType); // Select the screen type
-    },
-    child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 12,
-      ),
-      decoration: BoxDecoration(
-        color: isActive ? AppColors.primaryColor : Colors.transparent,
-        borderRadius: isActive
-            ? const BorderRadius.all(
-                Radius.circular(4),
-              )
-            : null,
-      ),
-      child: Row(
-        children: [
-          SvgPicture.asset(
-            iconPath,
-            width: 20,
-            height: 20,
-            color: isActive ? Colors.white : Colors.grey.shade700,
-          ),
-          if (isExpanded) const SizedBox(width: 12),
-          if (isExpanded)
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
-                color: isActive ? Colors.white : Colors
-                    .black, //isActive ? Colors.white : Colors.grey.shade800
+  final bool isActive =
+      context.watch<DashboardCubit>().state.selectedScreen == screenType;
+
+  return AnimatedContainer(
+    duration: const Duration(milliseconds: 200),
+    curve: Curves.easeInOut,
+    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+    child: InkWell(
+      onTap: () {
+        context.read<DashboardCubit>().selectNavigationItem(screenType);
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primaryColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            AnimatedScale(
+              scale: isActive ? 1.1 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: SvgPicture.asset(
+                iconPath,
+                width: 20,
+                height: 20,
+                color: isActive ? Colors.white : Colors.grey.shade700,
               ),
             ),
-        ],
+            if (isExpanded) const SizedBox(width: 12),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SizeTransition(
+                    sizeFactor: animation,
+                    axis: Axis.horizontal,
+                    child: child,
+                  ),
+                );
+              },
+              child: isExpanded
+                  ? Text(
+                      label,
+                      key: ValueKey('$label-expanded'),
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight:
+                            isActive ? FontWeight.w500 : FontWeight.normal,
+                        color: isActive ? Colors.white : Colors.black,
+                      ),
+                    )
+                  : const SizedBox.shrink(key: ValueKey('collapsed-text')),
+            ),
+          ],
+        ),
       ),
     ),
   );
