@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter Windows with Project File",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "C:/Users/mahmo/Desktop/ELDemy.ainoprj"
+      ],
+      "toolArgs": [
+        "--device-id",
+        "windows"
+      ]
+    }
+  ]
+}

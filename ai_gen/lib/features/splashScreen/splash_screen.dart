@@ -1,10 +1,12 @@
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/network/server_manager/server_manager.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
 //import 'package:ai_gen/features/HomeScreen/home_screen.dart';
 //import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key, this.initialProject});
@@ -20,6 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
+  String _status = "Loading Server....";
 
   @override
   void initState() {
@@ -38,26 +41,44 @@ class _SplashScreenState extends State<SplashScreen>
         curve: Curves.easeInOut, // Choose a suitable curve
       ),
     );
-    _animationController.forward();
-    loadServer();
+    _animationController.repeat(reverse: true);
+    _startServer();
   }
 
-  void loadServer() async {
-    // await GetIt.I.get<ServerManager>().startServer();
-
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (mounted) {
-      // Check if the widget is still mounted
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DashboardScreen(
-            projectModel: widget.initialProject,
+  Future<void> _startServer() async {
+    final serverManager = GetIt.I.get<ServerManager>();
+    setState(() => _status = "Checking server status...");
+    bool running = await serverManager.isServerRunning();
+    if (!running) {
+      setState(() => _status = "Starting backend server...");
+      // Start the server, but don't await its exit!
+      serverManager.runAndListenToServerScript();
+      // Now poll until the server is up
+      for (int i = 0; i < 20; i++) {
+        await Future.delayed(const Duration(seconds: 1));
+        if (await serverManager.isServerRunning()) {
+          running = true;
+          break;
+        }
+        setState(() => _status = "Waiting for server to start... (${i + 1})");
+      }
+    }
+    if (running) {
+      setState(() => _status = "Server is running. Loading dashboard...");
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DashboardScreen(
+              projectModel: widget.initialProject,
+            ),
           ),
-        ),
-        // MaterialPageRoute(builder: (context) => const DashboardScreen()), // will go to signup screen
-      );
+        );
+      }
+    } else {
+      setState(() => _status = "Failed to start server.");
+      // Optionally show a retry button or error dialog here
     }
   }
 
@@ -98,13 +119,14 @@ class _SplashScreenState extends State<SplashScreen>
 
             const SizedBox(height: 20), // Space between icon and text
             const Text(
-              'Model Craft',
+              'A I N O',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.black, // Adjust text color as needed
               ),
             ),
+            Text(_status),
           ],
         ),
       ),

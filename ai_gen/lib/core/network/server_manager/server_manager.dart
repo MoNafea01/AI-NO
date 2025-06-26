@@ -12,7 +12,8 @@ class ServerManager {
     if (_isServerRunning) return;
 
     String projectPath = Directory.current.path;
-    String backendPath = '${projectPath.replaceAll('\\ai_gen', '')}\\backend';
+    String backendPath = Directory.current.path;
+    // String backendPath = '${projectPath.replaceAll('\\ai_gen', '')}\\backend';
     try {
       print('Starting server from path: $backendPath');
       await _killExistingServers();
@@ -123,9 +124,73 @@ class ServerManager {
     }
   }
 
+  /// Checks if the server is already running by making a test request.
+  Future<bool> isServerRunning() async {
+    try {
+      final response = await _dio.get(
+        'http://127.0.0.1:8000/api/projects/',
+        options: Options(
+          sendTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 5),
+          validateStatus: (status) =>
+              status != null && status >= 200 && status < 400,
+        ),
+      );
+      return response.statusCode != null &&
+          response.statusCode! >= 200 &&
+          response.statusCode! < 400;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Runs run_server.bat in the same directory as the executable, listens to output, and waits for it to finish.
+  /// Stores the process for later control. Returns the exit code.
+  Future<int> runAndListenToServerScript() async {
+    try {
+      final exeDir = File(Platform.resolvedExecutable).parent;
+      final scriptPath = exeDir.uri.resolve('run_server.bat').toFilePath();
+
+      print('Running script: $scriptPath in $exeDir');
+
+      _serverProcess = await Process.start(
+        'cmd',
+        ['/c', scriptPath],
+        workingDirectory: exeDir.path,
+        runInShell: true,
+      );
+      _isServerRunning = true;
+
+      _serverProcess!.stdout.transform(SystemEncoding().decoder).listen((data) {
+        print('Script stdout: $data');
+        // You can parse output and make decisions here
+      });
+
+      print('Server process: ${_serverProcess?.runtimeType}');
+
+      _serverProcess!.stderr.transform(SystemEncoding().decoder).listen((data) {
+        print('Script stderr: $data');
+        // You can parse errors and make decisions here
+      });
+
+      final exitCode = await _serverProcess!.exitCode;
+      print('Script exited with code: $exitCode');
+      _isServerRunning = false;
+      _serverProcess = null;
+      return exitCode;
+    } catch (e) {
+      print('Error running server script: $e');
+      _isServerRunning = false;
+      _serverProcess = null;
+      return -1;
+    }
+  }
+
+  @override
   Future<void> stopServer() async {
     if (_serverProcess != null) {
       print('Stopping server...');
+      _serverProcess!.kill(ProcessSignal.sigterm);
       await _killExistingServers();
       _isServerRunning = false;
       _serverProcess = null;

@@ -42,11 +42,11 @@ Future<ProjectModel?> checkArgs(List<String> args) async {
   /// to check if the file has id and in database or not
   final int? projectID = null;
 
-  ProjectModel projectModel = ProjectModel(
-    name: projectName,
-    path: initialProjectPath,
-    id: projectID,
-  );
-
-  return projectModel;
+  return initialProjectPath == null
+      ? null
+      : ProjectModel(
+          name: projectName,
+          path: initialProjectPath,
+          id: projectID,
+        );
 }
