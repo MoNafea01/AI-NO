@@ -24,75 +24,191 @@ class ProjectsTable extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(color: Colors.white),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                child: DataTable(
-                  columnSpacing: 20,
-                  dataRowMinHeight: 50,
-                  dataRowMaxHeight: 60,
-                  columns: const [
-                    DataColumn(
-                      label: Expanded(
-                        child:
-                            Text("Project Name", textAlign: TextAlign.center),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: const BoxDecoration(
+              color: Color(0xFFE6E6E6),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+              ),
+            ),
+            child: const Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Row(
+                    children: [
+                      Text(
+                        "Name",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF666666),
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_downward,
+                        size: 12,
+                        color: Color(0xFF666666),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "Description",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF666666),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    "Created At",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF666666),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    "Last Update",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF666666),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Body
+          Expanded(
+            child: ListView.builder(
+              itemCount: homeState.projects.length,
+              itemBuilder: (context, index) {
+                final project = homeState.projects[index];
+                return Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Color(0xFFCCCCCC),
+                        width: 1,
                       ),
                     ),
-                    DataColumn(
-                        label: Expanded(
-                            child: Text("Created At",
-                                textAlign: TextAlign.center))),
-                    DataColumn(
-                        label: Expanded(
-                            child: Text("Last Update",
-                                textAlign: TextAlign.center))),
-                    DataColumn(
-                        label: Expanded(
-                            child: Text("Description",
-                                textAlign: TextAlign.center))),
-                  ],
-                  rows: homeState.projects
-                      .map(
-                        (project) => DataRow(
-                          cells: [
-                            DataCell(
-                              Center(child: _projectName(context, project)),
+                  ),
+                  child: Row(
+                    children: [
+                      // Name column with checkbox
+                      Expanded(
+                        flex: 3,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: const Color(0xFFD1D5DB)),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                             ),
-                            DataCell(
-                              Center(child: Text(project.createdAt.toString())),
-                            ),
-                            DataCell(
-                              Center(child: Text(project.updatedAt.toString())),
-                            ),
-                            DataCell(
-                              Center(child: Text(project.description ?? "")),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _projectName(context, project),
+                                  if (project.description != null &&
+                                      project.description!.isNotEmpty)
+                                    Text(
+                                      project.description!,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF6B7280),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      )
-                      .toList(),
-                ),
-              ),
-            );
-          },
-        ),
+                      ),
+                      // Description column
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          project.description ?? "",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF374151),
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      // Created At column
+                      Expanded(
+                        flex: 1,
+                        child: Text(
+                          project.createdAt.toString().substring(0, 16),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      // Last Update column
+                      Expanded(
+                        flex: 1,
+                        child: Text(
+                          project.updatedAt.toString().substring(0, 16),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  TextButton _projectName(BuildContext context, ProjectModel project) {
-    return TextButton(
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.bluePrimaryColor,
-        minimumSize: const Size(100, 50),
-      ),
-      onPressed: () {
+  Widget _projectName(BuildContext context, ProjectModel project) {
+    return InkWell(
+      onTap: () {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -100,7 +216,16 @@ class ProjectsTable extends StatelessWidget {
           ),
         );
       },
-      child: Text(project.name ?? "Project Name"),
+      child: Text(
+        project.name ?? "Project Name",
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF111827),
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 }

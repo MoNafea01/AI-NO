@@ -28,38 +28,27 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  bloc: ^9.0.0
+  connectivity_plus: ^6.0.5
+  cupertino_icons: ^1.0.8
+  dio: ^5.8.0+1
+  dropdown_button2: ^2.3.9
+  equatable: ^2.0.7
+  file_picker: ^10.1.2
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  #handling api requests and responses
-  dio: ^5.8.0+1
-  #comparing objects
-  equatable: ^2.0.7
-  #for State management package
-  bloc: ^9.0.0
   flutter_bloc: ^9.1.1
-  #cache data securely
   flutter_secure_storage: ^9.2.4
-  #for dependency injection
-  get_it: ^8.0.3
-  #for windows apps
-  window_manager: ^0.4.3
-  #for loading svg assets
   flutter_svg: ^2.1.0
-  #toast messages
   fluttertoast: ^8.2.12
-  #for the Dropdown menus and combo boxes
-  dropdown_button2: ^2.3.9
-  #for selecting files from the file system
-  file_picker: ^10.1.2
-  http: ^1.3.0
-  provider: ^6.1.2
-  #the node view package that is localized and used in this project
-  vs_node_view: ^2.1.1
-  toggle_switch: ^2.3.0
   font_awesome_flutter: ^10.8.0
-
-
+  get_it: ^8.0.3
+  http: ^1.3.0
+  intl: ^0.20.2
+  provider: ^6.1.2
+  toggle_switch: ^2.3.0
+  vs_node_view: ^2.1.1
+  window_manager: ^0.4.3
 
 dev_dependencies:
   flutter_lints: ^5.0.0
@@ -78,7 +67,6 @@ flutter:
   assets:
     - assets/images/
     - shorebird.yaml
-
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see

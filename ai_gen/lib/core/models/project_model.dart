@@ -28,7 +28,8 @@ class ProjectModel {
     map['id'] = id;
     map['project_name'] = name;
     map['project_description'] = description;
-    map['created_at'] = createdAt?.toIso8601String();
+    map['created_at'] = createdAt?.toIso8601String(); // Convert to ISO 8601 string but i want to keep the date format
+    // map['created_at'] = createdAt?.toString(); // Keep the date format
     map['updated_at'] = updatedAt?.toIso8601String();
     return map;
   }

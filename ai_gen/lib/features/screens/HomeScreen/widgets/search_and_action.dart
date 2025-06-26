@@ -1,5 +1,7 @@
 // Search and Actions Row Widget
 import 'package:ai_gen/core/utils/helper/helper.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/widgets/project_actions/export_project_dialog.dart';
 import 'package:flutter/material.dart';
@@ -40,38 +42,77 @@ class SearchAndActionsRow extends StatelessWidget {
         ),
         CustomIconTextButton(
           text: "Import",
-          icon: Icons.download,
+          // icon: Icons.download,
           backgroundColor: const Color(0xfff2f2f2),
-          textColor: const Color.fromARGB(255, 15, 14, 14),
-          iconColor: const Color.fromARGB(255, 7, 7, 7),
+          textColor: AppColors.primaryColor,
+          //  iconColor: AppColors.primaryColor,
           onTap: () {
             Helper.showDialogHelper(
               context,
               ImportProjectDialog(cubit: context.read<HomeCubit>()),
             );
           },
+          assetName: AssetsPaths.importIcon, iconColor: AppColors.primaryColor,
         ),
         CustomIconTextButton(
+          assetName: AssetsPaths.exportIcon,
           text: "Export",
-          icon: Icons.upload,
+          //   icon: Icons.upload,
           backgroundColor: const Color(0xfff2f2f2),
-          textColor: const Color.fromARGB(255, 15, 14, 14),
-          iconColor: const Color.fromARGB(255, 7, 7, 7),
+          textColor: AppColors.primaryColor,
+          //   iconColor: AppColors.primaryColor,
           onTap: () {
             Helper.showDialogHelper(context, const ExportProjectDialog());
           },
+          iconColor: AppColors.primaryColor,
         ),
         CustomIconTextButton(
           text: "New Project",
-          icon: Icons.add,
-          backgroundColor: Colors.blue,
+          // icon: Icons.add,
+          backgroundColor: AppColors.primaryColor,
           textColor: Colors.white,
-          iconColor: Colors.white,
+          //  iconColor: Colors.white,
           onTap: () {
             Helper.showDialogHelper(context, const CreateNewProjectDialog());
           },
+          assetName: AssetsPaths.addIcon,
+          iconColor: Colors.white,
         ),
       ],
     );
   }
+}
+
+// shaltoot
+Widget buildSearchBar(BuildContext context) {
+  return Row(
+    children: [
+      Expanded(
+        child: SizedBox(
+          height: 40,
+          child: TextField(
+            onChanged: (query) {},
+            decoration: InputDecoration(
+              hintText: 'Find a project',
+              hintStyle: TextStyle(color: Colors.grey.shade500),
+              prefixIcon:
+                  Icon(Icons.search, size: 20, color: Colors.grey.shade600),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(color: Colors.blue.shade300),
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 0),
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(width: 8),
+    ],
+  );
 }

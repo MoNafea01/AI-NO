@@ -1,5 +1,6 @@
 import 'package:ai_gen/core/reusable_widgets/failure_screen.dart';
 import 'package:ai_gen/core/reusable_widgets/loading_screen.dart';
+import 'package:ai_gen/features/HomeScreen/project_screen.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,26 +17,35 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => HomeCubit()..loadHomePage(),
-      child: const Scaffold(
-        backgroundColor: Color(0xfff2f2f2),
-        body: Row(
-          children: [
-            Sidebar(),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 65, vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 20,
-                  children: [
-                    HeaderSection(),
-                    SearchAndActionsRow(),
-                    Expanded(child: _Content()),
-                  ],
+      child: Scaffold(
+        backgroundColor: const Color(0xfff2f2f2),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // i want here to get only [table details , bottom btns ]
+
+              // Sidebar(),
+              Expanded(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 65, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 20,
+                    children: [
+                      // HeaderSection(), // old header section
+                      buildHeader(context),
+                      const SearchAndActionsRow(), //old search and actions row
+                      // buildSearchBar(context),
+                      const Expanded(child: _Content()),
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
