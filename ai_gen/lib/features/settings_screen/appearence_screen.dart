@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_cubit.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_state.dart';
@@ -12,10 +11,12 @@ class PreferenceModeSelector extends StatefulWidget {
   State<PreferenceModeSelector> createState() => _PreferenceModeSelectorState();
 }
 
-enum ThemeModePreference { 
- // system,
-  
-   light, dark }
+enum ThemeModePreference {
+  // system,
+
+  light,
+  dark
+}
 
 class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
   ThemeModePreference selected = ThemeModePreference.light; // system
@@ -37,33 +38,33 @@ class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: BlocBuilder<ThemeCubit, ThemeState>(
-                builder: (context,state) {
-                   final isDarkMode = state.isDarkMode;
+                builder: (context, state) {
+                  final isDarkMode = state.isDarkMode;
                   return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // _buildCard(
-                    //   icon: Icons.desktop_windows,
-                    //   label: 'System theme',
-                    //   //  imageAsset: 'assets/system_theme.png',
-                    //   value: ThemeModePreference.system,
-                    // ),
-                    const SizedBox(width: 16), // Spacing between cards
-                    _buildCard(
-                      icon: Icons.wb_sunny_outlined,
-                      label: 'Light theme',
-                      //  imageAsset: 'assets/light_theme.png',
-                      value: ThemeModePreference.light,
-                    ),
-                    const SizedBox(width: 16), // Spacing between cards
-                    _buildCard(
-                      icon: Icons.nights_stay_outlined,
-                      label: 'Dark theme',
-                      //   imageAsset: 'assets/dark_theme.png',
-                      value: ThemeModePreference.dark,
-                    ),
-                  ],
-                );
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // _buildCard(
+                      //   icon: Icons.desktop_windows,
+                      //   label: 'System theme',
+                      //   //  imageAsset: 'assets/system_theme.png',
+                      //   value: ThemeModePreference.system,
+                      // ),
+                      const SizedBox(width: 16), // Spacing between cards
+                      _buildCard(
+                        icon: Icons.wb_sunny_outlined,
+                        label: 'Light theme',
+                        //  imageAsset: 'assets/light_theme.png',
+                        value: ThemeModePreference.light,
+                      ),
+                      const SizedBox(width: 16), // Spacing between cards
+                      _buildCard(
+                        icon: Icons.nights_stay_outlined,
+                        label: 'Dark theme',
+                        //   imageAsset: 'assets/dark_theme.png',
+                        value: ThemeModePreference.dark,
+                      ),
+                    ],
+                  );
                 },
               ),
             ),
