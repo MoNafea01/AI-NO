@@ -144,19 +144,30 @@ class ServerManager {
     }
   }
 
+  /// Checks if the server process is still running
+  bool isServerProcessRunning() {
+    return _serverProcess != null && _isServerRunning;
+  }
+
+  /// Gets the current server process
+  Process? getServerProcess() {
+    return _serverProcess;
+  }
+
   /// Runs run_server.bat in the same directory as the executable, listens to output, and waits for it to finish.
   /// Stores the process for later control. Returns the exit code.
   Future<int> runAndListenToServerScript() async {
     try {
-      final exeDir = File(Platform.resolvedExecutable).parent;
-      final scriptPath = exeDir.uri.resolve('run_server.bat').toFilePath();
+      // Use the project root directory instead of the executable directory
+      final projectRoot = Directory.current.path;
+      final scriptPath = '$projectRoot\\run_server.bat';
 
-      print('Running script: $scriptPath in $exeDir');
+      print('Running script: $scriptPath in $projectRoot');
 
       _serverProcess = await Process.start(
         'cmd',
         ['/c', scriptPath],
-        workingDirectory: exeDir.path,
+        workingDirectory: projectRoot,
         runInShell: true,
       );
       _isServerRunning = true;
@@ -173,11 +184,10 @@ class ServerManager {
         // You can parse errors and make decisions here
       });
 
-      final exitCode = await _serverProcess!.exitCode;
-      print('Script exited with code: $exitCode');
-      _isServerRunning = false;
-      _serverProcess = null;
-      return exitCode;
+      // Don't wait for the process to exit, just start it and return
+      // The process will continue running in the background
+      print('Server script started successfully');
+      return 0;
     } catch (e) {
       print('Error running server script: $e');
       _isServerRunning = false;

@@ -23,6 +23,7 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _animationController;
   late Animation<double> _animation;
   String _status = "Loading Server....";
+  bool _showRetryButton = false;
 
   @override
   void initState() {
@@ -47,22 +48,58 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _startServer() async {
     final serverManager = GetIt.I.get<ServerManager>();
-    setState(() => _status = "Checking server status...");
+    setState(() {
+      _status = "Checking server status...";
+      _showRetryButton = false;
+    });
+
     bool running = await serverManager.isServerRunning();
     if (!running) {
       setState(() => _status = "Starting backend server...");
-      // Start the server, but don't await its exit!
-      serverManager.runAndListenToServerScript();
-      // Now poll until the server is up
-      for (int i = 0; i < 20; i++) {
-        await Future.delayed(const Duration(seconds: 1));
-        if (await serverManager.isServerRunning()) {
-          running = true;
-          break;
+
+      try {
+        // Start the server script
+        int exitCode = await serverManager.runAndListenToServerScript();
+
+        // If the script failed to start, show error immediately
+        if (exitCode != 0) {
+          setState(() {
+            _status = "Failed to start server script.";
+            _showRetryButton = true;
+          });
+          return;
         }
-        setState(() => _status = "Waiting for server to start... (${i + 1})");
+
+        // Now poll until the server is up with shorter intervals
+        for (int i = 0; i < 30; i++) {
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          // Check if the server process is still running
+          if (!serverManager.isServerProcessRunning()) {
+            setState(() {
+              _status = "Server process stopped unexpectedly.";
+              _showRetryButton = true;
+            });
+            return;
+          }
+
+          if (await serverManager.isServerRunning()) {
+            running = true;
+            break;
+          }
+          setState(
+              () => _status = "Waiting for server to start... (${i + 1}/30)");
+        }
+      } catch (e) {
+        print('Error during server startup: $e');
+        setState(() {
+          _status = "Error starting server: ${e.toString()}";
+          _showRetryButton = true;
+        });
+        return;
       }
     }
+
     if (running) {
       setState(() => _status = "Server is running. Loading dashboard...");
       await Future.delayed(const Duration(milliseconds: 500));
@@ -77,9 +114,16 @@ class _SplashScreenState extends State<SplashScreen>
         );
       }
     } else {
-      setState(() => _status = "Failed to start server.");
-      // Optionally show a retry button or error dialog here
+      setState(() {
+        _status =
+            "Failed to start server. Please check if the backend is properly configured.";
+        _showRetryButton = true;
+      });
     }
+  }
+
+  Future<void> _retryServer() async {
+    await _startServer();
   }
 
   @override
@@ -126,7 +170,39 @@ class _SplashScreenState extends State<SplashScreen>
                 color: Colors.black, // Adjust text color as needed
               ),
             ),
-            Text(_status),
+            const SizedBox(height: 10),
+            Text(
+              _status,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (_showRetryButton) ...[
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _retryServer,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Retry',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
