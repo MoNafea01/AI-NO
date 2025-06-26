@@ -161,6 +161,17 @@ class ServerManager {
       // Use the project root directory instead of the executable directory
       final projectRoot = Directory.current.path;
       final scriptPath = '$projectRoot\\run_server.bat';
+      final scriptFile = File(scriptPath);
+
+      print('Checking script: $scriptPath in $projectRoot');
+
+      // Check if the script file exists
+      if (!await scriptFile.exists()) {
+        print('ERROR: Server script not found at: $scriptPath');
+        print(
+            'Please ensure run_server.bat exists in the project root directory.');
+        return -2; // Special error code for missing script
+      }
 
       print('Running script: $scriptPath in $projectRoot');
 
@@ -184,6 +195,36 @@ class ServerManager {
         // You can parse errors and make decisions here
       });
 
+      // Check if the process started successfully by waiting a short time
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Check if the process is still running after a short delay
+      if (_serverProcess != null) {
+        try {
+          // Try to get the exit code with a timeout
+          int? exitCode;
+          try {
+            exitCode = await _serverProcess!.exitCode.timeout(
+              const Duration(seconds: 2),
+            );
+          } catch (timeoutError) {
+            // If timeout, the process is still running (good)
+            exitCode = null;
+          }
+
+          // If we got an exit code, the process failed quickly
+          if (exitCode != null && exitCode != 0) {
+            print('ERROR: Server script failed with exit code: $exitCode');
+            _isServerRunning = false;
+            _serverProcess = null;
+            return exitCode;
+          }
+        } catch (e) {
+          // If we can't get the exit code, the process might still be running
+          print('Process status check: $e');
+        }
+      }
+
       // Don't wait for the process to exit, just start it and return
       // The process will continue running in the background
       print('Server script started successfully');
@@ -206,5 +247,54 @@ class ServerManager {
       _serverProcess = null;
       print('Server stopped');
     }
+  }
+
+  /// Gets a user-friendly error message based on the exit code
+  String getErrorMessage(int exitCode) {
+    switch (exitCode) {
+      case -2:
+        return "Server script not found. Please ensure 'run_server.bat' exists in the project directory.";
+      case -1:
+        return "Failed to start server script. Please check your system configuration.";
+      case 1:
+        return "Server script failed to execute. Please check if Python and Django are properly installed.";
+      case 2:
+        return "Server script failed due to missing dependencies. Please check your backend setup.";
+      case 9009:
+        return "Command not found. Please ensure Python is installed and added to your system PATH.";
+      case 127:
+        return "Command not found. Please check if the required executables are available.";
+      default:
+        return "Server script failed with error code: $exitCode. Please check the console for details.";
+    }
+  }
+
+  /// Gets detailed error information for debugging
+  String getDetailedErrorInfo(int exitCode) {
+    String baseMessage = getErrorMessage(exitCode);
+    String additionalInfo = "";
+
+    switch (exitCode) {
+      case -2:
+        additionalInfo = "\n\nTroubleshooting:\n"
+            "1. Make sure 'run_server.bat' exists in the project root directory\n"
+            "2. Check if the file path contains special characters\n"
+            "3. Verify file permissions";
+        break;
+      case 9009:
+        additionalInfo = "\n\nTroubleshooting:\n"
+            "1. Install Python from https://python.org\n"
+            "2. Add Python to your system PATH\n"
+            "3. Restart your terminal/IDE after installation";
+        break;
+      case 1:
+        additionalInfo = "\n\nTroubleshooting:\n"
+            "1. Check if Django is installed: pip install django\n"
+            "2. Verify your virtual environment is activated\n"
+            "3. Check if all dependencies are installed";
+        break;
+    }
+
+    return baseMessage + additionalInfo;
   }
 }

@@ -61,10 +61,12 @@ class _SplashScreenState extends State<SplashScreen>
         // Start the server script
         int exitCode = await serverManager.runAndListenToServerScript();
 
-        // If the script failed to start, show error immediately
+        // Handle different error scenarios
         if (exitCode != 0) {
+          String errorMessage = serverManager.getErrorMessage(exitCode);
+
           setState(() {
-            _status = "Failed to start server script.";
+            _status = errorMessage;
             _showRetryButton = true;
           });
           return;
