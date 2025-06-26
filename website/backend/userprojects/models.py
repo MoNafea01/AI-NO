@@ -12,6 +12,8 @@ class PROJECTS(models.Model):
     options = [('private','private') , ('public','public')]
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     option = models.CharField(max_length=50 , null=False, blank=False , choices=options)
+    model = models.CharField(max_length=255, null=True, blank=True) # filter
+    dataset = models.CharField(max_length=255, null=True, blank=True) # filter
     description = models.CharField(max_length=255)
     file = models.FileField(upload_to='projects' , null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
