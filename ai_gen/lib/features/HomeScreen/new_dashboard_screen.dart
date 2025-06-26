@@ -8,7 +8,7 @@ import 'package:ai_gen/features/HomeScreen/widgets/build_side_bar_dashboard.dart
 
 import 'package:ai_gen/features/architecturesScreen/architecture_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
-import 'package:ai_gen/features/learnScreen/data/video.dart';
+import 'package:ai_gen/features/learnScreen/learn_screen.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:ai_gen/features/screens/HomeScreen/widgets/project_table.dart';
@@ -73,7 +73,7 @@ class _DashboardView extends StatelessWidget {
         return const DatasetsScreen();
       case AppScreen.learn:
       //  return const LearnScreen(); LearningScreen
-        return const LearnScreen();
+        return const PlaylistScreen();
       case AppScreen.docs:
         return const DocsScreen();
       case AppScreen.settings:
