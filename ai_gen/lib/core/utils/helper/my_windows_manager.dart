@@ -10,7 +10,7 @@ Future<void> initializeWindowsManager() async {
   windowManager.setSize(const Size(800, 650), animate: true);
 
   windowManager.center(animate: true);
-  windowManager.setTitle("AI Gen");
+  windowManager.setTitle("AINO");
 
   // // Set the initial size to match the constraints
 

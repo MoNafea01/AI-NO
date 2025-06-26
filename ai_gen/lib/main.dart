@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp>
     return MaterialApp(
       scaffoldMessengerKey: scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
-      title: 'AI Gen',
+      title: 'AINO',
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
       home: const SplashScreen(),
     );
