@@ -4,6 +4,7 @@ import 'package:ai_gen/features/node_view/presentation/widgets/custom_fab.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../cubit/grid_node_view_cubit.dart';
 import 'widgets/menu_actions.dart';
@@ -25,11 +26,20 @@ class _GridNodeViewState extends State<GridNodeView> {
   static const double _sidebarWidth = 500;
 
   late final VSNodeDataProvider nodeDataProvider;
+  String _appVersion = '';
 
   @override
   void initState() {
     super.initState();
     nodeDataProvider = context.read<GridNodeViewCubit>().nodeDataProvider;
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _appVersion = packageInfo.version;
+    });
   }
 
   @override
@@ -103,10 +113,10 @@ class _GridNodeViewState extends State<GridNodeView> {
   }
 
   Widget _buildVersionInfo() {
-    return const Positioned(
+    return Positioned(
       bottom: 10,
       left: 10,
-      child: Text("V0.8.8+5"),
+      child: Text("V$_appVersion"),
     );
   }
 
