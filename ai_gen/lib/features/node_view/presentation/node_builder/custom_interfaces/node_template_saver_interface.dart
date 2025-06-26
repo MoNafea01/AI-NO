@@ -1,15 +1,17 @@
-import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import 'base/base_interface.dart';
-import 'base/universal_accepted_types.dart';
+import 'model_interface.dart';
+import 'multi_output_interface.dart';
 import 'network_interface.dart';
+import 'node_loader_interface.dart';
+import 'preprocessor_interface.dart';
+import 'base/universal_accepted_types.dart';
 
-class VSModelInputData extends BaseInputData {
+class VSNodeTemplateSaverInputData extends BaseInputData {
   ///Basic List input interface
-  VSModelInputData({
+  VSNodeTemplateSaverInputData({
     required super.type,
     required super.node,
     super.title,
@@ -25,31 +27,27 @@ class VSModelInputData extends BaseInputData {
   @override
   List<Type> get acceptedTypes => [
         ...universalAcceptedTypes,
+        BaseOutputData,
         VSModelOutputData,
         VSNetworkOutputData,
         VSFitterOutputData,
+        VSNodeTemplateSaverOutputData,
+        MultiOutputOutputData,
+        VSPreprocessorInputData,
+        VSNodeLoaderOutputData,
       ];
 }
 
-class VSModelOutputData extends BaseOutputData {
+class VSNodeTemplateSaverOutputData extends BaseOutputData {
   ///Basic List output interface
-  VSModelOutputData({required super.type, required super.node});
+  VSNodeTemplateSaverOutputData({required super.type, required super.node});
 
   @override
   IconData get outputIcon => Icons.square_rounded;
 
-  Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
-      get _outputFunction {
+  Future<void> Function(Map<String, dynamic> data) get _outputFunction {
     return (Map<String, dynamic> data) async {
-      final Map<String, dynamic> apiBody = {
-        "model_name": node.name,
-        "model_type": node.type,
-        "task": node.task,
-        "params": node.paramsToJson,
-      };
-
-      final INodeServices nodeServerCalls = GetIt.I.get<INodeServices>();
-      return await nodeServerCalls.runNode(node, apiBody);
+      await runNodeWithData(data);
     };
   }
 

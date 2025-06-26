@@ -127,13 +127,13 @@ class NodeContentState extends State<NodeContent> {
             crossAxisAlignment: CrossAxisAlignment.center,
             spacing: 16,
             children: [
-              _InterfaceWidget(_hiddenInputWidgets),
+              _HiddenInterfaceWidget(_hiddenInputWidgets),
               VSNodeTitle(
                 key: _titleKey,
                 data: widget.data,
                 onTitleChange: updateOutputs,
               ),
-              _InterfaceWidget(_hiddenOutputWidgets),
+              _HiddenInterfaceWidget(_hiddenOutputWidgets),
             ],
           ),
         ),
@@ -161,7 +161,7 @@ class NodeContentState extends State<NodeContent> {
       right: 0,
       top: 0,
       bottom: 0,
-      child: _InterfaceWidget(_outputWidgets),
+      child: _InterfaceWidget(_outputWidgets, outputKeys: _outputKeys),
     );
   }
 
@@ -188,16 +188,36 @@ class NodeContentState extends State<NodeContent> {
 /// A widget that displays a list of interface elements in a column.
 ///
 /// This widget is used to organize input and output ports in a vertical layout.
+class _HiddenInterfaceWidget extends StatelessWidget {
+  /// Creates a new [_InterfaceWidget] instance.
+  ///
+  /// [children] is required and contains the list of widgets to display.
+  const _HiddenInterfaceWidget(this.children);
+
+  /// The list of widgets to display in the interface
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: 4,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: children,
+    );
+  }
+}
+
 class _InterfaceWidget extends StatelessWidget {
   /// Creates a new [_InterfaceWidget] instance.
   ///
   /// [children] is required and contains the list of widgets to display.
   const _InterfaceWidget(this.children,
-      {this.crossAxisAlignment = CrossAxisAlignment.end});
+      {this.crossAxisAlignment = CrossAxisAlignment.end, this.outputKeys});
 
   /// The list of widgets to display in the interface
   final List<Widget> children;
   final CrossAxisAlignment crossAxisAlignment;
+  final List<GlobalKey<VSNodeOutputState>>? outputKeys;
 
   @override
   Widget build(BuildContext context) {

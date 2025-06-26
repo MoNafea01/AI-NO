@@ -30,6 +30,11 @@ class NodeSerializer {
       // check if the node category, type, and task keys exist and if not, create them
       _createKeysIfNotExist(categorizedNodes, node);
 
+      // get the showing order of the node
+      int length =
+          categorizedNodes[node.category]![node.type]![node.task]!.length;
+      node.order = length + 1;
+
       // Add the node to the list of nodes in the corresponding category, type, and task
       categorizedNodes[node.category]![node.type]![node.task]!.add(node);
     }
