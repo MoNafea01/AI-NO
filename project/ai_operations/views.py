@@ -1,5 +1,5 @@
 from __init__ import *
-import json, datetime, tempfile, subprocess, pandas as pd
+import json, datetime, tempfile, subprocess, random, pandas as pd, copy
 import uuid
 
 import requests
@@ -1166,7 +1166,7 @@ class ExportProjectAPIView(APIView):
             if not(os.path.abspath(folder_path) == os.path.abspath(folder_path).split('.')[-1]):
                 return Response({"error": "Folder path must be a directory, not a file."}, status=status.HTTP_400_BAD_REQUEST)
             
-            encrypt = not( password == '')
+            encrypt = not(password == '')
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
             if not project_id:
@@ -1181,6 +1181,11 @@ class ExportProjectAPIView(APIView):
                 
             # Get all nodes for the project
             nodes = Node.objects.filter(project_id=project_id)
+            
+            # Set node_data to None for all nodes before serialization
+            for node in nodes:
+                node.node_data = None
+            
             serializer = NodeSerializer(nodes, many=True)
             
             # Create export data with project info and nodes
@@ -1189,6 +1194,8 @@ class ExportProjectAPIView(APIView):
                 "project_name": project.project_name,
                 "project_description": project.project_description,
                 "export_date": datetime.datetime.now().isoformat(),
+                "model": project.model,
+                "dataset": project.dataset,
                 "nodes": serializer.data
             }
             # Convert to JSON 
