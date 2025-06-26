@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/reusable_widgets/failure_screen.dart';
 import 'package:ai_gen/core/reusable_widgets/loading_screen.dart';
 import 'package:ai_gen/features/HomeScreen/project_screen.dart';
@@ -5,13 +6,13 @@ import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'widgets/header_section.dart';
 import 'widgets/project_table.dart';
 import 'widgets/search_and_action.dart';
-import 'widgets/side_bar_widget.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.projectModel});
+
+  final ProjectModel? projectModel;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,9 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       // HeaderSection(), // old header section
                       buildHeader(context),
-                      const SearchAndActionsRow(), //old search and actions row
+                      SearchAndActionsRow(
+                        projectModel: projectModel,
+                      ), //old search and actions row
                       // buildSearchBar(context),
                       const Expanded(child: _Content()),
                     ],

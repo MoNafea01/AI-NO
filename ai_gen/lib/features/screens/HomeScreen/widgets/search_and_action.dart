@@ -1,7 +1,9 @@
 // Search and Actions Row Widget
+import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/utils/helper/helper.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
+import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/widgets/project_actions/export_project_dialog.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +13,48 @@ import 'custom_icon_text_button.dart';
 import 'project_actions/create_new_project_dialog.dart';
 import 'project_actions/import_project_dialog.dart';
 
-class SearchAndActionsRow extends StatelessWidget {
-  const SearchAndActionsRow({super.key});
+class SearchAndActionsRow extends StatefulWidget {
+  const SearchAndActionsRow({super.key, this.projectModel});
+
+  final ProjectModel? projectModel;
+
+  @override
+  State<SearchAndActionsRow> createState() => _SearchAndActionsRowState();
+}
+
+class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (widget.projectModel != null) {
+        // to trigger when oppening the project from the main args
+        if (widget.projectModel?.id != null) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => NodeView(
+                projectModel: widget.projectModel!,
+              ),
+            ),
+          );
+        } else {
+          _triggerImport(context);
+        }
+      }
+    });
+  }
+
+  void _triggerImport(BuildContext context) {
+    Helper.showDialogHelper(
+      context,
+      ImportProjectDialog(
+        cubit: context.read<HomeCubit>(),
+        projectModel: widget.projectModel,
+        outsourceProject: true,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +89,7 @@ class SearchAndActionsRow extends StatelessWidget {
           textColor: AppColors.bluePrimaryColor,
           //  iconColor: AppColors.primaryColor,
           onTap: () {
-            Helper.showDialogHelper(
-              context,
-              ImportProjectDialog(cubit: context.read<HomeCubit>()),
-            );
+            _triggerImport(context);
           },
           assetName: AssetsPaths.importIcon,
           iconColor: AppColors.bluePrimaryColor,

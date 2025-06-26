@@ -1,8 +1,8 @@
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_dialog.dart';
 import 'package:ai_gen/core/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/core/reusable_widgets/pick_folder_icon.dart';
-import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
@@ -13,10 +13,19 @@ import 'package:get_it/get_it.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class ImportProjectDialog extends StatefulWidget {
-  const ImportProjectDialog({this.projectModel, this.cubit, super.key});
+  const ImportProjectDialog({
+    this.projectModel,
+    this.cubit,
+    this.outsourceProject = false,
+    super.key,
+  });
 
   final ProjectModel? projectModel;
   final Cubit? cubit;
+
+  //  used when the project is opened from the main args
+  final bool outsourceProject;
+
   @override
   State<ImportProjectDialog> createState() => _ImportProjectDialogState();
 }
@@ -32,10 +41,14 @@ class _ImportProjectDialogState extends State<ImportProjectDialog> {
 
   @override
   void initState() {
-    _projectpathController = TextEditingController();
+    _projectpathController = TextEditingController(
+        text: widget.outsourceProject ? widget.projectModel?.path : null);
     _projectPasswordController = TextEditingController();
-    _projectNameController = TextEditingController();
-    _projectDescriptionController = TextEditingController();
+    _projectNameController = TextEditingController(
+        text: widget.outsourceProject ? widget.projectModel?.name : null);
+    _projectDescriptionController = TextEditingController(
+        text:
+            widget.outsourceProject ? widget.projectModel?.description : null);
     super.initState();
   }
 
@@ -134,7 +147,7 @@ class _ImportProjectDialogState extends State<ImportProjectDialog> {
             isRequired: false,
             enabled: !_isLoading,
           ),
-          if (widget.projectModel != null)
+          if (!widget.outsourceProject)
             ToggleSwitch(
               minWidth: 900,
               cornerRadius: 12.0,

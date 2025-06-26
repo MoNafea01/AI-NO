@@ -4,10 +4,15 @@ import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'core/di/get_it_initialize.dart';
+import 'core/models/project_model.dart';
+import 'core/utils/helper/check_main_args.dart';
 import 'core/utils/helper/my_windows_manager.dart';
 import 'features/splashScreen/splash_screen.dart';
 
-void main() async {
+void main(List<String> args) async {
+  // to check if the project is opened from an a project file with .ainoprj extension
+  ProjectModel? initialProject = await checkArgs(args);
+
   WidgetsFlutterBinding.ensureInitialized();
   initializeGetIt();
   await initializeWindowsManager();
@@ -15,7 +20,7 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthProvider(),
-      child: const MyApp(),
+      child: MyApp(initialProject: initialProject),
     ),
   );
 }
@@ -24,7 +29,9 @@ final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.initialProject});
+
+  final ProjectModel? initialProject;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -60,7 +67,7 @@ class _MyAppState extends State<MyApp>
       debugShowCheckedModeBanner: false,
       title: 'AINO',
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      home: const SplashScreen(),
+      home: SplashScreen(initialProject: widget.initialProject),
     );
   }
 }

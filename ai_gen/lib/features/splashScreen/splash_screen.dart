@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
 //import 'package:ai_gen/features/HomeScreen/home_screen.dart';
@@ -6,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({super.key, this.initialProject});
+
+  final ProjectModel? initialProject;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -21,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-      // Initialize the AnimationController
+    // Initialize the AnimationController
     _animationController = AnimationController(
       vsync: this, // Use 'this' as the TickerProvider
       duration: const Duration(seconds: 2), // Adjust duration as needed
@@ -35,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen>
         curve: Curves.easeInOut, // Choose a suitable curve
       ),
     );
-    _animationController.forward(); 
+    _animationController.forward();
     loadServer();
   }
 
@@ -48,11 +51,16 @@ class _SplashScreenState extends State<SplashScreen>
       // Check if the widget is still mounted
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+        MaterialPageRoute(
+          builder: (context) => DashboardScreen(
+            projectModel: widget.initialProject,
+          ),
+        ),
         // MaterialPageRoute(builder: (context) => const DashboardScreen()), // will go to signup screen
       );
     }
   }
+
   @override
   void dispose() {
     _animationController
@@ -77,13 +85,12 @@ class _SplashScreenState extends State<SplashScreen>
                 AssetsPaths.projectLogoIcon, // Your actual SVG asset path
                 width: 150, // Adjust size as needed
                 height: 150, // Adjust size as needed
-              
               ),
               builder: (context, child) {
                 // Apply the rotation transformation
                 return Transform.rotate(
-                  angle:
-                      _animation.value, // Current rotation angle from the animation
+                  angle: _animation
+                      .value, // Current rotation angle from the animation
                   child: child, // The SvgPicture.asset widget
                 );
               },

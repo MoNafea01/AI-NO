@@ -1,22 +1,17 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
-
-import 'package:ai_gen/features/HomeScreen/project_screen.dart';
+import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_side_bar_dashboard.dart';
-
 import 'package:ai_gen/features/architecturesScreen/architecture_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
-import 'package:ai_gen/features/screens/HomeScreen/widgets/project_table.dart';
-
 import 'package:ai_gen/features/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
 
 import '../datasetScreen/dataset_screen.dart';
 import '../docsScreen/docs_screen.dart';
@@ -25,7 +20,9 @@ import '../modelScreen/model_screen.dart';
 import 'data/enum_app_screens.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, this.projectModel});
+
+  final ProjectModel? projectModel;
 
   @override
   Widget build(BuildContext context) {
@@ -40,23 +37,24 @@ class DashboardScreen extends StatelessWidget {
         BlocProvider(
           create: (context) => ProfileCubit(
             context.read<AuthProvider>(),
-          )..loadProfile(
-          ),
+          )..loadProfile(),
         ),
       ],
-      child: const _DashboardView(),
+      child: _DashboardView(projectModel: projectModel),
     );
   }
 }
 
 class _DashboardView extends StatelessWidget {
-  const _DashboardView();
+  const _DashboardView({this.projectModel});
+
+  final ProjectModel? projectModel;
 
   // Helper method to get the widget based on the selected screen
   Widget _getScreenWidget(AppScreen screen) {
     switch (screen) {
       case AppScreen.explore:
-        return const HomeScreen();
+        return HomeScreen(projectModel: projectModel);
       //return ProjectsScreen();
       //ProjectsTable
       case AppScreen.architectures:
