@@ -35,7 +35,6 @@ class _GridNodeViewState extends State<GridNodeView> {
   @override
   void dispose() {
     nodeDataProvider.dispose();
-    // GetIt.I.get<GridNodeViewCubit>().onDispose();
     super.dispose();
   }
 

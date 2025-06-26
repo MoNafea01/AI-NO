@@ -196,10 +196,4 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     _closeActiveNodePropertiesCard();
     emit(NodeViewSuccess());
   }
-
-  void onDispose() {
-    GetIt.I.unregister<GridNodeViewCubit>();
-    // nodeDataProvider.dispose();
-    // nodeManager.clearNodes();
-  }
 }

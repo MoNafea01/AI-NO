@@ -44,8 +44,6 @@ class VSNodeTemplateSaverOutputData extends BaseOutputData {
   Future<void> Function(Map<String, dynamic> data) get _outputFunction {
     return (Map<String, dynamic> data) async {
       await runNodeWithData(data);
-
-      // GetIt.I.get<GridNodeViewCubit>().loadNodeView();
     };
   }
 
