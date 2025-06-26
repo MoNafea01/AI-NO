@@ -2,6 +2,8 @@ import 'package:ai_gen/core/network/services/interfaces/node_services_interface.
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/base/base_interface.dart';
 import 'package:get_it/get_it.dart';
 
+import 'base/universal_accepted_types.dart';
+
 /// A class to hold shared state for output data
 class OutputState {
   bool isRunning = false;
@@ -18,7 +20,9 @@ class MultiOutputInputInterface extends BaseInputData {
   });
 
   @override
-  List<Type> get acceptedTypes => [MultiOutputOutputData];
+  List<Type> get acceptedTypes => [
+        ...universalAcceptedTypes,
+      ];
 }
 
 class MultiOutputOutputData extends BaseOutputData {

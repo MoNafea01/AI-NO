@@ -3,6 +3,8 @@ import 'package:ai_gen/features/node_view/presentation/node_builder/custom_inter
 import 'base/base_interface.dart';
 import 'multi_output_interface.dart';
 import 'network_interface.dart';
+import 'node_loader_interface.dart';
+import 'base/universal_accepted_types.dart';
 
 class VSFitterInputData extends BaseInputData {
   ///Basic List input interface
@@ -18,8 +20,13 @@ class VSFitterInputData extends BaseInputData {
   });
 
   @override
-  List<Type> get acceptedTypes =>
-      [VSAINOGeneralOutputData, MultiOutputOutputData, VSNetworkOutputData];
+  List<Type> get acceptedTypes => [
+        ...universalAcceptedTypes,
+        VSAINOGeneralOutputData,
+        MultiOutputOutputData,
+        VSNetworkOutputData,
+        VSNodeLoaderOutputData
+      ];
 }
 
 class VSFitterOutputData extends BaseOutputData {

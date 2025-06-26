@@ -78,7 +78,7 @@ class NodeServices implements INodeServices {
   @override
   Future<Map<String, dynamic>> runNode(NodeModel node, apiBody) async {
     print(
-        "Running node: ${node.name}: $_baseURL/${node.endPoint}?node_id=${node.nodeId}&project_id=${node.projectId}  \nwith body $apiBody");
+        "Running node: ${node.name}: $_baseURL/${node.endPoint}?node_id=${node.nodeId}&project_id=${node.projectId}&template_id=${node.order}  \nwith body $apiBody");
     return await _apiCall(
       node,
       () async => node.nodeId == null
@@ -92,7 +92,7 @@ class NodeServices implements INodeServices {
 
   Future<Response> _postNode(NodeModel node, apiBody) {
     return _dio.post(
-      "$_baseURL/${node.endPoint}?project_id=${node.projectId}",
+      "$_baseURL/${node.endPoint}?project_id=${node.projectId}&template_id=${node.order}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
@@ -100,7 +100,7 @@ class NodeServices implements INodeServices {
 
   Future<Response> _putNode(NodeModel node, apiBody) {
     return _dio.put(
-      "$_baseURL/${node.endPoint}?node_id=${node.nodeId}&project_id=${node.projectId}",
+      "$_baseURL/${node.endPoint}?node_id=${node.nodeId}&project_id=${node.projectId}&template_id=${node.order}",
       data: apiBody,
       options: Options(contentType: Headers.jsonContentType),
     );
@@ -151,7 +151,7 @@ class NodeServices implements INodeServices {
       if (e is Exception) {
         throw ApiErrorHandler.handleGeneral(e);
       } else {
-        throw Exception('Unknown error: $e');
+        throw Exception('Unknown error Occured');
       }
     }
   }

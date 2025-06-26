@@ -7,6 +7,7 @@ import 'package:get_it/get_it.dart';
 
 import 'base/base_interface.dart';
 import 'network_interface.dart';
+import 'node_loader_interface.dart';
 
 class VSPreprocessorInputData extends BaseInputData {
   ///Basic List input interface
@@ -20,8 +21,12 @@ class VSPreprocessorInputData extends BaseInputData {
   });
 
   @override
-  List<Type> get acceptedTypes =>
-      [VSPreprocessorOutputData, VSFitterOutputData, VSNetworkOutputData];
+  List<Type> get acceptedTypes => [
+        VSPreprocessorOutputData,
+        VSFitterOutputData,
+        VSNetworkOutputData,
+        VSNodeLoaderOutputData
+      ];
 
   @override
   // implement inputIcon

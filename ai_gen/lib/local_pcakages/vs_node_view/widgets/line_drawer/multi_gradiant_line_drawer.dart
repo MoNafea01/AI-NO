@@ -42,24 +42,33 @@ class MultiGradientLinePainter extends CustomPainter {
       final path = Path();
       path.moveTo(startPoint.dx, startPoint.dy);
 
-      late final Offset controlPoint1;
-      late final Offset controlPoint2;
-      if (endPoint.dx > startPoint.dx) {
+      Offset controlPoint1;
+      Offset controlPoint2;
+
+      final dxDifference = endPoint.dx - startPoint.dx;
+
+      final isRightward = dxDifference >= 0;
+
+      if (isRightward) {
+        final dyDifference = endPoint.dy - startPoint.dy;
+        final isUpwaard = dyDifference <= 0;
+        final double yDistance = isUpwaard ? 50 : -50;
+
         controlPoint1 = Offset(
-          startPoint.dx + (endPoint.dx - startPoint.dx) * -.8,
-          startPoint.dy,
+          startPoint.dx - dxDifference * 0.2,
+          startPoint.dy - yDistance,
         );
         controlPoint2 = Offset(
-          endPoint.dx + (endPoint.dx - startPoint.dx) * 0.8,
-          endPoint.dy,
+          endPoint.dx + dxDifference * 0.2,
+          endPoint.dy + yDistance,
         );
       } else {
         controlPoint1 = Offset(
-          startPoint.dx + (endPoint.dx - startPoint.dx) * 0.6,
+          startPoint.dx + dxDifference * 0.6,
           startPoint.dy,
         );
         controlPoint2 = Offset(
-          startPoint.dx + (endPoint.dx - startPoint.dx) * 0.4,
+          startPoint.dx + dxDifference * 0.4,
           endPoint.dy,
         );
       }
