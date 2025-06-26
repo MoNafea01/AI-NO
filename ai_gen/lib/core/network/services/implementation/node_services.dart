@@ -151,7 +151,7 @@ class NodeServices implements INodeServices {
       if (e is Exception) {
         throw ApiErrorHandler.handleGeneral(e);
       } else {
-        throw Exception('Unknown error: $e');
+        throw Exception('Unknown error Occured');
       }
     }
   }
