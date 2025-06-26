@@ -44,7 +44,7 @@ class SearchAndActionsRow extends StatelessWidget {
           text: "Import",
           // icon: Icons.download,
           backgroundColor: const Color(0xfff2f2f2),
-          textColor: AppColors.primaryColor,
+          textColor: AppColors.bluePrimaryColor,
           //  iconColor: AppColors.primaryColor,
           onTap: () {
             Helper.showDialogHelper(
@@ -52,24 +52,25 @@ class SearchAndActionsRow extends StatelessWidget {
               ImportProjectDialog(cubit: context.read<HomeCubit>()),
             );
           },
-          assetName: AssetsPaths.importIcon, iconColor: AppColors.primaryColor,
+          assetName: AssetsPaths.importIcon,
+          iconColor: AppColors.bluePrimaryColor,
         ),
         CustomIconTextButton(
           assetName: AssetsPaths.exportIcon,
           text: "Export",
           //   icon: Icons.upload,
           backgroundColor: const Color(0xfff2f2f2),
-          textColor: AppColors.primaryColor,
+          textColor: AppColors.bluePrimaryColor,
           //   iconColor: AppColors.primaryColor,
           onTap: () {
             Helper.showDialogHelper(context, const ExportProjectDialog());
           },
-          iconColor: AppColors.primaryColor,
+          iconColor: AppColors.bluePrimaryColor,
         ),
         CustomIconTextButton(
           text: "New Project",
           // icon: Icons.add,
-          backgroundColor: AppColors.primaryColor,
+          backgroundColor: AppColors.bluePrimaryColor,
           textColor: Colors.white,
           //  iconColor: Colors.white,
           onTap: () {

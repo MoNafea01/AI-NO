@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +20,7 @@ Widget buildInfoTile(BuildContext context, String label, String value) {
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.primaryColor,
+                color: AppColors.bluePrimaryColor,
               ),
         ),
         const SizedBox(height: 4),

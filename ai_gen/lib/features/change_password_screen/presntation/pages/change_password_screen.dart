@@ -148,7 +148,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        backgroundColor: AppColors.primaryColor,
+                        backgroundColor: AppColors.bluePrimaryColor,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 18),
                       ),

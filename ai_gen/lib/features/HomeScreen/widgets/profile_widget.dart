@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
@@ -53,7 +52,7 @@ class ProfileWidget extends StatelessWidget {
                 radius: 26,
                 child: Icon(
                   Icons.person,
-                  color: AppColors.primaryColor,
+                  color: AppColors.bluePrimaryColor,
                   size: 35,
                 ),
               ),

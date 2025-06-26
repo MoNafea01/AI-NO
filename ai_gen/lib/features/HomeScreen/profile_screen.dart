@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_state.dart';
@@ -26,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
           return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(
-                color: AppColors.primaryColor,
+                color: AppColors.bluePrimaryColor,
               ),
             ),
           );
@@ -142,7 +141,7 @@ class ProfileScreen extends StatelessWidget {
                         alignment: Alignment.bottomRight,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
+                            backgroundColor: AppColors.bluePrimaryColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4),
                             ),
@@ -201,7 +200,7 @@ class ProfileScreen extends StatelessWidget {
           body: Center(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
+                backgroundColor: AppColors.bluePrimaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),

@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
@@ -179,7 +178,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         TextButton(
           style: TextButton.styleFrom(
             backgroundColor: Colors.white,
-            foregroundColor: AppColors.primaryColor,
+            foregroundColor: AppColors.bluePrimaryColor,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
@@ -191,7 +190,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryColor,
+            backgroundColor: AppColors.bluePrimaryColor,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),

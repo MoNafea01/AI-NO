@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
@@ -161,7 +160,7 @@ Widget sidebarItem(
         vertical: 12,
       ),
       decoration: BoxDecoration(
-        color: isActive ? AppColors.primaryColor : Colors.transparent,
+        color: isActive ? AppColors.bluePrimaryColor : Colors.transparent,
         borderRadius: isActive
             ? const BorderRadius.all(
                 Radius.circular(4),
@@ -183,8 +182,10 @@ Widget sidebarItem(
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
-                color: isActive ? Colors.white : Colors
-                    .black, //isActive ? Colors.white : Colors.grey.shade800
+                color: isActive
+                    ? Colors.white
+                    : Colors
+                        .black, //isActive ? Colors.white : Colors.grey.shade800
               ),
             ),
         ],

@@ -96,7 +96,7 @@ class _CustomDialogState extends State<CustomDialog> {
     return ElevatedButton(
       onPressed: _onSubmitPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.bluePrimaryColor,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(
           horizontal: 24,
@@ -129,8 +129,8 @@ class _CustomDialogState extends State<CustomDialog> {
       ),
       child: Text(
         widget.cancelButtonText ?? 'Cancel',
-        style:
-            AppTextStyles.black16w400.copyWith(color: AppColors.primaryColor),
+        style: AppTextStyles.black16w400
+            .copyWith(color: AppColors.bluePrimaryColor),
       ),
     );
   }

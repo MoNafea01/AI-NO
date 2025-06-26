@@ -186,7 +186,7 @@ class SignupForm extends StatelessWidget {
                 },
                 child: const Text(
                   'Sign in',
-                  style: TextStyle(color: AppColors.primaryColor),
+                  style: TextStyle(color: AppColors.bluePrimaryColor),
                 ),
               ),
             ],

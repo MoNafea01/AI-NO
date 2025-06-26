@@ -51,7 +51,7 @@ class AuthLayout extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Container(
-              color: AppColors.primaryColor,
+              color: AppColors.bluePrimaryColor,
               padding: const EdgeInsets.all(32.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

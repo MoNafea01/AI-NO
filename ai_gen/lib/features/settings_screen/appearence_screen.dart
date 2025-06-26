@@ -1,4 +1,3 @@
-
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -82,7 +81,7 @@ class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
-            color: isSelected ? AppColors.primaryColor : Colors.transparent,
+            color: isSelected ? AppColors.bluePrimaryColor : Colors.transparent,
             width: 2,
           ),
           borderRadius: BorderRadius.circular(16),
