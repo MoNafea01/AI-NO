@@ -1,4 +1,5 @@
 import 'base/base_interface.dart';
+import 'base/universal_accepted_types.dart';
 import 'multi_output_interface.dart';
 import 'network_interface.dart';
 
@@ -17,6 +18,7 @@ class VSAINOGeneralInputData extends BaseInputData {
 
   @override
   List<Type> get acceptedTypes => [
+        ...universalAcceptedTypes,
         VSAINOGeneralOutputData,
         MultiOutputOutputData,
         VSNetworkOutputData,

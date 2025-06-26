@@ -5,7 +5,9 @@ import 'base/base_interface.dart';
 import 'model_interface.dart';
 import 'multi_output_interface.dart';
 import 'network_interface.dart';
+import 'node_loader_interface.dart';
 import 'preprocessor_interface.dart';
+import 'base/universal_accepted_types.dart';
 
 class VSNodeTemplateSaverInputData extends BaseInputData {
   ///Basic List input interface
@@ -24,6 +26,7 @@ class VSNodeTemplateSaverInputData extends BaseInputData {
 
   @override
   List<Type> get acceptedTypes => [
+        ...universalAcceptedTypes,
         BaseOutputData,
         VSModelOutputData,
         VSNetworkOutputData,
@@ -31,6 +34,7 @@ class VSNodeTemplateSaverInputData extends BaseInputData {
         VSNodeTemplateSaverOutputData,
         MultiOutputOutputData,
         VSPreprocessorInputData,
+        VSNodeLoaderOutputData,
       ];
 }
 

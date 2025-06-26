@@ -3,6 +3,7 @@ import 'package:ai_gen/local_pcakages/vs_node_view/data/standard_interfaces/vs_n
 import 'package:flutter/material.dart';
 
 import 'base/base_interface.dart';
+import 'base/universal_accepted_types.dart';
 
 class VsTextInputData extends BaseInputData {
   ///Basic int input interface
@@ -28,5 +29,10 @@ class VsTextInputData extends BaseInputData {
   }
   final TextEditingController controller;
   @override
-  List<Type> get acceptedTypes => [VSIntOutputData, VSNumOutputData];
+  List<Type> get acceptedTypes => [
+        ...universalAcceptedTypes,
+        VSIntOutputData,
+        VSNumOutputData,
+        VSNumOutputData,
+      ];
 }
