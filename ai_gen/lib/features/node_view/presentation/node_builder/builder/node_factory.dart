@@ -1,88 +1,33 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/network_interface.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../main.dart';
-import 'custom_interfaces/aino_general_interface.dart';
-import 'custom_interfaces/model_interface.dart';
-import 'custom_interfaces/multi_output_interface.dart';
-import 'custom_interfaces/node_loader_interface.dart';
-import 'custom_interfaces/node_template_saver_interface.dart';
-import 'custom_interfaces/preprocessor_interface.dart';
+import '../../../../../main.dart';
+import '../custom_interfaces/aino_general_interface.dart';
+import '../custom_interfaces/model_interface.dart';
+import '../custom_interfaces/multi_output_interface.dart';
+import '../custom_interfaces/node_loader_interface.dart';
+import '../custom_interfaces/node_template_saver_interface.dart';
+import '../custom_interfaces/preprocessor_interface.dart';
 
-class NodeBuilder {
-  NodeBuilder({required this.projectId});
+/// Responsible for instantiating node widgets/data from NodeModel.
+class NodeFactory {
+  NodeFactory({required this.projectId});
   final int projectId;
-  Future<List<Object>> buildNodesMenu() async {
-    final Map<String, Map<String, Map<String, List<NodeModel>>>> allNodes =
-        await NodeSerializer().categorizeNodes();
 
-    return [
-      // output node
-      (Offset offset, VSOutputData? ref) => VSOutputNode(
-            type: "Run",
-            widgetOffset: offset,
-            ref: ref,
-          ),
+  /// The function to create the output node (Run node).
 
-      ..._buildCategorizedNodes(allNodes),
-    ];
-  }
+  VSOutputNode runNode(Offset offset, VSOutputData? ref) => VSOutputNode(
+        type: "Run",
+        widgetOffset: offset,
+        ref: ref,
+      );
 
-  // Nodes Scheme
-  // Map<String, Map<String, Map<String, List<NodeModel>>>> mapScheme = {
-  //   "Models": {
-  //        "linear_models": {
-  //                "regression": [NodeModel(), NodeModel()],
-  //                "classification": [NodeModel()],
-  //          },
-  //          "svm": {
-  //                "regression": [NodeModel(), NodeModel()],
-  //                "classification": [NodeModel()],
-  //                "clustering": [NodeModel()],
-  //          }
-  //   },
-  // };
-
-  // first subgroup that contains the types
-  List<VSSubgroup> _buildCategorizedNodes(Map<String, Map> allNodes) {
-    return _buildSubgroups(allNodes, _buildTypes);
-  }
-
-  // second subgroup that contains the tasks
-  List<VSSubgroup> _buildTypes(Map<String, Map> nodesCategory) {
-    return _buildSubgroups(nodesCategory, _buildTasks);
-  }
-
-  // third subgroup that contains the nodes
-  List<VSSubgroup> _buildTasks(Map<String, List<NodeModel>> nodesType) {
-    return _buildSubgroups(nodesType, _buildNodes);
-  }
-
-  List<VSSubgroup> _buildSubgroups(
-    Map<String, dynamic> category,
-    Function group,
-  ) {
-    return category.entries.map((entry) {
-      final String name = entry.key;
-      final List<dynamic> subgroup = group(entry.value);
-      return VSSubgroup(name: name, subgroup: subgroup);
-    }).toList();
-  }
-
-  // build the last List of nodes
-  List<Function(Offset, VSOutputData?)> _buildNodes(List<NodeModel> nodesList) {
-    return nodesList.map((NodeModel node) => buildNode(node)).toList();
-  }
-
-  //build the node itself
+  /// Returns a function that builds a VSNodeData for a given NodeModel.
   Function(Offset, VSOutputData?) buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
-      // print(ref);
-
       NodeModel newNode = node.copyWith(projectId: projectId);
       return VSNodeData(
         id: newNode.nodeId?.toString(),
@@ -128,17 +73,15 @@ class NodeBuilder {
       return VSNodeTemplateSaverInputData(
           type: inputDot, initialConnection: ref, node: node);
     }
-
     return VSAINOGeneralInputData(
         type: inputDot, initialConnection: ref, node: node);
   }
 
   List<VSOutputData> _buildOutputData(NodeModel node) {
     if (node.outputDots == null || node.outputDots!.isEmpty) return [];
-
     final String outputDot = node.outputDots![0];
     if (node.outputDots!.length > 1) {
-      return multiOutputNodes(node);
+      return _multiOutputNodes(node);
     }
     if (node.category == "Models") {
       return [VSModelOutputData(type: outputDot, node: node)];
@@ -164,14 +107,12 @@ class NodeBuilder {
     if (node.name == "node_loader") {
       return [VSNodeLoaderOutputData(type: outputDot, node: node)];
     }
-
     return [VSAINOGeneralOutputData(type: outputDot, node: node)];
   }
 
-  List<MultiOutputOutputData> multiOutputNodes(NodeModel node) {
+  List<MultiOutputOutputData> _multiOutputNodes(NodeModel node) {
     final List<MultiOutputOutputData> outputData = [];
     final outputState = OutputState();
-
     for (int i = 0; i < node.outputDots!.length; i++) {
       outputData.add(
         MultiOutputOutputData(

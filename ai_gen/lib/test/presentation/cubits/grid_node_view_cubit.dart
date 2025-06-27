@@ -1,6 +1,5 @@
-import 'package:ai_gen/features/node_view/presentation/node_builder/node_builder.dart';
+import 'package:ai_gen/features/node_view/presentation/node_builder/builder/node_builder.dart';
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 import 'package:vs_node_view/data/vs_node_data_provider.dart';
 import 'package:vs_node_view/data/vs_node_manager.dart';
 
@@ -16,7 +15,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
       emit(GridNodeViewLoading());
 
       final List<Object> nodeBuilder =
-          await NodeBuilder(projectId: 1).buildNodesMenu();
+          await NodeMenuBuilder(projectId: 1).buildNodesMenu();
 
       nodeDataProvider = VSNodeDataProvider(
         nodeManager: VSNodeManager(nodeBuilders: nodeBuilder),

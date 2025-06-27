@@ -3,6 +3,7 @@ import 'base/universal_accepted_types.dart';
 import 'multi_output_interface.dart';
 import 'network_interface.dart';
 
+/// Input data interface for general AINO nodes.
 class VSAINOGeneralInputData extends BaseInputData {
   ///Basic List input interface
   VSAINOGeneralInputData({
@@ -25,6 +26,7 @@ class VSAINOGeneralInputData extends BaseInputData {
       ];
 }
 
+/// Output data interface for general AINO nodes.
 class VSAINOGeneralOutputData extends BaseOutputData {
   ///Basic List output interface
   VSAINOGeneralOutputData({
