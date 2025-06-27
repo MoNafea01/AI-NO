@@ -96,9 +96,9 @@ class _ProjectsTableState extends State<ProjectsTable> {
                   ),
                 ),
                 Expanded(
-                  flex: 1,
+                  flex: 2,
                   child: Text(
-                    "Created At",
+                    "Dataset",
                     style: TextStyle(
                       fontFamily: AppConstants.appFontName,
                       fontSize: 12,
@@ -108,9 +108,21 @@ class _ProjectsTableState extends State<ProjectsTable> {
                   ),
                 ),
                 Expanded(
-                  flex: 1,
+                  flex: 2,
                   child: Text(
-                    "Last Update",
+                    "Model",
+                    style: TextStyle(
+                      fontFamily: AppConstants.appFontName,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF666666),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "Created At",
                     style: TextStyle(
                       fontFamily: AppConstants.appFontName,
                       fontSize: 12,
@@ -159,24 +171,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _projectName(context, project),
-                                  if (project.description != null &&
-                                      project.description!.isNotEmpty)
-                                    _highlightSearchText(
-                                      project.description!,
-                                      context
-                                          .read<HomeCubit>()
-                                          .currentSearchQuery,
-                                      const TextStyle(
-                                        fontSize: 12,
-                                        color: Color(0xFF6B7280),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                              child: _projectName(context, project),
                             ),
                           ],
                         ),
@@ -185,7 +180,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
                       Expanded(
                         flex: 2,
                         child: _highlightSearchText(
-                          project.description ?? "",
+                          project.description ?? "No description",
                           context.read<HomeCubit>().currentSearchQuery,
                           const TextStyle(
                             fontSize: 14,
@@ -193,24 +188,21 @@ class _ProjectsTableState extends State<ProjectsTable> {
                           ),
                         ),
                       ),
+                      // Dataset column
+                      Expanded(
+                        flex: 2,
+                        child: _buildDatasetCell(project.dataset),
+                      ),
+                      // Model column
+                      Expanded(
+                        flex: 2,
+                        child: _buildModelCell(project.model),
+                      ),
                       // Created At column
                       Expanded(
-                        flex: 1,
+                        flex: 2,
                         child: Text(
-                          project.createdAt.toString().substring(0, 16),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF6B7280),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      // Last Update column
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          project.updatedAt.toString().substring(0, 16),
+                          _formatDateTime(project.createdAt),
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF6B7280),
@@ -343,6 +335,101 @@ class _ProjectsTableState extends State<ProjectsTable> {
         ],
       ),
     );
+  }
+
+  Widget _buildDatasetCell(String? dataset) {
+    if (dataset == null || dataset.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: const Text(
+          "No Dataset",
+          style: TextStyle(
+            fontSize: 12,
+            color: Color(0xFF9CA3AF),
+            fontStyle: FontStyle.italic,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: Colors.blue.shade200),
+      ),
+      child: Text(
+        dataset,
+        style: const TextStyle(
+          fontSize: 12,
+          color: Color(0xFF1E40AF),
+          fontWeight: FontWeight.w500,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildModelCell(String? model) {
+    if (model == null || model.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: const Text(
+          "No Model",
+          style: TextStyle(
+            fontSize: 12,
+            color: Color(0xFF9CA3AF),
+            fontStyle: FontStyle.italic,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.green.shade50,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: Colors.green.shade200),
+      ),
+      child: Text(
+        model,
+        style: const TextStyle(
+          fontSize: 12,
+          color: Color(0xFF047857),
+          fontWeight: FontWeight.w500,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  String _formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) return "N/A";
+
+    // Format as: 27/06/2025 22:53
+    return "${dateTime.day.toString().padLeft(2, '0')}/"
+        "${dateTime.month.toString().padLeft(2, '0')}/"
+        "${dateTime.year} "
+        "${dateTime.hour.toString().padLeft(2, '0')}:"
+        "${dateTime.minute.toString().padLeft(2, '0')}";
   }
 
   List<Widget> _buildPageNumbers(int totalPages) {

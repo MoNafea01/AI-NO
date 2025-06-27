@@ -3,6 +3,8 @@ class ProjectModel {
     this.id,
     this.name,
     this.description,
+    this.dataset,
+    this.model,
     this.createdAt,
     this.updatedAt,
     this.path,
@@ -11,13 +13,18 @@ class ProjectModel {
   int? id;
   String? name;
   String? description;
+  String? dataset;
+  String? model;
   DateTime? createdAt;
   DateTime? updatedAt;
   String? path;
+
   ProjectModel.fromJson(json) {
     id = json['id'];
     name = json['project_name'];
     description = json['project_description'];
+    dataset = json['dataset'];
+    model = json['model'];
     createdAt =
         json['created_at'] != null ? DateTime.parse(json['created_at']) : null;
     updatedAt =
@@ -30,9 +37,9 @@ class ProjectModel {
     map['id'] = id;
     map['project_name'] = name;
     map['project_description'] = description;
-    map['created_at'] = createdAt
-        ?.toIso8601String(); // Convert to ISO 8601 string but i want to keep the date format
-    // map['created_at'] = createdAt?.toString(); // Keep the date format
+    map['dataset'] = dataset;
+    map['model'] = model;
+    map['created_at'] = createdAt?.toIso8601String();
     map['updated_at'] = updatedAt?.toIso8601String();
     map['path'] = path;
     return map;
