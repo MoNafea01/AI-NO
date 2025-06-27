@@ -2,6 +2,8 @@ from .agents import Agent
 from .retrieval_agent import RetrievalAgent
 from .generation_agent import GenerationAgent
 from .feedback_agent import FeedbackAgent
+from .steps_estimator import StepsEstimateAgent
+from .mode_selector_agent import ModeSelectorAgent
 
 class OrchestratorAgent(Agent):
     def __init__(self, logger, config, model_name="gemini-2.0-flash"):
@@ -10,12 +12,23 @@ class OrchestratorAgent(Agent):
         self.retrieval_agent = RetrievalAgent(logger, config)
         self.generation_agent = GenerationAgent(logger, model_name)
         self.feedback_agent = FeedbackAgent(logger)
+        self.steps_estimate_agent = StepsEstimateAgent(logger, config)
+        self.mode_selector_agent = ModeSelectorAgent(logger, config)
 
     async def execute(self, input_data, context=None):
-        mode = input_data["mode"]
         question = input_data["question"]
+        
+        mode_selector_result = await self.mode_selector_agent.execute({"question": question})
+        mode = mode_selector_result["mode"]
+        print(f"Mode selected: {mode}")
+        
+        mode = '1' if mode == 'manual' else ('2' if mode == 'auto' else mode)
+        
         to_db = input_data["to_db"]
-        max_iterations = self.config['max_iterations'] if mode == "2" else 1
+        if mode == '2':
+            max_iterations = await self.steps_estimate_agent.execute({'question': question})
+        else:
+            max_iterations = 1
         cur_iter = 0
         log = []
 

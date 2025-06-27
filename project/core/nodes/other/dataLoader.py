@@ -98,6 +98,8 @@ class DataLoader:
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.build_payload(dataset_name, dataset_path, X, y, err)
         
@@ -113,7 +115,7 @@ class DataLoader:
             
             payload = []
             payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
-                                                        uid=self.uid, location_x=400.0, location_y=400.0, input_ports=self.input_ports, output_ports=self.output_ports, params={"dataset_name": dataset_name, "dataset_path": dataset_path},
+                                                        uid=self.uid, location_x=self.location_x, location_y=self.location_y, input_ports=self.input_ports, output_ports=self.output_ports, params={"dataset_name": dataset_name, "dataset_path": dataset_path},
                                                         displayed_name=self.displayed_name))
             names = ["X", "y"]
 

@@ -73,8 +73,8 @@ class NodeSaver:
                     'location_x': location_x,
                     'location_y': location_y,
                     'input_ports': input_ports,
-                    'displayed_name': displayed_name,
                     'output_ports': output_ports,
+                    'displayed_name': displayed_name,
                 }
             )
         

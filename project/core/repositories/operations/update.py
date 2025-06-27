@@ -38,7 +38,6 @@ class NodeUpdater:
         try:
             # take the <old> node (by its id)
             node = Node.objects.filter(node_id=node_id, project_id=project_id).first() # get node from database
-            
             folder_path = None
             if node.node_data is None:
                 folder_name = FolderHandler.get_folder_by_node_name(node.node_name)
@@ -78,9 +77,14 @@ class NodeUpdater:
             if payload['node_name'] not in PARENT_NODES:
                 payload['children'] = node.children
             
-
             if payload.get("node_name") in PARENT_NODES:
-                payload['parent'] = [payload.get('input_ports')[0].get('connectedNode').get('nodeData')]
+                in_ports = payload.get('input_ports')
+                if len(in_ports) > 0:
+                    # if input_ports is not empty, we take the first one and assign its connectedNode's nodeData to parent
+                    if in_ports[0].get('connectedNode') and in_ports[0].get('connectedNode').get('nodeData'):
+                        payload['parent'] = [in_ports[0].get('connectedNode').get('nodeData')]
+                else:
+                    payload['parent'] = []
 
                 # Compatability with old versions
                 if not payload.get('parent'):
@@ -106,7 +110,7 @@ class NodeUpdater:
 
             # serialization part
             success, out_node = NodeLoader(return_serialized=self.return_serialized)(node_id, project_id=project_id)
-            message = f"Node {out_node.get('node_name')} with id {node_id} updated."
+            message = f"Node Updated: {out_node.get('node_name')} with id {node_id}"
             payload.update({"message": message, "node_data": out_node.get('node_data')})
             return True, payload
         except ObjectDoesNotExist:

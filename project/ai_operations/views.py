@@ -1,5 +1,5 @@
 from __init__ import *
-import json, datetime, tempfile, subprocess, random, pandas as pd, copy
+import json, datetime, tempfile, subprocess, pandas as pd
 import uuid
 
 import requests
@@ -13,7 +13,8 @@ from .serializers import *
 
 from core.nodes import *
 from core.repositories import *
-from core.nodes.configs.const_ import get_node_name_by_api_ref, MODELS_NAMES
+from .utils import *
+from core.nodes.configs.const_ import get_node_name_by_api_ref
 
 from chatbot.app import sync_generate_cli
 from chatbot.res.defaults import create_data_mapping
@@ -26,41 +27,6 @@ class NodeQueryMixin:
     A mixin to handle 'get' requests for any ViewSet.
     It extracts "node_id" from request parameters and uses NodeLoader.
     """
-    
-    def delete_project_model(self, project_id, node_name):
-        """
-        Delete the project model based on the node_name.
-        This function is called after creating a new node.
-        """
-        try:
-            project = Project.objects.get(id=project_id)
-            models_names = MODELS_NAMES.copy()
-            models_names.append("sequential_model")
-            models_names = models_names[3:]  # Skip the first three items
-            if node_name in models_names:
-                project.model = None
-                project.save()
-                return True, "Project model updated successfully."
-            else:
-                return False, "Node name does not correspond to a valid model."
-        except Project.DoesNotExist:
-            return False, "Project not found."
-    
-    def delete_project_dataset(self, project_id, data_loader):
-        """
-        Delete the project dataset based on the data_loader_id.
-        This function is called after creating a new data loader node.
-        """
-        try:
-            project = Project.objects.get(id=project_id)
-            if data_loader.get('node_name') == "data_loader":
-                project.dataset = None
-                project.save()
-                return True, "Project dataset updated successfully."
-            else:
-                return False, "Node does not correspond to a valid data loader."
-        except (Project.DoesNotExist, Node.DoesNotExist):
-            return False, "Project or DataLoader node not found."
     
     def get_query_params(self, request):
         """Extracts query parameters from the request."""
@@ -180,8 +146,7 @@ class NodeQueryMixin:
                 try:
                     success, message = NodeDeleter(is_multi_channel)(node_id, project_id=project_id)
                     if success:
-                        self.delete_project_model(project_id, node_name)
-                        self.delete_project_dataset(project_id, node)
+                        delete_project_model_and_dataset(project_id, node)
                         return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
                     else:
                         return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
@@ -211,39 +176,6 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             return value["node_id"]
         return value
 
-    def get_input_ports(self, data, project_id):
-        """Extract input ports from the validated data."""
-        input_ports = []
-        for key, node_id in data.items():
-            if key in DICT_NODES:
-                if isinstance(node_id, dict):
-                    return False, Response(node_id, status=status.HTTP_400_BAD_REQUEST)
-                success, loaded = NodeLoader(return_path=True)(node_id=node_id, project_id=project_id)
-                if not success:
-                    return False, Response({"error": loaded}, status=status.HTTP_400_BAD_REQUEST)
-                if (len(loaded.get('parent')) == 1) and (loaded.get('node_name') not in PARENT_NODES):
-                    out_name = loaded.get("message")
-                    node_id = loaded.get("parent")[0]
-                
-                elif (len(loaded.get('parent')) == 0) or (loaded.get('node_name') in PARENT_NODES):
-                    prev_node_uid = loaded.get("uid")
-                    out_name = Component.objects.get(uid=prev_node_uid).output_channels
-                    
-                attr = {"name": key, "connectedNode": {"name": out_name, "nodeData": int(node_id)}}
-                input_ports.append(attr)
-        return True, input_ports
-    
-    def get_output_ports(self, component_id):
-        output_ports = []
-        try:
-            out_channels = Component.objects.get(uid=component_id).output_channels
-            if out_channels is not None:
-                for i in range(len(out_channels)):
-                    output_ports.append({"name": out_channels[i]})
-        except Component.DoesNotExist:
-            return False, Response({"error": f"Component with uid {component_id} not found"}, status=status.HTTP_404_NOT_FOUND)
-        return True, output_ports
-
 
     def get_processor_and_args(self, request):
         # for multi-channel nodes, else it returns the parent one
@@ -258,6 +190,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         if settings.TESTING:
             uid = 0
             default_name = "default"
+            node_name = "default"  # Set default node_name for testing
         else:
             try:
                 # get uid component for node by its name
@@ -292,23 +225,25 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 return validated_data, None, None, None, None
 
             if not settings.TESTING:
-                success, input_ports = self.get_input_ports(validated_data, project_id)
+                success, input_ports = get_input_ports(validated_data, project_id)
                 if not success:
                     return input_ports, None, None, None, None
-                success, output_ports = self.get_output_ports(component_id = uid)
+                success, output_ports = get_output_ports(component_id = uid)
                 if not success:
                     return output_ports, None, None, None, None
             displayed_name = request.data.get('displayed_name', None)
             if not displayed_name:
                 displayed_name = request.query_params.get('displayed_name', default_name)
+            
+            location_x, location_y = get_optimum_location(node_name)
 
             processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid, 
                                            input_ports=input_ports, output_ports=output_ports, displayed_name=displayed_name,
-                                           template_id=template_id)
+                                           template_id=template_id, location_x=location_x, location_y=location_y)
             BaseNodeAPIView.cur_id += 1
             
             if request.path == '/api/save_template/':
-                response = self.update_components()
+                response = update_components()
                 if response.status_code == 200:
                     print("Schema updated successfully.")
                 else:
@@ -317,54 +252,9 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST), None, None, None, None
 
-    def update_components(self):
-        url = "http://127.0.0.1:8000/api/update_components/"
-        path = str(os.path.join(settings.BASE_DIR, 'core', 'schema.xlsx')).replace("\\", r"\\")
-
-        response = requests.request("PUT", url, json={"file_path": path})
-        if response.status_code == 200:
-            print("Schema updated successfully.")
-            create_mapper(), create_data_mapping()
-
-        return response
     
-    def update_project_model(self, project_id, node_name):
-        """
-        Update the project model based on the node_name.
-        This function is called after creating a new node.
-        """
-        try:
-            project = Project.objects.get(id=project_id)
-            models_names = MODELS_NAMES.copy()
-            models_names.append("sequential_model")
-            models_names = models_names[3:]  # Skip the first three items
-            if node_name in models_names:
-                project.model = node_name
-                project.save()
-                return True, "Project model updated successfully."
-            else:
-                return False, "Node name does not correspond to a valid model."
-        except Project.DoesNotExist:
-            return False, "Project not found."
     
-    def update_project_dataset(self, project_id, data_loader):
-        """
-        Update the project dataset based on the data_loader_id.
-        This function is called after creating a new data loader node.
-        """
-        try:
-            project = Project.objects.get(id=project_id)
-            if data_loader.get('node_name') == "data_loader":
-                message = data_loader.get('message', '')
-                if not message in ['X', 'y']:
-                    dataset = message.split(': ')[-1]
-                project.dataset = dataset
-                project.save()
-                return True, "Project dataset updated successfully."
-            else:
-                return False, "Node does not correspond to a valid data loader."
-        except (Project.DoesNotExist, Node.DoesNotExist):
-            return False, "Project or DataLoader node not found."
+    
     
     def post(self, request):
         result = self.get_processor_and_args(request)
@@ -383,8 +273,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 return Response({"error": response_data}, status=status.HTTP_400_BAD_REQUEST)
             
             node_id = response_data.get("node_id")
-            self.update_project_model(project_id=project_id, node_name=response_data.get("node_name", ""))
-            self.update_project_dataset(project_id=project_id, data_loader=response_data)
+            update_project_model_and_dataset(project_id=project_id, node=response_data)
 
             # Returns node_data chosen
             response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path = not return_serialized)(node_id, project_id=project_id)
@@ -410,8 +299,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             if isinstance(message, str):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
             
-            self.update_project_model(project_id=project_id, node_name=processor().get("node_name", ""))
-            self.update_project_dataset(project_id=project_id, data_loader=processor())
+            update_project_model_and_dataset(project_id=project_id, node=processor())
             message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
             
             status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
@@ -766,7 +654,8 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
         """Loads a node, saves it, and optionally serializes it."""
         loader = NodeLoader(from_db=False)
         success, payload = loader(project_id = project_id, path=path)
-        node_name = payload.get("message").split(" ")[1]
+
+        node_name = payload.get("message").split(": ")[-1].split(' with id ')[0]
         uid = Component.objects.get(node_name="node_loader").uid
         payload.update({"node_name":node_name,
                         "project_id": project_id,
@@ -816,10 +705,8 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                 payload = self.get_serialized_payload(path, return_serialized, project_id)
                 node_id = request.query_params.get("node_id", None)
                 success, message = NodeUpdater(return_serialized)(node_id, project_id, payload)
-
-                message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
-                        
                 if success:
+                    message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
                     return Response({"message": message}, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
@@ -885,13 +772,12 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
             return_serialized = request.query_params.get("return_serialized") == "1"
 
             success, message = NodeUpdater(return_serialized)(node_id, project_id, response_data)
-
-            if return_serialized:
-                message["node_data"] = NodeDataExtractor(return_serialized=True)(message, project_id=project_id)
-            else:
-                message["node_data"] = NodeDataExtractor(return_path=True)(message, project_id=project_id)
-
             if success:
+                if return_serialized:
+                    message["node_data"] = NodeDataExtractor(return_serialized=True)(message, project_id=project_id)
+                else:
+                    message["node_data"] = NodeDataExtractor(return_path=True)(message, project_id=project_id)
+
                 return Response(message, status=status.HTTP_200_OK)
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 

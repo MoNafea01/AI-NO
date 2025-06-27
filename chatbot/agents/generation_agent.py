@@ -1,6 +1,6 @@
+from .agents import Agent
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from .agents import Agent
 from chatbot.core.rag_pipeline import get_llm
 from chatbot.core.templates import get_template
 
@@ -14,6 +14,7 @@ class GenerationAgent(Agent):
         question = input_data["question"]
         mode = input_data["mode"]
         cur_iter = input_data.get("cur_iter", 0)
+        nodes_context = input_data.get("nodes", "")
         docs_context = input_data["context"]
 
         # Dynamic prompt construction
@@ -25,6 +26,6 @@ class GenerationAgent(Agent):
             | self.output_parser
             )
 
-        result = chain.invoke({"question": question, "context": docs_context, "cur_iter": cur_iter})
+        result = chain.invoke({"question": question, "context": docs_context, "cur_iter": cur_iter, "nodes": nodes_context})
         self.logger.info(f"Generated CLI command: {result}")
         return {"output": result}

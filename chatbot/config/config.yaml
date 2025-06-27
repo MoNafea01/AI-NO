@@ -13,15 +13,16 @@ logging:
 templates:
   manual: manual_template.txt
   auto: auto_template.txt
-max_iterations: 10
+  data_steps: steps_estimate_template.txt
+  router: router_template.txt
+  select_mode: select_mode_template.txt
 chat:
   model: gemini-1.5-flash
   max_tokens: 256
   temperature: 0.7
 router:
   model: gemini-2.0-flash
-  prompt_template: file:router_template.txt
-clarification:
+steps_estimate:
   model: gemini-1.5-flash
-  prompt_template: file:clarification_template.txt
-  data_mapping: res/data_mapping.json
+mode_selector:
+  model: gemini-2.0-flash

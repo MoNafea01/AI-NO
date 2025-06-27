@@ -1230,8 +1230,1208 @@
                 ],
                 "183": [
                     {
-                        "message": "Model logistic_regression created",
+                        "id": 9181,
+                        "node_id": 2160853981120,
+                        "displayed_name": "Data Loader",
+                        "node_name": "data_loader",
+                        "message": "data loaded: Garbage classification",
+                        "params": [
+                            {
+                                "dataset_name": "iris"
+                            },
+                            {
+                                "dataset_path": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\testing\\Garbage classification"
+                            }
+                        ],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [
+                            2160880606000,
+                            2160880599664
+                        ],
+                        "parent": [],
+                        "location_x": 2162.745160973593,
+                        "location_y": 3454.2289199376423,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "X",
+                                "nodeData": 2160853981120
+                            },
+                            {
+                                "name": "y",
+                                "nodeData": 2160853981120
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9182,
+                        "node_id": 2160880606000,
+                        "displayed_name": "default",
+                        "node_name": "data_loader",
+                        "message": "X",
+                        "params": [],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [],
+                        "parent": [
+                            534240609620262912
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9183,
+                        "node_id": 2160880599664,
+                        "displayed_name": "default",
+                        "node_name": "data_loader",
+                        "message": "y",
+                        "params": [],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [],
+                        "parent": [
+                            534240609620262912
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9184,
+                        "node_id": 1713766531776,
+                        "displayed_name": "Train Test Split",
+                        "node_name": "train_test_split",
+                        "message": "Data",
+                        "params": [
+                            {
+                                "test_size": 0.2
+                            },
+                            {
+                                "random_state": 42
+                            }
+                        ],
+                        "task": "split",
+                        "node_type": "splitter",
+                        "uid": 55,
+                        "children": [
+                            1713763613632,
+                            1713760259328
+                        ],
+                        "parent": [],
+                        "location_x": 2378.8283031402743,
+                        "location_y": 3299.7168240916208,
+                        "input_ports": [
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "X",
+                                    "nodeData": 2160853981120
+                                }
+                            },
+                            {
+                                "name": "y",
+                                "connectedNode": {
+                                    "name": "y",
+                                    "nodeData": 2160853981120
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "X_Split",
+                                "nodeData": 1713766531776
+                            },
+                            {
+                                "name": "y_Split",
+                                "nodeData": 1713766531776
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9185,
+                        "node_id": 1713763613632,
+                        "displayed_name": "default",
+                        "node_name": "train_test_split",
+                        "message": "X_Split",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "splitter",
+                        "uid": 55,
+                        "children": [],
+                        "parent": [
+                            2720456753731928064
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9186,
+                        "node_id": 1713760259328,
+                        "displayed_name": "default",
+                        "node_name": "train_test_split",
+                        "message": "y_Split",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "splitter",
+                        "uid": 55,
+                        "children": [],
+                        "parent": [
+                            2720456753731928064
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9187,
+                        "node_id": 1713766351040,
+                        "displayed_name": "Splitter",
+                        "node_name": "splitter",
+                        "message": "data",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [
+                            1713764318832,
+                            1713764304912
+                        ],
+                        "parent": [],
+                        "location_x": 2599.239520294572,
+                        "location_y": 3279.2754184100727,
+                        "input_ports": [
+                            {
+                                "name": "data",
+                                "connectedNode": {
+                                    "name": "X_Split",
+                                    "nodeData": 1713766531776
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "data_1",
+                                "nodeData": 1713766351040
+                            },
+                            {
+                                "name": "data_2",
+                                "nodeData": 1713766351040
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9188,
+                        "node_id": 1713764318832,
+                        "displayed_name": "default",
+                        "node_name": "splitter",
+                        "message": "data_1",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [],
+                        "parent": [
+                            1425671860862910464
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9189,
+                        "node_id": 1713764304912,
+                        "displayed_name": "default",
+                        "node_name": "splitter",
+                        "message": "data_2",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [],
+                        "parent": [
+                            1425671860862910464
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9190,
+                        "node_id": 1713753902912,
+                        "displayed_name": "Splitter",
+                        "node_name": "splitter",
+                        "message": "data",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [
+                            1713754314512,
+                            1713754318928
+                        ],
+                        "parent": [],
+                        "location_x": 2770.3860342020103,
+                        "location_y": 3493.720093023209,
+                        "input_ports": [
+                            {
+                                "name": "data",
+                                "connectedNode": {
+                                    "name": "y_Split",
+                                    "nodeData": 1713766531776
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "data_1",
+                                "nodeData": 1713753902912
+                            },
+                            {
+                                "name": "data_2",
+                                "nodeData": 1713753902912
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9191,
+                        "node_id": 1713754314512,
+                        "displayed_name": "default",
+                        "node_name": "splitter",
+                        "message": "data_1",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [],
+                        "parent": [
+                            743376517316280320
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9192,
+                        "node_id": 1713754318928,
+                        "displayed_name": "default",
+                        "node_name": "splitter",
+                        "message": "data_2",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [],
+                        "parent": [
+                            743376517316280320
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9193,
+                        "node_id": 1713752969184,
+                        "displayed_name": "default",
+                        "node_name": "input_layer",
+                        "message": "Input layer created",
+                        "params": [
+                            {
+                                "shape": [
+                                    150,
+                                    150,
+                                    3
+                                ]
+                            },
+                            {
+                                "name": "input_layer_0"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 56,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713752969184
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9194,
+                        "node_id": 1713756015072,
+                        "displayed_name": "Conv2D Layer",
+                        "node_name": "conv2d_layer",
+                        "message": "Conv2D layer created",
+                        "params": [
+                            {
+                                "filters": 32
+                            },
+                            {
+                                "kernel_size": [
+                                    3,
+                                    3
+                                ]
+                            },
+                            {
+                                "strides": [
+                                    1,
+                                    1
+                                ]
+                            },
+                            {
+                                "padding": "valid"
+                            },
+                            {
+                                "activation": "relu"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 57,
+                        "children": [
+                            757731741128523776
+                        ],
+                        "parent": [],
+                        "location_x": 780.8107634848702,
+                        "location_y": 2357.743482462557,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 757731741128523776
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713756015072
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9195,
+                        "node_id": 1713754594512,
+                        "displayed_name": "MaxPool2D Layer",
+                        "node_name": "maxpool2d_layer",
+                        "message": "MaxPooling2D layer created",
+                        "params": [
+                            {
+                                "pool_size": [
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "strides": [
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "padding": "valid"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 58,
+                        "children": [
+                            1713756015072
+                        ],
+                        "parent": [],
+                        "location_x": 799.8187092786308,
+                        "location_y": 2463.268855914195,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713756015072
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713754594512
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9196,
+                        "node_id": 1713755991520,
+                        "displayed_name": "Conv2D Layer",
+                        "node_name": "conv2d_layer",
+                        "message": "Conv2D layer created",
+                        "params": [
+                            {
+                                "filters": 64
+                            },
+                            {
+                                "kernel_size": [
+                                    3,
+                                    3
+                                ]
+                            },
+                            {
+                                "strides": [
+                                    1,
+                                    1
+                                ]
+                            },
+                            {
+                                "padding": "valid"
+                            },
+                            {
+                                "activation": "relu"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 57,
+                        "children": [
+                            1713754594512
+                        ],
+                        "parent": [],
+                        "location_x": 1119.7094382308092,
+                        "location_y": 2395.1659343530496,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713754594512
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713755991520
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9197,
+                        "node_id": 1713755995360,
+                        "displayed_name": "MaxPool2D Layer",
+                        "node_name": "maxpool2d_layer",
+                        "message": "MaxPooling2D layer created",
+                        "params": [
+                            {
+                                "pool_size": [
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "strides": [
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "padding": "valid"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 58,
+                        "children": [
+                            1713755991520
+                        ],
+                        "parent": [],
+                        "location_x": 1126.4366652923022,
+                        "location_y": 2476.5054478414677,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713755991520
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713755995360
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9198,
+                        "node_id": 1713756561504,
+                        "displayed_name": "Conv2D Layer",
+                        "node_name": "conv2d_layer",
+                        "message": "Conv2D layer created",
+                        "params": [
+                            {
+                                "filters": 32
+                            },
+                            {
+                                "kernel_size": [
+                                    3,
+                                    3
+                                ]
+                            },
+                            {
+                                "strides": [
+                                    1,
+                                    1
+                                ]
+                            },
+                            {
+                                "padding": "valid"
+                            },
+                            {
+                                "activation": "relu"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 57,
+                        "children": [
+                            1713755995360
+                        ],
+                        "parent": [],
+                        "location_x": 1476.6068095903488,
+                        "location_y": 2480.6294896653476,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713755995360
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713756561504
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9199,
+                        "node_id": 1713755995984,
+                        "displayed_name": "MaxPool2D Layer",
+                        "node_name": "maxpool2d_layer",
+                        "message": "MaxPooling2D layer created",
+                        "params": [
+                            {
+                                "pool_size": [
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "strides": [
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "padding": "valid"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 58,
+                        "children": [
+                            1713756561504
+                        ],
+                        "parent": [],
+                        "location_x": 1485.081829638636,
+                        "location_y": 2566.5024762588096,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713756561504
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713755995984
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9200,
+                        "node_id": 1713764626224,
+                        "displayed_name": "Flatten Layer",
+                        "node_name": "flatten_layer",
+                        "message": "Flatten layer created",
+                        "params": [],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 59,
+                        "children": [
+                            1713755995984
+                        ],
+                        "parent": [],
+                        "location_x": 1503.0142858434583,
+                        "location_y": 2661.118861343029,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713755995984
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713764626224
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9201,
+                        "node_id": 1713756557472,
+                        "displayed_name": "DropOut Layer",
+                        "node_name": "dropout_layer",
+                        "message": "Dropout layer created",
+                        "params": [
+                            {
+                                "rate": 0.3
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 61,
+                        "children": [
+                            1713764626224
+                        ],
+                        "parent": [],
+                        "location_x": 1597.7587294592254,
+                        "location_y": 2833.689798232277,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713764626224
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713756557472
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9202,
+                        "node_id": 1713755022848,
+                        "displayed_name": "Dense Layer",
+                        "node_name": "dense_layer",
+                        "message": "Dense layer created",
+                        "params": [
+                            {
+                                "units": 512
+                            },
+                            {
+                                "activation": "relu"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 60,
+                        "children": [
+                            1713756557472
+                        ],
+                        "parent": [],
+                        "location_x": 1933.5550272004896,
+                        "location_y": 2771.4643973599236,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713756557472
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713755022848
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9203,
+                        "node_id": 1713756614784,
+                        "displayed_name": "Dense Layer",
+                        "node_name": "dense_layer",
+                        "message": "Dense layer created",
+                        "params": [
+                            {
+                                "units": 256
+                            },
+                            {
+                                "activation": "relu"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 60,
+                        "children": [
+                            1713755022848
+                        ],
+                        "parent": [],
+                        "location_x": 1948.7437331214333,
+                        "location_y": 2835.332909046166,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713755022848
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713756614784
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9204,
+                        "node_id": 1713766836384,
+                        "displayed_name": "Dense Layer",
+                        "node_name": "dense_layer",
+                        "message": "Dense layer created",
+                        "params": [
+                            {
+                                "units": 128
+                            },
+                            {
+                                "activation": "relu"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 60,
+                        "children": [
+                            1713756614784
+                        ],
+                        "parent": [],
+                        "location_x": 1945.1101550511266,
+                        "location_y": 2915.6514652005626,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713756614784
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713766836384
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9205,
+                        "node_id": 1713766830720,
+                        "displayed_name": "Dense Layer",
+                        "node_name": "dense_layer",
+                        "message": "Dense layer created",
+                        "params": [
+                            {
+                                "units": 6
+                            },
+                            {
+                                "activation": "softmax"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 60,
+                        "children": [
+                            1713766836384
+                        ],
+                        "parent": [],
+                        "location_x": 1965.447285300328,
+                        "location_y": 3023.17190053015,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713766836384
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713766830720
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9206,
+                        "node_id": 1713755507600,
+                        "displayed_name": "Sequential Model",
+                        "node_name": "sequential_model",
+                        "message": "Sequential model created",
+                        "params": [],
+                        "task": "neural_network",
+                        "node_type": "nn_model",
+                        "uid": 62,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2282.6547399505207,
+                        "location_y": 2999.742638152091,
+                        "input_ports": [
+                            {
+                                "name": "layer",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1713766830720
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "nn_model",
+                                "nodeData": 1713755507600
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9207,
+                        "node_id": 1713765008592,
+                        "displayed_name": "Network Compiler",
+                        "node_name": "model_compiler",
+                        "message": "Model Compiled",
+                        "params": [
+                            {
+                                "optimizer": "adam"
+                            },
+                            {
+                                "loss": "sparse_categorical_crossentropy"
+                            },
+                            {
+                                "metrics": [
+                                    "accuracy"
+                                ]
+                            }
+                        ],
+                        "task": "compile_model",
+                        "node_type": "compiler",
+                        "uid": 63,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2592.876927017596,
+                        "location_y": 3076.28981005035,
+                        "input_ports": [
+                            {
+                                "name": "nn_model",
+                                "connectedNode": {
+                                    "name": "nn_model",
+                                    "nodeData": 1713755507600
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "compiled_model",
+                                "nodeData": 1713765008592
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9208,
+                        "node_id": 2233930785008,
+                        "displayed_name": "NN Fitter",
+                        "node_name": "nn_fitter",
+                        "message": "NN fitted",
+                        "params": [
+                            {
+                                "batch_size": 256
+                            },
+                            {
+                                "epochs": 10
+                            }
+                        ],
+                        "task": "fit_model",
+                        "node_type": "fitter",
+                        "uid": 64,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2934.0650903930464,
+                        "location_y": 3158.227847320667,
+                        "input_ports": [
+                            {
+                                "name": "compiled_model",
+                                "connectedNode": {
+                                    "name": "compiled_model",
+                                    "nodeData": 1713765008592
+                                }
+                            },
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "data_1",
+                                    "nodeData": 1713766351040
+                                }
+                            },
+                            {
+                                "name": "y",
+                                "connectedNode": {
+                                    "name": "data_1",
+                                    "nodeData": 1713753902912
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "fitted_nn_model",
+                                "nodeData": 2233930785008
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9209,
+                        "node_id": 2234173783376,
+                        "displayed_name": "Predictor",
+                        "node_name": "predictor",
+                        "message": "Model Predictions",
+                        "params": [],
+                        "task": "predict",
+                        "node_type": "predictor",
+                        "uid": 45,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 3248.7936741047342,
+                        "location_y": 3323.834437091208,
+                        "input_ports": [
+                            {
+                                "name": "fitted_model",
+                                "connectedNode": {
+                                    "name": "fitted_nn_model",
+                                    "nodeData": 2233930785008
+                                }
+                            },
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "data_2",
+                                    "nodeData": 1713766351040
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "predictions",
+                                "nodeData": 2234173783376
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9210,
+                        "node_id": 2233930224976,
+                        "displayed_name": "Evaluator",
+                        "node_name": "evaluator",
+                        "message": "accuracy score",
+                        "params": [
+                            {
+                                "metric": "accuracy"
+                            }
+                        ],
+                        "task": "evaluate",
+                        "node_type": "metric",
+                        "uid": 54,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 3583.765674206083,
+                        "location_y": 3439.8680580837836,
+                        "input_ports": [
+                            {
+                                "name": "y_true",
+                                "connectedNode": {
+                                    "name": "data_2",
+                                    "nodeData": 1713753902912
+                                }
+                            },
+                            {
+                                "name": "y_pred",
+                                "connectedNode": {
+                                    "name": "predictions",
+                                    "nodeData": 2234173783376
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "score",
+                                "nodeData": 2233930224976
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9211,
+                        "node_id": 757731741128523776,
+                        "displayed_name": "Input Layer",
+                        "node_name": "input_layer",
+                        "message": "Input layer created",
+                        "params": [
+                            {
+                                "shape": [
+                                    150,
+                                    150,
+                                    3
+                                ]
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 56,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 577.4214646642977,
+                        "location_y": 2430.421512082724,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 757731741128523776
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": null
+                    },
+                    {
+                        "id": 9361,
                         "node_id": 2918052187382808576,
+                        "displayed_name": "Logistic Regression",
+                        "node_name": "logistic_regression",
+                        "message": "Model logistic_regression created",
+                        "params": [
+                            {
+                                "penalty": "l2"
+                            },
+                            {
+                                "C": 0.8
+                            }
+                        ],
+                        "task": "classification",
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 400.0,
+                        "location_y": 600.0,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "model",
+                                "nodeData": 2918052187382808576
+                            }
+                        ],
+                        "project": 183,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\183\\model\\logistic_regression_2918052187382808576.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 4553421802071719936,
                         "node_name": "logistic_regression",
                         "task": "classification",
                         "children": [],
@@ -1241,7 +2441,7 @@
                                 "penalty": "l2"
                             },
                             {
-                                "C": 0.8
+                                "C": 1.0
                             }
                         ],
                         "node_type": "linear_models",
@@ -1256,14 +2456,412 @@
                         "location_x": 400.0,
                         "location_y": 600.0,
                         "project_id": 183,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\test_grad\\project\\core\\saved\\183\\model\\logistic_regression_2918052187382808576.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\183\\model\\logistic_regression_4553421802071719936.pkl"
                     }
-                ]
+                ],
+                "33": [
+                    {
+                        "message": "Input layer created",
+                        "params": [
+                            {
+                                "shape": [
+                                    28,
+                                    28,
+                                    1
+                                ]
+                            }
+                        ],
+                        "node_id": 2928748236497813504,
+                        "node_name": "input_layer",
+                        "task": "neural_network",
+                        "children": [],
+                        "parent": [],
+                        "node_type": "nn_layer",
+                        "uid": 56,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "layer"
+                            }
+                        ],
+                        "location_x": 1232.30303513488,
+                        "location_y": 1241.8895148593808,
+                        "displayed_name": "Input Layer",
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\nets\\input_layer_2928748236497813504.pkl"
+                    },
+                    {
+                        "message": "Sequential model created",
+                        "params": [],
+                        "node_id": 954201274872561664,
+                        "node_name": "sequential_model",
+                        "task": "neural_network",
+                        "children": [],
+                        "parent": [
+                            "2928748236497813504"
+                        ],
+                        "node_type": "nn_layer",
+                        "uid": 62,
+                        "input_ports": [
+                            {
+                                "name": "layer",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 2928748236497813504
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "nn_model"
+                            }
+                        ],
+                        "location_x": 1953.965569987369,
+                        "location_y": 1861.7725866003577,
+                        "displayed_name": "Sequential Model",
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\nets\\sequential_model_954201274872561664.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 4564399326163435520,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "parent": [],
+                        "params": [
+                            {
+                                "penalty": "l2"
+                            },
+                            {
+                                "C": 1.0
+                            }
+                        ],
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "output_ports": [
+                            {
+                                "name": "model"
+                            }
+                        ],
+                        "input_ports": [],
+                        "displayed_name": "Logistic Regression",
+                        "location_x": 1070.2606112649844,
+                        "location_y": 1205.5149580509242,
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\logistic_regression_4564399326163435520.pkl"
+                    },
+                    {
+                        "message": "Preprocessor maxabs_scaler created",
+                        "node_id": 4276168950011723776,
+                        "node_name": "maxabs_scaler",
+                        "task": "preprocessing",
+                        "children": [],
+                        "parent": [],
+                        "params": [],
+                        "node_type": "scaler",
+                        "uid": 34,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "preprocessor"
+                            }
+                        ],
+                        "location_x": 1133.2765395666418,
+                        "location_y": 1239.4172433929798,
+                        "displayed_name": "MaxAbs Scaler",
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\preprocessing\\maxabs_scaler_4276168950011723776.pkl"
+                    },
+                    {
+                        "message": "data loaded: diabetes",
+                        "node_id": 993044821658632192,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            699466420949417984,
+                            2239697493510127616
+                        ],
+                        "parent": [],
+                        "params": [
+                            {
+                                "dataset_name": "diabetes"
+                            },
+                            {
+                                "dataset_path": ""
+                            }
+                        ],
+                        "node_type": "loader",
+                        "project_id": 33,
+                        "uid": 50,
+                        "location_x": 1215.1845274029104,
+                        "location_y": 1144.5336283798758,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "X"
+                            },
+                            {
+                                "name": "y"
+                            }
+                        ],
+                        "displayed_name": "Data Loader",
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\other\\data_loader_993044821658632192.pkl"
+                    },
+                    {
+                        "message": "data loaded: diabetes",
+                        "node_id": 2385783006422958080,
+                        "node_name": "data_loader",
+                        "task": "load_data",
+                        "children": [
+                            482167738928791552,
+                            3260607234039676928
+                        ],
+                        "parent": [],
+                        "params": [
+                            {
+                                "dataset_name": "diabetes"
+                            },
+                            {
+                                "dataset_path": ""
+                            }
+                        ],
+                        "node_type": "loader",
+                        "project_id": 33,
+                        "uid": 50,
+                        "location_x": 1066.1976309323734,
+                        "location_y": 1031.4095028432048,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "X"
+                            },
+                            {
+                                "name": "y"
+                            }
+                        ],
+                        "displayed_name": "Data Loader",
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\other\\data_loader_2385783006422958080.pkl"
+                    },
+                    {
+                        "message": "Model logistic_regression created",
+                        "node_id": 459649740791939072,
+                        "node_name": "logistic_regression",
+                        "task": "classification",
+                        "children": [],
+                        "parent": [],
+                        "params": [
+                            {
+                                "penalty": "l2"
+                            },
+                            {
+                                "C": 0.3
+                            }
+                        ],
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "output_ports": [
+                            {
+                                "name": "model"
+                            }
+                        ],
+                        "input_ports": [],
+                        "displayed_name": "Logistic Regression",
+                        "location_x": 1245.7085047066257,
+                        "location_y": 1094.520669086816,
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\logistic_regression_459649740791939072.pkl"
+                    },
+                    {
+                        "message": "Model fitted",
+                        "params": [],
+                        "node_id": 1943022868057096192,
+                        "node_name": "model_fitter",
+                        "children": [],
+                        "parent": [],
+                        "node_type": "fitter",
+                        "task": "fit_model",
+                        "uid": 44,
+                        "output_ports": [
+                            {
+                                "name": "fitted_model"
+                            }
+                        ],
+                        "input_ports": [
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "X",
+                                    "nodeData": 2385783006422958080
+                                }
+                            },
+                            {
+                                "name": "y",
+                                "connectedNode": {
+                                    "name": "y",
+                                    "nodeData": 2385783006422958080
+                                }
+                            },
+                            {
+                                "name": "model",
+                                "connectedNode": {
+                                    "name": "model",
+                                    "nodeData": 459649740791939072
+                                }
+                            }
+                        ],
+                        "project_id": 33,
+                        "location_x": 1947.4036587585733,
+                        "location_y": 1990.1854764708123,
+                        "displayed_name": "Model Fitter",
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\model_fitter_1943022868057096192.pkl"
+                    },
+                    {
+                        "message": "Input layer created",
+                        "params": [
+                            {
+                                "shape": [
+                                    1,
+                                    3
+                                ]
+                            }
+                        ],
+                        "node_id": 4369055692326240256,
+                        "node_name": "input_layer",
+                        "task": "neural_network",
+                        "children": [],
+                        "parent": [],
+                        "node_type": "nn_layer",
+                        "uid": 56,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "layer"
+                            }
+                        ],
+                        "location_x": 1151.6404444422735,
+                        "location_y": 1062.0506006444607,
+                        "displayed_name": "Input Layer",
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\nets\\input_layer_4369055692326240256.pkl"
+                    },
+                    {
+                        "message": "Dense layer created",
+                        "params": [
+                            {
+                                "units": 15
+                            },
+                            {
+                                "activation": "relu"
+                            }
+                        ],
+                        "node_id": 430376343214030848,
+                        "node_name": "dense_layer",
+                        "task": "neural_network",
+                        "children": [],
+                        "parent": [
+                            "4369055692326240256"
+                        ],
+                        "node_type": "nn_layer",
+                        "uid": 60,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 4369055692326240256
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer"
+                            }
+                        ],
+                        "displayed_name": "Dense Layer",
+                        "location_x": 1398.109587758239,
+                        "location_y": 1291.3835624030044,
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\nets\\dense_layer_430376343214030848.pkl"
+                    },
+                    {
+                        "message": "Dense layer created",
+                        "params": [
+                            {
+                                "units": 15
+                            },
+                            {
+                                "activation": "relu"
+                            }
+                        ],
+                        "node_id": 1849854650765869056,
+                        "node_name": "dense_layer",
+                        "task": "neural_network",
+                        "children": [],
+                        "parent": [
+                            "4369055692326240256"
+                        ],
+                        "node_type": "nn_layer",
+                        "uid": 60,
+                        "input_ports": [
+                            {
+                                "name": "prev_node",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 4369055692326240256
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "layer"
+                            }
+                        ],
+                        "displayed_name": "Dense Layer",
+                        "location_x": 1474.9115854426884,
+                        "location_y": 1432.114930336624,
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\nets\\dense_layer_1849854650765869056.pkl"
+                    },
+                    {
+                        "message": "Sequential model created",
+                        "params": [],
+                        "node_id": 1641563167999983616,
+                        "node_name": "sequential_model",
+                        "task": "neural_network",
+                        "children": [],
+                        "parent": [
+                            "1849854650765869056"
+                        ],
+                        "node_type": "nn_layer",
+                        "uid": 62,
+                        "input_ports": [
+                            {
+                                "name": "layer",
+                                "connectedNode": {
+                                    "name": "layer",
+                                    "nodeData": 1849854650765869056
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "nn_model"
+                            }
+                        ],
+                        "location_x": 1851.4485020054342,
+                        "location_y": 1824.6242737152957,
+                        "displayed_name": "Sequential Model",
+                        "project_id": 33,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\nets\\sequential_model_1641563167999983616.pkl"
+                    }
+                ],
+                "30": []
             }
         }
     },
     "active_user": "admin",
-    "active_project": "183",
+    "active_project": "33",
     "admin": [
         "admin"
     ]

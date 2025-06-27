@@ -18,6 +18,8 @@ class Conv2DLayer(BaseLayer):
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
         super().__init__(project_id=project_id)
 
@@ -48,6 +50,8 @@ class Conv2DLayer(BaseLayer):
             "input_ports": self.input_ports,
             "output_ports": self.output_ports,
             "displayed_name": self.displayed_name,
+            "location_x": self.location_x,
+            "location_y": self.location_y,
         }
 
 
@@ -66,6 +70,8 @@ class MaxPool2DLayer(BaseLayer):
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
         super().__init__(project_id=project_id)
     
@@ -93,5 +99,7 @@ class MaxPool2DLayer(BaseLayer):
             "uid": self.uid,
             "input_ports": self.input_ports,
             "output_ports": self.output_ports,
+            "location_x": self.location_x,
+            "location_y": self.location_y,
             "displayed_name": self.displayed_name,
         }

@@ -210,7 +210,7 @@ class ComponentSerializer(serializers.ModelSerializer):
 
 
 class NodeSerializer(serializers.ModelSerializer):
-    node_data = serializers.CharField(write_only=True, required=False)
+    node_data = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
     project_id = serializers.IntegerField(required=False, write_only=True)
     
     class Meta:
@@ -218,7 +218,8 @@ class NodeSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'params': {'allow_null': True},
-            'node_id': {'required': False}  # Make node_id read-only
+            'node_id': {'required': False},  # Make node_id read-only
+            'node_data': {'allow_null': True, 'allow_blank': True, 'required': False}
         }
     
     
@@ -228,7 +229,7 @@ class NodeSerializer(serializers.ModelSerializer):
         # if node_data_base64 :
         #     validated_data["node_data"] = base64.b64decode(node_data_base64)
 
-        project_id = validated_data.pop("project_id")
+        project_id = validated_data.pop("project_id", None)
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
@@ -251,7 +252,7 @@ class NodeSerializer(serializers.ModelSerializer):
         #     validated_data["node_data"] = base64.b64decode(node_data_base64)
         
         # Handle project_id if provided
-        project_id = validated_data.pop("project_id")
+        project_id = validated_data.pop("project_id", None)
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
