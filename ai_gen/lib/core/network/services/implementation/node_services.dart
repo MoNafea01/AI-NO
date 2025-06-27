@@ -20,11 +20,27 @@ class NodeServices implements INodeServices {
 
       Map<int, NodeModel> nodesDictionary = {};
       if (response.data != null) {
+        // Convert response data to list of NodeModel with idx
+        List<Map<String, dynamic>> nodesWithIdx = [];
+
         for (var nodeData in response.data) {
           NodeModel node = NodeModel.fromJson(nodeData);
           if (nodeData['uid'] != null && nodeData['uid'] is int) {
-            nodesDictionary[nodeData['uid']] = node;
+            nodesWithIdx.add({
+              'uid': nodeData['uid'],
+              'idx': nodeData['idx'] ?? 100, // Default to 0 if idx is null
+              'node': node,
+            });
           }
+        }
+
+        // Sort by idx field
+        nodesWithIdx
+            .sort((a, b) => (a['idx'] as int).compareTo(b['idx'] as int));
+
+        // Convert back to dictionary
+        for (var item in nodesWithIdx) {
+          nodesDictionary[item['uid']] = item['node'];
         }
       }
       return nodesDictionary;
