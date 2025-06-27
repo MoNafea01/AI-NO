@@ -1,12 +1,12 @@
-import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import 'base/base_interface.dart';
 import 'base/universal_accepted_types.dart';
 import 'network_interface.dart';
 
+/// Input data interface for model nodes.
+/// Handles connections to model outputs and other compatible data types.
 class VSModelInputData extends BaseInputData {
   ///Basic List input interface
   VSModelInputData({
@@ -31,6 +31,8 @@ class VSModelInputData extends BaseInputData {
       ];
 }
 
+/// Output data interface for model nodes.
+/// Handles model execution and provides model-specific API communication.
 class VSModelOutputData extends BaseOutputData {
   ///Basic List output interface
   VSModelOutputData({required super.type, required super.node});
@@ -38,22 +40,15 @@ class VSModelOutputData extends BaseOutputData {
   @override
   IconData get outputIcon => Icons.square_rounded;
 
-  Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
-      get _outputFunction {
-    return (Map<String, dynamic> data) async {
-      final Map<String, dynamic> apiBody = {
-        "model_name": node.name,
-        "model_type": node.type,
-        "task": node.task,
-        "params": node.paramsToJson,
-      };
-
-      final INodeServices nodeServerCalls = GetIt.I.get<INodeServices>();
-      return await nodeServerCalls.runNode(node, apiBody);
-    };
-  }
-
   @override
-  Future<dynamic> Function(Map<String, dynamic> data) get outputFunction =>
-      _outputFunction;
+  Map<String, dynamic> buildApiBody(Map<String, dynamic> inputData) {
+    final Map<String, dynamic> apiBody = super.buildApiBody(inputData);
+
+    // Add model-specific fields
+    apiBody["model_name"] = node.name;
+    apiBody["model_type"] = node.type;
+    apiBody["task"] = node.task;
+
+    return apiBody;
+  }
 }

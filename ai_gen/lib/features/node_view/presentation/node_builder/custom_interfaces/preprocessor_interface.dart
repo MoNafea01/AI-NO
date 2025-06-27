@@ -1,15 +1,13 @@
-import 'dart:async';
-
-import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 import 'base/base_interface.dart';
 import 'base/universal_accepted_types.dart';
 import 'network_interface.dart';
 import 'node_loader_interface.dart';
 
+/// Input data interface for preprocessor nodes.
+/// Handles connections to preprocessor outputs and other compatible data types.
 class VSPreprocessorInputData extends BaseInputData {
   ///Basic List input interface
   VSPreprocessorInputData({
@@ -38,6 +36,8 @@ class VSPreprocessorInputData extends BaseInputData {
   IconData get connectedInputIcon => Icons.square_rounded;
 }
 
+/// Output data interface for preprocessor nodes.
+/// Handles preprocessor execution and provides preprocessor-specific API communication.
 class VSPreprocessorOutputData extends BaseOutputData {
   ///Basic List output interface
   VSPreprocessorOutputData({
@@ -45,26 +45,19 @@ class VSPreprocessorOutputData extends BaseOutputData {
     required super.node,
   });
 
-  Future<Map<String, dynamic>> Function(Map<String, dynamic> data)
-      get _outputFunction {
-    return (Map<String, dynamic> data) async {
-      final Map<String, dynamic> apiBody = {
-        "preprocessor_name": node.name,
-        "preprocessor_type": node.type,
-        "params": node.paramsToJson,
-      };
-
-      final nodeServerCalls = GetIt.I.get<INodeServices>();
-      return await nodeServerCalls.runNode(node, apiBody);
-    };
-  }
-
   @override
   IconData get outputIcon => Icons.square_sharp;
 
   @override
-  Future<dynamic> Function(Map<String, dynamic> data) get outputFunction =>
-      _outputFunction;
+  Map<String, dynamic> buildApiBody(Map<String, dynamic> inputData) {
+    final Map<String, dynamic> apiBody = super.buildApiBody(inputData);
+
+    // Add preprocessor-specific fields
+    apiBody["preprocessor_name"] = node.name;
+    apiBody["preprocessor_type"] = node.type;
+
+    return apiBody;
+  }
 
   @override
   Color get interfaceColor => node.color;

@@ -1,7 +1,6 @@
-import 'base/base_interface.dart';
-import 'base/universal_accepted_types.dart';
-import 'multi_output_interface.dart';
-import 'network_interface.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
+
+import 'custom_interfaces.dart';
 
 /// Input data interface for general AINO nodes.
 class VSAINOGeneralInputData extends BaseInputData {
@@ -9,6 +8,7 @@ class VSAINOGeneralInputData extends BaseInputData {
   VSAINOGeneralInputData({
     required super.type,
     required super.node,
+    this.acceptAll = false,
     super.title,
     super.toolTip,
     super.initialConnection,
@@ -17,11 +17,17 @@ class VSAINOGeneralInputData extends BaseInputData {
     super.interfaceIconBuilder,
   });
 
+  final bool acceptAll;
+
+  @override
+  bool acceptInput(VSOutputData? data) {
+    return acceptAll ? true : super.acceptInput(data);
+  }
+
   @override
   List<Type> get acceptedTypes => [
         ...universalAcceptedTypes,
         VSAINOGeneralOutputData,
-        MultiOutputOutputData,
         VSNetworkOutputData,
       ];
 }

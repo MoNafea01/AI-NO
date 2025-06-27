@@ -46,10 +46,8 @@ class NodeMenuBuilder {
   }
 
   List<Function(Offset, VSOutputData?)> _buildNodes(List<NodeModel> nodesList) {
-    return nodesList
-        .map(
-          (NodeModel node) => factory.buildNode(node),
-        )
-        .toList();
+    return nodesList.map((NodeModel node) {
+      return factory.buildNode(node);
+    }).toList();
   }
 }

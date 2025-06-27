@@ -1,5 +1,6 @@
 import 'package:ai_gen/features/node_view/presentation/node_builder/builder/node_builder.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:vs_node_view/data/vs_node_data_provider.dart';
 import 'package:vs_node_view/data/vs_node_manager.dart';
 

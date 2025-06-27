@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'base/base_interface.dart';
 import 'base/universal_accepted_types.dart';
 
+/// Input data interface for text input nodes.
+/// Provides a text field widget for user input and handles text-based connections.
 class VsTextInputData extends BaseInputData {
   ///Basic int input interface
   VsTextInputData({
@@ -12,7 +14,7 @@ class VsTextInputData extends BaseInputData {
     required super.node,
     required this.controller,
     super.interfaceIconBuilder,
-    super.title = "xx",
+    super.title = "Text Input",
     super.initialConnection,
   }) {
     super.interfaceIconBuilder = (context, anchor, data) {
@@ -27,12 +29,14 @@ class VsTextInputData extends BaseInputData {
       );
     };
   }
+
+  /// Text editing controller for managing the input field.
   final TextEditingController controller;
+
   @override
   List<Type> get acceptedTypes => [
         ...universalAcceptedTypes,
         VSIntOutputData,
-        VSNumOutputData,
         VSNumOutputData,
       ];
 }

@@ -4,11 +4,14 @@ import 'package:get_it/get_it.dart';
 
 import 'base/universal_accepted_types.dart';
 
-/// A class to hold shared state for output data
+/// Shared state for managing multi-output node execution.
+/// Tracks whether the node is currently running to prevent duplicate executions.
 class OutputState {
   bool isRunning = false;
 }
 
+/// Input data interface for multi-output nodes.
+/// Handles connections to various data types for multi-output processing.
 class MultiOutputInputInterface extends BaseInputData {
   MultiOutputInputInterface({
     required super.node,
@@ -25,6 +28,8 @@ class MultiOutputInputInterface extends BaseInputData {
       ];
 }
 
+/// Output data interface for multi-output nodes.
+/// Handles execution of nodes with multiple outputs and manages output state.
 class MultiOutputOutputData extends BaseOutputData {
   MultiOutputOutputData({
     required this.index,
@@ -34,7 +39,10 @@ class MultiOutputOutputData extends BaseOutputData {
     super.outputFunction,
   });
 
+  /// The index of this output in the multi-output sequence.
   final int index;
+
+  /// Shared state for managing execution across all outputs.
   final OutputState outputState;
 
   @override
@@ -42,16 +50,19 @@ class MultiOutputOutputData extends BaseOutputData {
       get outputFunction {
     return (inputData) async {
       final nodeServices = GetIt.I.get<INodeServices>();
+
+      // Only the first output triggers the actual node execution
       if (index == 0) {
         outputState.isRunning = true;
         await runNodeWithData(inputData);
         outputState.isRunning = false;
       } else {
-        int x = 0;
+        // Wait for node execution to complete before retrieving results
+        int attempts = 0;
         while (node.nodeId == null) {
           await Future.delayed(const Duration(milliseconds: 100));
-          x++;
-          if (x == 20 && !outputState.isRunning) {
+          attempts++;
+          if (attempts == 20 && !outputState.isRunning) {
             await runNodeWithData(inputData);
             break;
           }

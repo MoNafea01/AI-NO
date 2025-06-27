@@ -1,10 +1,7 @@
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/aino_general_interface.dart';
+import 'custom_interfaces.dart';
 
-import 'base/base_interface.dart';
-import 'base/universal_accepted_types.dart';
-import 'network_interface.dart';
-import 'node_loader_interface.dart';
-
+/// Input data interface for fitter nodes.
+/// Handles connections to fitter outputs and other compatible data types.
 class VSFitterInputData extends BaseInputData {
   ///Basic List input interface
   VSFitterInputData({
@@ -28,6 +25,8 @@ class VSFitterInputData extends BaseInputData {
       ];
 }
 
+/// Output data interface for fitter nodes.
+/// Handles fitter execution and provides fitter-specific functionality.
 class VSFitterOutputData extends BaseOutputData {
   ///Basic List output interface
   VSFitterOutputData({

@@ -1,16 +1,9 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/network_interface.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../main.dart';
-import '../custom_interfaces/aino_general_interface.dart';
-import '../custom_interfaces/model_interface.dart';
-import '../custom_interfaces/multi_output_interface.dart';
-import '../custom_interfaces/node_loader_interface.dart';
-import '../custom_interfaces/node_template_saver_interface.dart';
-import '../custom_interfaces/preprocessor_interface.dart';
+import 'interface_factory.dart';
 
 /// Responsible for instantiating node widgets/data from NodeModel.
 class NodeFactory {
@@ -18,7 +11,6 @@ class NodeFactory {
   final int projectId;
 
   /// The function to create the output node (Run node).
-
   VSOutputNode runNode(Offset offset, VSOutputData? ref) => VSOutputNode(
         type: "Run",
         widgetOffset: offset,
@@ -52,77 +44,18 @@ class NodeFactory {
     };
   }
 
+  /// Builds input data interfaces using the InterfaceFactory.
   List<VSInputData> _buildInputData(NodeModel node, VSOutputData? ref) {
     return [
-      ...node.inputDots?.map((inputDot) => _inputDots(node, inputDot, ref)) ??
+      ...node.inputDots?.map((inputDot) {
+            return InterfaceFactory.createInputData(node, inputDot, ref);
+          }).toList() ??
           [],
     ];
   }
 
-  VSInputData _inputDots(
-      NodeModel node, String inputDot, VSOutputData<dynamic>? ref) {
-    if (inputDot == "model" || inputDot == "fitted_model") {
-      return VSModelInputData(
-          type: inputDot, initialConnection: ref, node: node);
-    }
-    if (inputDot == "preprocessor" || inputDot == "fitted_preprocessor") {
-      return VSPreprocessorInputData(
-          type: inputDot, initialConnection: ref, node: node);
-    }
-    if (node.name == "node_template_saver") {
-      return VSNodeTemplateSaverInputData(
-          type: inputDot, initialConnection: ref, node: node);
-    }
-    return VSAINOGeneralInputData(
-        type: inputDot, initialConnection: ref, node: node);
-  }
-
+  /// Builds output data interfaces using the InterfaceFactory.
   List<VSOutputData> _buildOutputData(NodeModel node) {
-    if (node.outputDots == null || node.outputDots!.isEmpty) return [];
-    final String outputDot = node.outputDots![0];
-    if (node.outputDots!.length > 1) {
-      return _multiOutputNodes(node);
-    }
-    if (node.category == "Models") {
-      return [VSModelOutputData(type: outputDot, node: node)];
-    }
-    if (node.category == "Preprocessors") {
-      return [VSPreprocessorOutputData(type: outputDot, node: node)];
-    }
-    if (node.category == "Network") {
-      return [VSNetworkOutputData(type: outputDot, node: node)];
-    }
-    if (node.name == "model_fitter" || node.name == "preprocessor_fitter") {
-      return [
-        VSFitterOutputData(
-          type: outputDot,
-          node: node,
-          outputIcon: Icons.square_sharp,
-        )
-      ];
-    }
-    if (node.name == "node_template_saver") {
-      return [VSNodeTemplateSaverOutputData(type: outputDot, node: node)];
-    }
-    if (node.name == "node_loader") {
-      return [VSNodeLoaderOutputData(type: outputDot, node: node)];
-    }
-    return [VSAINOGeneralOutputData(type: outputDot, node: node)];
-  }
-
-  List<MultiOutputOutputData> _multiOutputNodes(NodeModel node) {
-    final List<MultiOutputOutputData> outputData = [];
-    final outputState = OutputState();
-    for (int i = 0; i < node.outputDots!.length; i++) {
-      outputData.add(
-        MultiOutputOutputData(
-          index: i,
-          node: node,
-          type: node.outputDots![i],
-          outputState: outputState,
-        ),
-      );
-    }
-    return outputData;
+    return InterfaceFactory.createOutputData(node);
   }
 }
