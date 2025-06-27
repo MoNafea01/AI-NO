@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'base/base_interface.dart';
+import 'base/universal_accepted_types.dart';
 import 'network_interface.dart';
 import 'node_loader_interface.dart';
 
@@ -22,6 +23,7 @@ class VSPreprocessorInputData extends BaseInputData {
 
   @override
   List<Type> get acceptedTypes => [
+        ...universalAcceptedTypes,
         VSPreprocessorOutputData,
         VSFitterOutputData,
         VSNetworkOutputData,
