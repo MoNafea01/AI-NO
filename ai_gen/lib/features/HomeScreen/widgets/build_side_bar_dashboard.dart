@@ -35,7 +35,7 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
               if (state.isExpanded) const SizedBox(width: 8),
               if (state.isExpanded)
                 const Text(
-                  'Model Craft',
+                  'A I N O',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
