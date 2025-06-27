@@ -1,13 +1,7 @@
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
+import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
 
 import 'base/base_interface.dart';
-import 'base/universal_accepted_types.dart';
-import 'model_interface.dart';
-import 'multi_output_interface.dart';
-import 'network_interface.dart';
-import 'node_loader_interface.dart';
-import 'preprocessor_interface.dart';
 
 /// Input data interface for node template saver nodes.
 /// Handles connections to various node types for template saving operations.
@@ -27,17 +21,10 @@ class VSNodeTemplateSaverInputData extends BaseInputData {
   IconData get inputIcon => Icons.square_outlined;
 
   @override
-  List<Type> get acceptedTypes => [
-        ...universalAcceptedTypes,
-        BaseOutputData,
-        VSModelOutputData,
-        VSNetworkOutputData,
-        VSFitterOutputData,
-        VSNodeTemplateSaverOutputData,
-        MultiOutputOutputData,
-        VSPreprocessorInputData,
-        VSNodeLoaderOutputData,
-      ];
+  bool acceptInput(VSOutputData? data) => true;
+
+  @override
+  List<Type> get acceptedTypes => [];
 }
 
 /// Output data interface for node template saver nodes.
