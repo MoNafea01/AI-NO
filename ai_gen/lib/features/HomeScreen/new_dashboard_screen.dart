@@ -5,17 +5,20 @@ import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubi
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_side_bar_dashboard.dart';
+
 import 'package:ai_gen/features/architecturesScreen/architecture_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/learnScreen/learn_screen.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:ai_gen/features/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider, MultiBlocProvider, ReadContext;
+
 
 import '../datasetScreen/dataset_screen.dart';
 import '../docsScreen/docs_screen.dart';
-import '../learnScreen/learn_screen.dart';
+
 import '../modelScreen/model_screen.dart';
 import 'data/enum_app_screens.dart';
 
@@ -33,6 +36,11 @@ class DashboardScreen extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => HomeCubit()..loadHomePage(),
+        ),
+        BlocProvider(
+          create: (context) => ProfileCubit(
+            context.read<AuthProvider>(),
+          )..loadProfile(),
         ),
         BlocProvider(
           create: (context) => ProfileCubit(
@@ -64,7 +72,8 @@ class _DashboardView extends StatelessWidget {
       case AppScreen.datasets:
         return const DatasetsScreen();
       case AppScreen.learn:
-        return const LearnScreen();
+      //  return const LearnScreen(); LearningScreen
+        return const PlaylistScreen();
       case AppScreen.docs:
         return const DocsScreen();
       case AppScreen.settings:
@@ -77,6 +86,7 @@ class _DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       body: BlocBuilder<DashboardCubit, DashboardState>(
         builder: (context, state) {
           return Row(

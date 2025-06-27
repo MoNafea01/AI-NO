@@ -1,203 +1,387 @@
+// Enhanced ProfileScreen with better error handling and user experience
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_state.dart';
 import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
-
 import 'package:ai_gen/features/HomeScreen/widgets/edit_profile_dialog.dart';
 
+import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final fullNameFirstController = TextEditingController();
-    final fullNameLastController = TextEditingController();
-    final usernameController = TextEditingController();
-    final emailController = TextEditingController();
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
 
-    final bioController = TextEditingController();
-    return BlocBuilder<ProfileCubit, ProfileState>(
-      builder: (context, state) {
-        if (state is ProfileLoading) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(
-                color: AppColors.bluePrimaryColor,
-              ),
+class _ProfileScreenState extends State<ProfileScreen>
+    with WidgetsBindingObserver {
+  final fullNameFirstController = TextEditingController();
+  final fullNameLastController = TextEditingController();
+  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
+  final bioController = TextEditingController();
+
+  bool _isAppInForeground = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadBioFromPrefs();
+
+    // Load profile when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProfileCubit>().loadProfile();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    fullNameFirstController.dispose();
+    fullNameLastController.dispose();
+    usernameController.dispose();
+    emailController.dispose();
+    bioController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed && !_isAppInForeground) {
+      // App came back to foreground, refresh profile
+      _isAppInForeground = true;
+      context.read<ProfileCubit>().refreshProfile();
+    } else if (state == AppLifecycleState.paused) {
+      _isAppInForeground = false;
+    }
+  }
+
+  Future<void> _loadBioFromPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedBio = prefs.getString('user_bio') ?? '';
+      if (mounted) {
+        setState(() {
+          bioController.text = savedBio;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading bio: $e');
+    }
+  }
+
+  Future<void> _saveBioToPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_bio', bioController.text.trim());
+    } catch (e) {
+      debugPrint('Error saving bio: $e');
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content:
+            const Text('Your session has expired. You need to log in again.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Login Again'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout == true && mounted) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await authProvider.logout(context);
+    }
+  }
+
+  Widget _buildErrorWidget(String message) {
+    final isAuthError = message.contains('session has expired') ||
+        message.contains('log in again') ||
+        message.contains('Authentication error');
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isAuthError ? Icons.lock_outline : Icons.error_outline,
+              size: 64,
+              color: isAuthError ? Colors.orange : Colors.red,
             ),
-          );
-        } else if (state is ProfileLoaded) {
-          final profile = state.profile;
-          fullNameFirstController.text = profile.firstName;
-          fullNameLastController.text = profile.lastName;
-          usernameController.text = profile.username;
-          emailController.text = profile.email;
-          return Scaffold(
-            backgroundColor: const Color(0xFFF5F5F5),
-            // appBar: AppBar(
-            //   automaticallyImplyLeading: false,
-            //   backgroundColor: AppColors.appBackgroundColor,
-            //   title: const Text('User Profile'),
-            //   elevation: 2,
-            //   centerTitle: false,
-            //   actions: [
-            //     Tooltip(
-            //       message: 'Edit Profile',
-            //       child: TextButton.icon(
-            //         icon: const Icon(Icons.edit),
-            //         label: const Text('Edit Profile'),
-            //         onPressed: () {
-            //           showDialog(
-            //             context: context,
-            //             builder: (context) =>
-            //                 EditProfileDialog(profile: profile),
-            //           );
-            //         },
-            //       ),
-            //     ),
-            //     const SizedBox(width: 16),
-            //     Tooltip(
-            //       message: 'Back to Home',
-            //       child: TextButton.icon(
-            //         icon: const Icon(Icons.arrow_back_ios_new_outlined),
-            //         label: const Text('Back to Home'),
-            //         onPressed: () {
-            //           Navigator.pushReplacement(
-            //             context,
-            //             MaterialPageRoute(
-            //               builder: (context) => const DashboardScreen(),
-            //             ),
-            //           );
-            //         },
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      const Text("Name:", style: TextStyle(fontSize: 18)),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CustomTextField(
-                              controller: fullNameFirstController,
-                              hintText: 'First name',
-                              icon: Icons.person,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: CustomTextField(
-                              controller: fullNameLastController,
-                              hintText: 'Last name',
-                              icon: Icons.person,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      const Text("Username:", style: TextStyle(fontSize: 18)),
-                      const SizedBox(height: 8),
-                      CustomTextField(
-                        controller: usernameController,
-                        icon: Icons.person,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text("Email Address:",
-                          style: TextStyle(fontSize: 18)),
-                      const SizedBox(height: 8),
-                      CustomTextField(
-                        controller: emailController,
-                        icon: Icons.email,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text("Bio:", style: TextStyle(fontSize: 18)),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: bioController,
-                        maxLines: 4,
-                        decoration: InputDecoration(
-                          hintText: 'Write about yourself',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.all(16),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.bluePrimaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 14),
-                          ),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  EditProfileDialog(profile: profile),
-                            );
-                          },
-                          child: const Text("Save changes",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white)),
-                        ),
-                      ),
-                    ],
+            const SizedBox(height: 16),
+            Text(
+              isAuthError ? 'Session Expired' : 'Error Loading Profile',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: isAuthError ? Colors.orange : Colors.red,
                   ),
-                ),
-              ),
             ),
-          );
-        } else if (state is ProfileError) {
-          return Scaffold(
-            body: Center(
-              child: Column(
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 24),
+            if (isAuthError) ...[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.orange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                ),
+                onPressed: _handleLogout,
+                child: const Text('Login Again'),
+              ),
+            ] else ...[
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error Loading Profile',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(state.message),
-                  const SizedBox(height: 24),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.bluePrimaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                     onPressed: () {
-                      context.read<ProfileCubit>().loadProfile();
+                      context.read<ProfileCubit>().retry();
                     },
                     child: const Text('Try Again'),
                   ),
+                  const SizedBox(width: 12),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                            builder: (_) => const DashboardScreen()),
+                      );
+                    },
+                    child: const Text('Go to Dashboard'),
+                  ),
                 ],
               ),
-            ),
-          );
-        }
-        return Scaffold(
-          body: Center(
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: AppColors.bluePrimaryColor),
+            onPressed: () {
+              context.read<ProfileCubit>().refreshProfile();
+            },
+          ),
+        ],
+      ),
+      body: BlocConsumer<ProfileCubit, ProfileState>(
+        listener: (context, state) {
+          if (state is ProfileError) {
+            // Show snackbar for immediate feedback
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+                action: SnackBarAction(
+                  label: 'Retry',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    context.read<ProfileCubit>().retry();
+                  },
+                ),
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is ProfileLoading) {
+            return const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    color: AppColors.bluePrimaryColor,
+                  ),
+                  SizedBox(height: 16),
+                  Text('Loading profile...'),
+                ],
+              ),
+            );
+          } else if (state is ProfileLoaded) {
+            final profile = state.profile;
+
+            // Update controllers with profile data
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                fullNameFirstController.text = profile.firstName;
+                fullNameLastController.text = profile.lastName;
+                usernameController.text = profile.username;
+                emailController.text = profile.email;
+              }
+            });
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<ProfileCubit>().refreshProfile();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    const Text("Name:", style: TextStyle(fontSize: 18)),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextField(
+                            controller: fullNameFirstController,
+                            hintText: 'First name',
+                            icon: Icons.person,
+                            onChanged: (value) {
+                              // Optional: Auto-save on change
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: CustomTextField(
+                            controller: fullNameLastController,
+                            hintText: 'Last name',
+                            icon: Icons.person,
+                            onChanged: (value) {
+                              // Optional: Auto-save on change
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("Username:", style: TextStyle(fontSize: 18)),
+                    const SizedBox(height: 8),
+                    CustomTextField(
+                      controller: usernameController,
+                      icon: Icons.person,
+                      onChanged: (value) {
+                        // Optional: Auto-save on change
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("Email Address:",
+                        style: TextStyle(fontSize: 18)),
+                    const SizedBox(height: 8),
+                    CustomTextField(
+                      controller: emailController,
+                      icon: Icons.email,
+                      onChanged: (value) {
+                        // Optional: Auto-save on change
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("Bio:", style: TextStyle(fontSize: 18)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: bioController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'Write about yourself',
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.all(16),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          borderSide: const BorderSide(
+                              color: AppColors.bluePrimaryColor, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: const BorderSide(
+                              color: AppColors.bluePrimaryColor, width: 2),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        _saveBioToPrefs();
+                      },
+                    ),
+                    const SizedBox(height: 30),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.bluePrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 14),
+                        ),
+                        onPressed: () async {
+                          final result = await showDialog<bool>(
+                            context: context,
+                            builder: (dialogContext) => EditProfileDialog(
+                              profile: profile,
+                              currentBio: bioController.text,
+                            ),
+                          );
+
+                          if (result == true && mounted) {
+                            context.read<ProfileCubit>().loadProfile();
+                            await _loadBioFromPrefs();
+                          }
+                        },
+                        child: const Text("Save changes",
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.white)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          } else if (state is ProfileError) {
+            return _buildErrorWidget(state.message);
+          }
+
+          // Initial state
+          return Center(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.bluePrimaryColor,
@@ -213,37 +397,50 @@ class ProfileScreen extends StatelessWidget {
               child: const Text('Load Profile',
                   style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
 
+// Keep your existing CustomTextField class unchanged
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String? hintText;
   final IconData? icon;
+  final Function(String)? onChanged;
 
   const CustomTextField({
     required this.controller,
     super.key,
     this.hintText,
     this.icon,
+    this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hintText ?? controller.text,
-        prefixIcon: icon != null ? Icon(icon) : null,
+        prefixIcon:
+            icon != null ? Icon(icon, color: AppColors.bluePrimaryColor) : null,
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.all(16),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: const BorderSide(color: AppColors.bluePrimaryColor, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: const BorderSide(color: AppColors.bluePrimaryColor, width: 1),
         ),
       ),
     );

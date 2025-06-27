@@ -157,7 +157,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: AppColors.primaryColor,
                                 strokeWidth: 2,
                               ),
                             )

@@ -24,6 +24,7 @@ abstract class AssetsPaths {
     static const String importIcon = "${baseAssetPath}import_icon.svg";
      static const String exportIcon = "${baseAssetPath}export_icon.svg";
     static const String expandedIcon = "${baseAssetPath}expanded_icon.svg";
+    static const String learnScreenIcon = "${baseAssetPath}learn_icon_screen.svg";
 
 
 

@@ -1,5 +1,8 @@
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_cubit.dart';
+import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PreferenceModeSelector extends StatefulWidget {
   const PreferenceModeSelector({super.key});
@@ -8,10 +11,15 @@ class PreferenceModeSelector extends StatefulWidget {
   State<PreferenceModeSelector> createState() => _PreferenceModeSelectorState();
 }
 
-enum ThemeModePreference { system, light, dark }
+enum ThemeModePreference {
+  // system,
+
+  light,
+  dark
+}
 
 class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
-  ThemeModePreference selected = ThemeModePreference.system;
+  ThemeModePreference selected = ThemeModePreference.light; // system
 
   @override
   Widget build(BuildContext context) {
@@ -29,30 +37,35 @@ class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
             const SizedBox(height: 24),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildCard(
-                    icon: Icons.desktop_windows,
-                    label: 'System theme',
-                    //  imageAsset: 'assets/system_theme.png',
-                    value: ThemeModePreference.system,
-                  ),
-                  const SizedBox(width: 16), // Spacing between cards
-                  _buildCard(
-                    icon: Icons.wb_sunny_outlined,
-                    label: 'Light theme',
-                    //  imageAsset: 'assets/light_theme.png',
-                    value: ThemeModePreference.light,
-                  ),
-                  const SizedBox(width: 16), // Spacing between cards
-                  _buildCard(
-                    icon: Icons.nights_stay_outlined,
-                    label: 'Dark theme',
-                    //   imageAsset: 'assets/dark_theme.png',
-                    value: ThemeModePreference.dark,
-                  ),
-                ],
+              child: BlocBuilder<ThemeCubit, ThemeState>(
+                builder: (context, state) {
+                  final isDarkMode = state.isDarkMode;
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // _buildCard(
+                      //   icon: Icons.desktop_windows,
+                      //   label: 'System theme',
+                      //   //  imageAsset: 'assets/system_theme.png',
+                      //   value: ThemeModePreference.system,
+                      // ),
+                      const SizedBox(width: 16), // Spacing between cards
+                      _buildCard(
+                        icon: Icons.wb_sunny_outlined,
+                        label: 'Light theme',
+                        //  imageAsset: 'assets/light_theme.png',
+                        value: ThemeModePreference.light,
+                      ),
+                      const SizedBox(width: 16), // Spacing between cards
+                      _buildCard(
+                        icon: Icons.nights_stay_outlined,
+                        label: 'Dark theme',
+                        //   imageAsset: 'assets/dark_theme.png',
+                        value: ThemeModePreference.dark,
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -68,6 +81,20 @@ class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
     required ThemeModePreference value,
   }) {
     final isSelected = selected == value;
+    //final themeCubit = context.read<ThemeCubit>();
+    // if (isSelected) {
+    //   switch (value) {
+    //     // case ThemeModePreference.system:
+    //     //   themeCubit.setSystemMode();
+    //     //   break;
+    //     case ThemeModePreference.light:
+    //       themeCubit.setLightMode();
+    //       break;
+    //     case ThemeModePreference.dark:
+    //       themeCubit.setDarkMode();
+    //       break;
+    //   }
+    // }
     return GestureDetector(
       onTap: () {
         setState(() {
