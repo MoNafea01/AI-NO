@@ -1,11 +1,8 @@
-
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import 'widgets/create_new_project_button.dart';
@@ -65,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 if (isExpanded) const SizedBox(width: 8),
                 if (isExpanded)
                   const Text(
-                    'Model Craft',
+                    'AINO',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
