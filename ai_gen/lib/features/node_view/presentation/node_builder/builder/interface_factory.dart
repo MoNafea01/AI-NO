@@ -95,6 +95,11 @@ class InterfaceFactory {
         return [VSNodeLoaderOutputData(type: outputType, node: node)];
     }
 
+    // template nodes created by the user
+    if (node.task == "template") {
+      return [VSNodeTemplateSaverOutputData(type: outputType, node: node)];
+    }
+
     // Default to general interface
     return [VSAINOGeneralOutputData(type: outputType, node: node)];
   }

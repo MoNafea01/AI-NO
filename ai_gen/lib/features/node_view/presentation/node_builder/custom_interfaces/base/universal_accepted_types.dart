@@ -1,5 +1,4 @@
-import '../multi_output_interface.dart';
-import '../node_loader_interface.dart';
+import '../custom_interfaces.dart';
 
 /// Universal types that are accepted by all input interfaces.
 /// These types represent the most basic and commonly used output data types
@@ -7,4 +6,5 @@ import '../node_loader_interface.dart';
 final List<Type> universalAcceptedTypes = [
   VSNodeLoaderOutputData,
   MultiOutputOutputData,
+  VSNodeTemplateSaverOutputData,
 ];

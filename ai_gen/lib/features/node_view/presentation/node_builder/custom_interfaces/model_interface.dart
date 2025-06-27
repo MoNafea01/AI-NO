@@ -1,9 +1,6 @@
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
 import 'package:flutter/material.dart';
 
-import 'base/base_interface.dart';
-import 'base/universal_accepted_types.dart';
-import 'network_interface.dart';
+import 'custom_interfaces.dart';
 
 /// Input data interface for model nodes.
 /// Handles connections to model outputs and other compatible data types.
