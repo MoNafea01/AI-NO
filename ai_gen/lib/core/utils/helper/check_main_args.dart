@@ -1,9 +1,14 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
 import 'dart:io';
+
+import 'package:ai_gen/core/services/cache_service.dart';
 
 import '../../models/project_model.dart';
 
+///to pass arguments to test it
+/// flutter run -d windows --dart-define=file_path="C:\Users\mahmo\Desktop\ELDemy.ainoprj"
 Future<ProjectModel?> checkArgs(List<String> args) async {
   print("Command line args: $args");
 
@@ -36,11 +41,15 @@ Future<ProjectModel?> checkArgs(List<String> args) async {
     print("No file passed, open normal welcome screen");
   }
 
-  final projectName =
+  final String? projectName =
       initialProjectPath?.split(Platform.pathSeparator).last.split('.').first;
 
   /// to check if the file has id and in database or not
-  final int? projectID = null;
+  final String? storedProjectID =
+      await CacheService().getValue(initialProjectPath ?? '');
+
+  log("Open Stored project ID: $storedProjectID");
+  final int? projectID = int.tryParse(storedProjectID ?? '');
 
   return initialProjectPath == null
       ? null
