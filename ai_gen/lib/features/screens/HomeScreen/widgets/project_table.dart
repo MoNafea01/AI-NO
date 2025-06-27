@@ -6,6 +6,8 @@ import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'dart:math' as math;
 
 class ProjectsTable extends StatefulWidget {
@@ -18,6 +20,7 @@ class ProjectsTable extends StatefulWidget {
 class _ProjectsTableState extends State<ProjectsTable> {
   int currentPage = 1;
   final int itemsPerPage = 7;
+  Set<int> selectedProjectIds = <int>{};
 
   @override
   Widget build(BuildContext context) {
@@ -163,10 +166,25 @@ class _ProjectsTableState extends State<ProjectsTable> {
                               width: 16,
                               height: 16,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF5F5F5),
-                                border:
-                                    Border.all(color: const Color(0xFFD1D5DB)),
+                                color: selectedProjectIds.contains(project.id)
+                                    ? const Color(0xFF3B82F6)
+                                    : const Color(0xFFF5F5F5),
+                                border: Border.all(
+                                  color: selectedProjectIds.contains(project.id)
+                                      ? const Color(0xFF3B82F6)
+                                      : const Color(0xFFD1D5DB),
+                                ),
                                 borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: InkWell(
+                                onTap: () => _onProjectSelect(project.id),
+                                child: selectedProjectIds.contains(project.id)
+                                    ? const Icon(
+                                        Icons.check,
+                                        size: 12,
+                                        color: Colors.white,
+                                      )
+                                    : null,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -619,5 +637,142 @@ class _ProjectsTableState extends State<ProjectsTable> {
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
+  }
+
+  // Handle project selection
+  void _onProjectSelect(int? projectId) {
+    if (projectId == null) return;
+
+    if (selectedProjectIds.contains(projectId)) {
+      // If already selected, show delete confirmation
+      _showDeleteConfirmationDialog(projectId);
+    } else {
+      // If not selected, add to selection
+      setState(() {
+        selectedProjectIds.add(projectId);
+      });
+    }
+  }
+
+  // Show delete confirmation dialog
+  void _showDeleteConfirmationDialog(int projectId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Delete Project',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF374151),
+            ),
+          ),
+          content: const Text(
+            'Are you sure you want to delete this project? This action cannot be undone.',
+            style: TextStyle(
+              color: Color(0xFF6B7280),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Remove from selection if user cancels
+                setState(() {
+                  selectedProjectIds.remove(projectId);
+                });
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteProject(projectId);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFDC2626),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Delete project API call
+  Future<void> _deleteProject(int projectId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/api/projects/bulk-delete/'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'projects_ids': [projectId],
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Success - remove from selection and refresh the list
+        setState(() {
+          selectedProjectIds.remove(projectId);
+        });
+
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Project deleted successfully'),
+              backgroundColor: Color(0xFF10B981),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+
+        // Refresh the projects list - you might need to call your cubit method here
+        // context.read<HomeCubit>().loadProjects();
+      } else {
+        // Error handling
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete project: ${response.statusCode}'),
+              backgroundColor: const Color(0xFFDC2626),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+
+        // Remove from selection on error
+        setState(() {
+          selectedProjectIds.remove(projectId);
+        });
+      }
+    } catch (e) {
+      // Network or other errors
+      if (mounted) {
+        print('Error deleting project: $e');
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting project: $e'),
+            backgroundColor: const Color(0xFFDC2626),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+
+      // Remove from selection on error
+      setState(() {
+        selectedProjectIds.remove(projectId);
+      });
+    }
   }
 }
