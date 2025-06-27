@@ -18,7 +18,7 @@ class QueryRequest(BaseModel):
     model: str
 
 
-@app.post('/chat')
+@app.post('/chatbot')
 async def chat_endpoint(request: Request, query: QueryRequest):
     try:
         
@@ -46,7 +46,7 @@ async def chat_endpoint(request: Request, query: QueryRequest):
         }
 
 
-@app.post("/clear-history")
+@app.delete("/clear-history")
 async def clear_chat_history(request: Request):
     request.session["chat_history"] = []
     return {"status": "success", "message": "Chat history cleared."}
