@@ -4,7 +4,6 @@ import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
-import 'package:ai_gen/features/screens/HomeScreen/home_screen.dart';
 import 'package:ai_gen/features/screens/HomeScreen/widgets/project_actions/export_project_dialog.dart';
 import 'package:ai_gen/features/screens/HomeScreen/widgets/project_actions/import_project_dialog.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +54,7 @@ class MenuButton extends StatelessWidget {
           onTap: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-               // builder: (context) => const HomeScreen(), 
-builder: (context) => const DashboardScreen(), // go to main dashboard screen
+                builder: (context) => const DashboardScreen(),
               ),
             );
           },
