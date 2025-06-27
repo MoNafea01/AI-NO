@@ -7,7 +7,7 @@ retrieval:
   top_k: 5
   embedding_model: all-MiniLM-L6-v2
 logging:
-  path: aino_logs.log
+  path: logs/aino_logs.log
   max_bytes: 5242880
   backup_count: 50
 templates:

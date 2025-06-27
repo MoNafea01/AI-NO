@@ -40,6 +40,7 @@ class PayloadBuilder:
         else:
             payload["params"] = NodeAttributeExtractor.get_attributes(node_data)
         params = kwargs.get("params", {})
+        
         if isinstance(params, dict):
             kwargs['params'] = [{k: v} for k, v in params.items()]
         payload.update(kwargs)

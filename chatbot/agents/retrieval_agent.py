@@ -3,6 +3,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from .agents import Agent
 from chatbot.core.docs import get_docs
 
+# RetrievalAgent for handling document retrieval based on user queries
+# It uses a vector store to retrieve relevant documents based on the user's question.
 class RetrievalAgent(Agent):
     def __init__(self, logger, config, cache_dir="retriever_cache"):
         super().__init__("RetrievalAgent", logger)

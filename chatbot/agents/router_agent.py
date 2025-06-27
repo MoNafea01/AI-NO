@@ -2,6 +2,8 @@ from .agents import Agent
 from .retrieval_agent import RetrievalAgent
 from .generation_agent import GenerationAgent
 
+# RouterAgent for routing user queries to the appropriate agent based on classification
+# It uses a retrieval agent to fetch relevant documents and a generation agent to classify the query.
 class RouterAgent(Agent):
     def __init__(self, logger, config):
         super().__init__("RouterAgent", logger)
@@ -25,6 +27,7 @@ class RouterAgent(Agent):
                 "mode": "4",  # mode '4' is for router template
                 "context": retrieval_result['context']
             })
+            
             classification = classification['output'].strip().lower()
             self.logger.debug(f"Query classified as: {classification}")
             if classification == "cli":

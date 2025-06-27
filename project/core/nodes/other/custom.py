@@ -176,6 +176,24 @@ class NodeTemplateSaver(BaseNode):
 
         input_channels = None
         output_channels = ["node"]
+        
+        
+        transformed_params = []
+        if params:
+            for param_dict in params:
+                for key, value in param_dict.items():
+                    
+                    param_type = "float" if isinstance(value, float) else (
+                        "int" if isinstance(value, int) else (
+                            "bool" if isinstance(value, bool) else "str"))
+                    
+                    transformed_params.append({
+                        "name": key,
+                        "type": param_type,
+                        "default": value
+                    })
+        
+        params = transformed_params
 
         api_call = f"template/"
         new_node = {
@@ -247,12 +265,11 @@ class NodeTemplateLoader(BaseNode):
             project_path = f"{self.project_id}/" if self.project_id else ""
             NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}other")
             payload.pop("node_data", None)
+            
             return payload
 
         except FileNotFoundError:
             return f"Node template with ID {self.uid} not found."
         except Exception as e:
             return f"Error loading node template: {e}"
-        
-    
         

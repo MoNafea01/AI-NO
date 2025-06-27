@@ -16,7 +16,7 @@ def init_logger(name, config=None, log_file=None):
     if not config:
         config = {
             'logging': {
-                'path': os.path.join(parent_path, "aino_logs.log"),
+                'path': os.path.join(parent_path, "logs","aino_logs.log"),
                 'max_bytes': 1024 * 1024 * 5,  # 5 MB
                 'backup_count': 5
             }
@@ -35,7 +35,7 @@ def init_logger(name, config=None, log_file=None):
 
     return logger
 
-log_file = os.path.join(parent_path, "aino_logs.log")
+log_file = os.path.join(parent_path, "logs", "aino_logs.log")
 logger = init_logger(__name__, log_file=log_file)
 
 def load_config(config_path="config.yaml"):

@@ -15,11 +15,7 @@ from core.nodes import *
 from core.repositories import *
 from .utils import *
 from core.nodes.configs.const_ import get_node_name_by_api_ref
-
-from chatbot.app import sync_generate_cli
 from chatbot.res.defaults import create_data_mapping
-
-from cli.call_cli import call_script
 from cli.utils.mapper import create_mapper
 
 class NodeQueryMixin:
@@ -846,8 +842,9 @@ class ExcelUploadAPIView(APIView):
                     row_data = row.to_dict()
                     if row_data.get('params'):
                         for param in row_data['params']:
-                            param['name'] = param['name'].strip()
-                    
+                            if isinstance(param, dict) and 'name' in param:
+                                param['name'] = param['name'].strip()
+
                     serializer = ComponentSerializer(data=row_data)
                     if serializer.is_valid():
                         serializer.save()
@@ -1626,78 +1623,5 @@ class EmptyProjectsDeleteAPIView(APIView):
             
             return Response(response_data, status=status.HTTP_200_OK)
             
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class ChatbotAPIView(APIView):
-    """API endpoint for interacting with the chatbot."""
-    history = []
-    
-    def post(self, request, *args, **kwargs):
-        try:
-            # Extract required parameters
-            query = request.data.get('query')
-            mode = request.data.get('mode', 'manual')  # Default to manual mode
-            project_id = request.query_params.get('project_id')
-            route = request.data.get("route", "chat")
-
-            if project_id:
-                try:
-                    project_id = Project.objects.get(id=project_id).id
-                except Project.DoesNotExist:
-                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
-
-                call_script(f"load_project {project_id}")
-            modes = {
-                "manual": '1',
-                "auto": '2'
-            }
-            if mode in modes.keys():
-                mode = modes[mode]
-                
-            model_name = request.data.get('model_name', 'gemini-1.5-pro')  # Default model
-            iteration = request.data.get('iteration', 0)  # Current iteration
-            to_db = request.data.get('to_db', False)  # Flag for database usage
-            
-            if route in ['1', 'chat']:
-                to_db = False
-                mode = 'manual'
-
-            
-            if not query:
-                return Response({"error": "Query is required"}, status=status.HTTP_400_BAD_REQUEST)
-                
-            # Validate mode
-            if mode not in ['1', '2', 'manual', 'auto']:
-                return Response({"error": "Mode must be '1' (manual) or '2' (auto)"}, 
-                              status=status.HTTP_400_BAD_REQUEST)
-
-            if route not in ['chat', '1', 'agent', '2']:
-                return Response({"error": "Choose 'agent' or 'chat'"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            response, logs, hist = sync_generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration, route=route, history=ChatbotAPIView.history)
-            
-            ChatbotAPIView.history = hist
-            return Response({"output": response, "status": "success", "logs": logs}, status=status.HTTP_200_OK)
-        
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
-class CLIAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        try:
-            command = request.data.get('command')
-            
-            if not command:
-                return Response({"error": "Command is required"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Call the CLI script with the provided command and parameters
-            response = call_script(command)
-            
-            return Response(response, status=status.HTTP_200_OK)
-        
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

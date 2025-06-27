@@ -65,8 +65,6 @@
     "nn_fitter": "fit_net/",
     "node_template_saver": "save_template/",
     "nafea_template": "template/",
-    "testing_template": "template/",
     "test_1": "template/",
-    "new_template_11": "template/",
     "a_new_one": "template/"
 }

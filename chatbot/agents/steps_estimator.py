@@ -2,6 +2,8 @@ from .agents import Agent
 from .retrieval_agent import RetrievalAgent
 from .generation_agent import GenerationAgent
 
+# StepsEstimateAgent for estimating the number of steps required to complete a task
+# It estimates the number of steps taken for a given pipeline based on user queries.
 class StepsEstimateAgent(Agent):
     def __init__(self, logger, config):
         super().__init__("StepsEstimateAgent", logger)

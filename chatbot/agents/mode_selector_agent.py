@@ -2,6 +2,8 @@ from .agents import Agent
 from .retrieval_agent import RetrievalAgent
 from .generation_agent import GenerationAgent
 
+# ModeSelectorAgent for selecting the mode of operation based on user queries
+# It retrieves relevant documents and classifies the query into a specific mode (e.g., manual, auto, etc.)
 class ModeSelectorAgent(Agent):
     def __init__(self, logger, config):
         super().__init__("ModeSelectorAgent", logger)

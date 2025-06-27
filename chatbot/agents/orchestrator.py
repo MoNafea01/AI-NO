@@ -5,6 +5,8 @@ from .feedback_agent import FeedbackAgent
 from .steps_estimator import StepsEstimateAgent
 from .mode_selector_agent import ModeSelectorAgent
 
+# OrchestratorAgent for coordinating the workflow of the chatbot
+# It manages the retrieval of documents, generation of CLI commands, and feedback processing.
 class OrchestratorAgent(Agent):
     def __init__(self, logger, config, model_name="gemini-2.0-flash"):
         super().__init__("OrchestratorAgent", logger)
@@ -20,7 +22,7 @@ class OrchestratorAgent(Agent):
         
         mode_selector_result = await self.mode_selector_agent.execute({"question": question})
         mode = mode_selector_result["mode"]
-        print(f"Mode selected: {mode}")
+        print(f"Mode  selected: {mode}")
         
         mode = '1' if mode == 'manual' else ('2' if mode == 'auto' else mode)
         

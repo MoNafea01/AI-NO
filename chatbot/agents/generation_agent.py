@@ -4,6 +4,8 @@ from langchain_core.output_parsers import StrOutputParser
 from chatbot.core.rag_pipeline import get_llm
 from chatbot.core.templates import get_template
 
+# GenerationAgent for generating CLI commands based on user queries
+# It uses a language model to generate commands based on the provided context and question.
 class GenerationAgent(Agent):
     def __init__(self, logger, model_name="gemini-2.0-flash"):
         super().__init__("GenerationAgent", logger)
