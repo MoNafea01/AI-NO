@@ -715,7 +715,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'projects_ids': [projectId],
+          'project_ids': [projectId],
         }),
       );
 
