@@ -706,18 +706,28 @@ class _ProjectsTableState extends State<ProjectsTable> {
     );
   }
 
-  // Delete project API call
+  // Delete project API call - UPDATED TO USE DELETE METHOD
   Future<void> _deleteProject(int projectId) async {
     try {
-      final response = await http.post(
+      // Debug logs
+      print('Attempting to delete project: $projectId');
+
+      final response = await http.delete(
+        // Changed from http.post to http.delete
         Uri.parse('http://127.0.0.1:8000/api/projects/bulk-delete/'),
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: json.encode({
           'project_ids': [projectId],
         }),
       );
+
+      // Debug logs
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      print('Response headers: ${response.headers}');
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         // Success - remove from selection and refresh the list
@@ -736,7 +746,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
           );
         }
 
-        // Refresh the projects list - you might need to call your cubit method here
+        // Refresh the projects list - uncomment if you have this method
         // context.read<HomeCubit>().loadProjects();
       } else {
         // Error handling
