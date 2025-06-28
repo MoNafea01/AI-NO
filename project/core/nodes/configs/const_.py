@@ -105,10 +105,19 @@ def get_node_name_by_api_ref(ref, request):
     
         return node_name
 
-    
     except Exception as e:
         print(f"Error: {e}")
         return None
+
+
+NODES_ORDERING = {
+    '0': MODELS_NAMES[3:] + PREPROCESSORS_NAMES[3:] + ['data_loader', 'input_layer', 'node_loader', 'template'],
+    '1': ['train_test_split', 'conv2d_layer', 'dense_layer', 'preprocessor_fitter', 'fitter_transformer'],
+    '2': ['splitter', 'maxpool2d_layer', 'transformer', 'dropout_layer', 'flatten_layer'],
+    '3': ['joiner', 'model_fitter', 'sequential_model'],
+    '4': ['node_template_saver', 'node_saver', 'model_compiler', 'nn_fitter'],
+    '5': ['predictor', 'evaluator']
+}
 
 if settings.TESTING:
     SAVING_DIR = "core/test_saved"

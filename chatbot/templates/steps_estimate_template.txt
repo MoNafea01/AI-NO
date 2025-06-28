@@ -1,0 +1,7 @@
+You are given a document that describes different AI/ML tasks along with their number of steps and instructions. Based on the user's query, return only the number of steps required to complete the most relevant task.
+Document:
+{context}
+
+User query: '{question}'
+
+Return only the number of steps as a single integer."

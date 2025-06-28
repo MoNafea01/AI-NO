@@ -27,6 +27,8 @@ Steps:
   1. Create data_loader with dataset_name="diabetes"
   2. Create knn_classifier with n_neighbors=5
   3. Fit model with model_fitter
+  4. stop
+
 Corpus: 
   - Step 1 API response: [{{"node_id": "dl_123", "message": "data loaded"}}, {{"node_id": "X_id", "message": "data loaded X"}}, {{"node_id": "y_id", "message": "data loaded y"}}]
   - Step 2 API response: {{"node_id": "knn_456", "message": "knn created"}}

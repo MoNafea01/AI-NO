@@ -124,7 +124,6 @@ def load_project(project_id):
     projects = data_store['users'][active_user]["projects"]
 
     response = send_request_to_api([], "nodes/", method_type="get", project_id=project_id)
-
     projects[project_id] = response 
 
     return True, response

@@ -11,7 +11,10 @@ def get_template(mode):
     logger.info(f"Loading template for mode: {mode}")
     file_map = {
         '1': config['templates']['manual'],
-        '2': config['templates']['auto']
+        '2': config['templates']['auto'],
+        '3': config['templates']['data_steps'],
+        '4': config['templates']['router'],
+        '5': config['templates']['select_mode']
     }
     template_path = os.path.join(template_dir, file_map[mode])
     logger.debug(f"Template path: {template_path}")

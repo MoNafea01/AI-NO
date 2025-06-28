@@ -210,7 +210,7 @@ class ComponentSerializer(serializers.ModelSerializer):
 
 
 class NodeSerializer(serializers.ModelSerializer):
-    node_data = serializers.CharField(write_only=True, required=False)
+    node_data = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
     project_id = serializers.IntegerField(required=False, write_only=True)
     
     class Meta:
@@ -218,7 +218,8 @@ class NodeSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'params': {'allow_null': True},
-            'node_id': {'required': False}  # Make node_id read-only
+            'node_id': {'required': False},  # Make node_id read-only
+            'node_data': {'allow_null': True, 'allow_blank': True, 'required': False}
         }
     
     
@@ -228,7 +229,7 @@ class NodeSerializer(serializers.ModelSerializer):
         # if node_data_base64 :
         #     validated_data["node_data"] = base64.b64decode(node_data_base64)
 
-        project_id = validated_data.pop("project_id")
+        project_id = validated_data.pop("project_id", None)
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
@@ -251,7 +252,7 @@ class NodeSerializer(serializers.ModelSerializer):
         #     validated_data["node_data"] = base64.b64decode(node_data_base64)
         
         # Handle project_id if provided
-        project_id = validated_data.pop("project_id")
+        project_id = validated_data.pop("project_id", None)
         if project_id:
             try:
                 project = Project.objects.get(id=project_id)
@@ -304,6 +305,23 @@ class ProjectSerializer(serializers.ModelSerializer):
         nodes = Node.objects.filter(project_id=obj.id)
         serializer = NodeSerializer(nodes, many=True, context=self.context)
         return serializer.data
+    
+    @classmethod
+    def get_filtered_queryset(cls, queryset, request):
+        """Filter projects based on query parameters."""
+        if not request:
+            return queryset
+            
+        # Filter by model_name if provided
+        model_name = request.query_params.get('model_name')
+        dataset_name = request.query_params.get('dataset_name')
+
+        if model_name:
+            queryset = queryset.filter(model=model_name)
+        if dataset_name:
+            queryset = queryset.filter(dataset=dataset_name)
+            
+        return queryset
 
 
 def validate(data, keys):

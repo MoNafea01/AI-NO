@@ -1,4 +1,4 @@
-import os
+import os, copy
 from ai_operations.models import Node
 from django.core.exceptions import ObjectDoesNotExist
 from core.nodes.configs.const_ import PARENT_NODES, MULTI_CHANNEL_NODES
@@ -21,13 +21,14 @@ class NodeUpdater:
     def __init__(self, return_serialized : bool = False):
         self.return_serialized = return_serialized
 
-    def __call__(self, node_id: int, project_id: int, payload: dict) -> tuple:
+    def __call__(self, node_id: int, project_id: int, o_payload: dict) -> tuple:
         if not node_id:
             return False, "Node ID must be provided."
         
         node_id = int(node_id) if node_id else None
         project_id = int(project_id) if project_id else None
 
+        payload = copy.deepcopy(o_payload)
         if isinstance(payload, str):
             return False, payload
 
@@ -37,7 +38,6 @@ class NodeUpdater:
         try:
             # take the <old> node (by its id)
             node = Node.objects.filter(node_id=node_id, project_id=project_id).first() # get node from database
-            
             folder_path = None
             if node.node_data is None:
                 folder_name = FolderHandler.get_folder_by_node_name(node.node_name)
@@ -77,9 +77,15 @@ class NodeUpdater:
             if payload['node_name'] not in PARENT_NODES:
                 payload['children'] = node.children
             
-
             if payload.get("node_name") in PARENT_NODES:
-                payload['parent'] = [payload.get('input_ports')[0].get('connectedNode').get('nodeData')]
+                in_ports = payload.get('input_ports')
+                if len(in_ports) > 0:
+                    in_node_data = in_ports[0].get('connectedNode').get('nodeData')
+                    # if input_ports is not empty, we take the first one and assign its connectedNode's nodeData to parent
+                    if in_ports[0].get('connectedNode') and in_node_data:
+                        payload['parent'] = [in_node_data]
+                else:
+                    payload['parent'] = []
 
                 # Compatability with old versions
                 if not payload.get('parent'):
@@ -105,7 +111,7 @@ class NodeUpdater:
 
             # serialization part
             success, out_node = NodeLoader(return_serialized=self.return_serialized)(node_id, project_id=project_id)
-            message = f"Node {out_node.get('node_name')} with id {node_id} updated."
+            message = f"Node Updated: {out_node.get('node_name')} with id {node_id}"
             payload.update({"message": message, "node_data": out_node.get('node_data')})
             return True, payload
         except ObjectDoesNotExist:

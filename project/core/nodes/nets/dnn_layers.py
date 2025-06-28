@@ -15,6 +15,8 @@ class DenseLayer(BaseLayer):
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
 
         self.prev_node = self.load_args(prev_node, attr="node_id")
@@ -45,6 +47,8 @@ class DenseLayer(BaseLayer):
             "input_ports": self.input_ports,
             "output_ports": self.output_ports,
             "displayed_name": self.displayed_name,
+            "location_x": self.location_x,
+            "location_y": self.location_y,
         }
 
 
@@ -59,6 +63,8 @@ class DropoutLayer(BaseLayer):
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
 
         self.prev_node = self.load_args(prev_node, attr="node_id")
@@ -86,5 +92,7 @@ class DropoutLayer(BaseLayer):
             "uid": self.uid,
             "input_ports": self.input_ports,
             "output_ports": self.output_ports,
+            "location_x": self.location_x,
+            "location_y": self.location_y,
             "displayed_name": self.displayed_name,
         }

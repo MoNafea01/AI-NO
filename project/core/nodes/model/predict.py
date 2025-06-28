@@ -31,6 +31,8 @@ class Predict(BaseNode):
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
         self.displayed_name = kwargs.get('displayed_name', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.payload = self._predict(err)
 
     def _predict(self, err=None):
@@ -75,7 +77,7 @@ class Predict(BaseNode):
             
             payload = PayloadBuilder.build_payload("Model Predictions", predictions, "predictor", node_type="predictor", task='predict',
                                                     uid=self.uid, output_ports=self.output_ports, input_ports=self.input_ports, project_id=self.project_id,
-                                                    displayed_name=self.displayed_name)
+                                                    displayed_name=self.displayed_name, location_x=self.location_x, location_y=self.location_y)
             
             project_path = f"{self.project_id}/" if self.project_id else ""
             NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}model")

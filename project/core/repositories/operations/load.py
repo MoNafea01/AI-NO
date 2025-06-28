@@ -93,7 +93,7 @@ class NodeLoader:
             if path:
                 self.from_db = False
             payload = {
-                    "message": f"Node {name} Loaded.",
+                    "message": f"Node Loaded: {name}",
                     "node_name": "node_loader",
                     "node_id": uuid.uuid1().int & ((1 << 63) - 1),
                     "params": {},

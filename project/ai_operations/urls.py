@@ -63,9 +63,6 @@ urlpatterns = [
     path('export-project/', ExportProjectAPIView.as_view(), name='export-project'),
     path('import-project/', ImportProjectAPIView.as_view(), name='import-project'),
 
-    path('chatbot/', ChatbotAPIView.as_view(), name='chatbot'),
-    path('cli/', CLIAPIView.as_view(), name='cli'),
-
     # Generates the raw OpenAPI schema
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

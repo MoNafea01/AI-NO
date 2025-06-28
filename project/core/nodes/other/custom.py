@@ -26,6 +26,8 @@ class Joiner(BaseNode):
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.join(err)
     
@@ -35,7 +37,8 @@ class Joiner(BaseNode):
         try:
             joined_data = (self.data_1, self.data_2)
             payload = PayloadBuilder.build_payload("joined_data", joined_data, "joiner", node_type="custom", task="join", project_id=self.project_id,
-                                                   uid=self.uid, input_ports=self.input_ports, output_ports=self.output_ports, displayed_name=self.displayed_name)
+                                                   uid=self.uid, input_ports=self.input_ports, output_ports=self.output_ports, displayed_name=self.displayed_name,
+                                                   location_x=self.location_x, location_y=self.location_y)
             
             project_path = f"{self.project_id}/" if self.project_id else ""
             NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}other")
@@ -62,6 +65,8 @@ class Splitter:
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.split(err)
 
@@ -73,8 +78,8 @@ class Splitter:
 
             payload = []
             payload.append(PayloadBuilder.build_payload("data", (out1, out2), "splitter", node_type="custom", task="split", project_id=self.project_id, uid=self.uid,
-                                                        location_x=self.get_location()[0], location_y=self.get_location()[1], input_ports=self.input_ports, output_ports=self.output_ports,
-                                                        displayed_name=self.displayed_name))
+                                                        input_ports=self.input_ports, output_ports=self.output_ports,
+                                                        displayed_name=self.displayed_name, location_x=self.location_x, location_y=self.location_y))
             
             for i in range(1, 3):
                 payload.append(PayloadBuilder.build_payload(f"data_{i}", [out1, out2][i-1], "splitter", node_type="custom", task="split", project_id=self.project_id, uid=self.uid,
@@ -89,21 +94,6 @@ class Splitter:
             return payload
         except Exception as e:
             return f"Error splitting data: {e}"
-    
-    def get_location(self):
-        in_ports = self.input_ports
-        in_ports_names = [port.get("connectedNode").get("name") for port in in_ports]
-        if "X" in in_ports_names:
-            X_location, y_location = 500.0, 500.0
-        elif "X_Split" in in_ports_names:
-            X_location, y_location = 600.0, 500.0
-        elif "y" in in_ports_names:
-            X_location, y_location = 500.0, 300.0
-        elif "y_Split" in in_ports_names:
-            X_location, y_location = 600.0, 300.0
-        else:
-            X_location, y_location = 500.0, 400.0
-        return X_location, y_location
 
     def __str__(self):
         return f"data: {self.payload}"
@@ -146,6 +136,8 @@ class NodeTemplateSaver(BaseNode):
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.save_template(err)
 
@@ -166,7 +158,8 @@ class NodeTemplateSaver(BaseNode):
             params = self.make_node(schema, node_name, self.chosen_name, last_uid, self.description, self.node.get('params'))
             node_content = NodeDataExtractor()(self.node.get('node_id'), project_id=self.project_id)
             payload = PayloadBuilder.build_payload("node", node_content, node_name, node_type="custom", task="save_template", project_id=self.project_id,
-                                                   uid=self.uid, input_ports=self.input_ports, output_ports=self.output_ports, displayed_name=self.displayed_name, params=params)
+                                                   uid=self.uid, input_ports=self.input_ports, output_ports=self.output_ports, displayed_name=self.displayed_name, 
+                                                   params=params, location_x=self.location_x, location_y=self.location_y)
             
             NodeSaver()(payload, rf"{blueprint_dir}")
             payload.pop("node_data", None)
@@ -183,6 +176,24 @@ class NodeTemplateSaver(BaseNode):
 
         input_channels = None
         output_channels = ["node"]
+        
+        
+        transformed_params = []
+        if params:
+            for param_dict in params:
+                for key, value in param_dict.items():
+                    
+                    param_type = "float" if isinstance(value, float) else (
+                        "int" if isinstance(value, int) else (
+                            "bool" if isinstance(value, bool) else "str"))
+                    
+                    transformed_params.append({
+                        "name": key,
+                        "type": param_type,
+                        "default": value
+                    })
+        
+        params = transformed_params
 
         api_call = f"template/"
         new_node = {
@@ -223,6 +234,8 @@ class NodeTemplateLoader(BaseNode):
         self.uid = node_template_saver_uid + int(template_id)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.load_template(err)
     
@@ -246,17 +259,17 @@ class NodeTemplateLoader(BaseNode):
             
             node_data = joblib.load(node_path)
             payload = PayloadBuilder.build_payload("node", node_data, "template", node_type="custom", task="load_template", project_id=self.project_id,
-                                                   uid=self.uid, input_ports=self.input_ports, output_ports=self.output_ports, displayed_name=self.displayed_name)
+                                                   uid=self.uid, input_ports=self.input_ports, output_ports=self.output_ports, 
+                                                   displayed_name=self.displayed_name, location_x=self.location_x, location_y=self.location_y)
             
             project_path = f"{self.project_id}/" if self.project_id else ""
             NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}other")
             payload.pop("node_data", None)
+            
             return payload
 
         except FileNotFoundError:
             return f"Node template with ID {self.uid} not found."
         except Exception as e:
             return f"Error loading node template: {e}"
-        
-    
         

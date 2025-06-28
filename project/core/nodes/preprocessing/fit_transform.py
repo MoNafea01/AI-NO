@@ -32,6 +32,8 @@ class FitTransform:
         self.uid = kwargs.get('uid', None)
         self.input_ports = kwargs.get('input_ports', None)
         self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
         self.displayed_name = kwargs.get('displayed_name', None)
 
         self.payload = self._fit_transform(err)
@@ -77,7 +79,7 @@ class FitTransform:
             payload = []
             payload.append(PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output),
                                                          "fitter_transformer", node_type="fitter_transformer", task="fit_transform", project_id=self.project_id,
-                                                         uid=self.uid, location_x=700.0, location_y=700.0, input_ports=self.input_ports, output_ports=self.output_ports,
+                                                         uid=self.uid, location_x=self.location_x, location_y=self.location_y, input_ports=self.input_ports, output_ports=self.output_ports,
                                                          displayed_name=self.displayed_name))
             
             names = ["fitted_preprocessor", "transformed_data"]

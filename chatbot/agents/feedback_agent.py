@@ -3,6 +3,8 @@ from chatbot.core.utils import parse_command_list, extract_id_message
 from cli.call_cli import call_script
 import ast
 
+# FeedbackAgent for processing user feedback on CLI commands
+# It validates the commands, interacts with the CLI, and updates documents accordingly.
 class FeedbackAgent(Agent):
     def __init__(self, logger):
         super().__init__("FeedbackAgent", logger)
