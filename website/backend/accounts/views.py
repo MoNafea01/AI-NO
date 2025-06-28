@@ -27,12 +27,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import RetrieveUpdateAPIView
 from .utils import send_otp_email
-# Create your views here.
 from django.contrib.auth.hashers import check_password
-###################################################################
 
 
-########################################### for signup ######################################################
+
+# for signup 
 class RegisterView(generics.CreateAPIView):
     """
     API endpoint for user registration.
@@ -59,7 +58,7 @@ class RegisterView(generics.CreateAPIView):
             )
 
 
-################################### verify user after signup using OTP ############################################
+# verify user after signup using OTP
 class VerifyOTPView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -93,18 +92,16 @@ class VerifyOTPView(APIView):
         # Call RequestOTPView to get new otp  via this url request-otp/
         return Response({"error": "Invalid or expired OTP, Ask for new one"}, status=status.HTTP_400_BAD_REQUEST)
 
-######################################################################################
 
-########################################### For Login ###########################################
+# For Login
 class MyTokenObtainPairView(TokenObtainPairView):
     """
     Standard login with username & password.
     """
     serializer_class = MyTokenObtainPairSerializer
 
-######################################################################################
 
-##################################### User profile Get and Update #################################################
+# User profile Get and Update
 class UserProfileView(RetrieveUpdateAPIView):
     """
     API endpoint to retrieve and update user profile.
@@ -126,10 +123,9 @@ class UserProfileView(RetrieveUpdateAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-################################################################################################################
 
 
-############################## change password with old one ###############################################
+# change password with old one
 class ChangePasswordView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -148,9 +144,8 @@ class ChangePasswordView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#############################################################################################################
 
-#################################### change password with OTP #####################################################
+# change password with OTP
 # ask for otp to change password
 class RequestOTPView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -173,6 +168,7 @@ class RequestOTPView(APIView):
 
 
                             ######################################
+
 
 # check otp then change password
 class VerifyOTPForPasswordChangeView(APIView):
@@ -228,7 +224,7 @@ class ChangePasswordWithOTPView(APIView):
             )
         return Response(change_password_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-###################################################################################################################
+
 
 class PostVoteAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -340,7 +336,6 @@ class CommentListCreateAPIView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         post = get_object_or_404(Post, pk=self.kwargs['post_id'])
         serializer.save(user = self.request.user, post=post)
-
 
 
 
