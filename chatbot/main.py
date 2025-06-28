@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from typing import Optional
 from starlette.middleware.sessions import SessionMiddleware
 
 from pydantic import BaseModel
@@ -14,8 +15,8 @@ app.add_middleware(SessionMiddleware, secret_key="1")
 
 class QueryRequest(BaseModel):
     user_input: str
-    to_db: bool
-    model: str
+    to_db: Optional[bool] = True
+    model: Optional[str] = "gemini-2.0-flash"
 
 
 @app.post('/chatbot')

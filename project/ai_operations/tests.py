@@ -1,6 +1,7 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
+import joblib
 import warnings
 
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
@@ -19,7 +20,7 @@ class PipelineIntegrationTest(APITestCase):
         response = self.client.post(url, data, format='json', query_params={"project_id": 1})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.put(url, {"params":{"dataset_name":"iris"}}, format='json', query_params={"node_id":response.data.get('node_id'), "project_id": 1})
-
+        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data_loader_X, data_loader_y = response.data.get('children')
         self.assertIsNotNone(data_loader_X)
