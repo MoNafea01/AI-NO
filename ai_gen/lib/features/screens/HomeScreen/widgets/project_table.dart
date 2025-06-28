@@ -810,6 +810,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
   final int itemsPerPage = 7;
   Set<int> selectedProjectIds = <int>{};
   bool isDeleting = false; // Track deletion state
+  bool isDeletingEmpty = false; // Track empty projects deletion
 
   @override
   Widget build(BuildContext context) {
@@ -825,7 +826,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
     }
 
     // Show loading indicator when deleting
-    if (isDeleting) {
+    if (isDeleting || isDeletingEmpty) {
       return Container(
         width: double.infinity,
         height: 400, // Adjust height as needed
@@ -834,17 +835,19 @@ class _ProjectsTableState extends State<ProjectsTable> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: const Color(0xFFE5E7EB)),
         ),
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(
+              const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF3B82F6)),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
-                'Deleting project...',
-                style: TextStyle(
+                isDeletingEmpty
+                    ? 'Deleting empty projects...'
+                    : 'Deleting project...',
+                style: const TextStyle(
                   fontSize: 16,
                   color: Color(0xFF6B7280),
                 ),
@@ -882,13 +885,38 @@ class _ProjectsTableState extends State<ProjectsTable> {
                 topRight: Radius.circular(8),
               ),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Expanded(
                   flex: 3,
                   child: Row(
                     children: [
-                      Text(
+                      // Header checkbox for deleting empty projects
+                      Tooltip(
+                        message:
+                            "Delete all empty projects (projects with no model or dataset)",
+                        child: Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F5F5),
+                            border: Border.all(
+                              color: const Color(0xFFD1D5DB),
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: InkWell(
+                            onTap: _showDeleteEmptyProjectsDialog,
+                            child: const Icon(
+                              Icons.delete_outline,
+                              size: 12,
+                              color: Color(0xFF666666),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
                         "Name",
                         style: TextStyle(
                           fontFamily: AppConstants.appFontName,
@@ -897,8 +925,8 @@ class _ProjectsTableState extends State<ProjectsTable> {
                           color: Color(0xFF666666),
                         ),
                       ),
-                      SizedBox(width: 4),
-                      Icon(
+                      const SizedBox(width: 4),
+                      const Icon(
                         Icons.arrow_downward,
                         size: 12,
                         color: Color(0xFF666666),
@@ -906,7 +934,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
                     ],
                   ),
                 ),
-                Expanded(
+                const Expanded(
                   flex: 2,
                   child: Text(
                     "Description",
@@ -918,7 +946,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
                     ),
                   ),
                 ),
-                Expanded(
+                const Expanded(
                   flex: 2,
                   child: Text(
                     "Dataset",
@@ -930,7 +958,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
                     ),
                   ),
                 ),
-                Expanded(
+                const Expanded(
                   flex: 2,
                   child: Text(
                     "Model",
@@ -942,7 +970,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
                     ),
                   ),
                 ),
-                Expanded(
+                const Expanded(
                   flex: 2,
                   child: Text(
                     "Created At",
@@ -982,29 +1010,33 @@ class _ProjectsTableState extends State<ProjectsTable> {
                         flex: 3,
                         child: Row(
                           children: [
-                            Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: selectedProjectIds.contains(project.id)
-                                    ? const Color(0xFF3B82F6)
-                                    : const Color(0xFFF5F5F5),
-                                border: Border.all(
+                            Tooltip(
+                              message: "Click to delete this project",
+                              child: Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
                                   color: selectedProjectIds.contains(project.id)
                                       ? const Color(0xFF3B82F6)
-                                      : const Color(0xFFD1D5DB),
+                                      : const Color(0xFFF5F5F5),
+                                  border: Border.all(
+                                    color:
+                                        selectedProjectIds.contains(project.id)
+                                            ? const Color(0xFF3B82F6)
+                                            : const Color(0xFFD1D5DB),
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: InkWell(
-                                onTap: () => _onProjectSelect(project.id),
-                                child: selectedProjectIds.contains(project.id)
-                                    ? const Icon(
-                                        Icons.check,
-                                        size: 12,
-                                        color: Colors.white,
-                                      )
-                                    : null,
+                                child: InkWell(
+                                  onTap: () => _onProjectSelect(project.id),
+                                  child: selectedProjectIds.contains(project.id)
+                                      ? const Icon(
+                                          Icons.check,
+                                          size: 12,
+                                          color: Colors.white,
+                                        )
+                                      : null,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -1465,7 +1497,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
 
     if (selectedProjectIds.contains(projectId)) {
       // If already selected, show delete confirmation
-      _showDeleteConfirmationDialog(projectId);
+      _showDeleteConfirmationDialog([projectId]);
     } else {
       // If not selected, add to selection
       setState(() {
@@ -1474,22 +1506,25 @@ class _ProjectsTableState extends State<ProjectsTable> {
     }
   }
 
-  // Show delete confirmation dialog
-  void _showDeleteConfirmationDialog(int projectId) {
+  // Show delete confirmation dialog for selected projects
+  void _showDeleteConfirmationDialog(List<int> projectIds) {
+    final projectCount = projectIds.length;
+    final projectText = projectCount == 1 ? 'project' : 'projects';
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            'Delete Project',
-            style: TextStyle(
+          title: Text(
+            'Delete ${projectCount == 1 ? 'Project' : 'Projects'}',
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Color(0xFF374151),
             ),
           ),
-          content: const Text(
-            'Are you sure you want to delete this project? This action cannot be undone.',
-            style: TextStyle(
+          content: Text(
+            'Are you sure you want to delete ${projectCount == 1 ? 'this' : 'these'} $projectText? This action cannot be undone.',
+            style: const TextStyle(
               color: Color(0xFF6B7280),
             ),
           ),
@@ -1499,7 +1534,9 @@ class _ProjectsTableState extends State<ProjectsTable> {
                 Navigator.of(context).pop();
                 // Remove from selection if user cancels
                 setState(() {
-                  selectedProjectIds.remove(projectId);
+                  for (int id in projectIds) {
+                    selectedProjectIds.remove(id);
+                  }
                 });
               },
               child: const Text(
@@ -1512,7 +1549,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _deleteProject(projectId);
+                _deleteProjects(projectIds);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFDC2626),
@@ -1526,8 +1563,56 @@ class _ProjectsTableState extends State<ProjectsTable> {
     );
   }
 
-  // Delete project API call - UPDATED TO USE DELETE METHOD
-  Future<void> _deleteProject(int projectId) async {
+  // Show delete empty projects confirmation dialog
+  void _showDeleteEmptyProjectsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Delete Empty Projects',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF374151),
+            ),
+          ),
+          content: const Text(
+            'Are you sure you want to delete all empty projects? This will remove all projects that have no model or dataset assigned. This action cannot be undone.',
+            style: TextStyle(
+              color: Color(0xFF6B7280),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteEmptyProjects();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFDC2626),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Delete Empty'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Delete selected projects API call - FIXED WITH CORRECT BODY FORMAT
+  Future<void> _deleteProjects(List<int> projectIds) async {
     try {
       // Set loading state
       setState(() {
@@ -1535,17 +1620,17 @@ class _ProjectsTableState extends State<ProjectsTable> {
       });
 
       // Debug logs
-      print('Attempting to delete project: $projectId');
+      print('Attempting to delete projects: $projectIds');
 
       final response = await http.delete(
-        // Changed from http.post to http.delete
         Uri.parse('http://127.0.0.1:8000/api/projects/bulk-delete/'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: json.encode({
-          'project_ids': [projectId],
+          'projects_ids':
+              projectIds, // Fixed: Changed from 'project_ids' to 'projects_ids'
         }),
       );
 
@@ -1557,33 +1642,34 @@ class _ProjectsTableState extends State<ProjectsTable> {
       if (response.statusCode == 200 || response.statusCode == 204) {
         // Success - remove from selection
         setState(() {
-          selectedProjectIds.remove(projectId);
+          for (int id in projectIds) {
+            selectedProjectIds.remove(id);
+          }
         });
 
         // Show success message
         if (mounted) {
+          final projectText = projectIds.length == 1 ? 'Project' : 'Projects';
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Project deleted successfully'),
-              backgroundColor: Color(0xFF10B981),
-              duration: Duration(seconds: 2),
+            SnackBar(
+              content: Text('$projectText deleted successfully'),
+              backgroundColor: const Color(0xFF10B981),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
 
         // Refresh the projects list by calling the cubit method
         if (mounted) {
-        //  await HomeCubit.get(context).l;
-          await context
-              .read<HomeCubit>()
-              .loadHomePage(); // Call your load projects method
+          await context.read<HomeCubit>().loadHomePage();
         }
       } else {
         // Error handling
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to delete project: ${response.statusCode}'),
+              content:
+                  Text('Failed to delete projects: ${response.statusCode}'),
               backgroundColor: const Color(0xFFDC2626),
               duration: const Duration(seconds: 3),
             ),
@@ -1592,17 +1678,19 @@ class _ProjectsTableState extends State<ProjectsTable> {
 
         // Remove from selection on error
         setState(() {
-          selectedProjectIds.remove(projectId);
+          for (int id in projectIds) {
+            selectedProjectIds.remove(id);
+          }
         });
       }
     } catch (e) {
       // Network or other errors
       if (mounted) {
-        print('Error deleting project: $e');
+        print('Error deleting projects: $e');
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error deleting project: $e'),
+            content: Text('Error deleting projects: $e'),
             backgroundColor: const Color(0xFFDC2626),
             duration: const Duration(seconds: 3),
           ),
@@ -1611,13 +1699,91 @@ class _ProjectsTableState extends State<ProjectsTable> {
 
       // Remove from selection on error
       setState(() {
-        selectedProjectIds.remove(projectId);
+        for (int id in projectIds) {
+          selectedProjectIds.remove(id);
+        }
       });
     } finally {
       // Always remove loading state
       if (mounted) {
         setState(() {
           isDeleting = false;
+        });
+      }
+    }
+  }
+
+  // Delete empty projects API call
+  Future<void> _deleteEmptyProjects() async {
+    try {
+      // Set loading state
+      setState(() {
+        isDeletingEmpty = true;
+      });
+
+      // Debug logs
+      print('Attempting to delete empty projects');
+
+      final response = await http.delete(
+        Uri.parse('http://127.0.0.1:8000/api/projects/delete-empty-projects/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      // Debug logs
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      print('Response headers: ${response.headers}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Success
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Empty projects deleted successfully'),
+              backgroundColor: Color(0xFF10B981),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+
+        // Refresh the projects list by calling the cubit method
+        if (mounted) {
+          await context.read<HomeCubit>().loadHomePage();
+        }
+      } else {
+        // Error handling
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Failed to delete empty projects: ${response.statusCode}'),
+              backgroundColor: const Color(0xFFDC2626),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Network or other errors
+      if (mounted) {
+        print('Error deleting empty projects: $e');
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting empty projects: $e'),
+            backgroundColor: const Color(0xFFDC2626),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      // Always remove loading state
+      if (mounted) {
+        setState(() {
+          isDeletingEmpty = false;
         });
       }
     }
