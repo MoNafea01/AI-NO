@@ -1,7 +1,6 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
-import joblib
 import warnings
 
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
