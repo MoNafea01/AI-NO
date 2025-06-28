@@ -80,9 +80,10 @@ class NodeUpdater:
             if payload.get("node_name") in PARENT_NODES:
                 in_ports = payload.get('input_ports')
                 if len(in_ports) > 0:
+                    in_node_data = in_ports[0].get('connectedNode').get('nodeData')
                     # if input_ports is not empty, we take the first one and assign its connectedNode's nodeData to parent
-                    if in_ports[0].get('connectedNode') and in_ports[0].get('connectedNode').get('nodeData'):
-                        payload['parent'] = [in_ports[0].get('connectedNode').get('nodeData')]
+                    if in_ports[0].get('connectedNode') and in_node_data:
+                        payload['parent'] = [in_node_data]
                 else:
                     payload['parent'] = []
 

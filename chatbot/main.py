@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from typing import Optional
 from starlette.middleware.sessions import SessionMiddleware
 
 from pydantic import BaseModel
@@ -14,11 +15,11 @@ app.add_middleware(SessionMiddleware, secret_key="1")
 
 class QueryRequest(BaseModel):
     user_input: str
-    to_db: bool
-    model: str
+    to_db: Optional[bool] = True
+    model: Optional[str] = "gemini-2.0-flash"
 
 
-@app.post('/chat')
+@app.post('/chatbot')
 async def chat_endpoint(request: Request, query: QueryRequest):
     try:
         
@@ -46,7 +47,7 @@ async def chat_endpoint(request: Request, query: QueryRequest):
         }
 
 
-@app.post("/clear-history")
+@app.delete("/clear-history")
 async def clear_chat_history(request: Request):
     request.session["chat_history"] = []
     return {"status": "success", "message": "Chat history cleared."}

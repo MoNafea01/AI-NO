@@ -62,6 +62,8 @@ urlpatterns = [
     path('update_components/', UpdateComponentsAPIView.as_view(), name='update-components'),
     path('export-project/', ExportProjectAPIView.as_view(), name='export-project'),
     path('import-project/', ImportProjectAPIView.as_view(), name='import-project'),
+    path('project-models/', ProjectModelsAPIView.as_view(), name='project-models'),
+    path('project-datasets/', ProjectDatasetsAPIView.as_view(), name='project-datasets'),
 
     # Generates the raw OpenAPI schema
     path('schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -1625,3 +1625,47 @@ class EmptyProjectsDeleteAPIView(APIView):
             
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ProjectModelsAPIView(APIView):
+    """API view to get all unique model names from projects."""
+    
+    def get(self, request):
+        """Return all unique model values from the Project table."""
+        try:
+            # Get all unique model values, excluding None/null values
+            models = Project.objects.exclude(model__isnull=True).exclude(model__exact='').values_list('model', flat=True).distinct()
+            
+            # Convert QuerySet to list and sort
+            unique_models = sorted(list(models))
+            
+            return Response({
+                "success": True,
+                "models": unique_models,
+                "count": len(unique_models)
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ProjectDatasetsAPIView(APIView):
+    """API view to get all unique dataset names from projects."""
+    
+    def get(self, request):
+        """Return all unique dataset values from the Project table."""
+        try:
+            # Get all unique dataset values, excluding None/null values
+            datasets = Project.objects.exclude(dataset__isnull=True).exclude(dataset__exact='').values_list('dataset', flat=True).distinct()
+            
+            # Convert QuerySet to list and sort
+            unique_datasets = sorted(list(datasets))
+            
+            return Response({
+                "success": True,
+                "datasets": unique_datasets,
+                "count": len(unique_datasets)
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
