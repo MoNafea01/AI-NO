@@ -1573,10 +1573,10 @@ class _ProjectsTableState extends State<ProjectsTable> {
 
         // Refresh the projects list by calling the cubit method
         if (mounted) {
-          await HomeCubit.get(context).loadHomePage();
-          // await context
-          //     .read<HomeCubit>()
-          //     .loadProjects(); // Call your load projects method
+        //  await HomeCubit.get(context).l;
+          await context
+              .read<HomeCubit>()
+              .loadHomePage(); // Call your load projects method
         }
       } else {
         // Error handling
