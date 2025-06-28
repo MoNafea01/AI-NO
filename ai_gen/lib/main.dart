@@ -70,20 +70,19 @@ class _MyAppState extends State<MyApp>
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-         BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
+        BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
-        builder: (context,state){
+        builder: (context, state) {
           return MaterialApp(
-            
-          scaffoldMessengerKey: scaffoldMessengerKey,
-          debugShowCheckedModeBanner: false,
-          title: 'AI Gen',
-      theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      // theme:
-      //           state.isDarkMode ? ThemeCubit.darkTheme : ThemeCubit.lightTheme,
-          home: const SplashScreen(),
-        );
+            scaffoldMessengerKey: scaffoldMessengerKey,
+            debugShowCheckedModeBanner: false,
+            title: 'AI Gen',
+            theme: ThemeData(scaffoldBackgroundColor: Colors.white),
+            // theme:
+            //           state.isDarkMode ? ThemeCubit.darkTheme : ThemeCubit.lightTheme,
+            home: const SplashScreen(),
+          );
         },
       ),
     );
