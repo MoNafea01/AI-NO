@@ -1,6 +1,7 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
 
@@ -10,6 +11,7 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(HomeInitial());
 
    final IProjectServices _appServices = GetIt.I.get<IProjectServices>();
+   static HomeCubit get(context) => BlocProvider.of(context);
 
   // Store all projects and filtered projects
   List<ProjectModel> _allProjects = [];
