@@ -23,14 +23,13 @@ class OrchestratorAgent(Agent):
         mode_selector_result = await self.mode_selector_agent.execute({"question": question})
         mode = mode_selector_result["mode"]
         print(f"Mode  selected: {mode}")
-        
-        mode = '1' if mode == 'manual' else ('2' if mode == 'auto' else mode)
-        
+                
         to_db = input_data["to_db"]
-        if mode == '2':
+        if mode == 'auto':
             max_iterations = await self.steps_estimate_agent.execute({'question': question})
         else:
             max_iterations = 1
+        
         cur_iter = 0
         log = []
 
@@ -60,7 +59,7 @@ class OrchestratorAgent(Agent):
                 "docs": retrieval_result["docs"],
                 "mode": mode
             })
-            if mode == "1" or not feedback_result["continue_iteration"]:
+            if mode == "manual" or not feedback_result["continue_iteration"]:
                 return {
                     "output": feedback_result["validated_outputs"],
                     "log": "\n".join(log)

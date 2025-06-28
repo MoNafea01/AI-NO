@@ -1,7 +1,7 @@
-from .agents import Agent
-from chatbot.core.utils import parse_command_list, extract_id_message
-from cli.call_cli import call_script
 import ast
+from .agents import Agent
+from cli.call_cli import call_script
+from chatbot.core.utils import parse_command_list, extract_id_message
 
 # FeedbackAgent for processing user feedback on CLI commands
 # It validates the commands, interacts with the CLI, and updates documents accordingly.
@@ -16,9 +16,9 @@ class FeedbackAgent(Agent):
         mode = input_data["mode"]
 
         # Parse and validate CLI commands
-        if mode == "1":
+        if mode == "manual":
             commands = parse_command_list(output)
-        elif mode == "2":
+        elif mode == "auto":
             commands = [output]
             
         validated_outputs = []

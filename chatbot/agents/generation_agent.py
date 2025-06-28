@@ -1,8 +1,8 @@
 from .agents import Agent
-from langchain.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 from chatbot.core.rag_pipeline import get_llm
 from chatbot.core.templates import get_template
+from langchain.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 # GenerationAgent for generating CLI commands based on user queries
 # It uses a language model to generate commands based on the provided context and question.

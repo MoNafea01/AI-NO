@@ -1,6 +1,6 @@
+from .agents import Agent
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
-from .agents import Agent
 from chatbot.core.docs import get_docs
 
 # RetrievalAgent for handling document retrieval based on user queries

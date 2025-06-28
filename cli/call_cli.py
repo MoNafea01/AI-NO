@@ -11,7 +11,7 @@ def call_script(command, *args, **kwargs):
             text=True,
             check=True,
         )
-        print("Subprocess completed successfully.")
+        # print("Subprocess completed successfully.")
 
     except subprocess.CalledProcessError as e:
         print("Subprocess failed.")

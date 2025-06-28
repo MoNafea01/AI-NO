@@ -1,42 +1,45 @@
 # #chatbot/core/rag_pipeline.py
 import os
 from langchain_community.vectorstores import FAISS
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema.runnable import RunnablePassthrough
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import OllamaLLM
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core.output_parsers import StrOutputParser
-from chatbot.core.templates import get_template
 from chatbot.core.utils import init_logger, load_config
 
 # # Configure logging
 config = load_config('config/config.yaml')
 logger = init_logger(__name__, config)
 
+
 def get_llm(model_name="gemini-1.5-pro", temperature=0.1, max_tokens=500):
     logger.info(f"Initializing LLM: {model_name}")
-    try:
-        if model_name.startswith("gemini"):
-            llm = ChatGoogleGenerativeAI(
-                model=model_name,
-                temperature=temperature,
-                max_output_tokens=max_tokens,
-                google_api_key=os.getenv("GOOGLE_API_KEY")
-            )
-        elif model_name.startswith("deepseek"):
-            llm = OllamaLLM(
-                model=model_name, 
-                temperature=0.1
-            )
-        else:
-            raise ValueError(f"Unsupported model: {model_name}")
+    google_keys = [os.getenv("GOOGLE_API_KEY"), os.getenv("GOOGLE_API_KEY2")]
+    
+    for google_key in google_keys:
+        try:
+            if model_name.startswith("gemini"):
+                llm = ChatGoogleGenerativeAI(
+                    model=model_name,
+                    temperature=temperature,
+                    max_output_tokens=max_tokens,
+                    google_api_key=google_key
+                )
+                
+            elif model_name.startswith("deepseek"):
+                llm = OllamaLLM(
+                    model=model_name, 
+                    temperature=0.1
+                )
+                
+            else:
+                raise ValueError(f"Unsupported model: {model_name}")
 
-        logger.debug("LLM initialized successfully")
-        return llm
-    except Exception as e:
-        logger.error(f"Failed to initialize LLM: {str(e)}")
-        raise
+            logger.debug("LLM initialized successfully")
+            return llm
+        
+        except Exception as e:
+            logger.error(f"Failed to initialize LLM: {str(e)}")
+    raise
 
 
 def format_docs(docs):
@@ -78,41 +81,41 @@ def get_retriever(docs, key="default"):
         raise
 
 
-def create_rag_chain(docs, cur_iter, model_name, selected_mode):
-    """Creates a RAG chain with the specified model_name."""
-    logger.info(f"Creating RAG chain for mode: {selected_mode}, iteration: {cur_iter}")
+# def create_rag_chain(docs, cur_iter, model_name, selected_mode):
+#     """Creates a RAG chain with the specified model_name."""
+#     logger.info(f"Creating RAG chain for mode: {selected_mode}, iteration: {cur_iter}")
 
-    try:
-        model = get_llm(model_name=model_name)
-        template = get_template(selected_mode)
-        prompt = ChatPromptTemplate.from_template(template)
+#     try:
+#         model = get_llm(model_name=model_name)
+#         template = get_template(selected_mode)
+#         prompt = ChatPromptTemplate.from_template(template)
 
-        retriever = get_retriever(docs, key=selected_mode)
+#         retriever = get_retriever(docs, key=selected_mode)
 
-        rag_chain = (
-            RunnablePassthrough()
-            | (lambda x: combine_inputs(x, retriever, cur_iter))
-            | prompt
-            | model
-            | StrOutputParser()
-        )
-        logger.debug("RAG chain created successfully")
-        return rag_chain
+#         rag_chain = (
+#             RunnablePassthrough()
+#             | (lambda x: combine_inputs(x, retriever, cur_iter))
+#             | prompt
+#             | model
+#             | StrOutputParser()
+#         )
+#         logger.debug("RAG chain created successfully")
+#         return rag_chain
     
-    except Exception as e:
-        logger.error(f"Error creating RAG chain: {str(e)}")
-        raise
+#     except Exception as e:
+#         logger.error(f"Error creating RAG chain: {str(e)}")
+#         raise
 
 
-def run_pipeline(docs, question: str, model_name, selected_mode, cur_iter=0):
-    logger.info(f"Running pipeline for question: {question}")
+# def run_pipeline(docs, question: str, model_name, selected_mode, cur_iter=0):
+#     logger.info(f"Running pipeline for question: {question}")
     
-    try:
-        rag_chain = create_rag_chain(docs, cur_iter, model_name, selected_mode)
-        result = rag_chain.invoke({"question": question, "cur_iter": cur_iter})
-        logger.info("Pipeline execution completed")
-        return result
+#     try:
+#         rag_chain = create_rag_chain(docs, cur_iter, model_name, selected_mode)
+#         result = rag_chain.invoke({"question": question, "cur_iter": cur_iter})
+#         logger.info("Pipeline execution completed")
+#         return result
     
-    except Exception as e:
-        logger.error(f"Error running pipeline: {str(e)}")
-        raise
+#     except Exception as e:
+#         logger.error(f"Error running pipeline: {str(e)}")
+#         raise

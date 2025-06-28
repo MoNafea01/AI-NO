@@ -1,5 +1,5 @@
 #chatbot/app.py
-import gradio as gr, ast
+import gradio as gr
 from __init__ import *
 from chatbot.core.utils import init_logger, load_config
 from chatbot.core.rag_pipeline import get_llm
@@ -11,7 +11,6 @@ from langchain_core.output_parsers import StrOutputParser
 
 # Configure logging
 parent_path = os.path.dirname(os.path.abspath(__file__))
-cb_logs_path = os.path.join(parent_path, "logs", "chatbot_logs.txt")
 config = load_config('config/config.yaml')
 logger = init_logger(__name__, config)
 
@@ -45,7 +44,7 @@ async def process_query(user_input, to_db, model, chat_history):
     if route == "chat":
         logger.info("Processing as chat query")
         response = await chat_chain.ainvoke({"query": user_input, "context": chat_history})
-        chat_history.append({"bot": response, "user": user_input})
+        chat_history.append({"user": user_input, "bot": response})
         return response, "", chat_history
     
     # Process CLI query

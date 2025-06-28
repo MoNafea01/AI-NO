@@ -17,13 +17,13 @@ class StepsEstimateAgent(Agent):
         # Load Context
         retrieval_result = await self.retrieval_agent.execute({
             "question": question,
-            "mode": "3"  # mode '3' is for step estimation template
+            "mode": "step" 
         })
         
         # Invoke model
         model_response = await self.generation_agent.execute({
             "question": question,
-            "mode": "3",  # mode '3' is for step estimation docs
+            "mode": "step",
             "context": retrieval_result["context"]
         })
         self.logger.info(f"Estimated steps: {model_response['output']}")
@@ -34,4 +34,4 @@ class StepsEstimateAgent(Agent):
             return step_count
         except Exception as e:
             self.logger.error(f"Failed to parse step count: {model_response} — {e}")
-            return 1  # fallback to 1 step if extraction fails
+            return 1

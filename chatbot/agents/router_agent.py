@@ -16,7 +16,7 @@ class RouterAgent(Agent):
         
         retrieval_result = await self.retrieval_agent.execute({
             "question": query,
-            "mode": "4"  # mode '1' is for manual mode docs
+            "mode": "router"
         })
         self.logger.debug(f"Retrieved {len(retrieval_result['docs'])} documents")
         
@@ -24,19 +24,18 @@ class RouterAgent(Agent):
         try:
             classification = await self.generation_agent.execute({
                 "question": query,
-                "mode": "4",  # mode '4' is for router template
+                "mode": "router",
                 "context": retrieval_result['context']
             })
             
             classification = classification['output'].strip().lower()
             self.logger.debug(f"Query classified as: {classification}")
-            if classification == "cli":
-                return {"route": "agent"}
-            elif classification == "chat":
-                return {"route": "chat"}
-            else:
-                self.logger.warning(f"Invalid classification: {classification}")
-                return {"route": "chat"}  # Default to chat
+            
+            if classification not in ["agent", "chat"]:
+                self.logger.warning(f"Unexpected classification: {classification}. Defaulting to 'chat'.")
+                classification = "chat"
+
+            return {"route": classification}
         except Exception as e:
             self.logger.error(f"Error in RouterAgent: {str(e)}")
             raise

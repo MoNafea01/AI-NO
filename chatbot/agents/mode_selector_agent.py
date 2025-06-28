@@ -17,17 +17,18 @@ class ModeSelectorAgent(Agent):
         
         node_result = await self.retrieval_agent.execute({
             "question": query,
-            "mode": '6'  # mode '6' is for selecting the get all nodes requires automation
+            "mode": 'auto_mode_nodes'
         })
         auto_result = await self.retrieval_agent.execute({
             "question": query,
-            "mode": '5'  # mode '5' is for selecting the auto mode doces
+            "mode": 'selector'
         })
+        
         self.logger.debug(f"Retrieved {len(node_result['docs'])} documents from auto node docs, {len(auto_result['docs'])} from auto docs")
 
         classification = await self.generation_agent.execute({
             "question": query,
-            "mode": '5',
+            "mode": 'selector',
             "context": auto_result['context'],
             "nodes": node_result['context']
         })
