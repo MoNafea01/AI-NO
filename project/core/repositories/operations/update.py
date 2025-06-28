@@ -67,7 +67,7 @@ class NodeUpdater:
                 for i, (tmp_id, new_id) in enumerate(zip(o_ids, new_ids)):
                     data = NodeDataExtractor()(tmp_id, project_id=project_id)
                     new_payload = deepcopy(payload)
-                    print(f"configs: {configs}")
+                    print(f"DEBUG: configs: {configs}")
                     new_payload.update(**configs[i])
                     new_payload.update({"node_id":new_id, "node_data": data})
                     payload["node_data"].append(data)
