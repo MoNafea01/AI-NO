@@ -720,7 +720,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
           'Accept': 'application/json',
         },
         body: json.encode({
-          'project_ids': [projectId],
+          'projects_ids': [projectId],
         }),
       );
 
