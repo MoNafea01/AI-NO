@@ -11,7 +11,6 @@ import 'package:ai_gen/core/models/project_model.dart';
 
 class ModelsScreen extends StatelessWidget {
   const ModelsScreen({Key? key}) : super(key: key);
-  
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +30,6 @@ class ModelsView extends StatefulWidget {
 
 class _ModelsViewState extends State<ModelsView> {
   final TextEditingController _searchController = TextEditingController();
-  
 
   @override
   void dispose() {
@@ -41,7 +39,6 @@ class _ModelsViewState extends State<ModelsView> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: const Color(0xffF2F2F2),
       body: Padding(
@@ -239,7 +236,8 @@ class _ModelsViewState extends State<ModelsView> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                        childAspectRatio: 4 / 1.8, // details width to height ratio
+                          childAspectRatio:
+                              4 / 1.8, // details width to height ratio
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),
@@ -269,80 +267,74 @@ class _ModelsViewState extends State<ModelsView> {
   }
 }
 
-
-
- 
-
-  Widget buildProjectItem(BuildContext context, ProjectModel project) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).pop(); // Close dialog first
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NodeView(projectModel: project),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
+Widget buildProjectItem(BuildContext context, ProjectModel project) {
+  return InkWell(
+    onTap: () {
+      Navigator.of(context).pop(); // Close dialog first
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NodeView(projectModel: project),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      );
+    },
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            project.name ?? 'Unnamed Project',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (project.description != null) ...[
+            const SizedBox(height: 8),
             Text(
-              project.name ?? 'Unnamed Project',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              project.description!,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+          if (project.dataset != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.dataset_outlined, size: 16, color: Colors.blue[600]),
+                const SizedBox(width: 4),
+                Text(
+                  'Dataset: ${project.dataset}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.blue[600],
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (project.createdAt != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Created: ${project.createdAt!.toString().split(' ')[0]}',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[500],
               ),
             ),
-            if (project.description != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                project.description!,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-            if (project.dataset != null) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.dataset_outlined,
-                      size: 16, color: Colors.blue[600]),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Dataset: ${project.dataset}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue[600],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (project.createdAt != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                'Created: ${project.createdAt!.toString().split(' ')[0]}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                ),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
-    );
-  }
-
+    ),
+  );
+}
