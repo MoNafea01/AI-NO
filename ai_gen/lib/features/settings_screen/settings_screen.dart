@@ -5,7 +5,7 @@ import 'package:ai_gen/features/settings_screen/appearence_screen.dart';
 import 'package:ai_gen/features/settings_screen/widgets/build_tap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ai_gen/features/HomeScreen/profile_screen.dart';
+import 'package:ai_gen/features/HomeScreen/screens/profile_screen.dart';
 //import 'package:ai_gen/features/change_password_screen/presntation/pages/change_password_screen.dart';
 import 'package:ai_gen/features/settings_screen/cubits/settings_cubit.dart';
 

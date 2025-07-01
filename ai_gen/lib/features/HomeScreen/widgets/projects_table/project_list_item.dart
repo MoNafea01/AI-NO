@@ -1,0 +1,149 @@
+import 'package:ai_gen/features/node_view/presentation/node_view.dart';
+import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../../core/models/project_model.dart';
+
+import 'project_cells.dart'; // Contains _buildDatasetCell, _buildModelCell, _highlightSearchText
+
+class ProjectListItem extends StatelessWidget {
+  final ProjectModel project;
+  final bool isSelected;
+  final Function(int?) onSelect;
+
+  const ProjectListItem({
+    super.key,
+    required this.project,
+    required this.isSelected,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF5F5F5),
+        border: Border(
+          bottom: BorderSide(
+            color: Color(0xFFCCCCCC),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Name column with checkbox
+          Expanded(
+            flex: 3,
+            child: Row(
+              children: [
+                Tooltip(
+                  message: "Click to select/deselect this project for deletion",
+                  child: Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFF3B82F6)
+                          : const Color(0xFFF5F5F5),
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF3B82F6)
+                            : const Color(0xFFD1D5DB),
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: InkWell(
+                      onTap: () => onSelect(project.id),
+                      child: isSelected
+                          ? const Icon(
+                              Icons.check,
+                              size: 12,
+                              color: Colors.white,
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _projectName(context, project),
+                ),
+              ],
+            ),
+          ),
+          // Description column
+          Expanded(
+            flex: 2,
+            child: highlightSearchText(
+              project.description ?? "No description",
+              context.read<HomeCubit>().currentSearchQuery,
+              const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF374151),
+              ),
+            ),
+          ),
+          // Dataset column
+          Expanded(
+            flex: 2,
+            child: buildDatasetCell(project.dataset),
+          ),
+          // Model column
+          Expanded(
+            flex: 2,
+            child: buildModelCell(project.model),
+          ),
+          // Created At column
+          Expanded(
+            flex: 2,
+            child: Text(
+              _formatDateTime(project.createdAt),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF6B7280),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Navigate to NodeView for the project
+  Widget _projectName(BuildContext context, ProjectModel project) {
+    return InkWell(
+      onTap: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NodeView(projectModel: project),
+          ),
+        );
+      },
+      child: highlightSearchText(
+        project.name ?? "Project Name",
+        context.read<HomeCubit>().currentSearchQuery,
+        const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF111827),
+        ),
+      ),
+    );
+  }
+
+  // Helper to format DateTime
+  String _formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) return "N/A";
+    return "${dateTime.day.toString().padLeft(2, '0')}/"
+        "${dateTime.month.toString().padLeft(2, '0')}/"
+        "${dateTime.year} "
+        "${dateTime.hour.toString().padLeft(2, '0')}:"
+        "${dateTime.minute.toString().padLeft(2, '0')}";
+  }
+}

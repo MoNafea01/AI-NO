@@ -63,7 +63,14 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.bluePrimaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+
+            ),
+            child: const Text("OK" , style: TextStyle(color: Colors.white),),
           )
         ],
       ),
@@ -130,7 +137,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                 ),
               ),
               child: authProvider.isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
+                  ? const CircularProgressIndicator(color: AppColors.bluePrimaryColor)
                   : const Text('Verify', style: TextStyle(fontSize: 18)),
             ),
             const SizedBox(height: 12),
@@ -141,8 +148,15 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                       _startResendCooldown();
                     }
                   : null,
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.bluePrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
               child: Text(
                 _canResend ? 'Resend OTP' : 'Resend in $_resendSeconds seconds',
+                style: const TextStyle(fontSize: 16 , color: Colors.white),
               ),
             )
           ],

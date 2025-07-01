@@ -3,12 +3,13 @@ import 'package:ai_gen/core/reusable_widgets/failure_screen.dart';
 import 'package:ai_gen/core/reusable_widgets/loading_screen.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_dashboard_header.dart';
+import 'package:ai_gen/features/HomeScreen/widgets/projects_table/projects_table.dart';
 import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
+import 'package:ai_gen/features/screens/HomeScreen/widgets/search_and_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'widgets/project_table.dart';
-import 'widgets/search_and_action.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, this.projectModel});
@@ -26,7 +27,6 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               Expanded(
                 child: Padding(
                   padding:
@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                       SearchAndActionsRow(
                         projectModel: projectModel,
                       ), //old search and actions row
-                      
+
                       const Expanded(child: _Content()),
                     ],
                   ),

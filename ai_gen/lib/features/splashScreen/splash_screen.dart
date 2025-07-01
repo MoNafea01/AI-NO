@@ -1,7 +1,7 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/network/server_manager/server_manager.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
-import 'package:ai_gen/features/HomeScreen/new_dashboard_screen.dart';
+import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
 //import 'package:ai_gen/features/HomeScreen/home_screen.dart';

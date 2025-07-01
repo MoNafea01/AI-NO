@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/verify_otp_screen-for_password/presentation/pages/verify_otp_for_password_screen.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,9 @@ class _RequestOtpScreenState extends State<RequestOtpScreen> {
             ElevatedButton(
               onPressed: isLoading ? null : _requestOtp,
               child: isLoading
-                  ? const CircularProgressIndicator()
+                  ? const CircularProgressIndicator(
+                     color:AppColors.bluePrimaryColor,
+                  )
                   : const Text("Request OTP"),
             ),
           ],
