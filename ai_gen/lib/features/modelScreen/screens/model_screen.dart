@@ -193,7 +193,7 @@ class _ModelsViewState extends State<ModelsView> {
                           const Icon(Icons.error_outline,
                               size: 64, color: Colors.red),
                           const SizedBox(height: 16),
-                          Text('خطأ: ${state.errMsg}'),
+                          Text('Error: ${state.errMsg}'),
                           const SizedBox(height: 16),
                           ElevatedButton(
                             onPressed: () =>
@@ -239,7 +239,7 @@ class _ModelsViewState extends State<ModelsView> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                        //  childAspectRatio: 0.8,
+                        childAspectRatio: 3 / 2,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),

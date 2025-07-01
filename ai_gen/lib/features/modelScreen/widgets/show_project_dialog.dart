@@ -7,6 +7,8 @@ void showProjectsDialog(
   showDialog(
     context: context,
     builder: (context) => Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
@@ -14,8 +16,12 @@ void showProjectsDialog(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xff999999)),
         ),
-        width: MediaQuery.of(context).size.width * 0.4,
-        height: MediaQuery.of(context).size.height * 0.5,
+        // width: MediaQuery.of(context).size.width * 0.4,
+        // height: MediaQuery.of(context).size.height * 0.5,
+        constraints: BoxConstraints(
+          maxWidth: 500,
+          maxHeight: MediaQuery.of(context).size.height * 0.6,
+        ),
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
