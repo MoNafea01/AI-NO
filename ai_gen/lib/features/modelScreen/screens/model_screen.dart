@@ -239,7 +239,7 @@ class _ModelsViewState extends State<ModelsView> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                        childAspectRatio: 4 / 2.8, // details width to height ratio
+                        childAspectRatio: 4 / 1.8, // details width to height ratio
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),
