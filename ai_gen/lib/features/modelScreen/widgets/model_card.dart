@@ -18,6 +18,7 @@ class ModelCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProfile = context.watch<AuthProvider>().userProfile;
     return Container(
+      height: 200,
       decoration: BoxDecoration(
         color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(12),
@@ -66,10 +67,11 @@ class ModelCard extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 // Description
-                Text(
-                  projects.isNotEmpty && projects.first.description != null
+                Text( "description: ${
+                 projects.isNotEmpty && projects.first.description != null
                       ? projects.first.description!
-                      : 'A collection of AI models for various tasks',
+                      : 'A collection of AI models for various tasks'}"
+                 ,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xff666666),
@@ -133,7 +135,7 @@ class ModelCard extends StatelessWidget {
                       ),
                       child: Icon(
                         Icons.person,
-                        size: 14,
+                        size: 19,
                         color: Colors.purple[600],
                       ),
                     ),
