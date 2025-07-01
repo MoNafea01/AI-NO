@@ -81,7 +81,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
                   'Created: ${project.createdAt!.toString().split(' ')[0]}',
                   style: const TextStyle(
                     fontSize: 12,
-                   color: Color(0xff666666),
+                    color: Color(0xff666666),
                     fontFamily: AppConstants.appFontName,
                   ),
                 ),
