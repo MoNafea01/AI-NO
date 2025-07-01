@@ -1,4 +1,5 @@
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/modelScreen/widgets/show_project_dialog.dart';
 import 'package:flutter/material.dart';
@@ -37,21 +38,23 @@ class ModelCard extends StatelessWidget {
                   modelName,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: AppConstants.appFontName,
+                    color: Color(0xff666666),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
 
-                // Creator's username
-                // If userProfile is null, show 'Guest' or similar placeholder
+                
                 Text(
                   userProfile?.username ?? 'Guest',
                   maxLines: 1,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xff666666),
+                    fontFamily: AppConstants.appFontName
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -61,7 +64,8 @@ class ModelCard extends StatelessWidget {
                   '${projects.length} Variation • ${projects.length} Projects',
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xff666666),
+                     color: Color(0xff666666),
+                      fontFamily: AppConstants.appFontName
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -71,7 +75,8 @@ class ModelCard extends StatelessWidget {
                   "description: ${projects.isNotEmpty && projects.first.description != null ? projects.first.description! : 'A collection of AI models for various tasks'}",
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xff666666),
+                      color: Color(0xff666666),
+                      fontFamily: AppConstants.appFontName
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

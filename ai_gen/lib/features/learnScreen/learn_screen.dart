@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -15,8 +18,8 @@ class YouTubeApi {
       final playlistResponse = await http.get(Uri.parse(playlistUrl));
 
       if (playlistResponse.statusCode != 200) {
-        print('Playlist API Error: ${playlistResponse.statusCode}');
-        print('Response body: ${playlistResponse.body}');
+        log('Playlist API Error: ${playlistResponse.statusCode}');
+        log('Response body: ${playlistResponse.body}');
         throw Exception(
             'Failed to load playlist videos: ${playlistResponse.statusCode}');
       }
@@ -25,7 +28,7 @@ class YouTubeApi {
 
       if (playlistJson['items'] == null ||
           (playlistJson['items'] as List).isEmpty) {
-        print('No items found in playlist');
+        log('No items found in playlist');
         return [];
       }
 
@@ -37,7 +40,7 @@ class YouTubeApi {
           .join(',');
 
       if (videoIds.isEmpty) {
-        print('No valid video IDs found');
+        log('No valid video IDs found');
         return items.cast<Map<String, dynamic>>();
       }
 
@@ -46,8 +49,8 @@ class YouTubeApi {
       final videoDetailsResponse = await http.get(Uri.parse(videoDetailsUrl));
 
       if (videoDetailsResponse.statusCode != 200) {
-        print('Video details API Error: ${videoDetailsResponse.statusCode}');
-        print('Response body: ${videoDetailsResponse.body}');
+        log('Video details API Error: ${videoDetailsResponse.statusCode}');
+        log('Response body: ${videoDetailsResponse.body}');
         // Continue without durations instead of throwing error
         for (var item in items) {
           item['duration'] = 'N/A';
@@ -56,9 +59,10 @@ class YouTubeApi {
       }
 
       final videoDetailsJson = json.decode(videoDetailsResponse.body);
-      final durations = Map.fromIterable(videoDetailsJson['items'] ?? [],
-          key: (item) => item['id'],
-          value: (item) => item['contentDetails']['duration']);
+      final durations = {
+        for (var item in videoDetailsJson['items'] ?? [])
+          item['id']: item['contentDetails']['duration']
+      };
 
       for (var item in items) {
         final id = item['snippet']?['resourceId']?['videoId'];
@@ -71,7 +75,7 @@ class YouTubeApi {
 
       return items.cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching playlist: $e');
+      log('Error fetching playlist: $e');
       rethrow;
     }
   }
@@ -95,7 +99,7 @@ class YouTubeApi {
     if (hours > 0) {
       return '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
     } else {
-      return '${minutes}:${seconds.toString().padLeft(2, '0')}';
+      return '$minutes:${seconds.toString().padLeft(2, '0')}';
     }
   }
 }
@@ -173,6 +177,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                         Text(
                           'Learn',
                           style: TextStyle(
+                            fontFamily: AppConstants.appFontName,
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -182,14 +187,14 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                         Text(
                           'Gain the skills you need to create your model.',
                           style: TextStyle(
+                            fontFamily: AppConstants.appFontName,
                             fontSize: 16,
-                            color: Colors.grey,
+                            color: Color(0xff666666),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  // Illustration placeholder (you can add your custom illustration here)
                   Container(
                     width: 150,
                     height: 120,
@@ -209,32 +214,45 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
               const SizedBox(height: 32),
 
               // Search Bar with Filter Icon
-              Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      _searchQuery = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.tune, color: Colors.grey),
-                      onPressed: () {
-                        // Add filter functionality here
-                      },
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border:
+                        Border.all(color: const Color(0xff999999), width: 1.4),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color(0xffF2F2F2),
+                      hintText: 'Search',
+                      hintStyle: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontFamily: AppConstants.appFontName,
+                        fontSize: 16,
+                        color: Color(0xff666666),
+                      ),
+                      prefixIcon:
+                          const Icon(Icons.search, color: Color(0xff666666)),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.tune, color: Colors.grey),
+                        onPressed: () {
+                          // Add filter functionality here
+                        },
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
                   ),
                 ),
               ),
@@ -286,7 +304,10 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                   future: _playlistVideosFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(
+                          child: CircularProgressIndicator(
+                        color: AppColors.bluePrimaryColor,
+                      ));
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -357,76 +378,170 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
       category = 'Dataset';
     }
 
-    return InkWell(
-      onTap: () => _launchYouTubeVideo(videoId),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 0,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 80),
+      child: InkWell(
+        onTap: () => _launchYouTubeVideo(videoId),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xffF2F2F2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xff999999),
             ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: isGrid
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Three dots menu at the top
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        PopupMenuButton(
-                          icon: const Icon(Icons.more_horiz,
-                              color: Colors.grey, size: 20),
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'watch_later',
-                              child: Text('Watch Later'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'share',
-                              child: Text('Share'),
-                            ),
-                          ],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 0,
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: isGrid
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Three dots menu at the top
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          PopupMenuButton(
+                            icon: const Icon(Icons.more_horiz,
+                                color: Colors.grey, size: 20),
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'watch_later',
+                                child: Text('Watch Later'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'share',
+                                child: Text('Share'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Stack(
+                            children: [
+                              if (thumbnailUrl.isNotEmpty)
+                                Image.network(
+                                  thumbnailUrl,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey.shade300,
+                                      child: const Icon(
+                                          Icons.play_circle_outline,
+                                          size: 50),
+                                    );
+                                  },
+                                )
+                              else
+                                Container(
+                                  color: Colors.grey.shade300,
+                                  child: const Icon(Icons.play_circle_outline,
+                                      size: 50),
+                                ),
+                              Positioned(
+                                bottom: 8,
+                                right: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black87,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    duration,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                    Expanded(
-                      child: ClipRRect(
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              category,
+                              style: TextStyle(
+                                color: categoryTextColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Stack(
                           children: [
                             if (thumbnailUrl.isNotEmpty)
                               Image.network(
                                 thumbnailUrl,
-                                width: double.infinity,
-                                height: double.infinity,
+                                width: 160,
+                                height: 120,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
+                                    width: 160,
+                                    height: 90,
                                     color: Colors.grey.shade300,
                                     child: const Icon(Icons.play_circle_outline,
-                                        size: 50),
+                                        size: 30),
                                   );
                                 },
                               )
                             else
                               Container(
+                                width: 160,
+                                height: 90,
                                 color: Colors.grey.shade300,
                                 child: const Icon(Icons.play_circle_outline,
-                                    size: 50),
+                                    size: 30),
                               ),
                             Positioned(
-                              bottom: 8,
-                              right: 8,
+                              bottom: 6,
+                              right: 6,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
@@ -447,166 +562,79 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: categoryColor,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            category,
-                            style: TextStyle(
-                              color: categoryTextColor,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Three dots menu at the top right
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ),
+                                PopupMenuButton(
+                                  icon: const Icon(Icons.more_horiz,
+                                      color: Colors.grey),
+                                  itemBuilder: (context) => [
+                                    const PopupMenuItem(
+                                      value: 'watch_later',
+                                      child: Text('Watch Later'),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'share',
+                                      child: Text('Share'),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Stack(
-                        children: [
-                          if (thumbnailUrl.isNotEmpty)
-                            Image.network(
-                              thumbnailUrl,
-                              width: 160,
-                              height: 90,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: 160,
-                                  height: 90,
-                                  color: Colors.grey.shade300,
-                                  child: const Icon(Icons.play_circle_outline,
-                                      size: 30),
-                                );
-                              },
-                            )
-                          else
+                            const SizedBox(height: 8),
+                            Text(
+                              description.length > 100
+                                  ? '${description.substring(0, 100)}...'
+                                  : description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade600,
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
                             Container(
-                              width: 160,
-                              height: 90,
-                              color: Colors.grey.shade300,
-                              child: const Icon(Icons.play_circle_outline,
-                                  size: 30),
-                            ),
-                          Positioned(
-                            bottom: 6,
-                            right: 6,
-                            child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
+                                  horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.black87,
-                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                duration,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                category,
+                                style: TextStyle(
+                                  color: categoryTextColor,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Three dots menu at the top right
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.3,
-                                  ),
-                                ),
-                              ),
-                              PopupMenuButton(
-                                icon: const Icon(Icons.more_horiz,
-                                    color: Colors.grey),
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 'watch_later',
-                                    child: Text('Watch Later'),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'share',
-                                    child: Text('Share'),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            description.length > 100
-                                ? '${description.substring(0, 100)}...'
-                                : description,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
-                              height: 1.4,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: categoryColor,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Text(
-                              category,
-                              style: TextStyle(
-                                color: categoryTextColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider, MultiBlocProvider, ReadContext;
 
 
-import '../datasetScreen/dataset_screen.dart';
+import '../datasetScreen/screens/dataset_screen.dart';
 import '../docsScreen/docs_screen.dart';
 
 import '../modelScreen/screens/model_screen.dart';
