@@ -8,9 +8,10 @@ void showProjectsDialog(
   showDialog(
     context: context,
     builder: (context) => Dialog(
+      backgroundColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        decoration: BoxDecoration(
+         decoration: BoxDecoration(
           color: const Color(0xffF2F2F2),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xff999999)),
@@ -40,7 +41,7 @@ void showProjectsDialog(
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(Icons.close , color: Color(0xff666666) ,),
                 ),
               ],
             ),

@@ -358,7 +358,10 @@ class DatasetCard extends StatelessWidget {
             ),
           ),
 
-          const Spacer(),
+          const Divider(
+            color: Color(0xff999999),
+             height: 1,
+          ),
 
           // Bottom section with icons
           Container(

@@ -17,7 +17,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
     child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[200]!),
       ),

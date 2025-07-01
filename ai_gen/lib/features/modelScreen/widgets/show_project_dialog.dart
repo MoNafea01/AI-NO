@@ -34,14 +34,17 @@ void showProjectsDialog(
                   child: Text(
                     modelName,
                     style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff666666),
+                      fontFamily: AppConstants.appFontName,
+                      
                     ),
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(Icons.close, color: Color(0xff666666)),
                 ),
               ],
             ),

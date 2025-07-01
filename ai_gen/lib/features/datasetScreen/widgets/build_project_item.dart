@@ -17,7 +17,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
     child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[200]!),
       ),
@@ -37,9 +37,10 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
             const SizedBox(height: 8),
             Text(
               project.description!,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: Color(0xff666666),
+                fontFamily: AppConstants.appFontName,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -78,9 +79,10 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
               if (project.createdAt != null)
                 Text(
                   'Created: ${project.createdAt!.toString().split(' ')[0]}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[500],
+                   color: Color(0xff666666),
+                    fontFamily: AppConstants.appFontName,
                   ),
                 ),
             ],
