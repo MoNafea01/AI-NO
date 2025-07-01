@@ -19,7 +19,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
       decoration: BoxDecoration(
         color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: const Color(0xff999999)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
