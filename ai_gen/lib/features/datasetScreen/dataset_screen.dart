@@ -1,10 +1,12 @@
+import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/datasetScreen/cubit/dataset_screen.dart';
 import 'package:ai_gen/features/datasetScreen/cubit/dataset_screen_cubit.dart';
+import 'package:ai_gen/features/datasetScreen/widgets/build_project_item.dart';
+import 'package:ai_gen/features/datasetScreen/widgets/show_project_dialog.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ai_gen/core/models/project_model.dart';
-
 
 // class DatasetsScreen extends StatelessWidget {
 //   const DatasetsScreen({Key? key}) : super(key: key);
@@ -347,7 +349,6 @@ import 'package:ai_gen/core/models/project_model.dart';
 //   }
 // }
 
-
 class DatasetsScreen extends StatelessWidget {
   const DatasetsScreen({Key? key}) : super(key: key);
 
@@ -379,219 +380,231 @@ class _DatasetsViewState extends State<DatasetsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Datasets',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Text
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              'Discover and use high-quality datasets for training and fine-tuning machine learning models.',
+      backgroundColor: const Color(0xffF2F2F2),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 76.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 90),
+            const Text(
+              'Datasets',
               style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
+                fontFamily: AppConstants.appFontName,
+                color: Colors.black,
               ),
             ),
-          ),
-          const SizedBox(height: 20),
+            // Header Text
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 1),
+              child: Text(
+                'Discover and use high-quality datasets for training and\n fine-tuning machine learning models.',
+                style: TextStyle(
+                  fontFamily: AppConstants.appFontName,
+                  fontSize: 14,
+                  color: Color(0xff666666),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
 
-          // Search Bar
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
+            // Search Bar
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: const Color(0xff999999), width: 1.4),
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xffF2F2F2),
+                          hintText: 'Search',
+                          hintStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontFamily: AppConstants.appFontName,
+                            fontSize: 16,
+                            color: Color(0xff666666),
+                          ),
+                          prefixIcon: const Icon(Icons.search,
+                              color: Color(0xff666666)),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear,
+                                      color: Color(0xff666666)),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    context
+                                        .read<DatasetsCubit>()
+                                        .searchDatasets('');
+                                  },
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                        onChanged: (value) {
+                          setState(() {});
+                          context.read<DatasetsCubit>().searchDatasets(value);
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
                     height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xffF2F2F2),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey[300]!),
+                      border: Border.all(color: const Color(0xff999999)),
                     ),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search',
-                        hintStyle: TextStyle(color: Colors.grey[500]),
-                        prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon:
-                                    Icon(Icons.clear, color: Colors.grey[500]),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  context
-                                      .read<DatasetsCubit>()
-                                      .searchDatasets('');
-                                },
-                              )
-                            : null,
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                      ),
-                      onChanged: (value) {
-                        setState(() {});
-                        context.read<DatasetsCubit>().searchDatasets(value);
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  height: 48,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[300]!),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.tune, color: Colors.grey[600]),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Filter',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.tune, color: Colors.grey[600]),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Filter',
+                          style: TextStyle(
+                              color: Color(0xff666666),
+                              fontWeight: FontWeight.w600,
+                              fontFamily: AppConstants.appFontName),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // Your Datasets Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                const Icon(Icons.dataset_outlined, size: 20),
-                const SizedBox(width: 8),
-                const Text(
-                  'Your Datasets',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'See all',
+            // Your Datasets Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.dataset_outlined, size: 20),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Your Datasets',
                     style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: AppConstants.appFontName,
                     ),
                   ),
-                ),
-              ],
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'See all',
+                      style: TextStyle(
+                        color: Color(0xff666666),
+                        fontWeight: FontWeight.w600,
+                        fontFamily: AppConstants.appFontName,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // Datasets Grid
-          Expanded(
-            child: BlocBuilder<DatasetsCubit, DatasetsState>(
-              builder: (context, state) {
-                if (state is DatasetsLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is DatasetsFailure) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            size: 64, color: Colors.red),
-                        const SizedBox(height: 16),
-                        Text('Error: ${state.errMsg}'),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () =>
-                              context.read<DatasetsCubit>().loadDatasets(),
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  );
-                } else if (state is DatasetsSearchEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.search_off,
-                            size: 64, color: Colors.grey),
-                        const SizedBox(height: 16),
-                        Text('No results found for: "${state.query}"'),
-                      ],
-                    ),
-                  );
-                } else if (state is DatasetsSuccess) {
-                  final datasetsWithProjects = state.datasetsWithProjects;
-
-                  if (datasetsWithProjects.isEmpty) {
-                    return const Center(
+            // Datasets Grid
+            Expanded(
+              child: BlocBuilder<DatasetsCubit, DatasetsState>(
+                builder: (context, state) {
+                  if (state is DatasetsLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is DatasetsFailure) {
+                    return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.dataset, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text('No datasets available'),
+                          const Icon(Icons.error_outline,
+                              size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text('Error: ${state.errMsg}'),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () =>
+                                context.read<DatasetsCubit>().loadDatasets(),
+                            child: const Text('Retry'),
+                          ),
                         ],
+                      ),
+                    );
+                  } else if (state is DatasetsSearchEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.search_off,
+                              size: 64, color: Colors.grey),
+                          const SizedBox(height: 16),
+                          Text('No results found for: "${state.query}"'),
+                        ],
+                      ),
+                    );
+                  } else if (state is DatasetsSuccess) {
+                    final datasetsWithProjects = state.datasetsWithProjects;
+
+                    if (datasetsWithProjects.isEmpty) {
+                      return const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.dataset, size: 64, color: Colors.grey),
+                            SizedBox(height: 16),
+                            Text('No datasets available'),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio:  4 / 1.8,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                        itemCount: datasetsWithProjects.length,
+                        itemBuilder: (context, index) {
+                          final datasetName =
+                              datasetsWithProjects.keys.elementAt(index);
+                          final projects = datasetsWithProjects[datasetName]!;
+
+                          return DatasetCard(
+                            datasetName: datasetName,
+                            projects: projects,
+                          );
+                        },
                       ),
                     );
                   }
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.8,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                      ),
-                      itemCount: datasetsWithProjects.length,
-                      itemBuilder: (context, index) {
-                        final datasetName =
-                            datasetsWithProjects.keys.elementAt(index);
-                        final projects = datasetsWithProjects[datasetName]!;
-
-                        return DatasetCard(
-                          datasetName: datasetName,
-                          projects: projects,
-                        );
-                      },
-                    ),
-                  );
-                }
-
-                return const SizedBox.shrink();
-              },
+                  return const SizedBox.shrink();
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -647,7 +660,7 @@ class DatasetCard extends StatelessWidget {
 
                 // Project count and variation info
                 Text(
-                  '${projects.length} Projects • ${_getUniqueModelsCount(projects)} Models',
+                  '${projects.length} Projects • ${getUniqueModelsCount(projects)} Models',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -727,7 +740,7 @@ class DatasetCard extends StatelessWidget {
                     // Arrow/Menu button
                     InkWell(
                       onTap: () =>
-                          _showProjectsDialog(context, datasetName, projects),
+                          showProjectsDialog(context, datasetName, projects),
                       child: Container(
                         width: 24,
                         height: 24,
@@ -752,163 +765,10 @@ class DatasetCard extends StatelessWidget {
     );
   }
 
-  // Helper method to count unique models in projects
-  int _getUniqueModelsCount(List<ProjectModel> projects) {
-    final Set<String> uniqueModels = {};
-    for (final project in projects) {
-      if (project.model != null && project.model!.isNotEmpty) {
-        uniqueModels.add(project.model!);
-      }
-    }
-    return uniqueModels.length;
-  }
+ 
+  
 
-  void _showProjectsDialog(
-      BuildContext context, String datasetName, List<ProjectModel> projects) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.9,
-          height: MediaQuery.of(context).size.height * 0.7,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      datasetName,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
+ 
 
-              Text(
-                '${projects.length} Projects • ${_getUniqueModelsCount(projects)} Models',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 20),
 
-              // Projects List
-              Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: projects.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final project = projects[index];
-                    return _buildProjectItem(context, project);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProjectItem(BuildContext context, ProjectModel project) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).pop(); // Close dialog first
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NodeView(projectModel: project),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              project.name ?? 'Unnamed Project',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (project.description != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                project.description!,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                if (project.model != null) ...[
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.model_training,
-                            size: 12, color: Colors.blue[600]),
-                        const SizedBox(width: 4),
-                        Text(
-                          project.model!,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.blue[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                ],
-                if (project.createdAt != null)
-                  Text(
-                    'Created: ${project.createdAt!.toString().split(' ')[0]}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

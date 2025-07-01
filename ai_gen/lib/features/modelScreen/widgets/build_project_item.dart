@@ -1,4 +1,5 @@
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 
@@ -37,6 +38,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
               style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xff666666),
+                fontFamily: AppConstants.appFontName,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

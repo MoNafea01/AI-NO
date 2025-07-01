@@ -1,15 +1,13 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
-import 'package:ai_gen/features/modelScreen/widgets/build_project_item.dart';
+import 'package:ai_gen/features/datasetScreen/widgets/build_project_item.dart';
 import 'package:flutter/material.dart';
 
 void showProjectsDialog(
-    BuildContext context, String modelName, List<ProjectModel> projects) {
+    BuildContext context, String datasetName, List<ProjectModel> projects) {
   showDialog(
     context: context,
     builder: (context) => Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
@@ -17,7 +15,6 @@ void showProjectsDialog(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xff999999)),
         ),
-        
         constraints: BoxConstraints(
           maxWidth: 500,
           maxHeight: MediaQuery.of(context).size.height * 0.6,
@@ -32,10 +29,12 @@ void showProjectsDialog(
               children: [
                 Expanded(
                   child: Text(
-                    modelName,
+                    datasetName,
                     style: const TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff666666),
+                      fontFamily: AppConstants.appFontName,
                     ),
                   ),
                 ),
@@ -48,7 +47,7 @@ void showProjectsDialog(
             const SizedBox(height: 8),
 
             Text(
-              '${projects.length} Projects',
+              '${projects.length} Projects • ${getUniqueModelsCount(projects)} Models',
               style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xff666666),
@@ -75,4 +74,13 @@ void showProjectsDialog(
       ),
     ),
   );
+}
+int getUniqueModelsCount(List<ProjectModel> projects) {
+  final Set<String> uniqueModels = {};
+  for (final project in projects) {
+    if (project.model != null && project.model!.isNotEmpty) {
+      uniqueModels.add(project.model!);
+    }
+  }
+  return uniqueModels.length;
 }

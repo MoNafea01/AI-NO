@@ -50,8 +50,9 @@ class _ModelsViewState extends State<ModelsView> {
             const Text(
               'Models',
               style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontSize: 27,
+                fontWeight: FontWeight.w900,
+                fontFamily: AppConstants.appFontName,
                 color: Colors.black,
               ),
             ),
@@ -122,21 +123,21 @@ class _ModelsViewState extends State<ModelsView> {
                     height: 48,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xffF2F2F2),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey[300]!),
+                      border: Border.all(color: const Color(0xff999999)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.tune, color: Colors.grey[600]),
                         const SizedBox(width: 8),
-                        Text(
+                        const Text(
                           'Filter',
                           style: TextStyle(
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
+                              color: Color(0xff666666),
+                              fontWeight: FontWeight.w600,
+                              fontFamily: AppConstants.appFontName),
                         ),
                       ],
                     ),
@@ -158,6 +159,7 @@ class _ModelsViewState extends State<ModelsView> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
+                      fontFamily: AppConstants.appFontName,
                     ),
                   ),
                   const Spacer(),
@@ -168,6 +170,7 @@ class _ModelsViewState extends State<ModelsView> {
                       style: TextStyle(
                         color: Color(0xff666666),
                         fontWeight: FontWeight.w600,
+                        fontFamily: AppConstants.appFontName,
                       ),
                     ),
                   ),
