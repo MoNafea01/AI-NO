@@ -67,11 +67,8 @@ class ModelCard extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 // Description
-                Text( "description: ${
-                 projects.isNotEmpty && projects.first.description != null
-                      ? projects.first.description!
-                      : 'A collection of AI models for various tasks'}"
-                 ,
+                Text(
+                  "description: ${projects.isNotEmpty && projects.first.description != null ? projects.first.description! : 'A collection of AI models for various tasks'}",
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xff666666),
@@ -83,12 +80,13 @@ class ModelCard extends StatelessWidget {
             ),
           ),
 
-         // const Spacer(),
+          // const Spacer(),
           // Divider
 
-          const Divider( 
-            color: Color(0xff999999), 
-            height: 1,),
+          const Divider(
+            color: Color(0xff999999),
+            height: 1,
+          ),
 
           // Bottom section with icons
           Container(
@@ -120,7 +118,7 @@ class ModelCard extends StatelessWidget {
                   ),
                 ),
 
-               const Spacer(),
+                const Spacer(),
 
                 // Action buttons
                 Row(
@@ -149,7 +147,7 @@ class ModelCard extends StatelessWidget {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: const Color(0xff666666),
+                          color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
