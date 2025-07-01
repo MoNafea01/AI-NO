@@ -9,8 +9,13 @@ void showProjectsDialog(
     builder: (context) => Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: BoxDecoration(
+          color: const Color(0xffF2F2F2),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xff999999)),
+        ),
+        width: MediaQuery.of(context).size.width * 0.4,
+        height: MediaQuery.of(context).size.height * 0.5,
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,9 +43,9 @@ void showProjectsDialog(
 
             Text(
               '${projects.length} Projects',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: Color(0xff666666),
               ),
             ),
             const SizedBox(height: 20),

@@ -120,7 +120,7 @@ class ModelCard extends StatelessWidget {
                   ),
                 ),
 
-                const Spacer(),
+             //   const Spacer(),
 
                 // Action buttons
                 Row(

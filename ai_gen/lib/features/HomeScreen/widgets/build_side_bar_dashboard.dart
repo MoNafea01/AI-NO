@@ -163,11 +163,11 @@ List<Widget> buildAnimatedSidebarItems(
       'label': 'Explore',
       'screen': AppScreen.explore
     },
-    {
-      'icon': AssetsPaths.architectureIcon,
-      'label': 'Architectures',
-      'screen': AppScreen.architectures
-    },
+    // {
+    //   'icon': AssetsPaths.architectureIcon,
+    //   'label': 'Architectures',
+    //   'screen': AppScreen.architectures
+    // },
     {
       'icon': AssetsPaths.modelIcon,
       'label': 'Models',

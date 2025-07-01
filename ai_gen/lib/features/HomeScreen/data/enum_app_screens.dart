@@ -1,7 +1,7 @@
 //? enum for better readability 
 enum AppScreen {
   explore, //ProjectsScreen
-  architectures,
+ // architectures,
   models,
   datasets,
   //projects, //  ProjectsScreen

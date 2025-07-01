@@ -65,8 +65,8 @@ class _DashboardView extends StatelessWidget {
         return HomeScreen(projectModel: projectModel);
       //return ProjectsScreen();
       //ProjectsTable
-      case AppScreen.architectures:
-        return const ArchitecturesScreen();
+      // case AppScreen.architectures:
+      //   return const ArchitecturesScreen();
       case AppScreen.models:
         return const ModelsScreen();
       case AppScreen.datasets:
