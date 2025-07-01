@@ -19,7 +19,7 @@ import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider, 
 import '../datasetScreen/dataset_screen.dart';
 import '../docsScreen/docs_screen.dart';
 
-import '../modelScreen/model_screen.dart';
+import '../modelScreen/screens/model_screen.dart';
 import 'data/enum_app_screens.dart';
 
 class DashboardScreen extends StatelessWidget {
