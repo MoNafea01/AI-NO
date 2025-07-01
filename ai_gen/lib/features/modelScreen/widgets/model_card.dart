@@ -18,7 +18,7 @@ class ModelCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProfile = context.watch<AuthProvider>().userProfile;
     return Container(
-      height: 200,
+      //height: 200,
       decoration: BoxDecoration(
         color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(12),
@@ -120,7 +120,7 @@ class ModelCard extends StatelessWidget {
                   ),
                 ),
 
-             //   const Spacer(),
+               const Spacer(),
 
                 // Action buttons
                 Row(
@@ -149,7 +149,7 @@ class ModelCard extends StatelessWidget {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: const Color(0xff666666),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(

@@ -28,15 +28,16 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
+                color: Color(0xff666666)
               ),
             ),
             if (project.description != null) ...[
               const SizedBox(height: 8),
               Text(
                 project.description!,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: Color(0xff666666),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -63,9 +64,9 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
               const SizedBox(height: 8),
               Text(
                 'Created: ${project.createdAt!.toString().split(' ')[0]}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[500],
+                  color: Color(0xff666666),
                 ),
               ),
             ],
