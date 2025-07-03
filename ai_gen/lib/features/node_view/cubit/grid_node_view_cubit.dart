@@ -99,6 +99,11 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     Response responseProjectNodes =
         await _nodeServices.loadProjectNodes(projectModel.id!);
     nodeManager.myDeSerializedNodes(responseProjectNodes);
+
+    /*
+    newnode= api.listen(url);
+    nodeManager.nodes.add(newNode);
+    */
   }
 
   // used in importing other files
