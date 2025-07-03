@@ -1,17 +1,20 @@
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 Widget buildDatasetCell(String? dataset) {
   if (dataset == null || dataset.isEmpty) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: const Color(0xff666666)),
       ),
-      child: const Text(
-        "No Dataset",
-        style: TextStyle(
+      child: Text(
+        TranslationKeys.noDataset.tr,
+        style: const TextStyle(
           fontSize: 12,
           color: Color(0xFF9CA3AF),
           fontStyle: FontStyle.italic,
@@ -24,15 +27,15 @@ Widget buildDatasetCell(String? dataset) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
-      color: Colors.blue.shade50,
+      color: const Color(0xffF2F2F2),
       borderRadius: BorderRadius.circular(4),
-      border: Border.all(color: Colors.blue.shade200),
+      border: Border.all(color: const Color(0xff666666)),
     ),
     child: Text(
       dataset,
       style: const TextStyle(
         fontSize: 12,
-        color: Color(0xFF1E40AF),
+        color: Color(0x0ff2f2f2),
         fontWeight: FontWeight.w500,
       ),
       maxLines: 1,
@@ -46,14 +49,15 @@ Widget buildModelCell(String? model) {
   if (model == null || model.isEmpty) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: const Color(0xff666666)),
       ),
-      child: const Text(
-        "No Model",
-        style: TextStyle(
+      child: Text(
+        TranslationKeys.noModel.tr,
+        style: const TextStyle(
           fontSize: 12,
           color: Color(0xFF9CA3AF),
           fontStyle: FontStyle.italic,
@@ -66,15 +70,15 @@ Widget buildModelCell(String? model) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
-      color: Colors.green.shade50,
+      color: const Color(0xffF2F2F2),
       borderRadius: BorderRadius.circular(4),
-      border: Border.all(color: Colors.green.shade200),
+      border: Border.all(color: const Color(0xff666666)),
     ),
     child: Text(
       model,
       style: const TextStyle(
         fontSize: 12,
-        color: Color(0xFF047857),
+        color: Color(0x0ff2f2f2),
         fontWeight: FontWeight.w500,
       ),
       maxLines: 1,

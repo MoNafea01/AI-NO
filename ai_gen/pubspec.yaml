@@ -55,6 +55,7 @@ dependencies:
   toggle_switch: ^2.3.0
   vs_node_view: ^2.1.1
   window_manager: ^0.4.3
+  get: ^4.7.2
  
 
 dev_dependencies:

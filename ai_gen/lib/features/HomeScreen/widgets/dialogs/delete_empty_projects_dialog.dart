@@ -1,39 +1,51 @@
+import 'package:ai_gen/core/translation/translation_keys.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class DeleteEmptyProjectsDialog extends StatelessWidget {
   final VoidCallback onConfirm;
 
   const DeleteEmptyProjectsDialog({
-    super.key,
     required this.onConfirm,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
-        'Delete Empty Projects',
-        style: TextStyle(
+      backgroundColor: const Color(0xffF2F2F2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      title: Text(
+        TranslationKeys.deleteEmptyProjects.tr,
+        style: const TextStyle(
           fontWeight: FontWeight.bold,
           color: Color(0xFF374151),
         ),
       ),
-      content: const Text(
-        'Are you sure you want to delete all empty projects? This will remove all projects that have no model or dataset assigned. This action cannot be undone.',
-        style: TextStyle(
+      content: Text(
+        TranslationKeys.areYouSureYouWantToDeleteEmptyProjects.tr,
+        style: const TextStyle(
           color: Color(0xFF6B7280),
         ),
       ),
       actions: [
         TextButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.bluePrimaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text(
-            'Cancel',
-            style: TextStyle(
-              color: Color(0xFF6B7280),
-            ),
+          child: Text(
+            TranslationKeys.cancel.tr,
+            style: const TextStyle(
+                //   color: Color(0xFF6B7280),
+                ),
           ),
         ),
         ElevatedButton(
@@ -44,8 +56,11 @@ class DeleteEmptyProjectsDialog extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFDC2626),
             foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-          child: const Text('Delete Empty'),
+          child: Text(TranslationKeys.deleteEmpty.tr),
         ),
       ],
     );

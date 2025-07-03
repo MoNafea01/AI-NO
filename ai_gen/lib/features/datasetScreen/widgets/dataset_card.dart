@@ -2,17 +2,17 @@ import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
-import 'package:ai_gen/features/modelScreen/widgets/show_project_dialog.dart';
+import 'package:ai_gen/features/datasetScreen/widgets/show_project_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 
-class ModelCard extends StatelessWidget {
-  final String modelName;
+class DatasetCard extends StatelessWidget {
+  final String datasetName;
   final List<ProjectModel> projects;
 
-  const ModelCard({
-    required this.modelName,
+  const DatasetCard({
+    required this.datasetName,
     required this.projects,
     super.key,
   });
@@ -21,7 +21,6 @@ class ModelCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProfile = context.watch<AuthProvider>().userProfile;
     return Container(
-      //height: 200,
       decoration: BoxDecoration(
         color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(12),
@@ -35,9 +34,9 @@ class ModelCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Model Name
+                // Dataset Name
                 Text(
-                  modelName,
+                  datasetName,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -49,46 +48,50 @@ class ModelCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
 
-                
                 Text(
                   userProfile?.username ?? TranslationKeys.guest.tr,
                   maxLines: 1,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xff666666),
-                    fontFamily: AppConstants.appFontName
                   ),
+                ),
+                const SizedBox(height: 8),
+                // Dataset Type/Category
+                 Text(
+                  TranslationKeys.datasetCollection.tr,
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xff666666),
+                      fontFamily: AppConstants.appFontName),
                 ),
                 const SizedBox(height: 8),
 
                 // Project count and variation info
                 Text(
-                  '${projects.length} ${TranslationKeys.variation.tr} ${projects.length} Projects',
+                  '${projects.length} ${TranslationKeys.projectsCount}${getUniqueModelsCount(projects)} ${TranslationKeys.modelsCount}  ',
                   style: const TextStyle(
-                    fontSize: 12,
-                     color: Color(0xff666666),
-                      fontFamily: AppConstants.appFontName
-                  ),
+                      fontSize: 12,
+                      color: Color(0xff666666),
+                      fontFamily: AppConstants.appFontName),
                 ),
                 const SizedBox(height: 8),
 
-                // Description
+                // Description (using first project's info or general description)
                 Text(
-                  "${TranslationKeys.modelDescriptionPrefix.tr}${projects.isNotEmpty && projects.first.description != null ? projects.first.description! : TranslationKeys.defaultModelDescription.tr}",
+                  projects.isNotEmpty && projects.first.description != null
+                      ? projects.first.description!
+                      : TranslationKeys.comprehensiveDatasetDescription.tr,
                   style: const TextStyle(
-                    fontSize: 12,
+                      fontSize: 12,
                       color: Color(0xff666666),
-                      fontFamily: AppConstants.appFontName
-                  ),
+                      fontFamily: AppConstants.appFontName),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-
-          // const Spacer(),
-          // Divider
 
           const Divider(
             color: Color(0xff999999),
@@ -100,7 +103,7 @@ class ModelCard extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                // Downloads/Usage count
+                // Usage count
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -111,15 +114,18 @@ class ModelCard extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.download_outlined,
-                          size: 14, color: Color(0xff666666)),
+                      const Icon(
+                        Icons.analytics_outlined,
+                        size: 15.5,
+                        color: Color(0xff666666),
+                      ),
                       const SizedBox(width: 4),
                       Text(
-                        '${projects.length}', // Mock download count
+                        '${projects.length}',
                         style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xff666666),
-                        ),
+                            fontSize: 12,
+                            color: Color(0xff666666),
+                            fontFamily: AppConstants.appFontName),
                       ),
                     ],
                   ),
@@ -135,13 +141,13 @@ class ModelCard extends StatelessWidget {
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
-                        color: Colors.purple[100],
+                        color: Colors.green[100],
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         Icons.person,
-                        size: 19,
-                        color: Colors.purple[600],
+                        size: 14,
+                        color: Colors.green[600],
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -149,7 +155,7 @@ class ModelCard extends StatelessWidget {
                     // Arrow/Menu button
                     InkWell(
                       onTap: () =>
-                          showProjectsDialog(context, modelName, projects),
+                          showProjectsDialog(context, datasetName, projects),
                       child: Container(
                         width: 24,
                         height: 24,
@@ -159,7 +165,7 @@ class ModelCard extends StatelessWidget {
                         ),
                         child: const Icon(
                           Icons.keyboard_arrow_right,
-                          size: 16,
+                          size: 18,
                           color: Color(0xff666666),
                         ),
                       ),

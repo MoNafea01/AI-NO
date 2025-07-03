@@ -1,7 +1,13 @@
+import 'package:ai_gen/core/cache/cache_data.dart';
+import 'package:ai_gen/core/translation/translation_helper.dart';
+import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_cubit.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:ai_gen/core/cache/cache_helper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -17,10 +23,11 @@ import 'features/splashScreen/splash_screen.dart';
 void main(List<String> args) async {
   // to check if the project is opened from an a project file with .ainoprj extension
   ProjectModel? initialProject = await checkArgs(args);
-
+  await CacheHelper.init();
   WidgetsFlutterBinding.ensureInitialized();
   initializeGetIt();
   await initializeWindowsManager();
+  await TranslationHelper.setLanguage();
 
   runApp(
     ChangeNotifierProvider(
@@ -71,16 +78,22 @@ class _MyAppState extends State<MyApp>
     return MultiRepositoryProvider(
       providers: [
         BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
+         BlocProvider<HomeCubit>(
+          create: (_) => HomeCubit(),
+        ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, state) {
-          return MaterialApp(
+          return GetMaterialApp(
+            locale: Locale(CacheData.lang!),
+
+            translations: TranslationHelper(),
             scaffoldMessengerKey: scaffoldMessengerKey,
             debugShowCheckedModeBanner: false,
-            title: 'AI Gen',
-            theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-            // theme:
-            //           state.isDarkMode ? ThemeCubit.darkTheme : ThemeCubit.lightTheme,
+            title: AppConstants.appTitle,
+            // theme: ThemeData(scaffoldBackgroundColor: Colors.white),
+            theme:
+                state.isDarkMode ? ThemeCubit.darkTheme : ThemeCubit.lightTheme,
             home: const SplashScreen(),
           );
         },

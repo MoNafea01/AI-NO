@@ -1,4 +1,6 @@
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'dart:math' as math;
 import '../../../../../core/utils/app_constants.dart';
 
@@ -10,12 +12,7 @@ class PaginationControls extends StatelessWidget {
   final Function(int) goToPage;
 
   const PaginationControls({
-    super.key,
-    required this.currentPage,
-    required this.totalPages,
-    required this.goToPreviousPage,
-    required this.goToNextPage,
-    required this.goToPage,
+    required this.currentPage, required this.totalPages, required this.goToPreviousPage, required this.goToNextPage, required this.goToPage, super.key,
   });
 
   @override
@@ -64,7 +61,7 @@ class PaginationControls extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    "Previous",
+                     TranslationKeys.previous.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: AppConstants.appFontName,
@@ -103,7 +100,7 @@ class PaginationControls extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Next",
+                    TranslationKeys.next.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: AppConstants.appFontName,

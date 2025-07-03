@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/modelScreen/cubit/model_screen_cubit.dart';
@@ -8,6 +9,7 @@ import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:get/get.dart';
 
 class ModelsScreen extends StatelessWidget {
   const ModelsScreen({Key? key}) : super(key: key);
@@ -47,9 +49,9 @@ class _ModelsViewState extends State<ModelsView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 90),
-            const Text(
-              'Models',
-              style: TextStyle(
+            Text(
+              TranslationKeys.models.tr,
+              style: const TextStyle(
                 fontSize: 27,
                 fontWeight: FontWeight.w900,
                 fontFamily: AppConstants.appFontName,
@@ -57,9 +59,9 @@ class _ModelsViewState extends State<ModelsView> {
               ),
             ),
             // Header Text
-            const Text(
-              'Discover and use thousands of machine learning models, including the most popular \ndiffusion models and LLMs.',
-              style: TextStyle(
+            Text(
+              TranslationKeys.modelsDescription.tr,
+              style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
                 fontSize: 14,
                 color: Color(0xff666666),
@@ -86,7 +88,7 @@ class _ModelsViewState extends State<ModelsView> {
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xffF2F2F2),
-                          hintText: 'Search',
+                          hintText: TranslationKeys.search.tr,
                           hintStyle: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontFamily: AppConstants.appFontName,
@@ -132,9 +134,9 @@ class _ModelsViewState extends State<ModelsView> {
                       children: [
                         Icon(Icons.tune, color: Colors.grey[600]),
                         const SizedBox(width: 8),
-                        const Text(
-                          'Filter',
-                          style: TextStyle(
+                        Text(
+                          TranslationKeys.filter.tr,
+                          style: const TextStyle(
                               color: Color(0xff666666),
                               fontWeight: FontWeight.w600,
                               fontFamily: AppConstants.appFontName),
@@ -154,9 +156,9 @@ class _ModelsViewState extends State<ModelsView> {
                 children: [
                   const Icon(Icons.person_outline, size: 28),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Your Models',
-                    style: TextStyle(
+                  Text(
+                    TranslationKeys.yourModels.tr,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       fontFamily: AppConstants.appFontName,
@@ -165,9 +167,9 @@ class _ModelsViewState extends State<ModelsView> {
                   const Spacer(),
                   TextButton(
                     onPressed: () {},
-                    child: const Text(
-                      'See all',
-                      style: TextStyle(
+                    child: Text(
+                      TranslationKeys.seeAll.tr,
+                      style: const TextStyle(
                         color: Color(0xff666666),
                         fontWeight: FontWeight.w600,
                         fontFamily: AppConstants.appFontName,
@@ -193,12 +195,12 @@ class _ModelsViewState extends State<ModelsView> {
                           const Icon(Icons.error_outline,
                               size: 64, color: Colors.red),
                           const SizedBox(height: 16),
-                          Text('Error: ${state.errMsg}'),
+                          Text('${TranslationKeys.error.tr} ${state.errMsg}'),
                           const SizedBox(height: 16),
                           ElevatedButton(
                             onPressed: () =>
                                 context.read<ModelsCubit>().loadModels(),
-                            child: const Text('Retry'),
+                            child: Text(TranslationKeys.retry.tr),
                           ),
                         ],
                       ),
@@ -211,7 +213,8 @@ class _ModelsViewState extends State<ModelsView> {
                           const Icon(Icons.search_off,
                               size: 64, color: Color(0xff666666)),
                           const SizedBox(height: 16),
-                          Text('No results found for: "${state.query}"'),
+                          Text(
+                              '${TranslationKeys.noResultsFoundFor.tr}"${state.query}"'),
                         ],
                       ),
                     );
@@ -219,15 +222,14 @@ class _ModelsViewState extends State<ModelsView> {
                     final modelsWithProjects = state.modelsWithProjects;
 
                     if (modelsWithProjects.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.model_training,
+                            const Icon(Icons.model_training,
                                 size: 64, color: Color(0xff666666)),
-                            SizedBox(height: 16),
-                            Text('No models found '
-                                'You can add models from the AI Model Store.'),
+                            const SizedBox(height: 16),
+                            Text(TranslationKeys.addModelsFromStore.tr),
                           ],
                         ),
                       );
@@ -292,7 +294,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            project.name ?? 'Unnamed Project',
+            project.name ?? TranslationKeys.unnamedProject.tr,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -317,7 +319,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
                 Icon(Icons.dataset_outlined, size: 16, color: Colors.blue[600]),
                 const SizedBox(width: 4),
                 Text(
-                  'Dataset: ${project.dataset}',
+                  '${TranslationKeys.datasets.tr} ${project.dataset}',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.blue[600],
@@ -329,7 +331,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
           if (project.createdAt != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Created: ${project.createdAt!.toString().split(' ')[0]}',
+              '${TranslationKeys.created.tr} ${project.createdAt!.toString().split(' ')[0]}',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[500],

@@ -1,8 +1,10 @@
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_cubit.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 
 class PreferenceModeSelector extends StatefulWidget {
   const PreferenceModeSelector({super.key});
@@ -30,8 +32,8 @@ class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Preference mode',
+            Text(
+              TranslationKeys.prefrenceModeTitle.tr,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
@@ -52,14 +54,14 @@ class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
                       const SizedBox(width: 16), // Spacing between cards
                       _buildCard(
                         icon: Icons.wb_sunny_outlined,
-                        label: 'Light theme',
+                        label: TranslationKeys.lightMode.tr,
                         //  imageAsset: 'assets/light_theme.png',
                         value: ThemeModePreference.light,
                       ),
                       const SizedBox(width: 16), // Spacing between cards
                       _buildCard(
                         icon: Icons.nights_stay_outlined,
-                        label: 'Dark theme',
+                        label: TranslationKeys.darkMode.tr,
                         //   imageAsset: 'assets/dark_theme.png',
                         value: ThemeModePreference.dark,
                       ),
@@ -81,7 +83,7 @@ class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
     required ThemeModePreference value,
   }) {
     final isSelected = selected == value;
-    //final themeCubit = context.read<ThemeCubit>();
+    // final themeCubit = context.read<ThemeCubit>();
     // if (isSelected) {
     //   switch (value) {
     //     // case ThemeModePreference.system:

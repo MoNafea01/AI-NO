@@ -1,7 +1,9 @@
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 Widget buildProjectItem(BuildContext context, ProjectModel project) {
   return InkWell(
@@ -25,7 +27,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            project.name ?? 'Unnamed Project',
+            project.name ?? TranslationKeys.unnamedProject.tr,
             style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -51,7 +53,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
                 Icon(Icons.dataset_outlined, size: 16, color: Colors.blue[600]),
                 const SizedBox(width: 4),
                 Text(
-                  'Dataset: ${project.dataset}',
+                  '${TranslationKeys.datasets.tr} ${project.dataset}',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.blue[600],
@@ -63,7 +65,7 @@ Widget buildProjectItem(BuildContext context, ProjectModel project) {
           if (project.createdAt != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Created: ${project.createdAt!.toString().split(' ')[0]}',
+              '${TranslationKeys.created.tr}${project.createdAt!.toString().split(' ')[0]}',
               style: const TextStyle(
                 fontSize: 12,
                 color: Color(0xff666666),

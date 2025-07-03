@@ -1,7 +1,10 @@
+import 'package:ai_gen/core/translation/translation_keys.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
-import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 
 import '../../../../../core/models/project_model.dart';
 
@@ -13,15 +16,16 @@ class ProjectListItem extends StatelessWidget {
   final Function(int?) onSelect;
 
   const ProjectListItem({
-    super.key,
     required this.project,
     required this.isSelected,
     required this.onSelect,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 64, // perfect height
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
         color: Color(0xFFF5F5F5),
@@ -40,7 +44,9 @@ class ProjectListItem extends StatelessWidget {
             child: Row(
               children: [
                 Tooltip(
-                  message: "Click to select/deselect this project for deletion",
+                  message: isSelected
+                      ? TranslationKeys.undoSelectionTitle.tr
+                      : TranslationKeys.doYouWantToDelete.tr,
                   child: Container(
                     width: 16,
                     height: 16,
@@ -78,7 +84,7 @@ class ProjectListItem extends StatelessWidget {
           Expanded(
             flex: 2,
             child: highlightSearchText(
-              project.description ?? "No description",
+              project.description ?? TranslationKeys.noDescriptionTitle.tr,
               context.read<HomeCubit>().currentSearchQuery,
               const TextStyle(
                 fontSize: 14,
@@ -126,7 +132,7 @@ class ProjectListItem extends StatelessWidget {
         );
       },
       child: highlightSearchText(
-        project.name ?? "Project Name",
+        project.name ?? TranslationKeys.projectName.tr,
         context.read<HomeCubit>().currentSearchQuery,
         const TextStyle(
           fontSize: 14,
@@ -139,7 +145,7 @@ class ProjectListItem extends StatelessWidget {
 
   // Helper to format DateTime
   String _formatDateTime(DateTime? dateTime) {
-    if (dateTime == null) return "N/A";
+    if (dateTime == null) return TranslationKeys.na.tr;
     return "${dateTime.day.toString().padLeft(2, '0')}/"
         "${dateTime.month.toString().padLeft(2, '0')}/"
         "${dateTime.year} "

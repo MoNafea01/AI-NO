@@ -34,14 +34,11 @@ class DashboardScreen extends StatelessWidget {
         BlocProvider(
           create: (_) => DashboardCubit(),
         ),
+        
         BlocProvider(
           create: (context) => HomeCubit()..loadHomePage(),
         ),
-        BlocProvider(
-          create: (context) => ProfileCubit(
-            context.read<AuthProvider>(),
-          )..loadProfile(),
-        ),
+        
         BlocProvider(
           create: (context) => ProfileCubit(
             context.read<AuthProvider>(),

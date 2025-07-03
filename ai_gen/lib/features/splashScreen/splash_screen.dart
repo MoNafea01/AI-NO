@@ -1,5 +1,7 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/network/server_manager/server_manager.dart';
+import 'package:ai_gen/core/translation/translation_keys.dart';
+import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
@@ -9,6 +11,7 @@ import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -54,13 +57,13 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _startServer() async {
     final serverManager = GetIt.I.get<ServerManager>();
     setState(() {
-      _status = "Checking server status...";
+      _status = TranslationKeys.checkingServerStatus.tr;
       _showRetryButton = false;
     });
 
     bool running = await serverManager.isServerRunning();
     if (!running) {
-      setState(() => _status = "Starting backend server...");
+      setState(() => _status = TranslationKeys.startingBackendServer.tr);
 
       try {
         // Start the server script
@@ -84,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen>
           // Check if the server process is still running
           if (!serverManager.isServerProcessRunning()) {
             setState(() {
-              _status = "Server process stopped unexpectedly.";
+              _status = TranslationKeys.serverStoppedUnexpectedly.tr;
               _showRetryButton = true;
             });
             return;
@@ -108,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     if (running) {
-      setState(() => _status = "Server is running. Loading dashboard...");
+      setState(() => _status = TranslationKeys.serverRunningLoadingDashboard.tr);
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
        _checkAppStart();
@@ -116,7 +119,7 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       setState(() {
         _status =
-            "Failed to start server. Please check if the backend is properly configured.";
+            TranslationKeys.failedToStartServer;
         _showRetryButton = true;
       });
     }
@@ -205,7 +208,7 @@ Future<void> _checkAppStart() async {
 
             const SizedBox(height: 20), // Space between icon and text
             const Text(
-              'A I N O',
+              AppConstants.appName,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -236,9 +239,9 @@ Future<void> _checkAppStart() async {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Retry',
-                  style: TextStyle(
+                child:  Text(
+                  TranslationKeys.retry.tr,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),

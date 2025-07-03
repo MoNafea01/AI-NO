@@ -27,11 +27,11 @@ Widget buildPasswordField(TextEditingController controller, bool visible,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(6),
-        borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
+        borderSide: const BorderSide(color: Color(0xff666666), width: 2),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(6),
-        borderSide: const BorderSide(color: AppColors.primaryColor, width: 1),
+        borderSide: const BorderSide(color: Color(0xff666666), width: 1),
       ),
     ),
   );

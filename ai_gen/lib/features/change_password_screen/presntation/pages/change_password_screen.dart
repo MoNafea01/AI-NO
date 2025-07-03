@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/change_password_screen/presntation/widgets/build_password_field.dart';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 
@@ -33,8 +35,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       // Make sure new password and confirm password match
       if (_newPasswordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("New password and confirmation must match")),
+           SnackBar(
+              content: Text(TranslationKeys.newPasswordAndConfirmationMustMatch.tr),),
         );
         setState(() => _isLoading = false);
         return;
@@ -50,11 +52,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         // Show success message with custom style
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content:  Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 10),
-                Text("Password changed successfully"),
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 10),
+                Text(TranslationKeys.passwordChangedSuccessfully.tr),
               ],
             ),
             backgroundColor: Colors.green,
@@ -83,7 +85,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             children: [
               const Icon(Icons.error_outline, color: Colors.white),
               const SizedBox(width: 10),
-              Expanded(child: Text("Error: ${e.toString()}")),
+              Expanded(child: Text("${TranslationKeys.error.tr}${e.toString()}")),
             ],
           ),
           backgroundColor: Colors.red,
@@ -122,17 +124,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 16),
-                buildLabel("Current Password:"),
+                buildLabel(TranslationKeys.currentPasswordTitle.tr),
                 buildPasswordField(_oldPasswordController, _obscureOld, () {
                   setState(() => _obscureOld = !_obscureOld);
                 }),
                 const SizedBox(height: 24),
-                buildLabel("Change Password:"),
+                buildLabel(TranslationKeys.changePasswordTitle.tr),
                 buildPasswordField(_newPasswordController, _obscureNew, () {
                   setState(() => _obscureNew = !_obscureNew);
                 }),
                 const SizedBox(height: 24),
-                buildLabel("Confirm Password:"),
+                buildLabel(TranslationKeys.confirmPasswordTitle.tr),
                 Row(
                   children: [
                     Expanded(
@@ -161,8 +163,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 strokeWidth: 2,
                               ),
                             )
-                          : const Text("Confirm",
-                              style: TextStyle(
+                          :  Text(TranslationKeys.confirm.tr,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,

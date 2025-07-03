@@ -1,0 +1,260 @@
+// ar.dart
+import 'translation_keys.dart';
+
+Map<String, String> ar = {
+  TranslationKeys.chooseProducts: 'اختر المنتجات',
+  TranslationKeys.makePayment: 'قم بالدفع',
+  TranslationKeys.getYourOrder: 'احصل على طلبك',
+  TranslationKeys.body:
+      'الكثير من الكلام، الكثير من الكلام، الكثير من الكلام، الكثير من الكلام، الكثير من الكلام، الكثير من الكلام، الكثير من الكلام، الكثير من الكلام',
+  TranslationKeys.prev: 'السابق',
+  TranslationKeys.doYouWantToDelete: "هل تريد حذف هذا المشروع؟",
+
+  TranslationKeys.skip: 'تخطي',
+  TranslationKeys.undoSelectionTitle: "هل تريد التراجع عن الحذف؟",
+  TranslationKeys.getStarted: 'ابدأ الآن',
+  TranslationKeys.register: 'تسجيل',
+  TranslationKeys.login: 'تسجيل الدخول',
+  TranslationKeys.findItHereHuyItNow: 'ابحث عنه هنا، اشتريه الآن!',
+  TranslationKeys.youWantAuthenticHereYouGo: 'تريد الأصلي، ها هو!',
+  TranslationKeys.welcomeBack: 'مرحباً بعودتك',
+  TranslationKeys.confirmPasswordHintText: "تاكيد",
+  TranslationKeys.passwordHintText: "كلمة المرور",
+  TranslationKeys.emailHintText: "البريد الالكتروني",
+  TranslationKeys.phoneHintText: "رقم الهاتف",
+  TranslationKeys.fullNameHintText: "اسم المستخدم كامل",
+  TranslationKeys.createAnAccount: 'إنشاء حساب',
+  TranslationKeys.settings: 'الإعدادات',
+  TranslationKeys.language: 'اللغة',
+  TranslationKeys.arabic: 'العربية',
+  TranslationKeys.english: 'الإنجليزية',
+  TranslationKeys.save: 'حفظ',
+  TranslationKeys.profile: 'الملف الشخصي',
+  TranslationKeys.userFullName: 'اسم المستخدم كامل',
+  TranslationKeys.myProfile: 'ملفي الشخصي',
+  TranslationKeys.myOrders: 'طلباتي',
+  TranslationKeys.myFavorites: 'المفضلة',
+  TranslationKeys.logOut: 'تسجيل الخروج',
+  TranslationKeys.fullNameIsRequired: 'اسم المستخدم كامل مطلوب',
+  TranslationKeys.passwordIsRequired: 'كلمة المرور مطلوبة',
+  TranslationKeys.shortPassword: "كلمة المرور يجب ان تكون على الاقل 6 حروف",
+  TranslationKeys.confirmPasswordIsRequired: 'تاكيد كلمة المرور مطلوب',
+  TranslationKeys.confirmShortPassword:
+      "تاكيد كلمة المرور يجب ان تكون على الاقل 6 حروف",
+  TranslationKeys.emailIsRequired: 'البريد الالكتروني مطلوب',
+  TranslationKeys.emailNotValid: 'البريد الالكتروني غير صحيح',
+  TranslationKeys.passwordNotValid: 'كلمة المرور غير صحيحة',
+  TranslationKeys.passwordNotMatch: 'كلمة المرور غير متطابقة',
+  TranslationKeys.phoneIsRequired: 'رقم الهاتف مطلوب',
+  TranslationKeys.phoneNotValid: 'رقم الهاتف غير صحيح',
+  TranslationKeys.search: 'بحث',
+  TranslationKeys.searchAnyProduct: 'ابحث عن منتج..',
+  TranslationKeys.home: 'الرئيسية',
+  TranslationKeys.items: 'المنتجات',
+
+  // New translations for server status
+  TranslationKeys.loadingServer: 'جاري تحميل الخادم....',
+  TranslationKeys.checkingServerStatus: 'جاري التحقق من حالة الخادم...',
+  TranslationKeys.startingBackendServer: 'جاري بدء خادم الواجهة الخلفية...',
+  TranslationKeys.serverStoppedUnexpectedly:
+      'توقفت عملية الخادم بشكل غير متوقع.',
+  TranslationKeys.waitingForServerToStart: 'في انتظار بدء تشغيل الخادم...',
+  TranslationKeys.errorStartingServer: 'خطأ في بدء تشغيل الخادم:',
+  TranslationKeys.serverRunningLoadingDashboard:
+      'الخادم يعمل. جاري تحميل لوحة التحكم...',
+  TranslationKeys.failedToStartServer:
+      'فشل في بدء تشغيل الخادم. يرجى التحقق مما إذا كانت الواجهة الخلفية مهيأة بشكل صحيح.',
+
+  // New translations for login/welcome
+  TranslationKeys.welcomeBackToModelCraft: 'مرحباً بعودتك إلى\nModel Craft!',
+  TranslationKeys.signInToContinueDesigning:
+      'سجل الدخول لمواصلة تصميم وتطوير نماذجك.',
+  TranslationKeys.signInToContinue: 'سجل الدخول للمتابعة',
+  TranslationKeys.loginSuccessful: 'تم تسجيل الدخول بنجاح!',
+  TranslationKeys.redirectingToDashboard:
+      'جاري إعادة التوجيه إلى لوحة التحكم...',
+  TranslationKeys.signIn: 'تسجيل الدخول',
+  TranslationKeys.emailAddress: 'عنوان البريد الإلكتروني',
+  TranslationKeys.rememberMe: 'تذكرني',
+  TranslationKeys.forgotPassword: 'هل نسيت كلمة المرور؟',
+  TranslationKeys.orSignInWith: 'أو سجل الدخول باستخدام',
+  TranslationKeys.dontHaveAnAccount: 'ليس لديك حساب؟',
+  TranslationKeys.createFreeAccount: 'إنشاء حساب مجاني',
+
+  // New translations for signup
+  TranslationKeys.joinModelCraftToday: 'انضم إلى Model Craft\nاليوم',
+  TranslationKeys.createAccountAndStartBringing:
+      'أنشئ حساباً وابدأ في إحياء نماذجك.',
+  TranslationKeys.signUp: 'إنشاء حساب',
+  TranslationKeys.username: 'اسم المستخدم',
+  TranslationKeys.firstName: 'الاسم الأول',
+  TranslationKeys.lastName: 'اسم العائلة',
+
+  TranslationKeys.iAgreeWithThe: 'أوافق على ',
+  TranslationKeys.termsAndConditions: 'الشروط والأحكام',
+  TranslationKeys.ofClarity: ' لـ Clarity',
+  TranslationKeys.buttonSignUp: 'إنشاء حساب',
+  TranslationKeys.retry: 'حاول المحاولة',
+  // New translations for Datasets Screen
+  TranslationKeys.datasets: 'مجموعات البيانات',
+  TranslationKeys.datasetsDescription:
+      'اكتشف واستخدم مجموعات بيانات عالية الجودة لتدريب وتعديل نماذج التعلم الآلي.',
+  TranslationKeys.filter: 'تصفية',
+  TranslationKeys.yourDatasets: 'مجموعات بياناتك',
+  TranslationKeys.seeAll: 'عرض الكل',
+  TranslationKeys.error: 'خطأ:',
+
+  TranslationKeys.noResultsFoundFor: 'لم يتم العثور على نتائج لـ: ',
+  TranslationKeys.noDatasetsAvailable: 'لا توجد مجموعات بيانات متاحة',
+  TranslationKeys.projectsCount: ' مشاريع • ',
+  TranslationKeys.modelsCount: ' نماذج',
+  TranslationKeys.datasetCollection: 'مجموعة بيانات',
+  TranslationKeys.comprehensiveDatasetDescription:
+      'مجموعة بيانات شاملة للتدريب والتقييم',
+  TranslationKeys.guest: 'ضيف',
+
+  // New translations for Project Item
+  TranslationKeys.unnamedProject: 'مشروع غير مسمى',
+  TranslationKeys.created: 'تم الإنشاء: ',
+  // New translations for Models Screen
+  TranslationKeys.models: 'النماذج',
+  TranslationKeys.modelsDescription:
+      'اكتشف واستخدم نماذج عالية الجودة لمهام التعلم الآلي المختلفة.',
+  TranslationKeys.yourModels: 'نماذجك',
+  TranslationKeys.noModelsFound: 'لم يتم العثور على نماذج',
+  TranslationKeys.noModelAvailable: 'لا توجد نماذج متاحة',
+  TranslationKeys.addModelsFromStore:
+      'لا توجد نماذج متاحة أو يمكنك الحصول على نماذج من المتجر.',
+  TranslationKeys.variation: ' تنوع • ',
+  TranslationKeys.modelDescriptionPrefix: 'الوصف: ',
+  TranslationKeys.defaultModelDescription:
+      'مجموعة من نماذج الذكاء الاصطناعي لمهام مختلفة',
+  TranslationKeys.projectsCountModels: ' مشاريع',
+  // New translations for Playlist Screen
+  TranslationKeys.learn: 'تعلم',
+  TranslationKeys.learnDescription:
+      'اكتسب المهارات التي تحتاجها لإنشاء نموذجك.',
+  TranslationKeys.noTitle: 'لا يوجد عنوان',
+  TranslationKeys.noDescription: 'لا يوجد وصف',
+  TranslationKeys.na: 'غير متوفر',
+  TranslationKeys.basicsCategory: 'أساسيات',
+  TranslationKeys.datasetCategory: 'مجموعة بيانات',
+  TranslationKeys.watchLater: 'المشاهدة لاحقاً',
+  TranslationKeys.share: 'مشاركة',
+  TranslationKeys.noVideosFound: 'لم يتم العثور على مقاطع فيديو.',
+  TranslationKeys.noVideosMatchSearch: 'لا توجد مقاطع فيديو مطابقة لبحثك.',
+  TranslationKeys.playlistApiError:
+      'خطأ في واجهة برمجة تطبيقات قائمة التشغيل: ',
+  TranslationKeys.responseBody: 'جسم الاستجابة: ',
+  TranslationKeys.failedToLoadPlaylistVideos:
+      'فشل تحميل مقاطع فيديو قائمة التشغيل: ',
+  TranslationKeys.noItemsFoundInPlaylist:
+      'لم يتم العثور على عناصر في قائمة التشغيل',
+  TranslationKeys.noValidVideoIdsFound: 'لم يتم العثور على معرفات فيديو صالحة',
+  TranslationKeys.videoDetailsApiError:
+      'خطأ في واجهة برمجة تطبيقات تفاصيل الفيديو: ',
+  TranslationKeys.errorFetchingPlaylist: 'خطأ في جلب قائمة التشغيل: ',
+  // New translations for Sidebar
+  TranslationKeys.collapse: 'غلق',
+  TranslationKeys.explore: 'استكشاف',
+  TranslationKeys.docs: 'المستندات',
+  // New translations for Profile Screen
+  TranslationKeys.logout: 'تسجيل الخروج',
+  TranslationKeys.sessionExpiredMessage:
+      'انتهت صلاحية جلستك. تحتاج إلى تسجيل الدخول مرة أخرى.',
+  TranslationKeys.cancel: 'إلغاء',
+  TranslationKeys.loginAgain: 'تسجيل الدخول مرة أخرى',
+  TranslationKeys.sessionExpired: 'انتهت صلاحية الجلسة',
+  TranslationKeys.errorLoadingProfile: 'خطأ في تحميل الملف الشخصي',
+  TranslationKeys.tryAgain: 'أعد المحاولة',
+  TranslationKeys.goToDashboard: 'الذهاب إلى لوحة التحكم',
+
+  TranslationKeys.loadingProfile: 'جاري تحميل الملف الشخصي...',
+  TranslationKeys.nameLabel: 'الاسم:',
+  TranslationKeys.usernameLabel: 'اسم المستخدم:',
+  TranslationKeys.emailAddressLabel: 'عنوان البريد الإلكتروني:',
+  TranslationKeys.bioLabel: 'السيرة الذاتية:',
+  TranslationKeys.writeAboutYourself: 'اكتب عن نفسك',
+  TranslationKeys.saveChanges: 'حفظ التغييرات',
+  TranslationKeys.loadProfile: 'تحميل الملف الشخصي',
+  TranslationKeys.refresh: 'تحديث',
+  // New translations for Projects Table
+  TranslationKeys.noProjectsFoundTable: 'لم يتم العثور على مشاريع',
+  TranslationKeys.deletingEmptyProjects: 'جاري حذف المشاريع الفارغة...',
+  TranslationKeys.deletingProject: 'جاري حذف المشروع...',
+  TranslationKeys.projectDeletedSuccessfully: 'تم حذف المشروع بنجاح',
+  TranslationKeys.projectsDeletedSuccessfully: 'تم حذف المشاريع بنجاح',
+  TranslationKeys.failedToDeleteProjects: 'فشل حذف المشاريع: ',
+  TranslationKeys.errorDeletingProjects: 'خطأ في حذف المشاريع: ',
+  TranslationKeys.emptyProjectsDeletedSuccessfully:
+      'تم حذف المشاريع الفارغة بنجاح',
+  TranslationKeys.failedToDeleteEmptyProjects: 'فشل حذف المشاريع الفارغة: ',
+  TranslationKeys.errorDeletingEmptyProjects: 'خطأ في حذف المشاريع الفارغة: ',
+
+  // Inferred dialog/table header/list item strings
+  TranslationKeys.confirmDeletion: 'تأكيد الحذف',
+  TranslationKeys.deleteConfirmationMessage:
+      'هل أنت متأكد أنك تريد حذف المشروع (المشاريع) المحدد؟ لا يمكن التراجع عن هذا الإجراء.',
+  TranslationKeys.deleteEmptyProjectsConfirmationMessage:
+      'هل أنت متأكد أنك تريد حذف جميع المشاريع الفارغة؟ لا يمكن التراجع عن هذا الإجراء.',
+  TranslationKeys.deleteButton: 'حذف',
+  TranslationKeys.allProjects: 'الكل',
+  TranslationKeys.selectedProjects: 'المحدد',
+  TranslationKeys.deleteSelected: 'حذف المحدد',
+  TranslationKeys.deleteEmptyProjects: 'حذف المشاريع الفارغة',
+  TranslationKeys.projectNameHeader: 'الاسم',
+  TranslationKeys.createdAtHeader: 'تاريخ الإنشاء',
+  TranslationKeys.lastModifiedHeader: 'آخر تعديل',
+  TranslationKeys.actionsHeader: 'الإجراءات',
+  TranslationKeys.openProject: 'فتح المشروع',
+  TranslationKeys.editProject: 'تعديل',
+  TranslationKeys.previousPage: 'السابق',
+  TranslationKeys.nextPage: 'التالي',
+  TranslationKeys.trySearchingWithDifferentKeywords:
+      'حاول بحث مختلف بالكلمات الدلالية.',
+  TranslationKeys.showAllProjects: 'اظهار جميع المشاريع',
+  TranslationKeys.newPasswordAndConfirmationMustMatch:
+      "كلمه السر وتاكيد كلمه السر يجب ان تتطابق",
+  TranslationKeys.passwordChangedSuccessfully: "تم تغيير كلمه السر بنجاح",
+  TranslationKeys.currentPasswordTitle: "كلمه السر الحالية:",
+  TranslationKeys.changePasswordTitle: "تغيير كلمه السر:",
+  TranslationKeys.confirmPasswordTitle: "تاكيد كلمه السر:",
+  TranslationKeys.confirm: "تاكيد",
+  TranslationKeys.prefrenceModeTitle: 'الوضع المفضل',
+  TranslationKeys.lightMode: 'وضع الضوء',
+  TranslationKeys.darkMode: 'وضع الظل',
+  TranslationKeys.settingsDescription: 'إدارة إعدادات حسابك',
+  TranslationKeys.account: 'حساب',
+  TranslationKeys.appearance: 'ظهور',
+  TranslationKeys.selectAllProjects: 'تحديد كل المشاريع',
+  TranslationKeys.deselectAllProjects: 'إلغاء تحديد كل المشاريع',
+  TranslationKeys.deleteSelectedProjects: 'حذف المشاريع المحددة',
+  TranslationKeys.deleteAllEmptyProjects:
+      'حذف جميع المشاريع الفارغة (المشاريع التي لا تحتوي على نموذج أو مجموعة بيانات)',
+  TranslationKeys.name: 'الاسم',
+  TranslationKeys.description: 'الوصف',
+  TranslationKeys.dataset: 'مجموعة البيانات',
+  TranslationKeys.model: 'النموذج',
+  TranslationKeys.createdAt: 'تاريخ الإنشاء',
+  TranslationKeys.projectName: 'اسم المشروع',
+  TranslationKeys.noDescriptionTitle: 'لا يوجد وصف',
+  TranslationKeys.noDataset: 'لا توجد بيانات',
+  TranslationKeys.noModel: 'لا يوجد نموذج',
+  TranslationKeys.previous: 'السابق',
+  TranslationKeys.projects: 'المشاريع',
+  TranslationKeys.viewAllProjects: 'عرض جميع مشاريعك',
+  TranslationKeys.import: 'استيراد',
+  TranslationKeys.export: 'تصدير',
+  TranslationKeys.newProject: 'مشروع جديد',
+  TranslationKeys.searchHint: "ابحث عن مشروع",
+  TranslationKeys.projectsToBeDeleted: 'المشاريع المراد حذفها:',
+  TranslationKeys.areYouSure: 'هل أنت متأكد أنك تريد حذف ',
+  TranslationKeys.thisActionCannotBeUndone: 'لا يمكن التراجع عن هذا الإجراء.',
+  TranslationKeys.deleteEmpty: 'حذف الفارغة',
+  TranslationKeys.areYouSureYouWantToDeleteEmptyProjects:
+      'هل أنت متأكد أنك تريد حذف جميع المشاريع الفارغة؟ سيؤدي هذا إلى إزالة جميع المشاريع التي لا تحتوي على نموذج أو مجموعة بيانات معينة. لا يمكن التراجع عن هذا الإجراء.',
+  TranslationKeys.thisTitle: 'هذا',
+  TranslationKeys.theseTitle: 'هؤلاء',
+  TranslationKeys.project: "المشروع",
+  TranslationKeys.questionMark: "؟",
+};

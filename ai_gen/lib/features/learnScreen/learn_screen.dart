@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -21,7 +23,7 @@ class YouTubeApi {
         log('Playlist API Error: ${playlistResponse.statusCode}');
         log('Response body: ${playlistResponse.body}');
         throw Exception(
-            'Failed to load playlist videos: ${playlistResponse.statusCode}');
+            '${TranslationKeys.failedToLoadPlaylistVideos.tr}${playlistResponse.statusCode}');
       }
 
       final playlistJson = json.decode(playlistResponse.body);
@@ -69,7 +71,7 @@ class YouTubeApi {
         if (id != null && durations[id] != null) {
           item['duration'] = _formatDuration(durations[id]);
         } else {
-          item['duration'] = 'N/A';
+          item['duration'] = TranslationKeys.na.tr;
         }
       }
 
@@ -170,22 +172,22 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
               // Header Section
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Learn',
-                          style: TextStyle(
+                          TranslationKeys.learn.tr,
+                          style: const TextStyle(
                             fontFamily: AppConstants.appFontName,
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
-                          'Gain the skills you need to create your model.',
+                          TranslationKeys.learnDescription.tr,
                           style: TextStyle(
                             fontFamily: AppConstants.appFontName,
                             fontSize: 16,
@@ -234,7 +236,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: const Color(0xffF2F2F2),
-                      hintText: 'Search',
+                      hintText: TranslationKeys.search.tr,
                       hintStyle: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontFamily: AppConstants.appFontName,
@@ -311,14 +313,15 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No videos found.'));
+                      return Center(
+                          child: Text(TranslationKeys.noVideosFound.tr));
                     }
 
                     final videos = _filterVideos(snapshot.data!);
 
                     if (videos.isEmpty) {
-                      return const Center(
-                          child: Text('No videos match your search.'));
+                      return Center(
+                          child: Text(TranslationKeys.noVideosMatchSearch.tr));
                     }
 
                     return isGridView
@@ -370,7 +373,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
 
     // Determine category based on video content
     String category = 'Basics';
-    Color categoryColor = Colors.green.shade100;
+    //Color categoryColor = Colors.green.shade100;
     Color categoryTextColor = Colors.green;
 
     if (title.toLowerCase().contains('dataset') ||
@@ -417,9 +420,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                 value: 'watch_later',
                                 child: Text('Watch Later'),
                               ),
-                              const PopupMenuItem(
-                                value: 'share',
-                                child: Text('Share'),
+                              PopupMenuItem(
+                                value: TranslationKeys.share.tr,
+                                child: Text(TranslationKeys.share.tr),
                               ),
                             ],
                           ),
@@ -587,13 +590,16 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                   icon: const Icon(Icons.more_horiz,
                                       color: Colors.grey),
                                   itemBuilder: (context) => [
-                                    const PopupMenuItem(
-                                      value: 'watch_later',
-                                      child: Text('Watch Later'),
+                                    PopupMenuItem(
+                                      value: TranslationKeys.watchLater.tr,
+                                      child:
+                                          Text(TranslationKeys.watchLater.tr),
                                     ),
-                                    const PopupMenuItem(
-                                      value: 'share',
-                                      child: Text('Share'),
+                                    PopupMenuItem(
+                                      value: TranslationKeys.share.tr,
+                                      child: Text(
+                                        TranslationKeys.share.tr,
+                                      ),
                                     ),
                                   ],
                                 ),

@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
@@ -9,6 +10,7 @@ import 'package:ai_gen/features/auth/presentation/widgets/outlinedPrimaryButton.
 import 'package:ai_gen/features/auth/presentation/widgets/social_sign_in_button.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/user_testimonal.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class SignupScreen extends StatelessWidget {
@@ -16,11 +18,11 @@ class SignupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const AuthLayout(
-      title: 'Join Model Craft\nToday',
-      subtitle: 'Create an account and start bringing your models to life.',
-      form: SignupForm(),
-      testimonial: UserTestimonial(),
+    return  AuthLayout(
+      title: TranslationKeys.joinModelCraftToday.tr,
+      subtitle: TranslationKeys.createAccountAndStartBringing.tr,
+      form: const SignupForm(),
+      testimonial: const UserTestimonial(),
     );
   }
 }
@@ -37,9 +39,9 @@ class SignupForm extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Sign Up',
-            style: TextStyle(
+           Text(
+            TranslationKeys.signUp.tr,
+            style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
@@ -49,7 +51,7 @@ class SignupForm extends StatelessWidget {
 
           // Username
           CustomTextField(
-            hintText: 'Username',
+            hintText: TranslationKeys.username.tr,
             suffixIcon: Icons.person_2_outlined,
             onChanged: (value) => authProvider.setUsername(value),
           ),
@@ -57,7 +59,7 @@ class SignupForm extends StatelessWidget {
 
           // First Name
           CustomTextField(
-            hintText: 'First name',
+            hintText: TranslationKeys.firstName.tr,
             suffixIcon: Icons.person_outline,
             onChanged: (value) => authProvider.setFirstName(value),
           ),
@@ -65,7 +67,7 @@ class SignupForm extends StatelessWidget {
 
           // Last Name
           CustomTextField(
-            hintText: 'Last name',
+            hintText: TranslationKeys.lastName.tr,
             suffixIcon: Icons.person_outline,
             onChanged: (value) => authProvider.setLastName(value),
           ),
@@ -73,7 +75,7 @@ class SignupForm extends StatelessWidget {
 
           // Email Field
           CustomTextField(
-            hintText: 'Email address',
+            hintText: TranslationKeys.emailHintText.tr,
             suffixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             onChanged: (value) => authProvider.setEmail(value),
@@ -82,7 +84,7 @@ class SignupForm extends StatelessWidget {
 
           // Password Field
           CustomTextField(
-            hintText: 'Password',
+            hintText: TranslationKeys.passwordHintText.tr,
             suffixIcon: Icons.lock_outline,
             isPassword: true,
             onChanged: (value) => authProvider.setPassword(value),
@@ -91,7 +93,7 @@ class SignupForm extends StatelessWidget {
 
           // Confirm Password Field
           CustomTextField(
-            hintText: 'Confirm Password',
+            hintText: TranslationKeys.confirmPassword.tr,
             suffixIcon: Icons.lock_outline,
             isPassword: true,
             onChanged: (value) => authProvider.setConfirmPassword(value),
@@ -108,15 +110,15 @@ class SignupForm extends StatelessWidget {
               ),
               Expanded(
                 child: RichText(
-                  text: const TextSpan(
-                    style: TextStyle(color: Colors.black),
+                  text:  TextSpan(
+                    style: const TextStyle(color: Colors.black),
                     children: [
-                      TextSpan(text: 'I agree with the '),
+                      TextSpan(text: TranslationKeys.iAgreeWithThe.tr),
                       TextSpan(
-                        text: 'Terms & Conditions',
-                        style: TextStyle(color: Color(0xFF1E88E5)),
+                        text: TranslationKeys.termsAndConditions.tr,
+                        style: const TextStyle(color: Color(0xFF1E88E5)),
                       ),
-                      TextSpan(text: ' of Clarity'),
+                      TextSpan(text: TranslationKeys.ofClarity.tr),
                     ],
                   ),
                 ),
@@ -126,7 +128,7 @@ class SignupForm extends StatelessWidget {
           const SizedBox(height: 24),
           CustomPrimaryButton(
             buttonBackgroundColor: AppColors.bluePrimaryColor,
-            buttonName: 'Sign up',
+            buttonName: TranslationKeys.signUp.tr,
             textButtonColor: AppColors.appBackgroundColor,
             onPressed: () {
               print("email: ${authProvider.email}");
@@ -175,7 +177,7 @@ class SignupForm extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Don't have an account?"),
+               Text(TranslationKeys.dontHaveAnAccount.tr),
               TextButton(
                 onPressed: () {
                   authProvider.resetForm();
@@ -184,9 +186,9 @@ class SignupForm extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => const LoginScreen()));
                 },
-                child: const Text(
-                  'Sign in',
-                  style: TextStyle(color: AppColors.bluePrimaryColor),
+                child:  Text(
+                  TranslationKeys.login.tr,
+                  style: const TextStyle(color: AppColors.bluePrimaryColor),
                 ),
               ),
             ],

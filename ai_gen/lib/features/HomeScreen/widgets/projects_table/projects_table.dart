@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:ai_gen/core/translation/translation_keys.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/dialogs/delete_confirmation_dialog.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/dialogs/delete_empty_projects_dialog.dart';
-import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
-import '../../../../../core/models/project_model.dart';
+
 
 import 'project_list_item.dart';
 import 'projects_table_header.dart';
@@ -23,7 +26,7 @@ class ProjectsTable extends StatefulWidget {
 
 class _ProjectsTableState extends State<ProjectsTable> {
   int currentPage = 1;
-  final int itemsPerPage = 7;
+  final int itemsPerPage = 8;
   Set<int> selectedProjectIds = <int>{};
   bool isDeleting = false; // Track deletion state
   bool isDeletingEmpty = false; // Track empty projects deletion
@@ -104,8 +107,9 @@ class _ProjectsTableState extends State<ProjectsTable> {
       builder: (BuildContext context) {
         return DeleteConfirmationDialog(
           projectIds: projectIds,
-          projectNames:
-              selectedProjects.map((p) => p.name ?? 'Unnamed Project').toList(),
+          projectNames: selectedProjects
+              .map((p) => p.name ?? TranslationKeys.unnamedProject.tr)
+              .toList(),
           onConfirm: _deleteProjects,
         );
       },
@@ -162,10 +166,13 @@ class _ProjectsTableState extends State<ProjectsTable> {
 
         // Show success message
         if (mounted) {
-          final projectText = projectIds.length == 1 ? 'Project' : 'Projects';
+          final projectText = projectIds.length == 1
+              ? TranslationKeys.projectsCountModels.tr
+              : TranslationKeys.projectsCountModels.tr;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$projectText deleted successfully'),
+              content: Text(
+                  '$projectText ${TranslationKeys.projectsDeletedSuccessfully.tr}'),
               backgroundColor: const Color(0xFF10B981),
               duration: const Duration(seconds: 2),
             ),
@@ -181,8 +188,8 @@ class _ProjectsTableState extends State<ProjectsTable> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content:
-                  Text('Failed to delete projects: ${response.statusCode}'),
+              content: Text(
+                  '${TranslationKeys.failedToDeleteProjects}${response.statusCode}'),
               backgroundColor: const Color(0xFFDC2626),
               duration: const Duration(seconds: 3),
             ),
@@ -203,7 +210,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error deleting projects: $e'),
+            content: Text('${TranslationKeys.failedToDeleteProjects}$e'),
             backgroundColor: const Color(0xFFDC2626),
             duration: const Duration(seconds: 3),
           ),
@@ -227,7 +234,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
   }
 
   // API call to delete empty projects
-   Future<void> _deleteEmptyProjects() async {
+  Future<void> _deleteEmptyProjects() async {
     try {
       // Set loading state
       setState(() {
@@ -254,10 +261,11 @@ class _ProjectsTableState extends State<ProjectsTable> {
         // Success
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Empty projects deleted successfully'),
-              backgroundColor: Color(0xFF10B981),
-              duration: Duration(seconds: 2),
+            SnackBar(
+              content:
+                  Text(TranslationKeys.emptyProjectsDeletedSuccessfully.tr),
+              backgroundColor: const Color(0xFF10B981),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -272,7 +280,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Failed to delete empty projects: ${response.statusCode}'),
+                  '${TranslationKeys.failedToDeleteEmptyProjects.tr}${response.statusCode}'),
               backgroundColor: const Color(0xFFDC2626),
               duration: const Duration(seconds: 3),
             ),
@@ -286,7 +294,7 @@ class _ProjectsTableState extends State<ProjectsTable> {
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error deleting empty projects: $e'),
+            content: Text('${TranslationKeys.failedToDeleteProjects}$e'),
             backgroundColor: const Color(0xFFDC2626),
             duration: const Duration(seconds: 3),
           ),
@@ -307,10 +315,10 @@ class _ProjectsTableState extends State<ProjectsTable> {
     HomeSuccess homeState = context.watch<HomeCubit>().state as HomeSuccess;
 
     if (homeState.projects.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          "No Projects Found",
-          style: TextStyle(fontSize: 20),
+          TranslationKeys.noProjectsFoundTable.tr,
+          style: const TextStyle(fontSize: 20),
         ),
       );
     }
@@ -334,8 +342,8 @@ class _ProjectsTableState extends State<ProjectsTable> {
               const SizedBox(height: 16),
               Text(
                 isDeletingEmpty
-                    ? 'Deleting empty projects...'
-                    : 'Deleting project...',
+                    ? TranslationKeys.deleteEmptyProjects
+                    : TranslationKeys.deletingProject,
                 style: const TextStyle(
                   fontSize: 16,
                   color: Color(0xFF6B7280),
@@ -395,5 +403,3 @@ class _ProjectsTableState extends State<ProjectsTable> {
     );
   }
 }
-
-

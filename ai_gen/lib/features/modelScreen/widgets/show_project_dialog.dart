@@ -1,7 +1,9 @@
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/modelScreen/widgets/build_project_item.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 void showProjectsDialog(
     BuildContext context, String modelName, List<ProjectModel> projects) {
@@ -51,7 +53,7 @@ void showProjectsDialog(
             const SizedBox(height: 8),
 
             Text(
-              '${projects.length} Projects',
+              '${projects.length} ${TranslationKeys.projectsCountModels.tr}',
               style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xff666666),

@@ -1,6 +1,6 @@
-
 // Search and Actions Row Widget
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/translation/translation_keys.dart';
 
 // Search and Actions Row Widget - Fixed Border Issue
 import 'dart:async';
@@ -8,18 +8,18 @@ import 'dart:async';
 import 'package:ai_gen/core/utils/app_constants.dart';
 
 import 'package:ai_gen/core/utils/helper/helper.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
-import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 import 'project_actions/import_project_dialog.dart';
 
 class SearchAndActionsRow extends StatefulWidget {
-
   const SearchAndActionsRow({super.key, this.projectModel});
 
   final ProjectModel? projectModel;
@@ -62,10 +62,6 @@ class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
     );
   }
 
-
-
-
- 
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
 
@@ -114,7 +110,7 @@ class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
                 ),
               ),
 
-              hintText: AppConstants.searchHint,
+              hintText: TranslationKeys.searchHint.tr,
               hintStyle: const TextStyle(
                 color: Color(0xff999999),
                 fontFamily: AppConstants.appFontName,

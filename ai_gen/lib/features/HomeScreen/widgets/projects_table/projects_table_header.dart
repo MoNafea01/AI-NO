@@ -1,4 +1,6 @@
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../../../core/utils/app_constants.dart';
 
 class ProjectsTableHeader extends StatelessWidget {
@@ -35,8 +37,8 @@ class ProjectsTableHeader extends StatelessWidget {
                 // Select All / Deselect All Button
                 Tooltip(
                   message: selectedProjectIds.isEmpty
-                      ? "Select all projects"
-                      : "Deselect all projects",
+                      ? TranslationKeys.selectAllProjects.tr
+                      : TranslationKeys.deselectAllProjects.tr,
                   child: Container(
                     width: 16,
                     height: 16,
@@ -69,7 +71,7 @@ class ProjectsTableHeader extends StatelessWidget {
                 if (selectedProjectIds.isNotEmpty) ...[
                   Tooltip(
                     message:
-                        "Delete selected projects (${selectedProjectIds.length})",
+                        "${TranslationKeys.deleteSelectedProjects.tr}(${selectedProjectIds.length})",
                     child: InkWell(
                       onTap: () => showDeleteConfirmationDialog(
                           selectedProjectIds.toList()),
@@ -107,8 +109,7 @@ class ProjectsTableHeader extends StatelessWidget {
 
                 // Delete Empty Projects Button
                 Tooltip(
-                  message:
-                      "Delete all empty projects (projects with no model or dataset)",
+                  message: TranslationKeys.deleteAllEmptyProjects.tr,
                   child: InkWell(
                     onTap: showDeleteEmptyProjectsDialog,
                     child: Container(
@@ -128,11 +129,11 @@ class ProjectsTableHeader extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
 
-                const Text(
-                  "Name",
-                  style: TextStyle(
+                Text(
+                  TranslationKeys.name.tr,
+                  style: const TextStyle(
                     fontFamily: AppConstants.appFontName,
-                    fontSize: 12,
+                    fontSize: 14.2,
                     fontWeight: FontWeight.w500,
                     color: Color(0xFF666666),
                   ),
@@ -140,55 +141,55 @@ class ProjectsTableHeader extends StatelessWidget {
                 const SizedBox(width: 4),
                 const Icon(
                   Icons.arrow_downward,
-                  size: 12,
+                  size: 16,
                   color: Color(0xFF666666),
                 ),
               ],
             ),
           ),
-          const Expanded(
+          Expanded(
             flex: 2,
             child: Text(
-              "Description",
-              style: TextStyle(
+              TranslationKeys.description.tr,
+              style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
-                fontSize: 12,
+                fontSize: 14.2,
                 fontWeight: FontWeight.w500,
                 color: Color(0xFF666666),
               ),
             ),
           ),
-          const Expanded(
+          Expanded(
             flex: 2,
             child: Text(
-              "Dataset",
-              style: TextStyle(
+              TranslationKeys.dataset.tr,
+              style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
-                fontSize: 12,
+                fontSize: 14.2,
                 fontWeight: FontWeight.w500,
                 color: Color(0xFF666666),
               ),
             ),
           ),
-          const Expanded(
+          Expanded(
             flex: 2,
             child: Text(
-              "Model",
-              style: TextStyle(
+              TranslationKeys.model.tr,
+              style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
-                fontSize: 12,
+                fontSize: 14.2,
                 fontWeight: FontWeight.w500,
                 color: Color(0xFF666666),
               ),
             ),
           ),
-          const Expanded(
+          Expanded(
             flex: 2,
             child: Text(
-              "Created At",
-              style: TextStyle(
+              TranslationKeys.createdAt.tr,
+              style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
-                fontSize: 12,
+                fontSize: 14.2,
                 fontWeight: FontWeight.w500,
                 color: Color(0xFF666666),
               ),

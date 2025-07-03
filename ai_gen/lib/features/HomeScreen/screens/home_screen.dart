@@ -1,13 +1,16 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/reusable_widgets/failure_screen.dart';
 import 'package:ai_gen/core/reusable_widgets/loading_screen.dart';
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_dashboard_header.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/projects_table/projects_table.dart';
-import 'package:ai_gen/features/screens/HomeScreen/cubit/home_cubit.dart';
+
 import 'package:ai_gen/features/screens/HomeScreen/widgets/search_and_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 
 
 
@@ -77,7 +80,7 @@ class _Content extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No projects found for "${state.query}"',
+                  '${TranslationKeys.noResultsFoundFor.tr}${state.query}"',
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.grey.shade600,
@@ -86,7 +89,7 @@ class _Content extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Try searching with different keywords',
+                  TranslationKeys.trySearchingWithDifferentKeywords.tr,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade500,
@@ -105,7 +108,7 @@ class _Content extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  child: const Text('Show All Projects'),
+                  child:  Text(TranslationKeys.showAllProjects.tr),
                 ),
               ],
             ),

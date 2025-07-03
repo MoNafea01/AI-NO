@@ -40,7 +40,7 @@ class CustomIconTextButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: 24,
+              width: 23,
               height: 24,
               child: SvgPicture.asset(
                 fit: BoxFit.cover,

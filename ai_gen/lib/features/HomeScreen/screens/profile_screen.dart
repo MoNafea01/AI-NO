@@ -1,4 +1,5 @@
 // Enhanced ProfileScreen with better error handling and user experience
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_state.dart';
@@ -8,6 +9,7 @@ import 'package:ai_gen/features/HomeScreen/widgets/edit_profile_dialog.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
@@ -91,17 +93,16 @@ class _ProfileScreenState extends State<ProfileScreen>
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content:
-            const Text('Your session has expired. You need to log in again.'),
+        title: Text(TranslationKeys.logout.tr),
+        content: const Text(TranslationKeys.sessionExpiredMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(TranslationKeys.cancel.tr),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Login Again'),
+            child: Text(TranslationKeys.loginAgain.tr),
           ),
         ],
       ),
@@ -131,7 +132,9 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              isAuthError ? 'Session Expired' : 'Error Loading Profile',
+              isAuthError
+                  ? TranslationKeys.sessionExpired.tr
+                  : TranslationKeys.errorLoadingProfile.tr,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: isAuthError ? Colors.orange : Colors.red,
                   ),
@@ -155,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
                 onPressed: _handleLogout,
-                child: const Text('Login Again'),
+                child: Text(TranslationKeys.loginAgain.tr),
               ),
             ] else ...[
               Row(
@@ -172,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     onPressed: () {
                       context.read<ProfileCubit>().retry();
                     },
-                    child: const Text('Try Again'),
+                    child: Text(TranslationKeys.tryAgain.tr),
                   ),
                   const SizedBox(width: 12),
                   TextButton(
@@ -182,7 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                             builder: (_) => const DashboardScreen()),
                       );
                     },
-                    child: const Text('Go to Dashboard'),
+                    child: Text(TranslationKeys.goToDashboard.tr),
                   ),
                 ],
               ),
@@ -198,12 +201,15 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(
+          TranslationKeys.profile.tr,
+          style: const TextStyle(color: Color(0xff666666)),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.bluePrimaryColor),
+            icon: const Icon(Icons.refresh, color: Color(0xff666666)),
             onPressed: () {
               context.read<ProfileCubit>().refreshProfile();
             },
@@ -219,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 content: Text(state.message),
                 backgroundColor: Colors.red,
                 action: SnackBarAction(
-                  label: 'Retry',
+                  label: TranslationKeys.retry.tr,
                   textColor: Colors.white,
                   onPressed: () {
                     context.read<ProfileCubit>().retry();
@@ -231,15 +237,15 @@ class _ProfileScreenState extends State<ProfileScreen>
         },
         builder: (context, state) {
           if (state is ProfileLoading) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(
+                  const CircularProgressIndicator(
                     color: AppColors.bluePrimaryColor,
                   ),
-                  SizedBox(height: 16),
-                  Text('Loading profile...'),
+                  const SizedBox(height: 16),
+                  Text(TranslationKeys.loadProfile.tr),
                 ],
               ),
             );
@@ -267,14 +273,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    const Text("Name:", style: TextStyle(fontSize: 18)),
+                    Text(TranslationKeys.nameLabel.tr,
+                        style: const TextStyle(fontSize: 18)),
                     const SizedBox(height: 8),
                     Row(
                       children: [
                         Expanded(
                           child: CustomTextField(
                             controller: fullNameFirstController,
-                            hintText: 'First name',
+                            hintText: TranslationKeys.firstName.tr,
                             icon: Icons.person,
                             onChanged: (value) {
                               // Optional: Auto-save on change
@@ -285,17 +292,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                         Expanded(
                           child: CustomTextField(
                             controller: fullNameLastController,
-                            hintText: 'Last name',
+                            hintText: TranslationKeys.lastName.tr,
                             icon: Icons.person,
-                            onChanged: (value) {
-                              // Optional: Auto-save on change
-                            },
+                            onChanged: (value) {},
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text("Username:", style: TextStyle(fontSize: 18)),
+                    Text(TranslationKeys.username.tr,
+                        style: const TextStyle(fontSize: 18)),
                     const SizedBox(height: 8),
                     CustomTextField(
                       controller: usernameController,
@@ -305,8 +311,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                       },
                     ),
                     const SizedBox(height: 20),
-                    const Text("Email Address:",
-                        style: TextStyle(fontSize: 18)),
+                    Text(TranslationKeys.emailAddress.tr,
+                        style: const TextStyle(fontSize: 18)),
                     const SizedBox(height: 8),
                     CustomTextField(
                       controller: emailController,
@@ -316,25 +322,26 @@ class _ProfileScreenState extends State<ProfileScreen>
                       },
                     ),
                     const SizedBox(height: 20),
-                    const Text("Bio:", style: TextStyle(fontSize: 18)),
+                    Text(TranslationKeys.bioLabel.tr,
+                        style: const TextStyle(fontSize: 18)),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: bioController,
                       maxLines: 4,
                       decoration: InputDecoration(
-                        hintText: 'Write about yourself',
+                        hintText: TranslationKeys.writeAboutYourself.tr,
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.all(16),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
                           borderSide: const BorderSide(
-                              color: AppColors.bluePrimaryColor, width: 1),
+                              color: Color(0xff666666), width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
                           borderSide: const BorderSide(
-                              color: AppColors.bluePrimaryColor, width: 2),
+                              color: Color(0xff666666), width: 2),
                         ),
                       ),
                       onChanged: (value) {
@@ -367,9 +374,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                             await _loadBioFromPrefs();
                           }
                         },
-                        child: const Text("Save changes",
-                            style:
-                                TextStyle(fontSize: 16, color: Colors.white)),
+                        child: Text(TranslationKeys.saveChanges.tr,
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white)),
                       ),
                     ),
                   ],
@@ -394,8 +401,8 @@ class _ProfileScreenState extends State<ProfileScreen>
               onPressed: () {
                 context.read<ProfileCubit>().loadProfile();
               },
-              child: const Text('Load Profile',
-                  style: TextStyle(fontSize: 16, color: Colors.white)),
+              child: Text(TranslationKeys.loadProfile.tr,
+                  style: const TextStyle(fontSize: 16, color: Colors.white)),
             ),
           );
         },
@@ -404,7 +411,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 }
 
-// Keep your existing CustomTextField class unchanged
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String? hintText;
@@ -426,8 +432,7 @@ class CustomTextField extends StatelessWidget {
       onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hintText ?? controller.text,
-        prefixIcon:
-            icon != null ? Icon(icon, color: AppColors.bluePrimaryColor) : null,
+        prefixIcon: icon != null ? Icon(icon, color: Color(0xff666666)) : null,
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.all(16),
@@ -436,11 +441,11 @@ class CustomTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: AppColors.bluePrimaryColor, width: 2),
+          borderSide: const BorderSide(color: Color(0xff666666), width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: AppColors.bluePrimaryColor, width: 1),
+          borderSide: const BorderSide(color: Color(0xff666666), width: 1),
         ),
       ),
     );

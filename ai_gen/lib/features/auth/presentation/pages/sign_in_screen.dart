@@ -2,6 +2,7 @@
 
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
@@ -11,6 +12,7 @@ import 'package:ai_gen/features/auth/presentation/widgets/outlinedPrimaryButton.
 import 'package:ai_gen/features/auth/presentation/widgets/social_sign_in_button.dart';
 import 'package:ai_gen/features/request_otp_screen/presentation/pages/request_otp_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -279,33 +281,33 @@ class _LoginFormState extends State<LoginForm>
   }
 
   Widget _buildSuccessAnimation() {
-    return const Column(
+    return  Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
+        const Icon(
           Icons.check_circle_outline,
           color: Colors.green,
           size: 80,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         Text(
-          "Login Successful!",
-          style: TextStyle(
+          TranslationKeys.loginSuccessful.tr,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.green,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
-          "Redirecting to dashboard...",
-          style: TextStyle(
+          TranslationKeys.redirectingToDashboard.tr,
+          style: const TextStyle(
             fontSize: 16,
             color: Colors.black54,
           ),
         ),
-        SizedBox(height: 24),
-        CircularProgressIndicator(
+        const SizedBox(height: 24),
+        const CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
         ),
       ],
@@ -318,9 +320,9 @@ class _LoginFormState extends State<LoginForm>
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Sign In',
-            style: TextStyle(
+           Text(
+            TranslationKeys.welcomeBack.tr,
+            style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
@@ -343,7 +345,7 @@ class _LoginFormState extends State<LoginForm>
                   : [],
             ),
             child: CustomTextField(
-              hintText: 'Email address',
+              hintText: TranslationKeys.emailHintText.tr,
               suffixIcon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
               focusNode: emailFocusNode,
@@ -376,7 +378,7 @@ class _LoginFormState extends State<LoginForm>
                   : [],
             ),
             child: CustomTextField(
-              hintText: 'Password',
+              hintText: TranslationKeys.passwordHintText.tr,
               suffixIcon: Icons.visibility_outlined,
               focusNode: passwordFocusNode,
               isPassword: true,
@@ -411,9 +413,9 @@ class _LoginFormState extends State<LoginForm>
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Remember me',
-                    style: TextStyle(fontSize: 14),
+                   Text(
+                    TranslationKeys.rememberMe.tr,
+                    style: const TextStyle(fontSize: 14),
                   ),
                 ],
               ),
@@ -425,9 +427,9 @@ class _LoginFormState extends State<LoginForm>
                     MaterialPageRoute(builder: (_) => const RequestOtpScreen()),
                   );
                 },
-                child: const Text(
-                  'Forgot password?',
-                  style: TextStyle(
+                child:  Text(
+                 TranslationKeys.forgotPassword.tr,
+                  style: const TextStyle(
                     color: Color(0xFF1E88E5),
                     fontWeight: FontWeight.w500,
                   ),
@@ -492,7 +494,7 @@ class _LoginFormState extends State<LoginForm>
           // Sign In Button
           CustomPrimaryButton(
             buttonBackgroundColor: AppColors.bluePrimaryColor,
-            buttonName: 'Sign in',
+            buttonName: TranslationKeys.signIn.tr,
             textButtonColor: AppColors.appBackgroundColor,
             onPressed: () => authProvider.signIn(context),
             isLoading: authProvider.isSigningIn,
@@ -500,10 +502,10 @@ class _LoginFormState extends State<LoginForm>
           const SizedBox(height: 24),
 
           // Social Sign In
-          const Text(
-            'Or sign in with',
+           Text(
+           TranslationKeys.orSignInWith.tr,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.black54,
               fontSize: 14,
             ),
@@ -528,9 +530,9 @@ class _LoginFormState extends State<LoginForm>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                "Don't have an account?",
-                style: TextStyle(color: Colors.black54),
+               Text(
+                TranslationKeys.dontHaveAnAccount.tr,
+                style: const TextStyle(color: Colors.black54),
               ),
               TextButton(
                 onPressed: () {
@@ -550,9 +552,9 @@ class _LoginFormState extends State<LoginForm>
                     ),
                   );
                 },
-                child: const Text(
-                  'Create free account',
-                  style: TextStyle(
+                child:  Text(
+                  TranslationKeys.createFreeAccount.tr,
+                  style: const TextStyle(
                     color: Color(0xFF1E88E5),
                     fontWeight: FontWeight.w600,
                   ),

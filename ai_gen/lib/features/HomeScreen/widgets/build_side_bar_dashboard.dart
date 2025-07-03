@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
@@ -9,6 +10,7 @@ import 'package:ai_gen/features/HomeScreen/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 Widget buildSidebar(BuildContext context, DashboardState state) {
   return AnimatedContainer(
@@ -60,6 +62,7 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -113,10 +116,10 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                             );
                           },
                           child: state.isExpanded
-                              ? const Text(
-                                  "Collapse",
-                                  key: ValueKey('collapse-text'),
-                                  style: TextStyle(
+                              ? Text(
+                                  TranslationKeys.collapse.tr,
+                                  key: const ValueKey('collapse-text'),
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     color: Color(0xff383838),
                                   ),
@@ -160,7 +163,7 @@ List<Widget> buildAnimatedSidebarItems(
   final items = [
     {
       'icon': AssetsPaths.exploreIcon,
-      'label': 'Explore',
+      'label': TranslationKeys.explore.tr,
       'screen': AppScreen.explore
     },
     // {
@@ -170,23 +173,27 @@ List<Widget> buildAnimatedSidebarItems(
     // },
     {
       'icon': AssetsPaths.modelIcon,
-      'label': 'Models',
+      'label': TranslationKeys.models.tr,
       'screen': AppScreen.models
     },
     {
       'icon': AssetsPaths.dataSetsIcon,
-      'label': 'Datasets',
+      'label': TranslationKeys.datasets.tr,
       'screen': AppScreen.datasets
     },
     {
       'icon': AssetsPaths.learnIcon,
-      'label': 'Learn',
+      'label': TranslationKeys.learn.tr,
       'screen': AppScreen.learn
     },
-    {'icon': AssetsPaths.docsIcon, 'label': 'Docs', 'screen': AppScreen.docs},
+    {
+      'icon': AssetsPaths.docsIcon,
+      'label': TranslationKeys.docs.tr,
+      'screen': AppScreen.docs
+    },
     {
       'icon': AssetsPaths.settingIcon,
-      'label': 'Settings',
+      'label': TranslationKeys.settings.tr,
       'screen': AppScreen.settings
     },
   ];
