@@ -78,7 +78,7 @@ class _MyAppState extends State<MyApp>
     return MultiRepositoryProvider(
       providers: [
         BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
-         BlocProvider<HomeCubit>(
+        BlocProvider<HomeCubit>(
           create: (_) => HomeCubit(),
         ),
       ],
