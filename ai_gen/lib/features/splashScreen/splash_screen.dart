@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, use_build_context_synchronously
+
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/network/server_manager/server_manager.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
@@ -35,23 +37,20 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    // Initialize the AnimationController
     _animationController = AnimationController(
-      vsync: this, // Use 'this' as the TickerProvider
-      duration: const Duration(seconds: 2), // Adjust duration as needed
+      vsync: this,
+      duration: const Duration(seconds: 2),
     );
 
-    // Initialize the Animation
     _animation = Tween<double>(begin: 0, end: 2 * 3.14159).animate(
-      // 2*pi for a full rotation
       CurvedAnimation(
         parent: _animationController,
-        curve: Curves.easeInOut, // Choose a suitable curve
+        curve: Curves.easeInOut,
       ),
     );
     _animationController.repeat(reverse: true);
     _startServer();
-   // _checkAppStart();
+    // _checkAppStart();
   }
 
   Future<void> _startServer() async {
@@ -111,35 +110,23 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     if (running) {
-      setState(() => _status = TranslationKeys.serverRunningLoadingDashboard.tr);
+      setState(
+          () => _status = TranslationKeys.serverRunningLoadingDashboard.tr);
       await Future.delayed(const Duration(milliseconds: 500));
+
       if (mounted) {
-       _checkAppStart();
+        _checkAuthentication();
       }
     } else {
       setState(() {
-        _status =
-            TranslationKeys.failedToStartServer;
+        _status = TranslationKeys.failedToStartServer;
         _showRetryButton = true;
       });
     }
   }
 
- 
-
-  Future<void> _retryServer() async {
-    await _startServer();
-  }
-
-  @override
-  void dispose() {
-    _animationController
-        .dispose(); // Dispose the controller when the widget is removed
-    super.dispose();
-  }
-
 // check app start
-Future<void> _checkAppStart() async {
+  Future<void> _checkAuthentication() async {
     await Future.delayed(const Duration(seconds: 2)); // show splash effect
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
@@ -151,31 +138,34 @@ Future<void> _checkAppStart() async {
 
     if (accessToken != null && refreshToken != null) {
       // ✅ User is already logged in
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()));
-      //MaterialPageRoute(builder: (context) => const DashboardScreen());
-      //  Navigator.pushReplacementNamed(context, '/home');
-      print("Navigating to HomeScreen (already logged in)");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardScreen(
+            projectModel: widget.initialProject,
+          ),
+        ),
+      );
     } else if (isFirstTime) {
       // ✅ First-time user, go to sign-up and mark as not first time anymore
       await prefs.setBool('isFirstTime', false);
 
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const SignupScreen()));
-
-      //MaterialPageRoute(builder: (context) => const SignupScreen());
-      //  Navigator.pushReplacementNamed(context, '/signUp');
-      print("Navigating to SignUpScreen (first time)");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupScreen()),
+      );
     } else {
       // ✅ Returning user but logged out, go to sign-in
-
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const LoginScreen()));
-      // MaterialPageRoute(builder: (context) => const LoginScreen());
-
-      //  Navigator.pushReplacementNamed(context, '/signIn');
-      print("Navigating to SignInScreen (returning user)");
     }
+  }
+
+  @override
+  void dispose() {
+    _animationController
+        .dispose(); // Dispose the controller when the widget is removed
+    super.dispose();
   }
 
   @override
@@ -227,7 +217,7 @@ Future<void> _checkAppStart() async {
             if (_showRetryButton) ...[
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _retryServer,
+                onPressed: _startServer,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
@@ -239,7 +229,7 @@ Future<void> _checkAppStart() async {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child:  Text(
+                child: Text(
                   TranslationKeys.retry.tr,
                   style: const TextStyle(
                     fontSize: 16,
