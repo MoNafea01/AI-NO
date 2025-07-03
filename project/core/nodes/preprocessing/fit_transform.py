@@ -30,6 +30,11 @@ class FitTransform:
 
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
 
         self.payload = self._fit_transform(err)
 
@@ -74,14 +79,15 @@ class FitTransform:
             payload = []
             payload.append(PayloadBuilder.build_payload("Preprocessor fitted and transformed", (fitted_preprocessor,output),
                                                          "fitter_transformer", node_type="fitter_transformer", task="fit_transform", project_id=self.project_id,
-                                                         uid=self.uid))
+                                                         uid=self.uid, location_x=self.location_x, location_y=self.location_y, input_ports=self.input_ports, output_ports=self.output_ports,
+                                                         displayed_name=self.displayed_name))
             
-            names = ["Fitted Preprocessor", "Transformed Data"]
+            names = ["fitted_preprocessor", "transformed_data"]
             tasks = ["fit_preprocessor", "transform"]
             uids = [self.uid - 2, self.uid - 1]
             for i in range(1, 3):
                 payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [fitted_preprocessor, output][i-1], "fitter_transformer",
-                                                             node_type="fitter_transformer", task=tasks[i-1], project_id=self.project_id, uid=uids[i-1]))
+                                                             node_type="fitter_transformer", task=tasks[i-1], project_id=self.project_id, uid=uids[i-1], parent=[payload[0]['node_id']]))
             
             payload[0]['children'] = [payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):

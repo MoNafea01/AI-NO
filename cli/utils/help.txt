@@ -1,0 +1,159 @@
+Cli script guidebook
+
+Available commands:
+
+User:
+    aino --user register <user_name> <password>	    // Register a new user
+	aino --user login <user_name> <password>		// Login to a user 
+	aino --user remove <user_name>		    // remove a user (you have to be admin to do that)
+	aino --user make_admin <user_name>		// make a user as an admin (you have to be admin to do that)
+
+
+
+Project:
+	aino --project create <project_name> <project_description>	// create a project
+	aino --project select <project_id>		// select an existing project 
+	aino --project remove <project_id>		// remove a project
+	aino --project deselect			        // deselect a project
+	aino --project list				        // list all projects
+	aino --project clear <project_id>		// clear all nodes in a project
+	aino --project load <project_id>		// loads a poject from database
+	aino --project get <project_id>		    // get all nodes in a project
+
+    
+node:
+	aino --node create <node_name> <args>				// create a node
+	aino --node edit <node_name> <node_id> <args>		// update an existing node
+	aino --node remove <node_name> <node_id>			// remove an existing node
+	aino --node show <node_name> <node_id> <output_port>	// get a node
+	aino --node list  							// list all nodes
+    
+General:
+	aino --general recent					// get recent project with recent user automatically
+	aino --general help					// list all possible commands
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+expected output for each command:
+register:
+	Success: “User {username} created.”
+	Fail: "User {username} already exists."
+login:
+	Success: "User {username} selected."
+	Fail: "Invalid username or password."
+remove_user:
+	Success: "User {username} removed."
+	Fail: "User does not exist." Or "You must be an admin to remove users."
+make_admin:
+	Success: "User {username} is now an admin."
+	Fail: "You must be an admin to make other users admins." Or "User does not exist."
+create_project:
+	Success: "Project {project_id} created."
+select_project:
+	Success: "Project {project_id} selected."
+	Fail: "No user selected." Or "Project does not exist."
+deselect_project:
+	Success: "Project deselected."
+list_projects:
+	Success: "Projects: "
+	Fail: "No user selected."
+remove_project:
+	Success: "Project {project_id} removed."
+	Fail: "Project does not exist." Or "No user selected."
+clear_project:
+	Success: "Project {project_id} cleared."
+	Fail: "No user selected."
+load_project:
+	Success: a list of json format
+get_project:
+	Success: a list of json format
+make:
+	Success: json format for the created node
+	Fail: "Error creating Node" Or "No Project selected." Or "Node {node_name} not found in the mapper."
+Edit:
+	Success: json format for the updated node
+	Fail: "No Project selected." Or "Node {node_name} not found in the mapper." Or "Node {block_id} not found." Or "Error Updating Node"
+remove:
+	Success: "Node {block_id} removed."
+	Fail: "No Project selected." Or "Node {node_name} not found in mapper." Or "Node {block_id} not found." Or "Error Removing Node"
+Show:
+	Success: a json format for the node
+	Fail: "No Project selected." Or "Node {node_name} not found in the mapper." Or "Node {block_id} not found." Or "Error getting Node"	
+
+All Possible node_name values:
+
+ridge
+lasso
+linear_regression
+sgd_regression
+elastic_net
+sgd_classifier
+ridge_classifier
+logistic_regression
+rbf_svr
+linear_svr
+poly_svr
+sigmoid_svr
+rbf_svc
+linear_svc
+poly_svc
+sigmoid_svc
+bagging_regressor
+adaboost_regressor
+gradient_boosting_regressor
+decision_tree_regressor
+random_forest_regressor
+bagging_classifier
+adaboost_classifier
+gradient_boosting_classifier
+decision_tree_classifier
+random_forest_classifier
+gaussian_nb
+bernoulli_nb
+multinomial_nb
+knn_regressor
+knn_classifier
+model_fitter
+predictor
+evaluator
+maxabs_scaler
+normalizer
+minmax_scaler
+robust_scaler
+standard_scaler
+label_encoder
+onehot_encoder
+ordinal_encoder
+label_binarizer
+knn_imputer
+simple_imputer
+binarizer
+preprocessor_fitter
+transformer
+fitter_transformer
+data_loader
+splitter
+joiner
+train_test_split
+input_layer
+conv2d_layer
+maxpool2d_layer
+flatten_layer
+dense_layer
+dropout_layer
+sequential_model
+nn_fitter
+model_compiler
+

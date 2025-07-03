@@ -1,5 +1,8 @@
 from __init__ import *
-import json, datetime, tempfile, subprocess, random, pandas as pd
+import json, datetime, tempfile, subprocess, pandas as pd
+import uuid
+
+import requests
 
 from rest_framework import status, viewsets
 from rest_framework.views import APIView, Response
@@ -10,16 +13,17 @@ from .serializers import *
 
 from core.nodes import *
 from core.repositories import *
+from .utils import *
 from core.nodes.configs.const_ import get_node_name_by_api_ref
-
-from chatbot.app import sync_generate_cli
-from cli.call_cli import call_script
+from chatbot.res.defaults import create_data_mapping
+from cli.utils.mapper import create_mapper
 
 class NodeQueryMixin:
     """
     A mixin to handle 'get' requests for any ViewSet.
     It extracts "node_id" from request parameters and uses NodeLoader.
     """
+    
     def get_query_params(self, request):
         """Extracts query parameters from the request."""
         node_id = request.query_params.get("node_id")
@@ -45,42 +49,69 @@ class NodeQueryMixin:
             if node.node_name not in DATA_NODES:
                 return_data = False
 
-            # get chain of nodes using "output" query_param, specific for layer nodes
-            if output.isdigit() and int(output) > 0:
+            
+            if output.lstrip('-').isdigit():
                 depth = int(output)
-                try:
-                    success, current_node = NodeLoader(return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
+                success, current_node = NodeLoader(return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
+
+                # get children of multi-channel nodes
+                if node.node_name in MULTI_CHANNEL_NODES:
                     if success:
                         children = current_node.get("children", [])
-                        if len(current_node.get("children")) > 1:
+                        if len(current_node.get("children")) > 1 and depth > 0:
                             child_id = children[int(output) - 1] if len(children) >= int(output) else None
                             if isinstance(child_id, int):
                                 success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
                                 node_id = str(child_id)
                     else:
                         return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
-                except Exception as e:
-                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-                
-                # get node's children, for multi_channel nodes it has 2 children
-                else:
-                    for i in range(depth):
-                        child = current_node.get("children", [])
-                        if child:
-                            child_id = child[0]
-                            try:
-                                success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
-                                if not success:
-                                    return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
-                            except Exception as e:
-                                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                # chain of nodes for viewing NN layers
+                else:  
+                    if int(output) < 0:
+                        for i in range(depth * -1):
+                            parent = current_node.get("parent", [])
+                            child = current_node.get("children", [])
+                            if parent:
+                                parent_id = parent[0]
+                                try:
+                                    success, current_node = NodeLoader(return_path=return_path)(node_id=str(parent_id), project_id=project_id)
+                                    if not success:
+                                        return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
+                                except Exception as e:
+                                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
                             
+                            # Compatability with old version of backend
+                            elif child:
+                                child_id = child[0]
+                                try:
+                                    success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
+                                    if not success:
+                                        return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
+                                except Exception as e:
+                                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                                
+                            else:
+                                break
+                        node_id = str(current_node.get("node_id", node_id))
+
+                    elif int(output) > 0:
+                        for i in range(depth):
+                            child = current_node.get("children", [])
+                            if child:
+                                child_id = child[0]
+                                try:
+                                    success, current_node = NodeLoader(return_path=return_path)(node_id=str(child_id), project_id=project_id)
+                                    if not success:
+                                        return Response({"error": current_node}, status=status.HTTP_400_BAD_REQUEST)
+                                except Exception as e:
+                                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                                
                             else:
                                 break
                         node_id = str(current_node.get("node_id", node_id))
 
             success, payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
-
             # Filter by project_id if provided
             if project_id and payload:
                 if str(payload.get('project_id')) != str(project_id):
@@ -110,6 +141,7 @@ class NodeQueryMixin:
                 try:
                     success, message = NodeDeleter(is_multi_channel)(node_id, project_id=project_id)
                     if success:
+                        delete_project_model_and_dataset(project_id, node)
                         return Response({"message": f"Node {node_id} deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
                     else:
                         return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
@@ -139,25 +171,30 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             return value["node_id"]
         return value
 
+
     def get_processor_and_args(self, request):
         # for multi-channel nodes, else it returns the parent one
         output_channel = request.query_params.get('output', None) 
         # return the node_data as hashed object for serialization
         return_serialized = request.query_params.get('return_serialized', '0') == '1'
         project_id = request.query_params.get('project_id') 
-        node_id = request.query_params.get("node_id", None)
+        template_id = request.query_params.get('template_id', None)
 
+        project_id = None if project_id == "" else project_id
+        node_id = request.query_params.get("node_id", None)
         if settings.TESTING:
             uid = 0
+            default_name = "default"
+            node_name = "default"  # Set default node_name for testing
         else:
             try:
                 # get uid component for node by its name
                 ref = request.path.strip('/').split('/')[-1] + '/'
                 node_name = get_node_name_by_api_ref(ref, request)
                 uid = Component.objects.get(node_name=node_name).uid
+                default_name = Component.objects.get(node_name=node_name).displayed_name
             except Component.DoesNotExist:
                 return Response({"error": f"Component with name {node_name} not found"}, status=status.HTTP_404_NOT_FOUND), None, None, None
-
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
@@ -177,29 +214,61 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 
                 validated_data['project_id'] = project_id
             
-            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid)
-            BaseNodeAPIView.cur_id += 1
+            input_ports, output_ports = [], []
 
+            if validated_data.get('error'):
+                return validated_data, None, None, None, None
+
+            if not settings.TESTING:
+                success, input_ports = get_input_ports(validated_data, project_id)
+                if not success:
+                    return input_ports, None, None, None, None
+                success, output_ports = get_output_ports(component_id = uid)
+                if not success:
+                    return output_ports, None, None, None, None
+            displayed_name = request.data.get('displayed_name', None)
+            if not displayed_name:
+                displayed_name = request.query_params.get('displayed_name', default_name)
+            
+            location_x, location_y = get_optimum_location(node_name)
+
+            processor = self.get_processor(validated_data, project_id=project_id, cur_id = BaseNodeAPIView.cur_id, uid=uid, 
+                                           input_ports=input_ports, output_ports=output_ports, displayed_name=displayed_name,
+                                           template_id=template_id, location_x=location_x, location_y=location_y)
+            BaseNodeAPIView.cur_id += 1
+            
+            if request.path == '/api/save_template/':
+                response = update_components()
+                if response.status_code == 200:
+                    print("Schema updated successfully.")
+                else:
+                    return Response({"error": response}, status=status.HTTP_400_BAD_REQUEST), None, None, None, None
             return processor, return_serialized, output_channel, node_id, project_id
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST), None, None, None
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST), None, None, None, None
 
+    
+    
+    
+    
     def post(self, request):
-
         result = self.get_processor_and_args(request)
         if isinstance(result[0], Response):
             return result[0]
-        processor, return_serialized, output_channel, *_ = result
+        processor, return_serialized, output_channel, *_, project_id = result
+        if isinstance(processor, str):
+            return Response({"error": processor}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
+
             response_data = processor(output_channel, return_serialized=return_serialized)
             if isinstance(response_data, str):
                 return Response({"error": response_data}, status=status.HTTP_400_BAD_REQUEST)
             
             node_id = response_data.get("node_id")
-            project_id = response_data.get("project_id")
+            update_project_model_and_dataset(project_id=project_id, node=response_data)
 
             # Returns node_data chosen
             response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path = not return_serialized)(node_id, project_id=project_id)
@@ -214,12 +283,18 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         
         processor, return_serialized, _, node_id, project_id = result
 
+        if isinstance(processor, str):
+            return Response({"error": processor}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
             success, message = NodeUpdater(return_serialized)(node_id, project_id, processor())
+            
             if isinstance(message, str):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+            
+            update_project_model_and_dataset(project_id=project_id, node=processor())
             message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
             
             status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
@@ -236,7 +311,7 @@ class DataLoaderAPIView(BaseNodeAPIView):
     def get_processor(self, validated_data, *args, **kwargs):
         return DataLoader(
             dataset_name=validated_data.get("params", {}).get("dataset_name"),
-            dataset_path=validated_data.get("params", {}).get("dataset_path"),
+            dataset_path=validated_data.get("params", {}).get("dataset_path", ""),
             **kwargs
         )
 
@@ -512,6 +587,7 @@ class SequentialAPIView(BaseNodeAPIView):
             **kwargs
         )
 
+
 class ModelCompilerAPIView(BaseNodeAPIView):
     """API view for handling model compilation."""
 
@@ -527,6 +603,7 @@ class ModelCompilerAPIView(BaseNodeAPIView):
             **kwargs
         )
 
+
 class NetModelFitterAPIView(BaseNodeAPIView):
     def get_serializer_class(self):
         return NetModelFitterSerializer
@@ -541,13 +618,39 @@ class NetModelFitterAPIView(BaseNodeAPIView):
             **kwargs
         )
 
+
+class NodeTemplateSaverAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return NodeTemplateSaverSerializer
+
+    def get_processor(self, validated_data, *args, **kwargs):
+        return NodeTemplateSaver(
+            node=validated_data.get("node"),
+            name = validated_data.get('params',{}).get("name"),
+            description = validated_data.get('params',{}).get("description"),
+            **kwargs
+        )
+
+class NodeTemplateLoaderAPIView(BaseNodeAPIView):
+    def get_serializer_class(self):
+        return NodeTemplateLoaderSerializer
+
+    def get_processor(self, validated_data, *args, **kwargs):
+        return NodeTemplateLoader(
+            **kwargs
+        )
+        
+    
+
+
 class NodeLoaderAPIView(APIView, NodeQueryMixin):
 
     def get_serialized_payload(self, path, return_serialized, project_id):
         """Loads a node, saves it, and optionally serializes it."""
         loader = NodeLoader(from_db=False)
-        success, payload = loader(project_id= project_id, path=path)
-        node_name = payload.get("message").split(" ")[1]
+        success, payload = loader(project_id = project_id, path=path)
+
+        node_name = payload.get("message").split(": ")[-1].split(' with id ')[0]
         uid = Component.objects.get(node_name="node_loader").uid
         payload.update({"node_name":node_name,
                         "project_id": project_id,
@@ -597,10 +700,8 @@ class NodeLoaderAPIView(APIView, NodeQueryMixin):
                 payload = self.get_serialized_payload(path, return_serialized, project_id)
                 node_id = request.query_params.get("node_id", None)
                 success, message = NodeUpdater(return_serialized)(node_id, project_id, payload)
-
-                message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
-                        
                 if success:
+                    message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
                     return Response({"message": message}, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
@@ -614,7 +715,12 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
     def process_node_save(self, request):
         """Handles node saving logic for both POST and PUT requests."""
         payload = request.data.get("node")
-        path = request.data.get("node_path")  # Optional path parameter
+        path = request.data.get('params', {}).get("node_path")  # Optional path parameter
+        if not payload:
+            return Response({"error": "Node data is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not path:
+            return Response({"error": "Path is required."}, status=status.HTTP_400_BAD_REQUEST)
         project_id = request.query_params.get('project_id')
         return_serialized = request.query_params.get("return_serialized") == "1"
         uid = Component.objects.get(node_name="node_saver").uid
@@ -624,7 +730,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
                 success, payload = NodeLoader()(node_id=payload, project_id=project_id)
             node_data = NodeDataExtractor()(payload, project_id=project_id)
             payload["node_data"] = node_data
-            payload["node_id"] = id(saver)
+            payload["node_id"] = uuid.uuid1().int & ((1 << 63) - 1)
             try:
                 project_id = Project.objects.get(id=project_id).id
             except :
@@ -652,7 +758,7 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request):
-        serializer, project_id = NodeSaverSerializer(data=request.data)
+        serializer = NodeSaverSerializer(data=request.data)
         if serializer.is_valid():
             response = self.process_node_save(request)
             response_data = response.data
@@ -661,13 +767,12 @@ class NodeSaveAPIView(APIView, NodeQueryMixin):
             return_serialized = request.query_params.get("return_serialized") == "1"
 
             success, message = NodeUpdater(return_serialized)(node_id, project_id, response_data)
-
-            if return_serialized:
-                message["node_data"] = NodeDataExtractor(return_serialized=True)(message, project_id=project_id)
-            else:
-                message["node_data"] = NodeDataExtractor(return_path=True)(message, project_id=project_id)
-
             if success:
+                if return_serialized:
+                    message["node_data"] = NodeDataExtractor(return_serialized=True)(message, project_id=project_id)
+                else:
+                    message["node_data"] = NodeDataExtractor(return_path=True)(message, project_id=project_id)
+
                 return Response(message, status=status.HTTP_200_OK)
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -736,8 +841,9 @@ class ExcelUploadAPIView(APIView):
                     row_data = row.to_dict()
                     if row_data.get('params'):
                         for param in row_data['params']:
-                            param['name'] = param['name'].strip()
-                    
+                            if isinstance(param, dict) and 'name' in param:
+                                param['name'] = param['name'].strip()
+
                     serializer = ComponentSerializer(data=row_data)
                     if serializer.is_valid():
                         serializer.save()
@@ -759,10 +865,41 @@ class ExcelUploadAPIView(APIView):
             'skipped': skipped_count,
             'errors': errors
             }    
+            create_data_mapping(), create_mapper()
             return Response(response, status=status.HTTP_201_CREATED)
             
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateComponentsAPIView(APIView):
+    def put(self, request):
+        try:
+            url1 = "http://127.0.0.1:8000/api/clear_components/"
+            url2 = "http://127.0.0.1:8000/api/upload_excel/"
+            path = request.data.get("file_path")
+
+            if not path:
+                    return Response({"error": "file_path is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            response1 = requests.request("DELETE", url1, headers={}, data={})
+            with open(path, 'rb') as file:
+                
+                files=[('file',('schema.xlsx', file,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))]
+                
+                response2 = requests.request("POST", url2, headers={}, data={}, files=files)
+            
+            if response1.status_code == 204 and response2.status_code == 201:
+                return Response({"message": "Components updated successfully"}, status=status.HTTP_200_OK)
+
+            else:
+                return Response({
+                        "error": "Failed to update components",
+                        "clear_status": response1.status_code,
+                        "upload_status": response2.status_code,
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
@@ -791,6 +928,8 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
                     item['project_id'] = project_id
                 if item.get('project'):
                     item.pop('project')
+                if not item.get('node_id'):
+                    item['node_id'] = uuid.uuid1().int & ((1 << 63) - 1)
                     
             serializer = self.get_serializer(data=data, many=True)
         else:
@@ -822,6 +961,8 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
             for item in request.data:
                 node_id = item.get('node_id')
                 if not node_id:
+                    # node_id = uuid.uuid1().int & ((1 << 63) - 1)
+                    # item['node_id'] = node_id
                     continue
                 
                 try:
@@ -838,8 +979,24 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
                         
                     instance.save()
                     updated_nodes.append(self.get_serializer(instance).data)
+                    
                 except Node.DoesNotExist:
-                    continue
+                    create_data = item.copy()
+                    if project_id:
+                        create_data['project_id'] = project_id
+
+                    create_serializer = self.get_serializer(data=create_data)
+                    
+                    if create_serializer.is_valid():
+                        new_node = create_serializer.save()
+                        updated_nodes.append(self.get_serializer(new_node).data)
+                    else:
+                        # Add validation errors to response
+                        updated_nodes.append({
+                            "node_id": node_id,
+                            "errors": create_serializer.errors,
+                            "status": "failed_validation"
+                        })
                     
             return Response(updated_nodes, status=status.HTTP_200_OK)
         else:
@@ -850,8 +1007,13 @@ class NodeAPIViewSet(viewsets.ModelViewSet, NodeQueryMixin):
         """Filter nodes by project if project_id is provided in query params"""
         queryset = Node.objects.all()
         project_id = self.request.query_params.get('project_id', None)
-        if project_id:
+        node_id = self.request.query_params.get('node_id', None)
+        if project_id and node_id:
+            queryset = queryset.filter(project_id=project_id, node_id=node_id)
+        elif project_id:
             queryset = queryset.filter(project_id=project_id)
+        elif node_id:
+            queryset = queryset.filter(node_id=node_id)
         
         return queryset
 
@@ -886,7 +1048,7 @@ class ExportProjectAPIView(APIView):
             if not(os.path.abspath(folder_path) == os.path.abspath(folder_path).split('.')[-1]):
                 return Response({"error": "Folder path must be a directory, not a file."}, status=status.HTTP_400_BAD_REQUEST)
             
-            encrypt = not( password == '')
+            encrypt = not(password == '')
             # Get project_id from query parameters
             project_id = request.query_params.get('project_id')
             if not project_id:
@@ -901,6 +1063,11 @@ class ExportProjectAPIView(APIView):
                 
             # Get all nodes for the project
             nodes = Node.objects.filter(project_id=project_id)
+            
+            # Set node_data to None for all nodes before serialization
+            for node in nodes:
+                node.node_data = None
+            
             serializer = NodeSerializer(nodes, many=True)
             
             # Create export data with project info and nodes
@@ -909,6 +1076,8 @@ class ExportProjectAPIView(APIView):
                 "project_name": project.project_name,
                 "project_description": project.project_description,
                 "export_date": datetime.datetime.now().isoformat(),
+                "model": project.model,
+                "dataset": project.dataset,
                 "nodes": serializer.data
             }
             # Convert to JSON 
@@ -971,6 +1140,7 @@ class ExportProjectAPIView(APIView):
                             "error": f"Converter script not found at path: {converter_path}"
                         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     
+                    print(f"Saved Password: {password}")
                     python_executable = sys.executable
                     # Run converter script
                     result = subprocess.run([
@@ -1210,6 +1380,11 @@ class ImportProjectAPIView(APIView):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    
+    def get_queryset(self):
+        """Override to apply filtering based on query parameters."""
+        queryset = Project.objects.all()
+        return ProjectSerializer.get_filtered_queryset(queryset, self.request)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -1238,6 +1413,93 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "success": True,
             "message": f"Project deleted successfully with {node_count} associated nodes",
         }, status=status.HTTP_200_OK)
+    
+    
+
+
+class MultiProjectNodeAPIView(APIView):
+    """API view for bulk operations on nodes across multiple projects."""
+    
+    def post(self, request):
+        """Create or update nodes across multiple projects."""
+        try:
+            # Extract the data structure: {project_id: [node1, node2, ...], ...}
+            projects_data = request.data
+            
+            if not isinstance(projects_data, list):
+                return Response({"error": "Request body must be a dictionary with project IDs as keys"},
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            results = {}
+            
+            for project_obj in projects_data:
+                if not isinstance(project_obj, dict):
+                    continue
+
+                project_id = project_obj.get('id')
+                nodes = project_obj.get('content', [])
+
+                if not project_id:
+                    continue
+                
+                if not isinstance(nodes, list):
+                    results[project_id] = {"error": "Project content must be provided as a list"}
+                    continue
+            
+                # Verify project exists or create it
+                try:
+                    project = Project.objects.get(id=project_id)
+                except Project.DoesNotExist:
+                    # Create a new project with default name
+                    project_name = project_obj.get('project_name', f'Project_{project_id}')
+                    project_description = project_obj.get('project_description', 'No description provided')
+                    
+                    project = Project.objects.create(
+                        project_name=project_name,
+                        project_description=project_description
+                    )
+                
+                # Process nodes for this project
+                project_results = []
+                for node_data in nodes:
+                    # Ensure node has a node_id
+                    if not node_data.get('node_id'):
+                        node_data['node_id'] = uuid.uuid1().int & ((1 << 63) - 1)
+                    
+                    if 'project' in node_data:
+                        node_data.pop('project')
+                    
+                    if 'node_data' in node_data:
+                        node_data.pop('node_data')
+
+                    # Set the project_id in the node data
+                    node_data['project_id'] = project.id
+                    # Create or update the node
+                    serializer = NodeSerializer(data=node_data)
+                    if serializer.is_valid():
+                        node = serializer.save()
+                        project_results.append({
+                            "node_id": node.node_id,
+                            "status": "created" 
+                        })
+                    else:
+                        project_results.append({
+                            "node_id": node_data.get('node_id'),
+                            "errors": serializer.errors,
+                            "status": "failed"
+                        })
+                
+                results[project_id] = {
+                    "project_name": project.project_name,
+                    "nodes_processed": len(project_results),
+                    "results": project_results
+                }
+            
+            return Response(results, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class BulkProjectDeleteAPIView(APIView):
     """API view for deleting multiple projects at once."""
@@ -1245,28 +1507,40 @@ class BulkProjectDeleteAPIView(APIView):
     def delete(self, request):
         try:
             # Extract project IDs from request data
-            project_ids = request.data.get('project_ids', [])
+            projects_ids = request.data.get('projects_ids', [])
             
-            if not project_ids:
-                return Response({"error": "No project IDs provided"}, 
-                              status=status.HTTP_400_BAD_REQUEST)
+            if not projects_ids:
+                url = "http://127.0.0.1:8000/api/projects/"
+                response = requests.get(url)
+
+                if response.status_code == 200:
+                    projects = response.json()
+                    projects_ids = [project['id'] for project in projects]
+                else:
+                    return Response({"error": "Failed to fetch projects"}, 
+                                  status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            if not isinstance(project_ids, list):
-                return Response({"error": "project_ids must be a list"}, 
+            if not isinstance(projects_ids, list):
+                return Response({"error": "projects_ids must be a list"}, 
                               status=status.HTTP_400_BAD_REQUEST)
             
             # Track deletion results
-            deleted_count = 0
+            deleted_count, node_count = 0, 0
             not_found_ids = []
             error_ids = []
-            
             # Process each project ID
-            for project_id in project_ids:
+            for project_id in projects_ids:
                 try:
                     project = Project.objects.get(id=project_id)
                     
                     # Delete associated nodes first
-                    node_count = Node.objects.filter(project_id=project_id).delete()[0]
+                    project_node_count = Node.objects.filter(project_id=project_id).delete()[0]
+                    node_count += project_node_count
+                    url = f"http://127.0.0.1:8000/api/clear_nodes/?project_id={project_id}"
+                    response = requests.delete(url)
+                    if response.status_code != 204:
+                        raise Exception(f"Failed to delete project {project_id}: {response.text}")
+
                     
                     # Delete the project
                     project.delete()
@@ -1281,7 +1555,8 @@ class BulkProjectDeleteAPIView(APIView):
             response_data = {
                 "success": True,
                 "deleted_count": deleted_count,
-                "total_requested": len(project_ids)
+                "total_requested": len(projects_ids),
+                "node_count": node_count,
             }
             
             if not_found_ids:
@@ -1301,75 +1576,95 @@ class BulkProjectDeleteAPIView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-class ChatbotAPIView(APIView):
-    """API endpoint for interacting with the chatbot."""
-    history = []
+class EmptyProjectsDeleteAPIView(APIView):
+    """API view for deleting projects that have no associated nodes."""
     
-    def post(self, request, *args, **kwargs):
+    def delete(self, request):
         try:
-            # Extract required parameters
-            query = request.data.get('query')
-            mode = request.data.get('mode', 'manual')  # Default to manual mode
-            project_id = request.query_params.get('project_id')
-            route = request.data.get("route", "chat")
-
-            if project_id:
+            # Find projects with no associated nodes
+            all_projects = Project.objects.all()
+            empty_projects = []
+            
+            for project in all_projects:
+                node_count = Node.objects.filter(project_id=project.id).count()
+                if node_count == 0:
+                    empty_projects.append(project.id)
+            
+            if not empty_projects:
+                return Response({
+                    "message": "No empty projects found",
+                    "deleted_count": 0
+                }, status=status.HTTP_200_OK)
+            
+            # Track deletion results
+            deleted_count = 0
+            error_ids = []
+            
+            # Process each empty project
+            for project_id in empty_projects:
                 try:
-                    project_id = Project.objects.get(id=project_id).id
-                except Project.DoesNotExist:
-                    project_id = Project.objects.create(project_name="new_project", project_description="new_project_created").id
-
-                call_script(f"select_project {project_id}")
-            modes = {
-                "manual": '1',
-                "auto": '2'
+                    project = Project.objects.get(id=project_id)
+                    project.delete()
+                    deleted_count += 1
+                except Exception as e:
+                    error_ids.append({"id": project_id, "error": str(e)})
+            
+            # Prepare response data
+            response_data = {
+                "success": True,
+                "message": f"Successfully deleted {deleted_count} empty projects",
+                "deleted_count": deleted_count,
+                "total_empty_projects": len(empty_projects)
             }
-            if mode in modes.keys():
-                mode = modes[mode]
-                
-            model_name = request.data.get('model_name', 'gemini-1.5-pro')  # Default model
-            iteration = request.data.get('iteration', 0)  # Current iteration
-            to_db = request.data.get('to_db', False)  # Flag for database usage
             
-            if route in ['1', 'chat']:
-                to_db = False
-                mode = 'manual'
-
+            if error_ids:
+                response_data["errors"] = error_ids
             
-            if not query:
-                return Response({"error": "Query is required"}, status=status.HTTP_400_BAD_REQUEST)
-                
-            # Validate mode
-            if mode not in ['1', '2', 'manual', 'auto']:
-                return Response({"error": "Mode must be '1' (manual) or '2' (auto)"}, 
-                              status=status.HTTP_400_BAD_REQUEST)
-
-            if route not in ['chat', '1', 'agent', '2']:
-                return Response({"error": "Choose 'agent' or 'chat'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(response_data, status=status.HTTP_200_OK)
             
-            response, logs, hist = sync_generate_cli(user_input=query, to_db=to_db, model=model_name, selected_mode=mode, cur_iter=iteration, route=route, history=ChatbotAPIView.history)
-            
-            ChatbotAPIView.history = hist
-            return Response({"output": response, "status": "success", "logs": logs}, status=status.HTTP_200_OK)
-        
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-class CLIAPIView(APIView):
-    def post(self, request, *args, **kwargs):
+class ProjectModelsAPIView(APIView):
+    """API view to get all unique model names from projects."""
+    
+    def get(self, request):
+        """Return all unique model values from the Project table."""
         try:
-            command = request.data.get('command')
+            # Get all unique model values, excluding None/null values
+            models = Project.objects.exclude(model__isnull=True).exclude(model__exact='').values_list('model', flat=True).distinct()
             
-            if not command:
-                return Response({"error": "Command is required"}, status=status.HTTP_400_BAD_REQUEST)
+            # Convert QuerySet to list and sort
+            unique_models = sorted(list(models))
             
-            # Call the CLI script with the provided command and parameters
-            response = call_script(command)
+            return Response({
+                "success": True,
+                "models": unique_models,
+                "count": len(unique_models)
+            }, status=status.HTTP_200_OK)
             
-            return Response(response, status=status.HTTP_200_OK)
-        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ProjectDatasetsAPIView(APIView):
+    """API view to get all unique dataset names from projects."""
+    
+    def get(self, request):
+        """Return all unique dataset values from the Project table."""
+        try:
+            # Get all unique dataset values, excluding None/null values
+            datasets = Project.objects.exclude(dataset__isnull=True).exclude(dataset__exact='').values_list('dataset', flat=True).distinct()
+            
+            # Convert QuerySet to list and sort
+            unique_datasets = sorted(list(datasets))
+            
+            return Response({
+                "success": True,
+                "datasets": unique_datasets,
+                "count": len(unique_datasets)
+            }, status=status.HTTP_200_OK)
+            
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,25 +1,77 @@
 import json
+import os
+import pandas as pd
+import json
 
-nodes = ['ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net', 'sgd_classifier', 
-        'ridge_classifier', 'logistic_regression', 'rbf_svr', 'linear_svr', 'poly_svr', 'sigmoid_svr', 
-        'rbf_svc', 'linear_svc', 'poly_svc', 'sigmoid_svc', 'bagging_regressor', 'adaboost_regressor', 
-        'gradient_boosting_regressor', 'decision_tree_regressor', 'random_forest_regressor', 'bagging_classifier', 
-        'adaboost_classifier', 'gradient_boosting_classifier', 'decision_tree_classifier', 'random_forest_classifier', 
-        'gaussian_nb', 'bernoulli_nb', 'multinomial_nb', 'knn_regressor', 'knn_classifier',
 
-        'model_fitter', 'predictor', 'evaluator', 
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+schema_dir = os.path.join(base_dir, 'project', 'core', 'schema.xlsx')
 
-        'maxabs_scaler', 'normalizer', 'minmax_scaler', 'robust_scaler', 
-        'standard_scaler', 'label_encoder', 'onehot_encoder', 'ordinal_encoder', 
-        'label_binarizer', 'knn_imputer', 'simple_imputer', 'binarizer',
+def create_data_mapping():
+    schema = pd.read_excel(schema_dir, sheet_name="Sheet1")
+    schema = schema[['node_name', 'params', 'input_channels', 'api_call']]
+    schema.fillna('[]', inplace=True)
+    schema['params'] = schema['params'].apply(lambda x: eval(x))
+    schema['input_channels'] = schema['input_channels'].apply(lambda x: eval(x))
+    input_channels = schema['input_channels'].tolist()
+    params = schema['params'].tolist()
 
-        'preprocessor_fitter', 'transformer', 'fitter_transformer', 
+    api_ref = schema['api_call'].tolist()
+    node_name = schema['node_name'].tolist()
+    new_params = []
+    for i, param in enumerate(params):
+        d = {}
+        x = {}
+        for sub_param in param:
+            x.update({sub_param['name'].strip(): sub_param['default']})
 
-        "data_loader", "splitter", "joiner", "train_test_split",
+        if api_ref[i] in ['create_model/', 'create_preprocessor/']:
+            d.update(x)
+        else:
+            d.update({"params": x})
 
-        'input_layer', 'conv2d_layer', 'maxpool2d_layer', 'flatten_layer', 'dense_layer', 
-        'dropout_layer', 'sequential_model', 'nn_fitter','model_compiler', 'node_saver', 'node_loader'
-        ]
+        new_params.append(d)
+
+    chnl_dict = {}
+    for i, chnl in enumerate(input_channels):
+        if len(chnl) > 0:
+            chnl_dict.update({node_name[i]: chnl})
+        else:
+            chnl_dict.update({node_name[i]: []})
+
+    new_params = {k: v for k, v in zip(schema['node_name'].tolist(), new_params)}
+
+
+    merged_nodes = {}
+
+    for key in set(chnl_dict) | set(new_params):
+        merged = {}
+        
+        # Add inputs as ID placeholders
+        for inp in chnl_dict.get(key, []):
+            merged[inp] = f"{inp}_id"
+
+        # Merge in parameters
+        params = new_params.get(key, {})
+        if isinstance(params, dict):
+            for p_key, p_val in params.items():
+                # Special handling: nest under 'params' only if 'params' exists as a key
+                if p_key == 'params':
+                    merged['params'] = {}
+                    for inner_k, inner_v in p_val.items():
+                        merged['params'][inner_k] = inner_v
+                else:
+                    merged[p_key] = p_val
+
+        merged_nodes[key] = merged
+    
+
+    with open(os.path.join(base_dir, 'chatbot', 'res', 'data_mapping.json'), 'w') as f:
+        json.dump(merged_nodes, f, indent=4)
+
+if __name__ == '__main__':
+    create_data_mapping()
+    print("Data mapping created successfully.")
 
 editable = [
     'alpha', 'penalty', 'C', 'kernel', 'l1_ratio', 'n_neighbors', 'n_estimators',
@@ -31,80 +83,3 @@ editable = [
     'X', 'y', 'y_true', 'y_pred', 'metric', 'preprocessor', "<user_name>", "<password>",
     "<project_id>", "<node_name>", "<node_id>", "<args>"
 ]
-
-
-params = [{'alpha': 1.0,},
-    {'alpha': 1.0,},
-    {},
-    {'penalty': 'l2',},
-    {'alpha': 1.0, 'l1_ratio': 0.5,},
-    {'penalty': 'l2',},
-    {'alpha': 1.0,},
-    {'penalty': 'l2','C': 1.0,},
-    {'C': 1.0},
-    {'C': 1.0},
-    {'kernel': 'poly', 'C': 1.0},
-    {'kernel': 'sigmoid', 'C': 1.0},
-    {'C': 1.0},
-    {'C': 1.0},
-    {'kernel':'poly', 'C': 1.0},
-    {'kernel':'sigmoid', 'C': 1.0},
-    {},
-    {},
-    {},
-    {'n_estimators' : 100},
-    {'n_estimators' : 100},
-    {},
-    {},
-    {},
-    {'n_estimators' : 100},
-    {'n_estimators' : 100},
-    {},
-    {},
-    {},
-    {'n_neighbors': 5,},
-    {'n_neighbors': 5,},
-
-    {"model": "model_id", "X": "X_id", "y": "y_id"},
-    {"fitted_model": "fitted_model_id", "X": "X_id"},
-    {"y_true": "y_true_id", "y_pred": "y_pred", "params": {"metric": "mse"}},
-
-    {},
-    {'norm': 'l2'},
-    {'feature_range': (0, 1)}, 
-    {'quantile_range': (25.0, 75.0)}, 
-    {}, 
-    {}, 
-    {}, 
-    {}, 
-    {}, 
-    {'n_neighbors': 5},
-    {'strategy': 'mean'},
-    {'threshold': 0.0},
-    
-    {"preprocessor": "preprocessor_id", "data": "data_id"},
-    {"fitted_preprocessor": "fitted_preprocessor_id", "data": "data_id"},
-    {"preprocessor": "preprocessor_id", "data": "data_id"},
-
-    {"params": {"dataset_name": "iris"}},
-    {"data": "data_id"},
-    {"data_1": "data_1_id", "data_2": "data_2_id"},
-    {"X": "X_id", "y": "y_id", "params": {"test_size": 0.2, "random_state": 42}},
-
-    {"params": {"shape": [28, 28, 1]}},
-    {"params": {"filters": 32, "kernel_size": (3, 3), "activation": "relu"}, "prev_node": "prev_node_id"},
-    {"params": {"pool_size": (2, 2)}, "prev_node": "prev_node_id"},
-    {"params": {}, "prev_node": "prev_node_id"},
-    {"params": {"units": 128, "activation": "relu"}, "prev_node": "prev_node_id"},
-    {"params": {"rate": 0.5}, "prev_node": "prev_node_id"},
-    {"params": {}, "layer": "layer_id"},
-    {"params": {"batch_size":20, "epochs":10}, "compiled_model": "model_id", "X": "X_id", "y": "y_id"},
-    {"params": {"optimizer": "sgd","loss": "categorical_crossentropy","metrics": ["accuracy"]}, "nn_model": "model_id"},
-    {"params": {}, "node_path": "node_path", "node": "node_id"},
-    {"params": {}, "node_path": "node_path"}
-
-]
-
-mapp = dict(zip(nodes, params))
-with open('data_mapping.json', 'w') as f:
-    json.dump(mapp, f, indent=4)

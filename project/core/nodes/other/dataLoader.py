@@ -96,6 +96,11 @@ class DataLoader:
             err = X
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self.build_payload(dataset_name, dataset_path, X, y, err)
         
     
@@ -110,14 +115,15 @@ class DataLoader:
             
             payload = []
             payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}", (X, y), "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
-                                                        uid=self.uid))
+                                                        uid=self.uid, location_x=self.location_x, location_y=self.location_y, input_ports=self.input_ports, output_ports=self.output_ports, params={"dataset_name": dataset_name, "dataset_path": dataset_path},
+                                                        displayed_name=self.displayed_name))
             names = ["X", "y"]
 
             for i in range(1, 3):
-                payload.append(PayloadBuilder.build_payload(f"data loaded: {dataset_name}_{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
-                                                            uid=self.uid))
+                payload.append(PayloadBuilder.build_payload(f"{names[i-1]}", [X, y][i-1], "data_loader", node_type="loader", task="load_data", project_id=self.project_id,
+                                                            uid=self.uid, parent=[payload[0]['node_id']]))
             
-            payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"] ]
+            payload[0]['children'] = [ payload[1]["node_id"], payload[2]["node_id"]]
             for i in range(3):
                 project_path = f"{self.project_id}/" if self.project_id else ""
                 NodeSaver()(payload[i], path=rf"{SAVING_DIR}/{project_path}other")

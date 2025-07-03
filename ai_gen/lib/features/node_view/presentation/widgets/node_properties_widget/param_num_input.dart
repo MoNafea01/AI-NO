@@ -1,101 +1,172 @@
 import 'package:ai_gen/core/models/node_model/parameter_model.dart';
-import 'package:ai_gen/core/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ParamNumInput extends StatefulWidget {
   const ParamNumInput({required this.parameter, super.key});
 
   final ParameterModel parameter;
+
   @override
   State<ParamNumInput> createState() => _ParamNumInputState();
 }
 
-class _ParamNumInputState extends State<ParamNumInput> {
-  late TextEditingController controller;
+class _ParamNumInputState extends State<ParamNumInput>
+    with SingleTickerProviderStateMixin {
+  late final TextEditingController _controller;
+  late final AnimationController _animationController;
+  late final Animation<double> _scaleAnimation;
+  String? _errorText;
+
   @override
   void initState() {
-    controller = TextEditingController(text: widget.parameter.value.toString());
     super.initState();
+    _controller =
+        TextEditingController(text: widget.parameter.value.toString());
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void didUpdateWidget(covariant ParamNumInput oldWidget) {
-    controller.text = widget.parameter.value.toString();
+    if (oldWidget.parameter.value != widget.parameter.value) {
+      _controller.text = widget.parameter.value?.toString() ?? '';
+      _validateInput(_controller.text);
+    }
     super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _customButton(
+        _buildIncrementButton(
           icon: Icons.add,
-          onTap: () {
-            if (widget.parameter.type == ParameterType.int) {
-              widget.parameter.value += 1;
-            } else if (widget.parameter.type == ParameterType.double) {
-              widget.parameter.value += 0.1;
-            }
-          },
+          onTap: _incrementValue,
         ),
-        _textField(),
-        _customButton(
+        _buildTextField(),
+        _buildIncrementButton(
           icon: Icons.remove,
-          onTap: () {
-            if (widget.parameter.value > 0.1) {
-              if (widget.parameter.type == ParameterType.int) {
-                widget.parameter.value = widget.parameter.value - 1;
-              } else if (widget.parameter.type == ParameterType.double) {
-                widget.parameter.value = widget.parameter.value - 0.1;
-              }
-            }
-          },
+          onTap: _decrementValue,
         ),
       ],
     );
   }
 
-  Widget _textField() {
+  Widget _buildTextField() {
     return Expanded(
       child: TextField(
-        controller: controller,
+        controller: _controller,
         style: const TextStyle(fontSize: 16),
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        decoration: const InputDecoration(
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+        ],
+        decoration: InputDecoration(
           border: InputBorder.none,
           isDense: true,
+          errorText: _errorText,
+          errorStyle: const TextStyle(height: 0),
         ),
-        onChanged: (value) {
-          setState(() {
-            widget.parameter.value = value;
-          });
-        },
+        onChanged: _validateAndUpdateValue,
       ),
     );
   }
 
-  Widget _customButton({required IconData icon, VoidCallback? onTap}) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          onTap?.call();
-          controller.text = widget.parameter.value.toString();
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: const BoxDecoration(
-          color: AppColors.grey200,
-          borderRadius: BorderRadius.all(Radius.circular(6)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Icon(icon, size: 20),
-          ],
+  Widget _buildIncrementButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _animationController
+                .forward()
+                .then((_) => _animationController.reverse());
+            onTap();
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.grey200,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: Colors.black,
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  void _validateAndUpdateValue(String value) {
+    setState(() {
+      _validateInput(value);
+      if (_errorText == null) {
+        widget.parameter.value = widget.parameter.type == ParameterType.int
+            ? int.tryParse(value) ?? 0
+            : double.tryParse(value) ?? 0.0;
+      }
+    });
+  }
+
+  void _validateInput(String value) {
+    if (value.isEmpty) {
+      _errorText = 'Value cannot be empty';
+    } else if (widget.parameter.type == ParameterType.int &&
+        !value.contains(RegExp(r'^\d+$'))) {
+      _errorText = 'Must be an integer';
+    } else if (widget.parameter.type == ParameterType.double &&
+        !value.contains(RegExp(r'^\d*\.?\d+$'))) {
+      _errorText = 'Must be a valid number';
+    } else {
+      _errorText = null;
+    }
+  }
+
+  void _incrementValue() {
+    setState(() {
+      if (widget.parameter.type == ParameterType.int) {
+        widget.parameter.value = (widget.parameter.value as int) + 1;
+      } else {
+        widget.parameter.value = (widget.parameter.value as double) + 0.1;
+      }
+      _controller.text = widget.parameter.value.toString();
+    });
+  }
+
+  void _decrementValue() {
+    setState(() {
+      if (widget.parameter.type == ParameterType.int) {
+        if ((widget.parameter.value as int) > 0) {
+          widget.parameter.value = (widget.parameter.value as int) - 1;
+        }
+      } else {
+        if ((widget.parameter.value as double) > 0.1) {
+          widget.parameter.value = (widget.parameter.value as double) - 0.1;
+        }
+      }
+      _controller.text = widget.parameter.value.toString();
+    });
   }
 }

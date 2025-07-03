@@ -31,10 +31,12 @@ else:
 
     with open(api_key_path, 'r') as f:
         api_key = json.load(f)
-        api_key = api_key.get('GOOGLE_API_KEY')
+        api_key1 = api_key.get('GOOGLE_API_KEY')
+        api_key2 = api_key.get('GOOGLE_API_KEY2')
 
 # setting the API key as an environment variable
-os.environ['GOOGLE_API_KEY'] = api_key
+os.environ['GOOGLE_API_KEY'] = api_key1
+os.environ['GOOGLE_API_KEY2'] = api_key2
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 

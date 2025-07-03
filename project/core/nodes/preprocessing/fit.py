@@ -30,6 +30,11 @@ class Fit(BaseNode):
 
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self._fit(err)
 
     def _fit(self, err=None):
@@ -72,7 +77,8 @@ class Fit(BaseNode):
 
             payload = PayloadBuilder.build_payload("Preprocessor fitted", fitted_preprocessor, "preprocessor_fitter", 
                                                    node_type="fitter", task="fit_preprocessor", project_id=self.project_id,
-                                                   uid=self.uid)
+                                                   uid=self.uid, input_ports=self.input_ports, output_ports=self.output_ports, 
+                                                   displayed_name=self.displayed_name, location_x=self.location_x, location_y=self.location_y)
             
             project_path = f"{self.project_id}/" if self.project_id else ""
             NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}preprocessing")

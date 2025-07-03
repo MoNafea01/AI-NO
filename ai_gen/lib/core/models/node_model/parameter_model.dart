@@ -1,4 +1,4 @@
-import 'package:ai_gen/core/helper/helper.dart';
+import 'package:ai_gen/core/utils/helper/helper.dart';
 
 enum ParameterType {
   string,

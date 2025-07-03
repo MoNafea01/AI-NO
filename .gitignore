@@ -12,7 +12,12 @@ db.sqlite3
 
 #Ignore saved nodes
 project/saved/*
+project/core/test_saved/*
 project/exports/*
 project/core/saved/*
 project/core/exports/*
 chatbot/credentials/*
+chatbot/logs/*
+
+#Ignore environment folder
+backend/*

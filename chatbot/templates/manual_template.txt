@@ -17,14 +17,14 @@ Instructions:
 - Format your response as a raw Python list: ['command1', 'command2', ...]
 - Do NOT include any explanations, comments, or formatting outside the list.
 - If no command matches the query, return an empty list: []
-- If user provided arguments make it in json format. e.g. {{'arg1': 'value1', 'arg2': 'value2'}}
+- If user provided arguments make it in arg=val format. e.g. arg1=value1 arg2=value2
 - The output MUST be ordered in the same order as the input.
 
 Example Query:
-I want to make a logistic regression model with C value of 0.5 and make a project with id 3.
+I want to make a logistic regression model with C value of 0.5 and make a project with name hello_world.
 
 Expected Response:
 [
-    'make logistic_regression {{'C':0.5}}',
-    'create_project 3'
+    'aino --node create logistic_regression C=0.5,
+    'aino --project create hello_world'
 ]
