@@ -2,7 +2,11 @@ from .agents import Agent
 from .retrieval_agent import RetrievalAgent
 from .generation_agent import GenerationAgent
 from .feedback_agent import FeedbackAgent
+from .steps_estimator import StepsEstimateAgent
+from .mode_selector_agent import ModeSelectorAgent
 
+# OrchestratorAgent for coordinating the workflow of the chatbot
+# It manages the retrieval of documents, generation of CLI commands, and feedback processing.
 class OrchestratorAgent(Agent):
     def __init__(self, logger, config, model_name="gemini-2.0-flash"):
         super().__init__("OrchestratorAgent", logger)
@@ -10,12 +14,23 @@ class OrchestratorAgent(Agent):
         self.retrieval_agent = RetrievalAgent(logger, config)
         self.generation_agent = GenerationAgent(logger, model_name)
         self.feedback_agent = FeedbackAgent(logger)
+        self.steps_estimate_agent = StepsEstimateAgent(logger, config)
+        self.mode_selector_agent = ModeSelectorAgent(logger, config)
 
     async def execute(self, input_data, context=None):
-        mode = input_data["mode"]
         question = input_data["question"]
+        
+        mode_selector_result = await self.mode_selector_agent.execute({"question": question})
+        mode = mode_selector_result["mode"]
+        print(f"Mode  Selected: {mode}")
+                
         to_db = input_data["to_db"]
-        max_iterations = self.config['max_iterations'] if mode == "2" else 1
+        if mode == 'auto':
+            max_iterations = await self.steps_estimate_agent.execute({'question': question})
+            print(f"Max Iterations: {max_iterations}")
+        else:
+            max_iterations = 1
+        
         cur_iter = 0
         log = []
 
@@ -37,6 +52,7 @@ class OrchestratorAgent(Agent):
                 "cur_iter": cur_iter
             })
             log.append(f"Generated: {generation_result['output']}")
+            print("Model   Output: ", generation_result['output'])
 
             # Step 3: Validate and get feedback
             feedback_result = await self.feedback_agent.execute({
@@ -45,7 +61,7 @@ class OrchestratorAgent(Agent):
                 "docs": retrieval_result["docs"],
                 "mode": mode
             })
-            if mode == "1" or not feedback_result["continue_iteration"]:
+            if mode == "manual" or not feedback_result["continue_iteration"]:
                 return {
                     "output": feedback_result["validated_outputs"],
                     "log": "\n".join(log)

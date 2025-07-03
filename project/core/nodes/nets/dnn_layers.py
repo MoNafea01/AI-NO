@@ -13,6 +13,11 @@ class DenseLayer(BaseLayer):
         self.layer_path = path
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
 
         self.prev_node = self.load_args(prev_node, attr="node_id")
         super().__init__(project_id=project_id)
@@ -31,8 +36,7 @@ class DenseLayer(BaseLayer):
     def get_params(self):
         return {
             "units": self.units, 
-            "activation": self.activation, 
-            "name": self.name,
+            "activation": self.activation
         }
     
     def payload_configs(self):
@@ -40,6 +44,11 @@ class DenseLayer(BaseLayer):
             "message": "Dense layer created",
             "node_name": "dense_layer",
             "uid": self.uid,
+            "input_ports": self.input_ports,
+            "output_ports": self.output_ports,
+            "displayed_name": self.displayed_name,
+            "location_x": self.location_x,
+            "location_y": self.location_y,
         }
 
 
@@ -52,6 +61,11 @@ class DropoutLayer(BaseLayer):
         self.name = name
         self.cur_id = cur_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
 
         self.prev_node = self.load_args(prev_node, attr="node_id")
         super().__init__(project_id=project_id)
@@ -68,8 +82,7 @@ class DropoutLayer(BaseLayer):
         return f"dropout_{self.cur_id}"
     
     def get_params(self):
-        return {"rate": self.rate, 
-                "name": self.name,
+        return {"rate": self.rate
                 }
     
     def payload_configs(self):
@@ -77,4 +90,9 @@ class DropoutLayer(BaseLayer):
             "message": "Dropout layer created",
             "node_name": "dropout_layer",
             "uid": self.uid,
+            "input_ports": self.input_ports,
+            "output_ports": self.output_ports,
+            "location_x": self.location_x,
+            "location_y": self.location_y,
+            "displayed_name": self.displayed_name,
         }

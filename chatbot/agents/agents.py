@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import logging
 
 class Agent(ABC):
     def __init__(self, name, logger):

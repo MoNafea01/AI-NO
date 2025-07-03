@@ -84,7 +84,3 @@ Preprocessors = ['maxabs_scaler', 'normalizer', 'minmax_scaler', 'robust_scaler'
                  'standard_scaler', 'label_encoder', 'onehot_encoder', 'ordinal_encoder', 
                  'label_binarizer', 'knn_imputer', 'simple_imputer', 'binarizer']
 
-dict_nodes = ['data', 'data_1', 'data_2', 'X', 
-              'y', 'model', 'y_true', 'y_pred', 
-              'preprocessor', 'prev_node', 'layer', 'node',
-              'compiled_model', 'nn_model', 'fitted_model', 'fitted_preprocessor']

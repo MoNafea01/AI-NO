@@ -16,7 +16,7 @@ Instructions:
 - Incorporate API responses from previous iterations (stored in the corpus) to resolve placeholders (e.g., <model_id>, <X_id>, <y_id>) in the current step’s command.
 - If a placeholder cannot be resolved due to missing API data, use default arguments from the node mapping or skip the command and return an empty string, logging the issue in the response.
 - Validate the API response from the previous iteration (if available) for errors. If an error is detected (e.g., "error" in the message), return an empty string and log the error.
-- Generate a single CLI command as a string for the current step, formatted according to the user guide. Use JSON format for arguments when specified (e.g., {{"arg1": "value1"}}).
+- Generate a single CLI command as a string for the current step, formatted according to the user guide. Use arguments format as key=value separated by space (e.g., model=42 X=11 y=215).
 - Ensure the command is syntactically correct and aligns with the CLI tool’s syntax.
 - Do NOT include explanations, comments, or lists. Return only the command string or 'done' if the last step is complete.
 - If no valid command can be generated (e.g., due to errors or missing data), return an empty string.
@@ -24,17 +24,19 @@ Instructions:
 Example:
 Query: I want to fit knn on diabetes dataset
 Steps: 
-  1. Create data_loader with dataset_name="diabetes"
+  1. Create data_loader with dataset_name=diabetes
   2. Create knn_classifier with n_neighbors=5
   3. Fit model with model_fitter
+  4. stop
+
 Corpus: 
   - Step 1 API response: [{{"node_id": "dl_123", "message": "data loaded"}}, {{"node_id": "X_id", "message": "data loaded X"}}, {{"node_id": "y_id", "message": "data loaded y"}}]
   - Step 2 API response: {{"node_id": "knn_456", "message": "knn created"}}
 
 Expected Responses by Iteration:
-- Iteration 1: make data_loader {{"params":{{"dataset_name": "diabetes"}}}}
-- Iteration 2: make knn_classifier {{"n_neighbors": 5}}
-- Iteration 3: make model_fitter {{"model": "knn_456", "X": "X_123", "y": "y_123"}}
+- Iteration 1: aino --node create data_loader dataset_name=diabetes
+- Iteration 2: aino --node create knn_classifier n_neighbors=5
+- Iteration 3: aino --node create model_fitter model=knn_456 X=X_id y=y_id
 - Iteration 4: 'done'
 
 Output:

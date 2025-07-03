@@ -8,12 +8,24 @@ from Crypto.Util.Padding import pad, unpad
 
 class AinoprjConverter:
     types = {
-        "node_id": "int", "node_name": "str", "node_type": "str", 
-        "task": "str", "message": "str", "node_data": "str",
-        "params": "dict", "x_loc": "int", "y_loc": "int",
-        "input_ports": "list", "output_ports": "list",
-        "children": "list", "project": "int", "location_x": "int",
-        "location_y": "int", "created_at": "str", "updated_at": "str",
+        "node_id": "int", 
+        "displayed_name": "str",
+        "node_name": "str",
+        "message": "str", 
+        "params": "dict", 
+        "task": "str", 
+        "node_type": "str", 
+        "uid": "int",
+        "parent":"list", 
+        "children": "list", 
+        "location_x": "int",
+        "location_y": "int", 
+        "input_ports": "list", 
+        "output_ports": "list",
+        "project": "int", 
+        "node_data": "str",
+        "created_at": "str", 
+        "updated_at": "str",
     }
 
     def __init__(self, in_format, out_format, source_path, destination_path, encrypt, password=None):
