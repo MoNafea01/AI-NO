@@ -257,4 +257,16 @@ Map<String, String> ar = {
   TranslationKeys.theseTitle: 'هؤلاء',
   TranslationKeys.project: "المشروع",
   TranslationKeys.questionMark: "؟",
+  TranslationKeys.advancedSearch: 'البحث المتقدم',
+  TranslationKeys.advancedSearchDescription: 'وصف البحث المتقدم',
+  TranslationKeys.selectModel: 'اختر النموذج',
+  TranslationKeys.selectDataset: 'اختر مجموعة البيانات',
+  TranslationKeys.clearFilters: 'مسح المرشحات',
+  TranslationKeys.searchResults: 'نتائج البحث',
+  TranslationKeys.modelCopied: 'تم نسخ النموذج',
+  TranslationKeys.datasetCopied: 'تم نسخ مجموعة البيانات',
+  TranslationKeys.copyToClipboard: 'نسخ إلى الحافظة',
+  TranslationKeys.noProjectsFound: 'لم يتم العثور على مشاريع',
+  TranslationKeys.searchProjectsModelsDatasetsHint:
+      'البحث في المشاريع والنماذج ومجموعات البيانات',
 };

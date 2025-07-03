@@ -305,6 +305,20 @@ abstract class TranslationKeys {
    static const String areYouSureYouWantToDeleteEmptyProjects =  'Are you sure you want to delete all empty projects? This will remove all projects that have no model or dataset assigned. This action cannot be undone.';
    static const String thisTitle ='this';
    static const String theseTitle ='these';
+   // في translation_keys.dart
+  static const String advancedSearch = 'advanced_search';
+  static const String advancedSearchDescription = 'advanced_search_description';
+  static const String selectModel = 'select_model';
+  static const String selectDataset = 'select_dataset';
+  static const String clearFilters = 'clear_filters';
+  static const String searchResults = 'search_results';
+  static const String modelCopied = 'model_copied';
+  static const String datasetCopied = 'dataset_copied';
+  static const String copyToClipboard = 'copy_to_clipboard';
+  static const String all = 'all';
+  static const String noProjectsFound = 'no_projects_found';
+  static const String searchProjectsModelsDatasetsHint =
+      'search_projects_models_datasets_hint';
  
 
 
