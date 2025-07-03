@@ -10,11 +10,7 @@ class ProjectsTableHeader extends StatelessWidget {
   final VoidCallback showDeleteEmptyProjectsDialog;
 
   const ProjectsTableHeader({
-    super.key,
-    required this.selectedProjectIds,
-    required this.toggleSelectAll,
-    required this.showDeleteConfirmationDialog,
-    required this.showDeleteEmptyProjectsDialog,
+    required this.selectedProjectIds, required this.toggleSelectAll, required this.showDeleteConfirmationDialog, required this.showDeleteEmptyProjectsDialog, super.key,
   });
 
   @override

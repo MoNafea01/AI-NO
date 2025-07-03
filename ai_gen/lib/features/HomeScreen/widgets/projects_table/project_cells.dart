@@ -16,7 +16,7 @@ Widget buildDatasetCell(String? dataset) {
         TranslationKeys.noDataset.tr,
         style: const TextStyle(
           fontSize: 12,
-          color: Color(0xFF9CA3AF),
+          color: Color(0xff666666),
           fontStyle: FontStyle.italic,
         ),
         textAlign: TextAlign.center,
@@ -35,7 +35,7 @@ Widget buildDatasetCell(String? dataset) {
       dataset,
       style: const TextStyle(
         fontSize: 12,
-        color: Color(0x0ff2f2f2),
+        color: Color(0xff666666),
         fontWeight: FontWeight.w500,
       ),
       maxLines: 1,
@@ -59,7 +59,7 @@ Widget buildModelCell(String? model) {
         TranslationKeys.noModel.tr,
         style: const TextStyle(
           fontSize: 12,
-          color: Color(0xFF9CA3AF),
+          color: Color(0xff666666),
           fontStyle: FontStyle.italic,
         ),
         textAlign: TextAlign.center,
@@ -78,7 +78,7 @@ Widget buildModelCell(String? model) {
       model,
       style: const TextStyle(
         fontSize: 12,
-        color: Color(0x0ff2f2f2),
+        color: Color(0xff666666),
         fontWeight: FontWeight.w500,
       ),
       maxLines: 1,
