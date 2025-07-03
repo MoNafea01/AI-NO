@@ -112,7 +112,6 @@ class NodeQueryMixin:
                         node_id = str(current_node.get("node_id", node_id))
 
             success, payload = NodeLoader(return_serialized=return_serialized, return_path=return_path, return_data=return_data)(node_id=node_id, project_id=project_id)
-
             # Filter by project_id if provided
             if project_id and payload:
                 if str(payload.get('project_id')) != str(project_id):

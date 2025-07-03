@@ -125,7 +125,8 @@ def get_optimum_location(node_name):
         )
     )
 
-    loc_x, loc_y = np.random.uniform(low=low, high=high, size=(2,)).tolist()
+    loc_x = np.random.uniform(low=low, high=high)
+    loc_y = np.random.uniform(low=1000, high=1500)
     
     return loc_x, loc_y
 

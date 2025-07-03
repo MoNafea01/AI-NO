@@ -1,12 +1,7 @@
 #chatbot/core/utils.py
 
-import re
-import os
-import ast
-import json
-import logging
+import re, os, ast, json, logging, yaml
 import logging.handlers
-import yaml
 from cli.call_cli import call_script
 
 MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
@@ -77,6 +72,7 @@ def extract_id_message(json_str):
         if isinstance(json_str, str):
             logger.debug("Parsing JSON string")
             json_obj = json.loads(json_str)
+                
         elif isinstance(json_str, dict):
             json_obj = json_str
             logger.debug("Processing JSON dictionary")
@@ -90,7 +86,7 @@ def extract_id_message(json_str):
             logger.info(f"Processing multi-channel node: {json_obj.get('node_name')}")
             for i in range(len(json_obj.get("children", []))):
                 logger.debug(f"Processing child {i+1}")
-                child = call_script(f"show {json_obj.get('node_name')} {node_id} {i+1}")
+                child = call_script(f"aino --node show {json_obj.get('node_name')} {node_id} {i+1}")
 
                 try:
                     child_message = child.get("message")
@@ -155,3 +151,20 @@ def parse_command_list(output: str):
     except Exception as e:
         logger.error(f"Failed to parse command list: {str(e)}. Raw output: {output}")
         return [f"Failed to parse command list. Error: {e}. Raw output: {output}"]
+
+
+def handle_params(command_line: str):
+    if 'params=' in command_line:
+        params_str = command_line.split('params=')[1].strip()
+        params = ast.literal_eval(params_str)
+        if isinstance(params, str):
+            try:
+                params = ast.literal_eval(params)
+            except (ValueError, SyntaxError):
+                pass
+        if isinstance(params, dict):
+            params_str_new = ' '.join([f"{k}={v}" for k, v in params.items() if v is not (None or '' or "")])
+            command_line = command_line.replace(f'params={params_str}', params_str_new)
+
+    return command_line
+

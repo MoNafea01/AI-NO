@@ -1,97 +1,256 @@
 {
     "users": {
-        "admin": {
-            "password": "admin",
+        "mo": {
+            "password": "nafea",
             "projects": {
-                "33": [
+                "41": [
                     {
-                        "message": "Model logistic_regression created",
-                        "node_id": 4296998098288312320,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "parent": [],
+                        "id": 1486,
+                        "node_id": 1003459395796926464,
+                        "displayed_name": "Data Loader",
+                        "node_name": "data_loader",
+                        "message": "data loaded: iris",
                         "params": [
                             {
-                                "penalty": "l2"
+                                "dataset_name": "iris"
                             },
                             {
-                                "C": 1.0
+                                "dataset_path": ""
                             }
                         ],
-                        "node_type": "linear_models",
-                        "uid": 6,
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [
+                            3861837784293638144,
+                            3640598452599062528
+                        ],
+                        "parent": [],
+                        "location_x": 1010.1875451548237,
+                        "location_y": 1310.9424151924154,
+                        "input_ports": [],
                         "output_ports": [
                             {
-                                "name": "model"
-                            }
-                        ],
-                        "input_ports": [],
-                        "displayed_name": "Logistic Regression",
-                        "location_x": 1224.533936926393,
-                        "location_y": 1170.178749623194,
-                        "project_id": 33,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\logistic_regression_4296998098288312320.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 1662110841299861504,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "parent": [],
-                        "params": [
-                            {
-                                "penalty": "l2"
+                                "name": "X",
+                                "nodeData": 1003459395796926464
                             },
                             {
-                                "C": 1.0
+                                "name": "y",
+                                "nodeData": 1003459395796926464
                             }
                         ],
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "output_ports": [
-                            {
-                                "name": "model"
-                            }
-                        ],
-                        "input_ports": [],
-                        "displayed_name": "Logistic Regression",
-                        "location_x": 1158.4000877238975,
-                        "location_y": 1137.3363057306858,
-                        "project_id": 33,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\logistic_regression_1662110841299861504.pkl"
+                        "project": 41,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\other\\data_loader_1003459395796926464.pkl"
                     },
                     {
-                        "message": "Model linear_regression created",
-                        "node_id": 449516641630355456,
-                        "node_name": "linear_regression",
-                        "task": "regression",
-                        "children": [],
-                        "parent": [],
+                        "id": 1487,
+                        "node_id": 3861837784293638144,
+                        "displayed_name": "default",
+                        "node_name": "data_loader",
+                        "message": "X",
                         "params": [],
-                        "node_type": "linear_models",
-                        "uid": 1,
-                        "output_ports": [
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [],
+                        "parent": [
+                            1003459395796926464
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 41,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\other\\data_loader_3861837784293638144.pkl"
+                    },
+                    {
+                        "id": 1488,
+                        "node_id": 3640598452599062528,
+                        "displayed_name": "default",
+                        "node_name": "data_loader",
+                        "message": "y",
+                        "params": [],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [],
+                        "parent": [
+                            1003459395796926464
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 41,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\other\\data_loader_3640598452599062528.pkl"
+                    },
+                    {
+                        "id": 1489,
+                        "node_id": 4072662541849919488,
+                        "displayed_name": "Logistic Regression",
+                        "node_name": "logistic_regression",
+                        "message": "Model logistic_regression created",
+                        "params": [
                             {
-                                "name": "model"
+                                "penalty": "l2"
+                            },
+                            {
+                                "C": 1.0
                             }
                         ],
+                        "task": "classification",
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 1108.173098378575,
+                        "location_y": 1480.2509424594184,
                         "input_ports": [],
-                        "displayed_name": "Linear Regression",
-                        "location_x": 1130.5555400534556,
-                        "location_y": 1046.603581572876,
-                        "project_id": 33,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\linear_regression_449516641630355456.pkl"
+                        "output_ports": [
+                            {
+                                "name": "model",
+                                "nodeData": 4072662541849919488
+                            }
+                        ],
+                        "project": 41,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\model\\logistic_regression_4072662541849919488.pkl"
+                    },
+                    {
+                        "id": 1490,
+                        "node_id": 892276779996217344,
+                        "displayed_name": "Model Fitter",
+                        "node_name": "model_fitter",
+                        "message": "Model fitted",
+                        "params": [],
+                        "task": "fit_model",
+                        "node_type": "fitter",
+                        "uid": 44,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 1902.5748483856967,
+                        "location_y": 1449.6616747275211,
+                        "input_ports": [
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "X",
+                                    "nodeData": 1003459395796926464
+                                }
+                            },
+                            {
+                                "name": "y",
+                                "connectedNode": {
+                                    "name": "y",
+                                    "nodeData": 1003459395796926464
+                                }
+                            },
+                            {
+                                "name": "model",
+                                "connectedNode": {
+                                    "name": "model",
+                                    "nodeData": 4072662541849919488
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "fitted_model",
+                                "nodeData": 892276779996217344
+                            }
+                        ],
+                        "project": 41,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\model\\model_fitter_892276779996217344.pkl"
+                    },
+                    {
+                        "id": 1491,
+                        "node_id": 3802728039184400384,
+                        "displayed_name": "Predictor",
+                        "node_name": "predictor",
+                        "message": "Model Predictions",
+                        "params": [],
+                        "task": "predict",
+                        "node_type": "predictor",
+                        "uid": 45,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2317.5134349250607,
+                        "location_y": 1353.9659495163974,
+                        "input_ports": [
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "X",
+                                    "nodeData": 1003459395796926464
+                                }
+                            },
+                            {
+                                "name": "fitted_model",
+                                "connectedNode": {
+                                    "name": "fitted_model",
+                                    "nodeData": 892276779996217344
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "predictions",
+                                "nodeData": 3802728039184400384
+                            }
+                        ],
+                        "project": 41,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\model\\predictor_3802728039184400384.pkl"
+                    },
+                    {
+                        "id": 1492,
+                        "node_id": 2496121197293535232,
+                        "displayed_name": "Evaluator",
+                        "node_name": "evaluator",
+                        "message": "accuracy score",
+                        "params": [
+                            {
+                                "metric": "accuracy"
+                            }
+                        ],
+                        "task": "evaluate",
+                        "node_type": "metric",
+                        "uid": 54,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2410.107941842243,
+                        "location_y": 1387.1513230992093,
+                        "input_ports": [
+                            {
+                                "name": "y_true",
+                                "connectedNode": {
+                                    "name": "y",
+                                    "nodeData": 1003459395796926464
+                                }
+                            },
+                            {
+                                "name": "y_pred",
+                                "connectedNode": {
+                                    "name": "predictions",
+                                    "nodeData": 3802728039184400384
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "score",
+                                "nodeData": 2496121197293535232
+                            }
+                        ],
+                        "project": 41,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\model\\evaluator_2496121197293535232.pkl"
                     },
                     {
                         "message": "data loaded: iris",
-                        "node_id": 3683945599012503552,
+                        "node_id": 3480157715873988608,
                         "node_name": "data_loader",
                         "task": "load_data",
                         "children": [
-                            3513090288149135360,
-                            2037316985255165952
+                            1597090121679699968,
+                            4245488177550262272
                         ],
                         "parent": [],
                         "params": [
@@ -103,10 +262,10 @@
                             }
                         ],
                         "node_type": "loader",
-                        "project_id": 33,
+                        "project_id": 41,
                         "uid": 50,
-                        "location_x": 1132.303949638694,
-                        "location_y": 1164.2491721324498,
+                        "location_x": 1218.3240875308934,
+                        "location_y": 1163.9113513736118,
                         "input_ports": [],
                         "output_ports": [
                             {
@@ -117,11 +276,11 @@
                             }
                         ],
                         "displayed_name": "Data Loader",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\other\\data_loader_3683945599012503552.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\other\\data_loader_3480157715873988608.pkl"
                     },
                     {
                         "message": "Model logistic_regression created",
-                        "node_id": 2061523833252282368,
+                        "node_id": 1621015494700105728,
                         "node_name": "logistic_regression",
                         "task": "classification",
                         "children": [],
@@ -131,7 +290,7 @@
                                 "penalty": "l2"
                             },
                             {
-                                "C": 0.3
+                                "C": 1.0
                             }
                         ],
                         "node_type": "linear_models",
@@ -143,15 +302,15 @@
                         ],
                         "input_ports": [],
                         "displayed_name": "Logistic Regression",
-                        "location_x": 1035.2826000970138,
-                        "location_y": 1017.9272757787422,
-                        "project_id": 33,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\logistic_regression_2061523833252282368.pkl"
+                        "location_x": 1092.0190787787733,
+                        "location_y": 1194.7692061379662,
+                        "project_id": 41,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\model\\logistic_regression_1621015494700105728.pkl"
                     },
                     {
                         "message": "Model fitted",
                         "params": [],
-                        "node_id": 718606719365742592,
+                        "node_id": 2293177739085152256,
                         "node_name": "model_fitter",
                         "children": [],
                         "parent": [],
@@ -168,107 +327,43 @@
                                 "name": "X",
                                 "connectedNode": {
                                     "name": "X",
-                                    "nodeData": 3683945599012503552
+                                    "nodeData": 3480157715873988608
                                 }
                             },
                             {
                                 "name": "y",
                                 "connectedNode": {
                                     "name": "y",
-                                    "nodeData": 3683945599012503552
+                                    "nodeData": 3480157715873988608
                                 }
                             },
                             {
                                 "name": "model",
                                 "connectedNode": {
                                     "name": "model",
-                                    "nodeData": 2061523833252282368
+                                    "nodeData": 1621015494700105728
                                 }
                             }
                         ],
-                        "project_id": 33,
-                        "location_x": 1891.3369821369877,
-                        "location_y": 1767.240840527617,
+                        "project_id": 41,
+                        "location_x": 1858.6515381856714,
+                        "location_y": 1027.394742621253,
                         "displayed_name": "Model Fitter",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\model_fitter_718606719365742592.pkl"
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\model\\model_fitter_2293177739085152256.pkl"
                     },
                     {
-                        "message": "data loaded: diabetes",
-                        "node_id": 426435693540081664,
-                        "node_name": "data_loader",
-                        "task": "load_data",
-                        "children": [
-                            381118222289666048,
-                            1607223220841283584
-                        ],
-                        "parent": [],
-                        "params": [
-                            {
-                                "dataset_name": "diabetes"
-                            },
-                            {
-                                "dataset_path": ""
-                            }
-                        ],
-                        "node_type": "loader",
-                        "project_id": 33,
-                        "uid": 50,
-                        "location_x": 1088.783956415365,
-                        "location_y": 1096.539738876283,
-                        "input_ports": [],
-                        "output_ports": [
-                            {
-                                "name": "X"
-                            },
-                            {
-                                "name": "y"
-                            }
-                        ],
-                        "displayed_name": "Data Loader",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\other\\data_loader_426435693540081664.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 3531949111588749312,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
-                        "children": [],
-                        "parent": [],
-                        "params": [
-                            {
-                                "penalty": "l2"
-                            },
-                            {
-                                "C": 0.5
-                            }
-                        ],
-                        "node_type": "linear_models",
-                        "uid": 6,
-                        "output_ports": [
-                            {
-                                "name": "model"
-                            }
-                        ],
-                        "input_ports": [],
-                        "displayed_name": "Logistic Regression",
-                        "location_x": 1122.6519979074305,
-                        "location_y": 1113.7769109139354,
-                        "project_id": 33,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\logistic_regression_3531949111588749312.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
+                        "message": "Model Predictions",
                         "params": [],
-                        "node_id": 3909970005311160320,
-                        "node_name": "model_fitter",
+                        "node_id": 605453778728058880,
+                        "node_name": "predictor",
                         "children": [],
                         "parent": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
+                        "node_type": "predictor",
+                        "task": "predict",
+                        "uid": 45,
                         "output_ports": [
                             {
-                                "name": "fitted_model"
+                                "name": "predictions"
                             }
                         ],
                         "input_ports": [
@@ -276,181 +371,604 @@
                                 "name": "X",
                                 "connectedNode": {
                                     "name": "X",
-                                    "nodeData": 426435693540081664
+                                    "nodeData": 3480157715873988608
                                 }
                             },
                             {
-                                "name": "y",
+                                "name": "fitted_model",
                                 "connectedNode": {
-                                    "name": "y",
-                                    "nodeData": 426435693540081664
-                                }
-                            },
-                            {
-                                "name": "model",
-                                "connectedNode": {
-                                    "name": "model",
-                                    "nodeData": 3531949111588749312
+                                    "name": "fitted_model",
+                                    "nodeData": 2293177739085152256
                                 }
                             }
                         ],
-                        "project_id": 33,
-                        "location_x": 1923.7206851013445,
-                        "location_y": 1943.8450863801781,
-                        "displayed_name": "Model Fitter",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\model_fitter_3909970005311160320.pkl"
+                        "project_id": 41,
+                        "displayed_name": "Predictor",
+                        "location_x": 2343.7130541033043,
+                        "location_y": 1101.8280186069474,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\model\\predictor_605453778728058880.pkl"
                     },
                     {
-                        "message": "data loaded: diabetes",
-                        "node_id": 2217179495373275136,
-                        "node_name": "data_loader",
-                        "task": "load_data",
-                        "children": [
-                            1221039552794263552,
-                            2021272911582658560
-                        ],
-                        "parent": [],
-                        "params": [
-                            {
-                                "dataset_name": "diabetes"
-                            },
-                            {
-                                "dataset_path": ""
-                            }
-                        ],
-                        "node_type": "loader",
-                        "project_id": 33,
-                        "uid": 50,
-                        "location_x": 1139.0185480328691,
-                        "location_y": 1206.061249049624,
-                        "input_ports": [],
-                        "output_ports": [
-                            {
-                                "name": "X"
-                            },
-                            {
-                                "name": "y"
-                            }
-                        ],
-                        "displayed_name": "Data Loader",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\other\\data_loader_2217179495373275136.pkl"
-                    },
-                    {
-                        "message": "data loaded: diabetes",
-                        "node_id": 3201778963907149824,
-                        "node_name": "data_loader",
-                        "task": "load_data",
-                        "children": [
-                            1164463082475421696,
-                            1478589156484513792
-                        ],
-                        "parent": [],
-                        "params": [
-                            {
-                                "dataset_name": "diabetes"
-                            },
-                            {
-                                "dataset_path": ""
-                            }
-                        ],
-                        "node_type": "loader",
-                        "project_id": 33,
-                        "uid": 50,
-                        "location_x": 1011.0673894821119,
-                        "location_y": 1233.7807825013576,
-                        "input_ports": [],
-                        "output_ports": [
-                            {
-                                "name": "X"
-                            },
-                            {
-                                "name": "y"
-                            }
-                        ],
-                        "displayed_name": "Data Loader",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\other\\data_loader_3201778963907149824.pkl"
-                    },
-                    {
-                        "message": "Model logistic_regression created",
-                        "node_id": 3889703806987993088,
-                        "node_name": "logistic_regression",
-                        "task": "classification",
+                        "message": "accuracy score",
+                        "node_id": 885802855531872256,
+                        "node_name": "evaluator",
+                        "task": "evaluate",
                         "children": [],
                         "parent": [],
                         "params": [
                             {
-                                "penalty": "l2"
-                            },
-                            {
-                                "C": 0.5
+                                "metric": "accuracy"
                             }
                         ],
-                        "node_type": "linear_models",
-                        "uid": 6,
+                        "node_type": "metric",
+                        "uid": 54,
                         "output_ports": [
                             {
-                                "name": "model"
-                            }
-                        ],
-                        "input_ports": [],
-                        "displayed_name": "Logistic Regression",
-                        "location_x": 1196.8100879279964,
-                        "location_y": 1082.5293982650169,
-                        "project_id": 33,
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\logistic_regression_3889703806987993088.pkl"
-                    },
-                    {
-                        "message": "Model fitted",
-                        "params": [],
-                        "node_id": 1270860623672049664,
-                        "node_name": "model_fitter",
-                        "children": [],
-                        "parent": [],
-                        "node_type": "fitter",
-                        "task": "fit_model",
-                        "uid": 44,
-                        "output_ports": [
-                            {
-                                "name": "fitted_model"
+                                "name": "score"
                             }
                         ],
                         "input_ports": [
                             {
-                                "name": "X",
-                                "connectedNode": {
-                                    "name": "X",
-                                    "nodeData": 3201778963907149824
-                                }
-                            },
-                            {
-                                "name": "y",
+                                "name": "y_true",
                                 "connectedNode": {
                                     "name": "y",
-                                    "nodeData": 3201778963907149824
+                                    "nodeData": 3480157715873988608
                                 }
                             },
                             {
-                                "name": "model",
+                                "name": "y_pred",
                                 "connectedNode": {
-                                    "name": "model",
-                                    "nodeData": 3889703806987993088
+                                    "name": "predictions",
+                                    "nodeData": 605453778728058880
                                 }
                             }
                         ],
-                        "project_id": 33,
-                        "location_x": 1815.5574859530693,
-                        "location_y": 1885.8300744360954,
-                        "displayed_name": "Model Fitter",
-                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\33\\model\\model_fitter_1270860623672049664.pkl"
+                        "project_id": 41,
+                        "displayed_name": "Evaluator",
+                        "location_x": 2368.1802616214723,
+                        "location_y": 1132.3103342970346,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\41\\model\\evaluator_885802855531872256.pkl"
                     }
                 ],
-                "30": []
+                "15": [
+                    {
+                        "id": 223,
+                        "node_id": 2160853981120,
+                        "displayed_name": "Data Loader",
+                        "node_name": "data_loader",
+                        "message": "data loaded: iris",
+                        "params": [
+                            {
+                                "dataset_name": "iris"
+                            },
+                            {
+                                "dataset_path": ""
+                            }
+                        ],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [
+                            2160880606000,
+                            2160880599664
+                        ],
+                        "parent": [],
+                        "location_x": 2154.346200786357,
+                        "location_y": 3391.163879202186,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "X",
+                                "nodeData": 2160853981120
+                            },
+                            {
+                                "name": "y",
+                                "nodeData": 2160853981120
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\data_loader_2160853981120.pkl"
+                    },
+                    {
+                        "id": 224,
+                        "node_id": 2160880606000,
+                        "displayed_name": "default",
+                        "node_name": "data_loader",
+                        "message": "X",
+                        "params": [],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [],
+                        "parent": [
+                            2160853981120
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\data_loader_2160880606000.pkl"
+                    },
+                    {
+                        "id": 225,
+                        "node_id": 2160880599664,
+                        "displayed_name": "default",
+                        "node_name": "data_loader",
+                        "message": "y",
+                        "params": [],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [],
+                        "parent": [
+                            2160853981120
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\data_loader_2160880599664.pkl"
+                    },
+                    {
+                        "id": 226,
+                        "node_id": 1713766531776,
+                        "displayed_name": "Train Test Split",
+                        "node_name": "train_test_split",
+                        "message": "Data",
+                        "params": [
+                            {
+                                "test_size": 0.2
+                            },
+                            {
+                                "random_state": 42
+                            }
+                        ],
+                        "task": "split",
+                        "node_type": "splitter",
+                        "uid": 55,
+                        "children": [
+                            1713763613632,
+                            1713760259328
+                        ],
+                        "parent": [],
+                        "location_x": 2378.8283031402743,
+                        "location_y": 3299.7168240916208,
+                        "input_ports": [
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "X",
+                                    "nodeData": 2160853981120
+                                }
+                            },
+                            {
+                                "name": "y",
+                                "connectedNode": {
+                                    "name": "y",
+                                    "nodeData": 2160853981120
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "X_Split",
+                                "nodeData": 1713766531776
+                            },
+                            {
+                                "name": "y_Split",
+                                "nodeData": 1713766531776
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\train_test_split_1713766531776.pkl"
+                    },
+                    {
+                        "id": 227,
+                        "node_id": 1713763613632,
+                        "displayed_name": "default",
+                        "node_name": "train_test_split",
+                        "message": "X_Split",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "splitter",
+                        "uid": 55,
+                        "children": [],
+                        "parent": [
+                            1713766531776
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\train_test_split_1713763613632.pkl"
+                    },
+                    {
+                        "id": 228,
+                        "node_id": 1713760259328,
+                        "displayed_name": "default",
+                        "node_name": "train_test_split",
+                        "message": "y_Split",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "splitter",
+                        "uid": 55,
+                        "children": [],
+                        "parent": [
+                            1713766531776
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\train_test_split_1713760259328.pkl"
+                    },
+                    {
+                        "id": 229,
+                        "node_id": 1713766351040,
+                        "displayed_name": "Splitter",
+                        "node_name": "splitter",
+                        "message": "data",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [
+                            1713764318832,
+                            1713764304912
+                        ],
+                        "parent": [],
+                        "location_x": 2686.145347213804,
+                        "location_y": 3299.3011518257895,
+                        "input_ports": [
+                            {
+                                "name": "data",
+                                "connectedNode": {
+                                    "name": "X_Split",
+                                    "nodeData": 1713766531776
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "data_1",
+                                "nodeData": 1713766351040
+                            },
+                            {
+                                "name": "data_2",
+                                "nodeData": 1713766351040
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\splitter_1713766351040.pkl"
+                    },
+                    {
+                        "id": 230,
+                        "node_id": 1713764318832,
+                        "displayed_name": "default",
+                        "node_name": "splitter",
+                        "message": "data_1",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [],
+                        "parent": [
+                            1713766351040
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\splitter_1713764318832.pkl"
+                    },
+                    {
+                        "id": 231,
+                        "node_id": 1713764304912,
+                        "displayed_name": "default",
+                        "node_name": "splitter",
+                        "message": "data_2",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [],
+                        "parent": [
+                            1713766351040
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\splitter_1713764304912.pkl"
+                    },
+                    {
+                        "id": 232,
+                        "node_id": 1713753902912,
+                        "displayed_name": "Splitter",
+                        "node_name": "splitter",
+                        "message": "data",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [
+                            1713754314512,
+                            1713754318928
+                        ],
+                        "parent": [],
+                        "location_x": 2670.3860342020116,
+                        "location_y": 3409.7200930232084,
+                        "input_ports": [
+                            {
+                                "name": "data",
+                                "connectedNode": {
+                                    "name": "y_Split",
+                                    "nodeData": 1713766531776
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "data_1",
+                                "nodeData": 1713753902912
+                            },
+                            {
+                                "name": "data_2",
+                                "nodeData": 1713753902912
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\splitter_1713753902912.pkl"
+                    },
+                    {
+                        "id": 233,
+                        "node_id": 1713754314512,
+                        "displayed_name": "default",
+                        "node_name": "splitter",
+                        "message": "data_1",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [],
+                        "parent": [
+                            1713753902912
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\splitter_1713754314512.pkl"
+                    },
+                    {
+                        "id": 234,
+                        "node_id": 1713754318928,
+                        "displayed_name": "default",
+                        "node_name": "splitter",
+                        "message": "data_2",
+                        "params": [],
+                        "task": "split",
+                        "node_type": "custom",
+                        "uid": 49,
+                        "children": [],
+                        "parent": [
+                            1713753902912
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\other\\splitter_1713754318928.pkl"
+                    },
+                    {
+                        "id": 235,
+                        "node_id": 1713752969184,
+                        "displayed_name": "default",
+                        "node_name": "input_layer",
+                        "message": "Input layer created",
+                        "params": [
+                            {
+                                "shape": [
+                                    150,
+                                    150,
+                                    3
+                                ]
+                            },
+                            {
+                                "name": "input_layer_0"
+                            }
+                        ],
+                        "task": "neural_network",
+                        "node_type": "nn_layer",
+                        "uid": 56,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "layer",
+                                "nodeData": 1713752969184
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": null
+                    },
+                    {
+                        "id": 251,
+                        "node_id": 2234173783376,
+                        "displayed_name": "Predictor",
+                        "node_name": "predictor",
+                        "message": "Model Predictions",
+                        "params": [],
+                        "task": "predict",
+                        "node_type": "predictor",
+                        "uid": 45,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 3328.793674104733,
+                        "location_y": 3304.5011037578747,
+                        "input_ports": [
+                            {
+                                "name": "fitted_model",
+                                "connectedNode": {
+                                    "name": "fitted_model",
+                                    "nodeData": 2663317333459664896
+                                }
+                            },
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "data_2",
+                                    "nodeData": 1713766351040
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "predictions",
+                                "nodeData": 2234173783376
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\model\\predictor_2234173783376.pkl"
+                    },
+                    {
+                        "id": 252,
+                        "node_id": 2233930224976,
+                        "displayed_name": "Evaluator",
+                        "node_name": "evaluator",
+                        "message": "accuracy score",
+                        "params": [
+                            {
+                                "metric": "accuracy"
+                            }
+                        ],
+                        "task": "evaluate",
+                        "node_type": "metric",
+                        "uid": 54,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 3584.045117427425,
+                        "location_y": 3521.836096577521,
+                        "input_ports": [
+                            {
+                                "name": "y_true",
+                                "connectedNode": {
+                                    "name": "predictions",
+                                    "nodeData": 2234173783376
+                                }
+                            },
+                            {
+                                "name": "y_pred",
+                                "connectedNode": {
+                                    "name": "data_2",
+                                    "nodeData": 1713753902912
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "score",
+                                "nodeData": 2233930224976
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\model\\evaluator_2233930224976.pkl"
+                    },
+                    {
+                        "id": 1211,
+                        "node_id": 2733967552614039552,
+                        "displayed_name": "Logistic Regression",
+                        "node_name": "logistic_regression",
+                        "message": "Model logistic_regression created",
+                        "params": [
+                            {
+                                "penalty": "l2"
+                            },
+                            {
+                                "C": 1.0
+                            }
+                        ],
+                        "task": "classification",
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2652.8838729962526,
+                        "location_y": 3173.88955746252,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "model",
+                                "nodeData": 2733967552614039552
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\model\\logistic_regression_2733967552614039552.pkl"
+                    },
+                    {
+                        "id": 1224,
+                        "node_id": 2663317333459664896,
+                        "displayed_name": "Model Fitter",
+                        "node_name": "model_fitter",
+                        "message": "Model fitted",
+                        "params": [],
+                        "task": "fit_model",
+                        "node_type": "fitter",
+                        "uid": 44,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2960.8838729962536,
+                        "location_y": 3186.2228907958533,
+                        "input_ports": [
+                            {
+                                "name": "model",
+                                "connectedNode": {
+                                    "name": "model",
+                                    "nodeData": 2733967552614039552
+                                }
+                            },
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "data_1",
+                                    "nodeData": 1713766351040
+                                }
+                            },
+                            {
+                                "name": "y",
+                                "connectedNode": {
+                                    "name": "data_1",
+                                    "nodeData": 1713753902912
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "fitted_model",
+                                "nodeData": 2663317333459664896
+                            }
+                        ],
+                        "project": 15,
+                        "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\model\\model_fitter_2663317333459664896.pkl"
+                    }
+                ]
             }
         }
     },
-    "active_user": "admin",
-    "active_project": "33",
+    "active_user": "mo",
+    "active_project": "41",
     "admin": [
-        "admin"
+        "mo"
     ]
 }

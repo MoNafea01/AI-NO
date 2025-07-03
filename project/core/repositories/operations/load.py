@@ -49,11 +49,13 @@ class NodeLoader:
             path: str = None, 
             ) -> dict:
         
+        if not str(node_id).isdigit():
+            return False, "node_id must be an integer, There is an error during node loading operation, re-check the provided ids for the input nodes."
         node_id = int(node_id) if node_id else None
         project_id = int(project_id) if project_id else None
 
         
-        if not (node_id  or path):
+        if not (node_id or path):
             return False, "Either(node_id and project_id) or path must be provided."
         
         try:

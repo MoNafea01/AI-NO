@@ -1,7 +1,8 @@
 import ast
+import asyncio
 from .agents import Agent
 from cli.call_cli import call_script
-from chatbot.core.utils import parse_command_list, extract_id_message
+from chatbot.core.utils import parse_command_list, extract_id_message, handle_params
 
 # FeedbackAgent for processing user feedback on CLI commands
 # It validates the commands, interacts with the CLI, and updates documents accordingly.
@@ -10,7 +11,7 @@ class FeedbackAgent(Agent):
         super().__init__("FeedbackAgent", logger)
 
     async def execute(self, input_data, context=None):
-        output = input_data["output"]
+        output = handle_params(input_data["output"])
         to_db = input_data["to_db"]
         docs = input_data["docs"]
         mode = input_data["mode"]
@@ -29,8 +30,9 @@ class FeedbackAgent(Agent):
                 if cmd in ['done', 'Done', 'done!', 'Done!']:
                     continue_iteration = False
                     break
-
-                api_response = extract_id_message(call_script(cmd))
+                call_script_response = await asyncio.to_thread(call_script, cmd)
+                
+                api_response = extract_id_message(call_script_response)
                 validated_outputs.append(api_response)
                 # Update last document with API response
                 try:

@@ -22,11 +22,12 @@ class OrchestratorAgent(Agent):
         
         mode_selector_result = await self.mode_selector_agent.execute({"question": question})
         mode = mode_selector_result["mode"]
-        print(f"Mode  selected: {mode}")
+        print(f"Mode  Selected: {mode}")
                 
         to_db = input_data["to_db"]
         if mode == 'auto':
             max_iterations = await self.steps_estimate_agent.execute({'question': question})
+            print(f"Max Iterations: {max_iterations}")
         else:
             max_iterations = 1
         
@@ -51,6 +52,7 @@ class OrchestratorAgent(Agent):
                 "cur_iter": cur_iter
             })
             log.append(f"Generated: {generation_result['output']}")
+            print("Model   Output: ", generation_result['output'])
 
             # Step 3: Validate and get feedback
             feedback_result = await self.feedback_agent.execute({

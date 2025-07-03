@@ -84,4 +84,3 @@ Preprocessors = ['maxabs_scaler', 'normalizer', 'minmax_scaler', 'robust_scaler'
                  'standard_scaler', 'label_encoder', 'onehot_encoder', 'ordinal_encoder', 
                  'label_binarizer', 'knn_imputer', 'simple_imputer', 'binarizer']
 
-

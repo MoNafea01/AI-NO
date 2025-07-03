@@ -1,5 +1,4 @@
 # #chatbot/core/rag_pipeline.py
-import os
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import OllamaLLM
@@ -11,35 +10,33 @@ config = load_config('config/config.yaml')
 logger = init_logger(__name__, config)
 
 
-def get_llm(model_name="gemini-1.5-pro", temperature=0.1, max_tokens=500):
+def get_llm(model_name="gemini-1.5-pro", temperature=0.1, max_tokens=500, google_key=None):
     logger.info(f"Initializing LLM: {model_name}")
-    google_keys = [os.getenv("GOOGLE_API_KEY"), os.getenv("GOOGLE_API_KEY2")]
     
-    for google_key in google_keys:
-        try:
-            if model_name.startswith("gemini"):
-                llm = ChatGoogleGenerativeAI(
-                    model=model_name,
-                    temperature=temperature,
-                    max_output_tokens=max_tokens,
-                    google_api_key=google_key
-                )
-                
-            elif model_name.startswith("deepseek"):
-                llm = OllamaLLM(
-                    model=model_name, 
-                    temperature=0.1
-                )
-                
-            else:
-                raise ValueError(f"Unsupported model: {model_name}")
+    try:
+        if model_name.startswith("gemini"):
+            llm = ChatGoogleGenerativeAI(
+                model=model_name,
+                temperature=temperature,
+                max_output_tokens=max_tokens,
+                google_api_key=google_key
+            )
+            
+        elif model_name.startswith("deepseek"):
+            llm = OllamaLLM(
+                model=model_name, 
+                temperature=0.1
+            )
+            
+        else:
+            raise ValueError(f"Unsupported model: {model_name}")
 
-            logger.debug("LLM initialized successfully")
-            return llm
-        
-        except Exception as e:
-            logger.error(f"Failed to initialize LLM: {str(e)}")
-    raise
+        logger.debug("LLM initialized successfully")
+        return llm
+    
+    except Exception as e:
+        logger.error(f"Failed to initialize LLM: {str(e)}")
+        raise
 
 
 def format_docs(docs):
