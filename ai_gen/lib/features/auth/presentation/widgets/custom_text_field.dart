@@ -18,15 +18,15 @@ class CustomTextField extends StatefulWidget {
   final int? maxLength;
   final TextInputAction? textInputAction;
   final EdgeInsetsGeometry? contentPadding;
+  
+  final String? fieldKey; 
 
   const CustomTextField({
-    Key? key,
-    required this.hintText,
+    required this.hintText, required this.onChanged, super.key,
     this.suffixIcon,
     this.prefixIcon,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
-    required this.onChanged,
     this.errorText,
     this.showError = false,
     this.focusNode,
@@ -37,7 +37,9 @@ class CustomTextField extends StatefulWidget {
     this.maxLength,
     this.textInputAction,
     this.contentPadding,
-  }) : super(key: key);
+  
+    this.fieldKey, // Add this
+  });
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();

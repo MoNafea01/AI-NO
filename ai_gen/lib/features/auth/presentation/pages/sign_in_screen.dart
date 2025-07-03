@@ -1,7 +1,4 @@
-
-
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
-
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
@@ -10,7 +7,7 @@ import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/outlinedPrimaryButton.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/social_sign_in_button.dart';
-import 'package:ai_gen/features/request_otp_screen/presentation/pages/request_otp_screen.dart';
+import 'package:ai_gen/features/auth/presentation/request_otp_screen/presentation/pages/request_otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -351,6 +348,10 @@ class _LoginFormState extends State<LoginForm>
               focusNode: emailFocusNode,
               onChanged: (value) {
                 authProvider.setEmail(value);
+                // Clear field-specific error when user starts typing
+                if (authProvider.emailError != null) {
+                  authProvider.clearEmailError();
+                }
                 // Only validate when user stops typing
                 Future.delayed(const Duration(milliseconds: 500), () {
                   authProvider.validateEmail(value);
@@ -363,7 +364,7 @@ class _LoginFormState extends State<LoginForm>
           ),
           const SizedBox(height: 16),
 
-          // Password Field
+// Password Field
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
@@ -384,6 +385,10 @@ class _LoginFormState extends State<LoginForm>
               isPassword: true,
               onChanged: (value) {
                 authProvider.setPassword(value);
+                // Clear field-specific error when user starts typing
+                if (authProvider.passwordError != null) {
+                  authProvider.clearPasswordError();
+                }
                 // Only validate when user stops typing
                 Future.delayed(const Duration(milliseconds: 500), () {
                   authProvider.validatePassword(value);

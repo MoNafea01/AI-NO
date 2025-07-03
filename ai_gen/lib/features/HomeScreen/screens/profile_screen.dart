@@ -1,4 +1,6 @@
 // Enhanced ProfileScreen with better error handling and user experience
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
@@ -432,7 +434,7 @@ class CustomTextField extends StatelessWidget {
       onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hintText ?? controller.text,
-        prefixIcon: icon != null ? Icon(icon, color: Color(0xff666666)) : null,
+        prefixIcon: icon != null ? Icon(icon, color: const Color(0xff666666)) : null,
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.all(16),

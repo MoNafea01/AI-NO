@@ -8,18 +8,18 @@ import 'package:ai_gen/features/HomeScreen/screens/home_screen.dart';
 import 'package:ai_gen/features/HomeScreen/screens/profile_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_side_bar_dashboard.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
-import 'package:ai_gen/features/learnScreen/learn_screen.dart';
+import 'package:ai_gen/features/dashboard_screens/learnScreen/learn_screen.dart';
 
 
-import 'package:ai_gen/features/settings_screen/settings_screen.dart';
+import 'package:ai_gen/features/dashboard_screens/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider, MultiBlocProvider, ReadContext;
 
 
-import '../../datasetScreen/screens/dataset_screen.dart';
-import '../../docsScreen/docs_screen.dart';
+import '../../dashboard_screens/datasetScreen/screens/dataset_screen.dart';
+import '../../dashboard_screens/docsScreen/docs_screen.dart';
 
-import '../../modelScreen/screens/model_screen.dart';
+import '../../dashboard_screens/modelScreen/screens/model_screen.dart';
 import '../data/enum_app_screens.dart';
 
 class DashboardScreen extends StatelessWidget {

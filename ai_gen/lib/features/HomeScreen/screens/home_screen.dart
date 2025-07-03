@@ -6,8 +6,9 @@ import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_dashboard_header.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/projects_table/projects_table.dart';
+import 'package:ai_gen/features/HomeScreen/widgets/search_and_action.dart';
 
-import 'package:ai_gen/features/screens/HomeScreen/widgets/search_and_action.dart';
+//import 'package:ai_gen/features/screens/HomeScreen/widgets/search_and_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';

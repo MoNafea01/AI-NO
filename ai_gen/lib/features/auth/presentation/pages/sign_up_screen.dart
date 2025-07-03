@@ -1,12 +1,10 @@
 // ignore_for_file: avoid_print
-
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/custom_text_field.dart';
-import 'package:ai_gen/features/auth/presentation/widgets/outlinedPrimaryButton.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/social_sign_in_button.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/user_testimonal.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +37,7 @@ class SignupForm extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-           Text(
+          Text(
             TranslationKeys.signUp.tr,
             style: const TextStyle(
               fontSize: 32,
@@ -53,7 +51,15 @@ class SignupForm extends StatelessWidget {
           CustomTextField(
             hintText: TranslationKeys.username.tr,
             suffixIcon: Icons.person_2_outlined,
-            onChanged: (value) => authProvider.setUsername(value),
+            fieldKey: 'username',
+            errorText: authProvider.fieldErrors['username'],
+            onChanged: (value) {
+              authProvider.setUsername(value);
+              // Clear error when user starts typing
+              if (authProvider.fieldErrors.containsKey('username')) {
+                authProvider.clearFieldErrors();
+              }
+            },
           ),
           const SizedBox(height: 16),
 
@@ -61,7 +67,14 @@ class SignupForm extends StatelessWidget {
           CustomTextField(
             hintText: TranslationKeys.firstName.tr,
             suffixIcon: Icons.person_outline,
-            onChanged: (value) => authProvider.setFirstName(value),
+            fieldKey: 'first_name',
+            errorText: authProvider.fieldErrors['first_name'],
+            onChanged: (value) {
+              authProvider.setFirstName(value);
+              if (authProvider.fieldErrors.containsKey('first_name')) {
+                authProvider.clearFieldErrors();
+              }
+            },
           ),
           const SizedBox(height: 16),
 
@@ -69,7 +82,14 @@ class SignupForm extends StatelessWidget {
           CustomTextField(
             hintText: TranslationKeys.lastName.tr,
             suffixIcon: Icons.person_outline,
-            onChanged: (value) => authProvider.setLastName(value),
+            fieldKey: 'last_name',
+            errorText: authProvider.fieldErrors['last_name'],
+            onChanged: (value) {
+              authProvider.setLastName(value);
+              if (authProvider.fieldErrors.containsKey('last_name')) {
+                authProvider.clearFieldErrors();
+              }
+            },
           ),
           const SizedBox(height: 16),
 
@@ -78,7 +98,14 @@ class SignupForm extends StatelessWidget {
             hintText: TranslationKeys.emailHintText.tr,
             suffixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
-            onChanged: (value) => authProvider.setEmail(value),
+            fieldKey: 'email',
+            errorText: authProvider.fieldErrors['email'],
+            onChanged: (value) {
+              authProvider.setEmail(value);
+              if (authProvider.fieldErrors.containsKey('email')) {
+                authProvider.clearFieldErrors();
+              }
+            },
           ),
           const SizedBox(height: 16),
 
@@ -87,7 +114,14 @@ class SignupForm extends StatelessWidget {
             hintText: TranslationKeys.passwordHintText.tr,
             suffixIcon: Icons.lock_outline,
             isPassword: true,
-            onChanged: (value) => authProvider.setPassword(value),
+            fieldKey: 'password',
+            errorText: authProvider.fieldErrors['password'],
+            onChanged: (value) {
+              authProvider.setPassword(value);
+              if (authProvider.fieldErrors.containsKey('password')) {
+                authProvider.clearFieldErrors();
+              }
+            },
           ),
           const SizedBox(height: 16),
 
@@ -96,7 +130,14 @@ class SignupForm extends StatelessWidget {
             hintText: TranslationKeys.confirmPassword.tr,
             suffixIcon: Icons.lock_outline,
             isPassword: true,
-            onChanged: (value) => authProvider.setConfirmPassword(value),
+            fieldKey: 'password2',
+            errorText: authProvider.fieldErrors['password2'],
+            onChanged: (value) {
+              authProvider.setConfirmPassword(value);
+              if (authProvider.fieldErrors.containsKey('password2')) {
+                authProvider.clearFieldErrors();
+              }
+            },
           ),
           const SizedBox(height: 16),
 
@@ -110,7 +151,7 @@ class SignupForm extends StatelessWidget {
               ),
               Expanded(
                 child: RichText(
-                  text:  TextSpan(
+                  text: TextSpan(
                     style: const TextStyle(color: Colors.black),
                     children: [
                       TextSpan(text: TranslationKeys.iAgreeWithThe.tr),
@@ -126,26 +167,54 @@ class SignupForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          CustomPrimaryButton(
-            buttonBackgroundColor: AppColors.bluePrimaryColor,
-            buttonName: TranslationKeys.signUp.tr,
-            textButtonColor: AppColors.appBackgroundColor,
-            onPressed: () {
-              print("email: ${authProvider.email}");
-              print(
-                  "isValidEmail: ${authProvider.isValidEmail(authProvider.email)}");
-              print("password: ${authProvider.password}");
-              print(
-                  "password valid: ${authProvider.isStrongPassword(authProvider.password)}");
 
-              print("agreeTerms: ${authProvider.agreeTerms}");
-              print("isSignUpValid: ${authProvider.isSignUpValid}");
-              authProvider.signUp(context);
+          // Updated Sign Up Button with Loading State
+          Container(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: authProvider.isLoading
+                  ? null
+                  : () {
+                      // Clear any existing errors before attempting signup
+                      authProvider.clearFieldErrors();
 
-              // if (authProvider.isSignUpValid && !authProvider.isLoading) {
-              //   authProvider.signUp(context); // Pass context here
-              // }
-            },
+                      print("email: ${authProvider.email}");
+                      print(
+                          "isValidEmail: ${authProvider.isValidEmail(authProvider.email)}");
+                      print("password: ${authProvider.password}");
+                      print(
+                          "password valid: ${authProvider.isStrongPassword(authProvider.password)}");
+                      print("agreeTerms: ${authProvider.agreeTerms}");
+                      print("isSignUpValid: ${authProvider.isSignUpValid}");
+                      authProvider.signUp(context);
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.bluePrimaryColor,
+                disabledBackgroundColor:
+                    AppColors.bluePrimaryColor.withOpacity(0.6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: authProvider.isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      TranslationKeys.signUp.tr,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
           ),
 
           const SizedBox(height: 24),
@@ -177,7 +246,7 @@ class SignupForm extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-               Text(TranslationKeys.dontHaveAnAccount.tr),
+              Text(TranslationKeys.dontHaveAnAccount.tr),
               TextButton(
                 onPressed: () {
                   authProvider.resetForm();
@@ -186,7 +255,7 @@ class SignupForm extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => const LoginScreen()));
                 },
-                child:  Text(
+                child: Text(
                   TranslationKeys.login.tr,
                   style: const TextStyle(color: AppColors.bluePrimaryColor),
                 ),
