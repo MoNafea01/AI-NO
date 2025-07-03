@@ -18,6 +18,7 @@ def get_docs(choice):
     logger.info(f"Loading documents for choice: {choice}")
 
     try:
+        
         pdf_file = os.path.join(res_path, "Cli script guidebook.pdf")
         logger.debug(f"Loading PDF from: {pdf_file}")
 
@@ -36,23 +37,36 @@ def get_docs(choice):
                                     json.dumps(data_mapping))
         logger.debug("Created data mapping document")
 
-        if choice == '1':
+        if choice in ['manual', 'router']:
             logger.info("Returning manual mode documents")
             return pdf_docs + [data_mapping_doc]
         
-        elif choice == '2':
+        elif choice in ['auto', 'step', 'selector']:
             steps_file = os.path.join(res_path, "steps.pdf")
             logger.debug(f"Loading steps PDF from: {steps_file}")
             steps_loader = PyPDFLoader(steps_file)
             steps_docs = steps_loader.load_and_split()
             logger.info(f"Successfully loaded {len(steps_docs)} pages from steps PDF")
-
-            logger.info("Returning auto mode documents")
-            return steps_docs + pdf_docs + [data_mapping_doc] + [Document(page_content='')]
-
+            if choice in ['auto', 'selector']:
+                logger.info("Returning auto mode documents")
+                return steps_docs + pdf_docs + [data_mapping_doc] + [Document(page_content='')]
+            
+            elif choice == 'step':
+                logger.info("Returning only data steps document")
+                return steps_docs
+            
+        elif choice == 'auto_mode_nodes':
+            logger.info("Returning auto mode nodes documents")
+            nodes_file = os.path.join(res_path, "auto_mode_nodes.pdf")
+            logger.debug(f"Loading auto mode nodes PDF from: {nodes_file}")
+            nodes_loader = PyPDFLoader(nodes_file)
+            nodes_docs = nodes_loader.load_and_split()
+            logger.info(f"Successfully loaded {len(nodes_docs)} pages from auto mode nodes PDF")
+            return nodes_docs
+        
         else:
             logger.error(f"Invalid mode choice: {choice}")
-            raise ValueError("Invalid mode choice. Must be '1' (manual) or '2' (auto).")
+            raise ValueError("Invalid mode choice. Must be 'manual' or 'auto'.")
     except Exception as e:
         logger.exception(f"Error in get_docs: {str(e)}")
         raise 

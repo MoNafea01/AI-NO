@@ -1,6 +1,10 @@
 from core.nodes.configs.models import MODELS
 from core.nodes.configs.preprocessors import PREPROCESSORS
 from django.conf import settings
+import os
+import pandas as pd
+base_dir = settings.BASE_DIR if hasattr(settings, 'BASE_DIR') else os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../'))
+schema_dir = os.path.join(base_dir, 'core', 'schema.xlsx')
 
 # these nodes are in json format and are used to be input to other nodes
 DICT_NODES = ['data', 'data_1', 'data_2', 'X', 
@@ -9,7 +13,7 @@ DICT_NODES = ['data', 'data_1', 'data_2', 'X',
               'compiled_model', 'nn_model', 'fitted_model', 'fitted_preprocessor']
 
 # these are layers names
-PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer"]
+PARENT_NODES = ["dense_layer", "flatten_layer", "dropout_layer", "maxpool2d_layer", "conv2d_layer", "sequential_model"]
 
 # nodes with more than one record on database
 MULTI_CHANNEL_NODES = ["data_loader", "train_test_split", "splitter", "fitter_transformer"]
@@ -64,7 +68,8 @@ nodes = ['ridge', 'lasso', 'linear_regression', 'sgd_regression', 'elastic_net',
  "data_loader", "splitter", "joiner", "train_test_split",
 
  'input_layer', 'conv2d_layer', 'maxpool2d_layer', 'flatten_layer', 'dense_layer', 
- 'dropout_layer', 'sequential_model', 'nn_fitter','model_compiler',  'node_saver', 'node_loader'
+ 'dropout_layer', 'sequential_model', 'nn_fitter','model_compiler',  'node_saver', 'node_loader',
+ 'node_template_saver', 'template'
  ]
 
 api_ref = [
@@ -72,34 +77,50 @@ api_ref = [
     *preprocessors, "fit_preprocessor/", "transform/", "fit_transform/",
     "data_loader/", "splitter/", "joiner/", "train_test_split/", 
     "create_input/", "conv2d/", "maxpool2d/", "flatten/", "dense/", "dropout/", "sequential/", 
-    "fit_net/", "compile/", "save_node/", "load_node/"
+    "fit_net/", "compile/", "save_node/", "load_node/",
+    'save_template/', 'template/'
 ]
 mapper = dict(zip(nodes, api_ref))
 
-def get_node_name_by_api_ref(api_ref, request):
-    from core.nodes.utils import NodeNameHandler
+def get_node_name_by_api_ref(ref, request):
     """
     Get the node name by api ref.
     """
-    for name, api in mapper.items():
-        if api == api_ref:
-            if name in MODELS_NAMES[3:]:
-                node_name = request.data.get("model_name")
-                node_path = request.data.get("model_path")
-                if node_path:
-                    node_name, _ = NodeNameHandler.handle_name(node_path)
-            elif name in PREPROCESSORS_NAMES[3:]:
-                node_name = request.data.get("preprocessor_name")
-                node_path = request.data.get("preprocessor_path")
-                if node_path:
-                    node_name, _ = NodeNameHandler.handle_name(node_path)
-            else:
-                node_name = name
-            return node_name
-        
-    return None
+    query_params = request.query_params.copy()
+
+    template_id = query_params.pop('template_id', None) 
+    if isinstance(template_id, list):
+        template_id = template_id[0] if template_id else None
+    
+    try:
+        node_name = None
+        schema = pd.read_excel(schema_dir, sheet_name="Sheet1")
+        if ref == 'create_model/':
+            node_name = request.data.get('model_name')
+        elif ref == 'create_preprocessor/':
+            node_name = request.data.get('preprocessor_name')
+        else:
+            node = schema[schema['api_call'] == ref].iloc[0]
+            node_name = node['node_name']
+    
+        return node_name
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+NODES_ORDERING = {
+    '0': MODELS_NAMES[3:] + PREPROCESSORS_NAMES[3:] + ['data_loader', 'input_layer', 'node_loader', 'template'],
+    '1': ['train_test_split', 'conv2d_layer', 'dense_layer', 'preprocessor_fitter', 'fitter_transformer'],
+    '2': ['splitter', 'maxpool2d_layer', 'transformer', 'dropout_layer', 'flatten_layer'],
+    '3': ['joiner', 'model_fitter', 'sequential_model'],
+    '4': ['node_template_saver', 'node_saver', 'model_compiler', 'nn_fitter'],
+    '5': ['predictor', 'evaluator']
+}
 
 if settings.TESTING:
     SAVING_DIR = "core/test_saved"
 else:
     SAVING_DIR = "core/saved"
+

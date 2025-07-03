@@ -5,6 +5,7 @@ from io import BytesIO
 from ai_operations.models import Node
 from django.core.exceptions import ObjectDoesNotExist
 from core.nodes.utils import NodeNameHandler
+import uuid
 
 
 class NodeLoader:
@@ -47,9 +48,14 @@ class NodeLoader:
             project_id: int = None,
             path: str = None, 
             ) -> dict:
+        
+        if not str(node_id).isdigit():
+            return False, "node_id must be an integer, There is an error during node loading operation, re-check the provided ids for the input nodes."
         node_id = int(node_id) if node_id else None
         project_id = int(project_id) if project_id else None
-        if not (node_id  or path):
+
+        
+        if not (node_id or path):
             return False, "Either(node_id and project_id) or path must be provided."
         
         try:
@@ -71,7 +77,7 @@ class NodeLoader:
                 if node_path and os.path.exists(node_path):
                     node_data = joblib.load(node_path)
                 else:
-                    print(Warning(f"Node data file not found at path: {node_path}"))
+                    print(Warning(f"\tWarning Node data file not found at path: {node_path}"))
                     node_data = None
                     
             except Exception as e:
@@ -89,14 +95,15 @@ class NodeLoader:
             if path:
                 self.from_db = False
             payload = {
-                    "message": f"Node {name} Loaded.",
+                    "message": f"Node Loaded: {name}",
                     "node_name": "node_loader",
-                    "node_id": id(self),
+                    "node_id": uuid.uuid1().int & ((1 << 63) - 1),
                     "params": {},
                     "task": "load_node",
                     "node_type": "loader",
                     "project": project_id,
                     "children": [],
+                    "parent": [],
                 }
             
                 

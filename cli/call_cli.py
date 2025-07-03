@@ -1,17 +1,21 @@
+import ast
+import shlex
 import json, os
 import subprocess
 main_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "main.py")
-def call_script(command, *args, **kwargs):
+def call_script(command_line):
+    args = shlex.split(command_line)
+    
+    cmd_list = ["python", main_path] + args
 
-    # Here, you might call your script. For example:
     try:
         result = subprocess.run(
-            ["python", main_path, command],
+            cmd_list,
             capture_output=True,
             text=True,
             check=True,
         )
-        print("Subprocess completed successfully.")
+        # print("Subprocess completed successfully.")
 
     except subprocess.CalledProcessError as e:
         print("Subprocess failed.")
@@ -26,23 +30,19 @@ def call_script(command, *args, **kwargs):
     try:
         response = json.loads(result.stdout)
     except json.JSONDecodeError:
-        response = {"error": "Failed to decode JSON", "raw": result.stdout}
+        try:
+            response = ast.literal_eval(result.stdout)
+        except Exception:
+            response =  result.stdout
     return response
 
 if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
-        command = sys.argv[1]
-        try:
-            parameters = sys.argv[2]
-        except:
-            parameters = ""
-        
-        args = ""
-        if len(sys.argv) > 3:
-            args = sys.argv[3:]
-        # print(command, parameters, args)
-        response = call_script(command, parameters, args)
+        clean_args = [arg for arg in sys.argv[1:] if arg.strip() != '']
+        response = call_script(*clean_args)
         print("Response:", response)
     else:
-        print("No command provided.")
+        # print("No command provided.")
+        pass
+    

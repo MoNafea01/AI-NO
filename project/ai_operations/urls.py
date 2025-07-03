@@ -16,7 +16,9 @@ urlpatterns = [
     path('projects/', ProjectViewSet.as_view({'get': 'list', 'post': 'create'}), name='project-list'),
     path('projects/<int:pk>/', ProjectViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='project-detail'),
     path('projects/bulk-delete/', BulkProjectDeleteAPIView.as_view(), name='bulk-project-delete'),
-
+    path('projects/delete-empty-projects/', EmptyProjectsDeleteAPIView.as_view(), name='delete-empty-projects'),
+    path('multi-project-nodes/', MultiProjectNodeAPIView.as_view(), name='multi-project-nodes'),
+    
     path('nodes/', NodeAPIViewSet.as_view({'get': 'list', 'post': 'create', 'put': 'update', 'delete': 'destroy'}), name='node-list'),
     path('nodes/<int:pk>/', NodeAPIViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='node-detail'),
     path('nodes/clear-project/', NodeAPIViewSet.as_view({'delete': 'clear_project_nodes'}), name='clear-project-nodes'),
@@ -53,13 +55,15 @@ urlpatterns = [
     path('sequential/', SequentialAPIView.as_view(), name='sequential'),
     path('compile/', ModelCompilerAPIView.as_view(), name='compile'),
     path('fit_net/', NetModelFitterAPIView.as_view(), name='fit_net'),
+    path('save_template/', NodeTemplateSaverAPIView.as_view(), name='save_template'),
+    path('template/', NodeTemplateLoaderAPIView.as_view(), name='template'),
     
     path('upload_excel/', ExcelUploadAPIView.as_view(), name='upload-excel'),
+    path('update_components/', UpdateComponentsAPIView.as_view(), name='update-components'),
     path('export-project/', ExportProjectAPIView.as_view(), name='export-project'),
     path('import-project/', ImportProjectAPIView.as_view(), name='import-project'),
-
-    path('chatbot/', ChatbotAPIView.as_view(), name='chatbot'),
-    path('cli/', CLIAPIView.as_view(), name='cli'),
+    path('project-models/', ProjectModelsAPIView.as_view(), name='project-models'),
+    path('project-datasets/', ProjectDatasetsAPIView.as_view(), name='project-datasets'),
 
     # Generates the raw OpenAPI schema
     path('schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -1,5 +1,4 @@
 @echo off
-call "D:\College\4th\Graduation Project\simple_task\backend\flutter\Scripts\activate"
-cd "D:\College\4th\Graduation Project\simple_task\project"
+call "C:\Users\a1mme\OneDrive\Desktop\MO\test_grad\.venv\Scripts\activate.bat"
+cd project
 python manage.py runserver
-pause

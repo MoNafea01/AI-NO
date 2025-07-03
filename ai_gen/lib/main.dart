@@ -1,4 +1,5 @@
 import 'package:ai_gen/core/cache/cache_data.dart';
+import 'package:ai_gen/core/cache/cache_helper.dart';
 import 'package:ai_gen/core/translation/translation_helper.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
@@ -6,10 +7,9 @@ import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_cubit.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:ai_gen/core/cache/cache_helper.dart';
-import 'package:get_it/get_it.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 

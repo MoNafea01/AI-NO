@@ -21,6 +21,11 @@ class Model(BaseNode):
 
         self.params = default_params
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         super().__init__(project_id=project_id)  # Pass project_id to BaseNode
     
     def _get_default_params(self) -> dict:
@@ -44,6 +49,12 @@ class Model(BaseNode):
             "node_type": self.get_type_task()[0],
             "node_name": self.node_name,
             "uid": self.uid,
+            "output_ports": self.output_ports,
+            "input_ports": self.input_ports,
+            "displayed_name": self.displayed_name,
+            "location_x": self.location_x,
+            "location_y": self.location_y,
+            "project_id": self.project_id,
         }
     
     def get_params(self):

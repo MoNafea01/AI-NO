@@ -1,8 +1,8 @@
-Classify the following user query as either 'cli' (related to generating CLI commands for a machine learning pipeline) or 'chat' (general conversation).
-    Query: {query}
+Classify the following user query as either 'agent' (related to generating CLI commands for a machine learning pipeline) or 'chat' (general conversation).
+    Query: {question}
     Reference Information: {context}
     Scope:
-    - You are in a NO Code Platform for AI models deployment, you are given either a general query or a nodes' creation query, yor task is to classify them based on your knowledge from Reference Information.
+    - You are in a NO Code Platform for AI models deployment, you are given a query, yor task is to classify it based on your knowledge from Reference Information.
 
     You are given the folliwing information:
     - A user guide that contains command-line instructions for a CLI tool.
@@ -11,12 +11,13 @@ Classify the following user query as either 'cli' (related to generating CLI com
 
 
     Instructions:
-    - Return only 'cli' or 'chat' as a single word.
+    - Return only 'agent' or 'chat' as a single word.
     - Carefully read the Reference Information and node names for each node.
-    - Consider queries that looks to satisfy the Reference Information operations as 'cli'
+    - Consider queries that looks to satisfy the Reference Information operations as 'agent'
     - Consider questions about general knowledge, explanations, or unrelated topics as 'chat'.
+    
     Examples:
-    - "I want to fit knn on diabetes dataset" -> cli
+    - "I want to fit knn on diabetes dataset" -> agent
     - "What is a neural network?" -> chat
-    - "Build a neural net" -> cli
+    - "Build a neural net" -> agent
     - "Tell me about the weather" -> chat

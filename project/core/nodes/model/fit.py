@@ -32,6 +32,11 @@ class Fit(BaseNode):
         self.model = model
         self.project_id = project_id
         self.uid = kwargs.get('uid', None)
+        self.input_ports = kwargs.get('input_ports', None)
+        self.output_ports = kwargs.get('output_ports', None)
+        self.location_x = kwargs.get('location_x', None)
+        self.location_y = kwargs.get('location_y', None)
+        self.displayed_name = kwargs.get('displayed_name', None)
         self.payload = self._fit(err)
 
     def _fit(self,err=None):
@@ -72,9 +77,8 @@ class Fit(BaseNode):
                 return fitted_model
 
             payload = PayloadBuilder.build_payload("Model fitted", fitted_model, "model_fitter", node_type="fitter", task="fit_model",
-                                                   uid=self.uid)
-            if self.project_id:
-                payload['project_id'] = self.project_id
+                                                   uid=self.uid, output_ports=self.output_ports, input_ports=self.input_ports, project_id=self.project_id,
+                                                   location_x=self.location_x, location_y=self.location_y, displayed_name=self.displayed_name)
 
             project_path = f"{self.project_id}/" if self.project_id else ""
             NodeSaver()(payload, rf"{SAVING_DIR}/{project_path}model")
