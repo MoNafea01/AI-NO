@@ -37,10 +37,12 @@ class ClearAllNodes:
 
 class NodeDataExtractor:
 
-    def __init__(self, from_db : bool = True, return_serialized : bool = False, return_path : bool = False):
+    def __init__(self, from_db : bool = True, return_serialized : bool = False, 
+                 return_path : bool = False, return_data : bool = False):
         self.from_db = from_db
         self.return_serialized = return_serialized
         self.return_path = return_path
+        self.return_data = return_data
 
     def __call__(self, *args, project_id=None):
         return self.node_data_extract(*args, project_id=project_id)
@@ -50,7 +52,7 @@ class NodeDataExtractor:
         l = []
         for arg in args:
             if isinstance(arg, dict):
-                success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg.get("node_id"), project_id=project_id)
+                success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path, self.return_data)(arg.get("node_id"), project_id=project_id)
                 if success:
                     data = data.get("node_data")
 
@@ -59,7 +61,7 @@ class NodeDataExtractor:
                 elif data is None:
                     l.append("Node not found.")
             elif isinstance(arg, int):
-                success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(arg, project_id=project_id)
+                success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path, self.return_data)(arg, project_id=project_id)
                 if success:
                     data = data.get("node_data")
 
@@ -69,11 +71,11 @@ class NodeDataExtractor:
                     l.append("Node not found.")
             elif isinstance(arg, str):
                 if arg.isnumeric():
-                    success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path)(int(arg), project_id=project_id)
+                    success, data = NodeLoader(self.from_db, self.return_serialized, self.return_path, self.return_data)(int(arg), project_id=project_id)
                     if success:
                         data = data.get("node_data")
                 else:
-                    success, data = NodeLoader(from_db=False, return_serialized=self.return_serialized, return_path=self.return_path)(path=arg)
+                    success, data = NodeLoader(from_db=False, return_serialized=self.return_serialized, return_path=self.return_path, return_data=self.return_data)(path=arg)
                     if success:
                         data = data.get("node_data")
                 if data is not None:

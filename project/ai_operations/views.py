@@ -179,6 +179,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         return_serialized = request.query_params.get('return_serialized', '0') == '1'
         project_id = request.query_params.get('project_id') 
         template_id = request.query_params.get('template_id', None)
+        return_data = request.query_params.get('return_data', '1') == '1'
 
         project_id = None if project_id == "" else project_id
         node_id = request.query_params.get("node_id", None)
@@ -194,7 +195,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 uid = Component.objects.get(node_name=node_name).uid
                 default_name = Component.objects.get(node_name=node_name).displayed_name
             except Component.DoesNotExist:
-                return Response({"error": f"Component with name {node_name} not found"}, status=status.HTTP_404_NOT_FOUND), None, None, None
+                return Response({"error": f"Component with name {node_name} not found"}, status=status.HTTP_404_NOT_FOUND), None, None, None, None, None
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
@@ -217,15 +218,15 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             input_ports, output_ports = [], []
 
             if validated_data.get('error'):
-                return validated_data, None, None, None, None
+                return validated_data, None, None, None, None, None
 
             if not settings.TESTING:
                 success, input_ports = get_input_ports(validated_data, project_id)
                 if not success:
-                    return input_ports, None, None, None, None
+                    return input_ports, None, None, None, None, None
                 success, output_ports = get_output_ports(component_id = uid)
                 if not success:
-                    return output_ports, None, None, None, None
+                    return output_ports, None, None, None, None, None
             displayed_name = request.data.get('displayed_name', None)
             if not displayed_name:
                 displayed_name = request.query_params.get('displayed_name', default_name)
@@ -242,10 +243,11 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 if response.status_code == 200:
                     print("Schema updated successfully.")
                 else:
-                    return Response({"error": response}, status=status.HTTP_400_BAD_REQUEST), None, None, None, None
-            return processor, return_serialized, output_channel, node_id, project_id
+                    return Response({"error": response}, status=status.HTTP_400_BAD_REQUEST), None, None, None, None, None
+                
+            return processor, return_serialized, output_channel, node_id, project_id, return_data
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST), None, None, None, None
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST), None, None, None, None, None
 
     
     
@@ -255,7 +257,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         result = self.get_processor_and_args(request)
         if isinstance(result[0], Response):
             return result[0]
-        processor, return_serialized, output_channel, *_, project_id = result
+        processor, return_serialized, output_channel, *_, project_id, return_data = result
         if isinstance(processor, str):
             return Response({"error": processor}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -269,9 +271,12 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
             
             node_id = response_data.get("node_id")
             update_project_model_and_dataset(project_id=project_id, node=response_data)
-
+            
             # Returns node_data chosen
-            response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path = not return_serialized)(node_id, project_id=project_id)
+            if not response_data.get('node_name') in DATA_NODES:
+                return_data = False
+                
+            response_data["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path = not return_serialized, return_data=return_data)(node_id, project_id=project_id)
             return Response(response_data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -281,7 +286,7 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
         if isinstance(result[0], Response):
             return result[0]
         
-        processor, return_serialized, _, node_id, project_id = result
+        processor, return_serialized, _, node_id, project_id, return_data = result
 
         if isinstance(processor, str):
             return Response({"error": processor}, status=status.HTTP_400_BAD_REQUEST)
@@ -295,7 +300,11 @@ class BaseNodeAPIView(APIView, NodeQueryMixin):
                 return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
             
             update_project_model_and_dataset(project_id=project_id, node=processor())
-            message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized)(node_id, project_id=project_id)
+            
+            if not message.get('node_name') in DATA_NODES:
+                return_data = False
+                
+            message["node_data"] = NodeDataExtractor(return_serialized=return_serialized, return_path=not return_serialized, return_data=return_data)(node_id, project_id=project_id)
             
             status_code = status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
             return Response(message if success else {"error": message}, status=status_code)
