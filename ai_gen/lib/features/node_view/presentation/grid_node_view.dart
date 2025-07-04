@@ -71,41 +71,6 @@ class _GridNodeViewState extends State<GridNodeView> {
     );
   }
 
-  Widget _buildInteractiveNodeView(GridNodeViewCubit gridNodeViewCubit) {
-    return InteractiveVSNodeView(
-      width: _gridWidth,
-      height: _gridHeight,
-      showGrid: gridNodeViewCubit.showGrid,
-      nodeDataProvider: nodeDataProvider,
-    );
-  }
-
-  Widget _buildRunButton(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    return Positioned(
-      top: 32,
-      right: screenWidth / 100,
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          RunButton(),
-          SizedBox(height: 20),
-          NodePropertiesCard(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomControls() {
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    return Positioned(
-      bottom: screenHeight / 50,
-      right: screenWidth / 100,
-      child: const CustomFAB(),
-    );
-  }
-
   Widget _buildNodesMenuActionButton() {
     final screenHeight = MediaQuery.sizeOf(context).height;
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -149,6 +114,41 @@ class _GridNodeViewState extends State<GridNodeView> {
         },
         child: ChatScreen(projectModel: gridNodeViewCubit.projectModel),
       ),
+    );
+  }
+
+  Widget _buildInteractiveNodeView(GridNodeViewCubit gridNodeViewCubit) {
+    return InteractiveVSNodeView(
+      width: _gridWidth,
+      height: _gridHeight,
+      showGrid: gridNodeViewCubit.showGrid,
+      nodeDataProvider: nodeDataProvider,
+    );
+  }
+
+  Widget _buildRunButton(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    return Positioned(
+      top: 32,
+      right: screenWidth / 100,
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          RunButton(),
+          SizedBox(height: 20),
+          NodePropertiesCard(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomControls() {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    return Positioned(
+      bottom: screenHeight / 50,
+      right: screenWidth / 100,
+      child: const CustomFAB(),
     );
   }
 

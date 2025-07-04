@@ -57,7 +57,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
       emit(GridNodeViewLoading());
       await _initializeProject();
       await _initializeNodeManager();
-      await _loadProjectNodes();
+      await _loadOrUpdateProjectNodes();
       _initializeNodeDataProvider();
       emit(NodeViewSuccess());
     } catch (e) {
@@ -95,21 +95,17 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   }
 
   // Node Operations
-  Future<void> _loadProjectNodes() async {
+  Future<void> _loadOrUpdateProjectNodes() async {
     Response responseProjectNodes =
         await _nodeServices.loadProjectNodes(projectModel.id!);
-    nodeManager.myDeSerializedNodes(responseProjectNodes);
 
-    /*
-    newnode= api.listen(url);
-    nodeManager.nodes.add(newNode);
-    */
+    nodeManager.myDeSerializedNodes(responseProjectNodes);
   }
 
   // used in importing other files
   Future<void> updateNodes() async {
     try {
-      await _loadProjectNodes();
+      await _loadOrUpdateProjectNodes();
       emit(NodeViewSuccess());
     } catch (e) {
       emit(NodeViewFailure(e.toString()));

@@ -537,12 +537,280 @@
                         "node_data": "C:\\Users\\a1mme\\OneDrive\\Desktop\\MO\\aino\\project\\core\\saved\\15\\model\\model_fitter_2663317333459664896.pkl"
                     }
                 ],
-                "39": []
+                "39": [
+                    {
+                        "id": 1783,
+                        "node_id": 1614874734199767948,
+                        "displayed_name": "Data Loader",
+                        "node_name": "data_loader",
+                        "message": "data loaded: iris",
+                        "params": [
+                            {
+                                "dataset_name": "iris"
+                            },
+                            {
+                                "dataset_path": ""
+                            }
+                        ],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [
+                            691355335612105612,
+                            2041590798893122444
+                        ],
+                        "parent": [],
+                        "location_x": 1118.923982841767,
+                        "location_y": 1425.9491788321998,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "X",
+                                "nodeData": 1614874734199767948
+                            },
+                            {
+                                "name": "y",
+                                "nodeData": 1614874734199767948
+                            }
+                        ],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\other\\data_loader_1614874734199767948.pkl"
+                    },
+                    {
+                        "id": 1784,
+                        "node_id": 691355335612105612,
+                        "displayed_name": "default",
+                        "node_name": "data_loader",
+                        "message": "X",
+                        "params": [],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [],
+                        "parent": [
+                            1614874734199767948
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\other\\data_loader_691355335612105612.pkl"
+                    },
+                    {
+                        "id": 1785,
+                        "node_id": 2041590798893122444,
+                        "displayed_name": "default",
+                        "node_name": "data_loader",
+                        "message": "y",
+                        "params": [],
+                        "task": "load_data",
+                        "node_type": "loader",
+                        "uid": 50,
+                        "children": [],
+                        "parent": [
+                            1614874734199767948
+                        ],
+                        "location_x": 0.0,
+                        "location_y": 0.0,
+                        "input_ports": [],
+                        "output_ports": [],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\other\\data_loader_2041590798893122444.pkl"
+                    },
+                    {
+                        "id": 1786,
+                        "node_id": 1133833999001256844,
+                        "displayed_name": "Logistic Regression",
+                        "node_name": "logistic_regression",
+                        "message": "Model logistic_regression created",
+                        "params": [
+                            {
+                                "penalty": "l2"
+                            },
+                            {
+                                "C": 1.0
+                            }
+                        ],
+                        "task": "classification",
+                        "node_type": "linear_models",
+                        "uid": 6,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 1200.8091225977685,
+                        "location_y": 1344.300904447803,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "model",
+                                "nodeData": 1133833999001256844
+                            }
+                        ],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\model\\logistic_regression_1133833999001256844.pkl"
+                    },
+                    {
+                        "id": 1787,
+                        "node_id": 1444582373289821068,
+                        "displayed_name": "Model Fitter",
+                        "node_name": "model_fitter",
+                        "message": "Model fitted",
+                        "params": [],
+                        "task": "fit_model",
+                        "node_type": "fitter",
+                        "uid": 44,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 1849.7073916689897,
+                        "location_y": 1392.7819751662282,
+                        "input_ports": [
+                            {
+                                "name": "model",
+                                "connectedNode": {
+                                    "name": "model",
+                                    "nodeData": 1133833999001256844
+                                }
+                            },
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "X",
+                                    "nodeData": 1614874734199767948
+                                }
+                            },
+                            {
+                                "name": "y",
+                                "connectedNode": {
+                                    "name": "y",
+                                    "nodeData": 1614874734199767948
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "fitted_model",
+                                "nodeData": 1444582373289821068
+                            }
+                        ],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\model\\model_fitter_1444582373289821068.pkl"
+                    },
+                    {
+                        "id": 1788,
+                        "node_id": 4592879987798508428,
+                        "displayed_name": "Predictor",
+                        "node_name": "predictor",
+                        "message": "Model Predictions",
+                        "params": [],
+                        "task": "predict",
+                        "node_type": "predictor",
+                        "uid": 45,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2293.294972135365,
+                        "location_y": 1197.774921887734,
+                        "input_ports": [
+                            {
+                                "name": "fitted_model",
+                                "connectedNode": {
+                                    "name": "fitted_model",
+                                    "nodeData": 1444582373289821068
+                                }
+                            },
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "X",
+                                    "nodeData": 1614874734199767948
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "predictions",
+                                "nodeData": 4592879987798508428
+                            }
+                        ],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\model\\predictor_4592879987798508428.pkl"
+                    },
+                    {
+                        "id": 1789,
+                        "node_id": 2232712308079657868,
+                        "displayed_name": "Evaluator",
+                        "node_name": "evaluator",
+                        "message": "accuracy score",
+                        "params": [
+                            {
+                                "metric": "accuracy"
+                            }
+                        ],
+                        "task": "evaluate",
+                        "node_type": "metric",
+                        "uid": 54,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2489.2244816931175,
+                        "location_y": 1123.6548180387235,
+                        "input_ports": [
+                            {
+                                "name": "y_true",
+                                "connectedNode": {
+                                    "name": "y",
+                                    "nodeData": 1614874734199767948
+                                }
+                            },
+                            {
+                                "name": "y_pred",
+                                "connectedNode": {
+                                    "name": "predictions",
+                                    "nodeData": 4592879987798508428
+                                }
+                            }
+                        ],
+                        "output_ports": [
+                            {
+                                "name": "score",
+                                "nodeData": 2232712308079657868
+                            }
+                        ],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\model\\evaluator_2232712308079657868.pkl"
+                    },
+                    {
+                        "id": 1790,
+                        "node_id": 2531357258369663884,
+                        "displayed_name": "Sgd Regression",
+                        "node_name": "sgd_regression",
+                        "message": "Model sgd_regression created",
+                        "params": [
+                            {
+                                "penalty": "l2"
+                            }
+                        ],
+                        "task": "regression",
+                        "node_type": "linear_models",
+                        "uid": 5,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2303.2352046723995,
+                        "location_y": 2368.9371611382185,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "model",
+                                "nodeData": 2531357258369663884
+                            }
+                        ],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\model\\sgd_regression_2531357258369663884.pkl"
+                    }
+                ]
             }
         }
     },
     "active_user": "mo",
-    "active_project": "41",
+    "active_project": "39",
     "admin": [
         "mo"
     ]

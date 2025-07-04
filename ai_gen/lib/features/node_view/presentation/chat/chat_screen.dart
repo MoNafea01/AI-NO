@@ -2,6 +2,7 @@ import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/core/utils/themes/textstyles.dart';
+import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +25,11 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _controller =
-        ChatController(ChatService(), projectId: widget.projectModel.id ?? 0);
+    _controller = ChatController(
+      ChatService(),
+      projectId: widget.projectModel.id ?? 0,
+      gridNodeViewCubit: context.read<GridNodeViewCubit>(),
+    );
   }
 
   @override

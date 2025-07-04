@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/services/chat_service.dart';
@@ -10,8 +13,10 @@ class ChatController extends ChangeNotifier {
 
   List<ChatMessage> get messages => _messages;
   bool get isLoading => _isLoading;
+  GridNodeViewCubit gridNodeViewCubit;
 
-  ChatController(this._chatService, {required this.projectId}) {
+  ChatController(this._chatService,
+      {required this.projectId, required this.gridNodeViewCubit}) {
     loadChatHistory();
   }
 
@@ -40,20 +45,30 @@ class ChatController extends ChangeNotifier {
     _isLoading = true;
     _messages.add(ChatMessage(sender: 'user', text: userInput));
     notifyListeners();
+    Timer? updateNodesTimer;
+
+    late final dynamic response;
     try {
-      final response = await _chatService.sendMessage(
-        projectId: projectId,
-        userInput: userInput,
+      updateNodesTimer = Timer.periodic(
+        const Duration(seconds: 5),
+        (timer) => gridNodeViewCubit.updateNodes(),
       );
+
+      try {
+        response = await _chatService.sendMessage(
+          projectId: projectId,
+          userInput: userInput,
+        );
+      } finally {
+        updateNodesTimer.cancel();
+        gridNodeViewCubit.updateNodes();
+        updateNodesTimer = null;
+      }
+
       final output = response['output'] ?? '';
       if (output.isNotEmpty) {
         _messages.add(ChatMessage(sender: 'bot', text: output.toString()));
       }
-      // Optionally update full chat history from response
-      // final chatHistory = response['chat_history'] as List<dynamic>?;
-      // if (chatHistory != null) {
-      //   _messages = _chatService.parseChatHistory(chatHistory);
-      // }
     } catch (e) {
       _messages.add(ChatMessage(sender: 'bot', text: 'Error: ${e.toString()}'));
     }
