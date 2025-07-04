@@ -79,8 +79,9 @@ def extract_id_message(json_str):
 
         message = json_obj.get("message")
         node_id = json_obj.get("node_id")
+        in_ports = json_obj.get("input_ports", [])
         logger.debug(f"Extracted message: {message}, node_id: {node_id}")
-        out.append({"message":message, "node_id": node_id})
+        out.append({"message":message, "node_id": node_id, "input_ports": in_ports})
 
         if json_obj.get("node_name") in MULTI_CHANNEL_NODES:
             logger.info(f"Processing multi-channel node: {json_obj.get('node_name')}")
