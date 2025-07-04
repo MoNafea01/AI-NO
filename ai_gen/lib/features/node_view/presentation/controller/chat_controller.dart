@@ -47,7 +47,7 @@ class ChatController extends ChangeNotifier {
       );
       final output = response['output'] ?? '';
       if (output.isNotEmpty) {
-        _messages.add(ChatMessage(sender: 'bot', text: output));
+        _messages.add(ChatMessage(sender: 'bot', text: output.toString()));
       }
       // Optionally update full chat history from response
       // final chatHistory = response['chat_history'] as List<dynamic>?;

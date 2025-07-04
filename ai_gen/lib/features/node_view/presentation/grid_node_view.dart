@@ -31,9 +31,6 @@ class _GridNodeViewState extends State<GridNodeView> {
   late final VSNodeDataProvider nodeDataProvider;
   String _appVersion = '';
 
-  // Keep chat controller and screen alive
-  ChatScreen? _chatScreen;
-
   @override
   void initState() {
     super.initState();
@@ -63,8 +60,8 @@ class _GridNodeViewState extends State<GridNodeView> {
       appBar: _buildAppBar(gridNodeViewCubit),
       body: Stack(
         children: [
-          _buildNodeView(gridNodeViewCubit),
-          _buildTopControls(context),
+          _buildInteractiveNodeView(gridNodeViewCubit),
+          _buildRunButton(context),
           _buildBottomControls(),
           _buildNodesMenuActionButton(),
           _buildChatActionButton(gridNodeViewCubit),
@@ -74,7 +71,7 @@ class _GridNodeViewState extends State<GridNodeView> {
     );
   }
 
-  Widget _buildNodeView(GridNodeViewCubit gridNodeViewCubit) {
+  Widget _buildInteractiveNodeView(GridNodeViewCubit gridNodeViewCubit) {
     return InteractiveVSNodeView(
       width: _gridWidth,
       height: _gridHeight,
@@ -83,7 +80,7 @@ class _GridNodeViewState extends State<GridNodeView> {
     );
   }
 
-  Widget _buildTopControls(BuildContext context) {
+  Widget _buildRunButton(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     return Positioned(
       top: 32,
@@ -135,8 +132,7 @@ class _GridNodeViewState extends State<GridNodeView> {
   Widget _buildChatActionButton(GridNodeViewCubit gridNodeViewCubit) {
     final screenHeight = MediaQuery.sizeOf(context).height;
     final screenWidth = MediaQuery.sizeOf(context).width;
-    // Create chat screen once and keep it alive
-    _chatScreen ??= ChatScreen(projectModel: gridNodeViewCubit.projectModel);
+
     return Positioned(
       top: screenHeight / 30,
       left: (screenWidth / 50) + 50,
@@ -151,7 +147,7 @@ class _GridNodeViewState extends State<GridNodeView> {
                 : _activeAction = ActiveAction.chat;
           });
         },
-        child: _chatScreen!,
+        child: ChatScreen(projectModel: gridNodeViewCubit.projectModel),
       ),
     );
   }
@@ -168,6 +164,7 @@ class _GridNodeViewState extends State<GridNodeView> {
     return AppBar(
       backgroundColor: AppColors.grey100,
       surfaceTintColor: AppColors.grey100,
+      foregroundColor: AppColors.black,
       title: Text(
         gridNodeViewCubit.projectModel.name ?? "Project Name",
         style: AppTextStyles.title22,
