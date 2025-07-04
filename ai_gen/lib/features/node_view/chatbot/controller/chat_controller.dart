@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/services/chat_service.dart';
+import '../services/chat_service.dart';
 
 class ChatController extends ChangeNotifier {
   final ChatService _chatService;
