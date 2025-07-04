@@ -1,5 +1,5 @@
-import 'package:ai_gen/core/cache/cache_data.dart';
-import 'package:ai_gen/core/cache/cache_helper.dart';
+import 'package:ai_gen/core/data/cache/cache_data.dart';
+import 'package:ai_gen/core/data/cache/cache_helper.dart';
 import 'package:ai_gen/core/translation/translation_helper.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/helper/bloc_observer.dart';
@@ -16,7 +16,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'core/di/get_it_initialize.dart';
 import 'core/models/project_model.dart';
-import 'core/network/server_manager/server_manager.dart';
+import 'core/data/network/server_manager/server_manager.dart';
 import 'core/utils/helper/check_main_args.dart';
 import 'core/utils/helper/my_windows_manager.dart';
 import 'features/splashScreen/splash_screen.dart';

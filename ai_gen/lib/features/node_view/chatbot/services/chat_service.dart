@@ -1,4 +1,4 @@
-import 'package:ai_gen/core/network/network_constants.dart';
+import 'package:ai_gen/core/data/network/network_constants.dart';
 import 'package:dio/dio.dart';
 
 class ChatMessage {

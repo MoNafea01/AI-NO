@@ -1,6 +1,6 @@
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/reusable_widgets/failure_screen.dart';
-import 'package:ai_gen/core/reusable_widgets/loading_screen.dart';
+import 'package:ai_gen/core/utils/reusable_widgets/failure_screen.dart';
+import 'package:ai_gen/core/utils/reusable_widgets/loading_screen.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';

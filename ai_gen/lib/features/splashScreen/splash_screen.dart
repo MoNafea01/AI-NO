@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/network/server_manager/server_manager.dart';
+import 'package:ai_gen/core/data/network/server_manager/server_manager.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
