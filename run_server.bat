@@ -1,9 +1,4 @@
 @echo off
-<<<<<<< HEAD
-call "D:\College\4th\Graduation Project\simple_task\backend\flutter\Scripts\activate"
-cd "D:\College\4th\Graduation Project\simple_task\project"
-python manage.py runserver
-=======
 setlocal
 
 :: Ask the user to enter the path to activate.bat
@@ -29,5 +24,4 @@ cd chatbot
 uvicorn main:app --reload --host 0.0.0.0 --port 8080
 
 endlocal
->>>>>>> main
 pause

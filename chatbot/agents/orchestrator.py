@@ -62,11 +62,8 @@ class OrchestratorAgent(Agent):
                 "docs": retrieval_result["docs"],
                 "mode": mode
             })
-<<<<<<< HEAD
-=======
             
             docs = feedback_result["updated_docs"]
->>>>>>> main
             if mode == "manual" or not feedback_result["continue_iteration"]:
                 return {
                     "output": feedback_result["validated_outputs"],

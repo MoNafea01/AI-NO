@@ -156,8 +156,6 @@ def parse_command_list(output: str):
 
 
 def handle_params(command_line: str):
-<<<<<<< HEAD
-=======
     if isinstance(command_line, str) and command_line.startswith('```python\n['):
         command_line = ast.literal_eval(command_line[9:-3])
     if isinstance(command_line, list):
@@ -166,7 +164,6 @@ def handle_params(command_line: str):
 
 
 def _handle_params(command_line: str):
->>>>>>> main
     if 'params=' in command_line:
         params_str = command_line.split('params=')[1].strip()
         params = ast.literal_eval(params_str)
@@ -180,7 +177,3 @@ def _handle_params(command_line: str):
             command_line = command_line.replace(f'params={params_str}', params_str_new)
 
     return command_line
-<<<<<<< HEAD
-
-=======
->>>>>>> main
