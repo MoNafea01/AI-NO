@@ -9,6 +9,8 @@ final class GridNodeViewLoading extends GridNodeViewState {}
 
 final class NodeViewSuccess extends GridNodeViewState {}
 
+final class NodeViewUpdating extends NodeViewSuccess {}
+
 final class NodeViewFailure extends GridNodeViewState {
   final String errMessage;
 

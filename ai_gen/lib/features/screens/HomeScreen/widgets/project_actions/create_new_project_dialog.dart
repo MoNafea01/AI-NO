@@ -1,6 +1,6 @@
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/reusable_widgets/custom_dialog.dart';
-import 'package:ai_gen/core/reusable_widgets/custom_text_form_field.dart';
+import 'package:ai_gen/core/utils/reusable_widgets/custom_dialog.dart';
+import 'package:ai_gen/core/utils/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 

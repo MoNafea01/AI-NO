@@ -1,4 +1,4 @@
-import 'package:ai_gen/core/reusable_widgets/custom_menu_item.dart';
+import 'package:ai_gen/core/utils/reusable_widgets/custom_menu_item.dart';
 import 'package:ai_gen/core/utils/helper/helper.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/textstyles.dart';

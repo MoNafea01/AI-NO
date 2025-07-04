@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/core/data/network/services/interfaces/node_services_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:vs_node_view/data/vs_interface.dart';

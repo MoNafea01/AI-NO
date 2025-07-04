@@ -1,3 +1,5 @@
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,30 +25,46 @@ class RunButton extends StatelessWidget {
     );
   }
 
-  Widget outputCard(BuildContext context, String? scopeOutput) {
+  Widget outputCard(BuildContext context, Map<String, String>? scopeOutput) {
     if (scopeOutput == null) {
       return const SizedBox.shrink();
     }
 
     return Container(
-      constraints: const BoxConstraints(minWidth: 200, maxWidth: 400),
+      constraints: const BoxConstraints(minWidth: 200, maxWidth: 300),
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: _decoration(),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            style: IconButton.styleFrom(
-              padding: const EdgeInsets.all(0),
-              minimumSize: const Size(0, 0),
-            ),
-            onPressed: () {
-              context.read<GridNodeViewCubit>().closeRunMenu();
-            },
-            icon: const Icon(Icons.close),
+          Row(
+            children: [
+              Text(
+                scopeOutput.keys.first.toString(),
+                style: AppTextStyles.black14Bold
+                    .copyWith(fontWeight: FontWeight.w700),
+              ),
+              const Spacer(),
+              IconButton(
+                style: IconButton.styleFrom(
+                  padding: const EdgeInsets.all(0),
+                  minimumSize: const Size(0, 0),
+                ),
+                onPressed: () {
+                  context.read<GridNodeViewCubit>().closeRunMenu();
+                },
+                icon: const Icon(
+                  Icons.close,
+                  color: AppColors.blackText2,
+                ),
+              ),
+            ],
           ),
-          Text(scopeOutput),
+          Text(
+            scopeOutput.values.first.toString(),
+            style: AppTextStyles.black14w400,
+          ),
         ],
       ),
     );

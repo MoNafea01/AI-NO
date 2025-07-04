@@ -1,8 +1,8 @@
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/network/api_error_handler.dart';
-import 'package:ai_gen/core/network/network_constants.dart';
-import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
-import 'package:ai_gen/core/services/cache_service.dart';
+import 'package:ai_gen/core/data/network/api_error_handler.dart';
+import 'package:ai_gen/core/data/network/network_constants.dart';
+import 'package:ai_gen/core/data/network/services/interfaces/project_services_interface.dart';
+import 'package:ai_gen/core/data/cache/cache_services/cache_service.dart';
 import 'package:dio/dio.dart';
 
 class ProjectServices implements IProjectServices {

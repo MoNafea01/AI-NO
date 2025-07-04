@@ -9,6 +9,13 @@ abstract class AppTextStyles {
     color: AppColors.blackText2,
   );
 
+  static const TextStyle title22 = TextStyle(
+    fontSize: 22,
+    height: 28 / 20,
+    fontWeight: FontWeight.w600,
+    color: AppColors.blackText2,
+  );
+
   static const TextStyle titleMedium = TextStyle(
     fontSize: 20,
     height: 28 / 20,

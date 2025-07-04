@@ -3,7 +3,7 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:ai_gen/core/services/cache_service.dart';
+import 'package:ai_gen/core/data/cache/cache_services/cache_service.dart';
 
 import '../../models/project_model.dart';
 
