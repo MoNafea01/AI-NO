@@ -136,6 +136,8 @@ def load_json_file(file_path):
         raise
 
 def parse_command_list(output: str):
+    if isinstance(output, list):
+        output = str(output)
     logger.info("Parsing command list")
     pattern = r"\[(.*?)\]"
     matches = re.findall(pattern, output, re.DOTALL)
@@ -154,6 +156,14 @@ def parse_command_list(output: str):
 
 
 def handle_params(command_line: str):
+    if isinstance(command_line, str) and command_line.startswith('```python\n['):
+        command_line = ast.literal_eval(command_line[9:-3])
+    if isinstance(command_line, list):
+        return [_handle_params(cmd) for cmd in command_line]
+    return _handle_params(command_line)
+
+
+def _handle_params(command_line: str):
     if 'params=' in command_line:
         params_str = command_line.split('params=')[1].strip()
         params = ast.literal_eval(params_str)
@@ -167,4 +177,3 @@ def handle_params(command_line: str):
             command_line = command_line.replace(f'params={params_str}', params_str_new)
 
     return command_line
-

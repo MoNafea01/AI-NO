@@ -3,6 +3,7 @@ import asyncio
 from .agents import Agent
 from cli.call_cli import call_script
 from chatbot.core.utils import parse_command_list, extract_id_message, handle_params
+import copy
 
 # FeedbackAgent for processing user feedback on CLI commands
 # It validates the commands, interacts with the CLI, and updates documents accordingly.
@@ -13,7 +14,7 @@ class FeedbackAgent(Agent):
     async def execute(self, input_data, context=None):
         output = handle_params(input_data["output"])
         to_db = input_data["to_db"]
-        docs = input_data["docs"]
+        docs = copy.deepcopy(input_data["docs"])
         mode = input_data["mode"]
 
         # Parse and validate CLI commands
