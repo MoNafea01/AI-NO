@@ -1091,6 +1091,13 @@
                         "location_y": 1392.7819751662282,
                         "input_ports": [
                             {
+                                "name": "model",
+                                "connectedNode": {
+                                    "name": "model",
+                                    "nodeData": 1133833999001256844
+                                }
+                            },
+                            {
                                 "name": "X",
                                 "connectedNode": {
                                     "name": "X",
@@ -1102,13 +1109,6 @@
                                 "connectedNode": {
                                     "name": "y",
                                     "nodeData": 1614874734199767948
-                                }
-                            },
-                            {
-                                "name": "model",
-                                "connectedNode": {
-                                    "name": "model",
-                                    "nodeData": 1133833999001256844
                                 }
                             }
                         ],
@@ -1137,17 +1137,17 @@
                         "location_y": 1197.774921887734,
                         "input_ports": [
                             {
-                                "name": "X",
-                                "connectedNode": {
-                                    "name": "X",
-                                    "nodeData": 1614874734199767948
-                                }
-                            },
-                            {
                                 "name": "fitted_model",
                                 "connectedNode": {
                                     "name": "fitted_model",
                                     "nodeData": 1444582373289821068
+                                }
+                            },
+                            {
+                                "name": "X",
+                                "connectedNode": {
+                                    "name": "X",
+                                    "nodeData": 1614874734199767948
                                 }
                             }
                         ],
@@ -1202,6 +1202,34 @@
                         ],
                         "project": 39,
                         "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\model\\evaluator_2232712308079657868.pkl"
+                    },
+                    {
+                        "id": 1790,
+                        "node_id": 2531357258369663884,
+                        "displayed_name": "Sgd Regression",
+                        "node_name": "sgd_regression",
+                        "message": "Model sgd_regression created",
+                        "params": [
+                            {
+                                "penalty": "l2"
+                            }
+                        ],
+                        "task": "regression",
+                        "node_type": "linear_models",
+                        "uid": 5,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2284.0,
+                        "location_y": 2394.5,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "model",
+                                "nodeData": 2531357258369663884
+                            }
+                        ],
+                        "project": 39,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\39\\model\\sgd_regression_2531357258369663884.pkl"
                     }
                 ]
             }
