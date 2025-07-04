@@ -1,9 +1,9 @@
 import 'dart:developer';
 
-import 'package:ai_gen/core/models/node_model/node_model.dart';
-import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/data/network/services/interfaces/node_services_interface.dart';
 import 'package:ai_gen/core/data/network/services/interfaces/project_services_interface.dart';
+import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/builder/node_builder.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:bloc/bloc.dart';
@@ -26,7 +26,8 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   // Node Management
   late VSNodeDataProvider nodeDataProvider;
   late VSNodeManager nodeManager;
-  Iterable<String?>? results;
+  // Iterable<String?>? results;
+  Iterable<Map<String, String>?>? results;
 
   // UI State
   late bool showGrid;
@@ -147,7 +148,9 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   }
 
   void _updateRunningStatus() {
-    results = ("Running nodes...").split(",");
+    results = [
+      {"RUN": "Running nodes..."}
+    ];
     emit(NodeViewSuccess());
   }
 
@@ -166,7 +169,12 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     results = entries.map(
       (output) {
         if (output.value != null) {
-          return "${output.key}: ${output.value}".replaceAll(",", ",\n");
+          if (output.value['node_data'] is String) {
+            return {output.key: output.value['message']};
+          } else {
+            return {output.key: output.value['node_data']};
+          }
+          // return "${output.key}: ${output.value}".replaceAll(",", ",\n");
         }
         return null;
       },
@@ -174,7 +182,9 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   }
 
   void _handleRunError() {
-    results = ("Wrong parameter type").split(",");
+    results = [
+      {"Run": "Wrong parameter type"}
+    ];
     emit(NodeViewSuccess());
   }
 
