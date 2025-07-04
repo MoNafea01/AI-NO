@@ -27,4 +27,5 @@ abstract class AssetsPaths {
   static const String expandedIcon = "${baseAssetPath}expanded_icon.svg";
   static const String learnScreenIcon = "${baseAssetPath}learn_icon_screen.svg";
   static const String chatBotIcon = "${baseAssetPath}chat_bot.svg";
+  static const String chatBotActiveIcon = "${baseAssetPath}chat_bot_active.svg";
 }

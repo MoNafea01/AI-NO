@@ -97,17 +97,19 @@ class _GridNodeViewState extends State<GridNodeView> {
   Widget _buildChatActionButton(GridNodeViewCubit gridNodeViewCubit) {
     final screenHeight = MediaQuery.sizeOf(context).height;
     final screenWidth = MediaQuery.sizeOf(context).width;
-
+    final bool isActive = _activeAction == ActiveAction.chat;
     return Positioned(
       top: screenHeight / 30,
       left: (screenWidth / 50) + 50,
       child: CustomTopAction(
         heroTag: 'Chat with AI',
-        iconWidget: SvgPicture.asset(AssetsPaths.chatBotIcon),
-        isActive: _activeAction == ActiveAction.chat,
+        iconWidget: isActive
+            ? SvgPicture.asset(AssetsPaths.chatBotActiveIcon)
+            : SvgPicture.asset(AssetsPaths.chatBotIcon),
+        isActive: isActive,
         onTap: () {
           setState(() {
-            _activeAction == ActiveAction.chat
+            isActive
                 ? _activeAction = ActiveAction.none
                 : _activeAction = ActiveAction.chat;
           });
