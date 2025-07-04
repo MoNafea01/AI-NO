@@ -106,6 +106,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   Future<void> updateNodes() async {
     try {
       emit(NodeViewUpdating());
+      nodeManager.clearNodes();
       log("update nodes");
       await _loadOrUpdateProjectNodes();
       emit(NodeViewSuccess());
