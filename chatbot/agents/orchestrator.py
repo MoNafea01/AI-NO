@@ -33,14 +33,15 @@ class OrchestratorAgent(Agent):
         
         cur_iter = 0
         log = []
-
+        docs = None
         while cur_iter < max_iterations:
             cur_iter += 1
             self.logger.info(f"Starting iteration {cur_iter}")
             # Step 1: Retrieve documents
             retrieval_result = await self.retrieval_agent.execute({
                 "question": question,
-                "mode": mode
+                "mode": mode,
+                "docs": docs
             })
             log.append(f"Retrieved {len(retrieval_result['docs'])} documents")
 
@@ -61,6 +62,8 @@ class OrchestratorAgent(Agent):
                 "docs": retrieval_result["docs"],
                 "mode": mode
             })
+            
+            docs = feedback_result["updated_docs"]
             if mode == "manual" or not feedback_result["continue_iteration"]:
                 return {
                     "output": feedback_result["validated_outputs"],
