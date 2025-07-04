@@ -2,6 +2,7 @@ import 'package:ai_gen/core/cache/cache_data.dart';
 import 'package:ai_gen/core/cache/cache_helper.dart';
 import 'package:ai_gen/core/translation/translation_helper.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/helper/bloc_observer.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/settings_screen/cubits/theme_cubit/theme_cubit.dart';
@@ -25,6 +26,7 @@ void main(List<String> args) async {
   ProjectModel? initialProject = await checkArgs(args);
   await CacheHelper.init();
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = MyBlocObserver();
   initializeGetIt();
   await initializeWindowsManager();
   await TranslationHelper.setLanguage();

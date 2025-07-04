@@ -105,6 +105,8 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   // used in importing other files
   Future<void> updateNodes() async {
     try {
+      emit(NodeViewUpdating());
+      log("update nodes");
       await _loadOrUpdateProjectNodes();
       emit(NodeViewSuccess());
     } catch (e) {
