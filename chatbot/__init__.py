@@ -3,7 +3,6 @@ import sys
 import json
 import warnings
 
-
 # Suppress TensorFlow warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -42,3 +41,4 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 # append cli to sys.path to import it.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
