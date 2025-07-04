@@ -3,15 +3,15 @@ import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 
-class NodeSelectorSidebar extends StatefulWidget {
-  const NodeSelectorSidebar({required this.vsNodeDataProvider, super.key});
+class NodeSelectorMenu extends StatefulWidget {
+  const NodeSelectorMenu({required this.vsNodeDataProvider, super.key});
   final VSNodeDataProvider vsNodeDataProvider;
 
   @override
-  State<NodeSelectorSidebar> createState() => _NodeSelectorSidebarState();
+  State<NodeSelectorMenu> createState() => _NodeSelectorMenuState();
 }
 
-class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
+class _NodeSelectorMenuState extends State<NodeSelectorMenu> {
   late Map<String, dynamic> nodeBuilders;
   List<Widget> sidebarWidgets = [];
   late dynamic currentEntries;
@@ -21,6 +21,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
   @override
   void initState() {
     super.initState();
+
     currentEntries = widget.vsNodeDataProvider.nodeBuildersMap.entries;
     currentGroup = 'Nodes';
     _buildSidebarWidgets();
@@ -29,20 +30,22 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height,
-      color: AppColors.grey200,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: IntrinsicWidth(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTitle(),
-                _divider(),
-                ...sidebarWidgets,
-              ],
-            ),
+      constraints: const BoxConstraints(minWidth: 200),
+      decoration: const BoxDecoration(
+        color: AppColors.grey100,
+        borderRadius: BorderRadius.all(Radius.circular(8)),
+      ),
+      padding: const EdgeInsets.only(top: 8.0),
+      child: IntrinsicWidth(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildTitle(),
+              _divider(),
+              ...sidebarWidgets,
+            ],
           ),
         ),
       ),
@@ -79,7 +82,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
     );
   }
 
-  Divider _divider() => const Divider(color: AppColors.darkGrey);
+  Divider _divider() => const Divider(color: AppColors.grey200);
 
   void _navigateBack() {
     setState(() {
@@ -102,7 +105,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
     }
   }
 
-  Widget _buildGroupButton(dynamic entry) {
+  Widget _buildGroupButton(entry) {
     return TextButton(
       onPressed: () => _navigateToGroup(entry),
       child: Row(
@@ -119,7 +122,7 @@ class _NodeSelectorSidebarState extends State<NodeSelectorSidebar> {
     );
   }
 
-  void _navigateToGroup(dynamic entry) {
+  void _navigateToGroup(entry) {
     setState(() {
       sidebarWidgets = [];
       previousEntries.add({currentGroup: currentEntries});
