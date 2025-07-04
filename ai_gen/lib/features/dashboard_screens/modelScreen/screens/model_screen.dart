@@ -51,8 +51,8 @@ class _ModelsViewState extends State<ModelsView> {
             Text(
               TranslationKeys.models.tr,
               style: const TextStyle(
-                fontSize: 27,
-                fontWeight: FontWeight.w900,
+                 fontSize: 48,
+                fontWeight: FontWeight.w700,
                 fontFamily: AppConstants.appFontName,
                 color: Colors.black,
               ),

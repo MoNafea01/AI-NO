@@ -1,10 +1,7 @@
-
+// Fixed SplashScreen - تصحيح شاشة البداية
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:developer';
-
-
-
 
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/network/server_manager/server_manager.dart';
@@ -27,7 +24,6 @@ class SplashScreen extends StatefulWidget {
   final ProjectModel? initialProject;
 
   @override
-  // ignore: library_private_types_in_public_api
   _SplashScreenState createState() => _SplashScreenState();
 }
 
@@ -37,6 +33,7 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _animation;
   String _status = "Loading Server....";
   bool _showRetryButton = false;
+  bool _isNavigating = false; // إضافة flag لمنع التنقل المتكرر
 
   @override
   void initState() {
@@ -54,28 +51,28 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _animationController.repeat(reverse: true);
     _startServer();
-    // _checkAppStart();
   }
 
   Future<void> _startServer() async {
+    if (_isNavigating) return; // منع إعادة التشغيل إذا كان التنقل قيد التنفيذ
+
     final serverManager = GetIt.I.get<ServerManager>();
     setState(() {
       _status = TranslationKeys.checkingServerStatus.tr;
       _showRetryButton = false;
     });
 
-    bool running = await serverManager.isServerRunning();
-    if (!running) {
-      setState(() => _status = TranslationKeys.startingBackendServer.tr);
+    try {
+      bool running = await serverManager.isServerRunning();
+      if (!running) {
+        setState(() => _status = TranslationKeys.startingBackendServer.tr);
 
-      try {
         // Start the server script
         int exitCode = await serverManager.runAndListenToServerScript();
 
         // Handle different error scenarios
         if (exitCode != 0) {
           String errorMessage = serverManager.getErrorMessage(exitCode);
-
           setState(() {
             _status = errorMessage;
             _showRetryButton = true;
@@ -83,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
           return;
         }
 
-        // Now poll until the server is up with shorter intervals
+        // Poll until the server is up with shorter intervals
         for (int i = 0; i < 30; i++) {
           await Future.delayed(const Duration(milliseconds: 500));
 
@@ -100,135 +97,137 @@ class _SplashScreenState extends State<SplashScreen>
             running = true;
             break;
           }
-          setState(
-              () => _status = "Waiting for server to start... (${i + 1}/30)");
+
+          if (mounted) {
+            setState(
+                () => _status = "Waiting for server to start... (${i + 1}/30)");
+          }
         }
-      } catch (e) {
-        log('Error during server startup: $e');
+      }
+
+      if (running) {
+        setState(
+            () => _status = TranslationKeys.serverRunningLoadingDashboard.tr);
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        if (mounted && !_isNavigating) {
+          _checkAuthentication();
+        }
+      } else {
+        setState(() {
+          _status = TranslationKeys.failedToStartServer;
+          _showRetryButton = true;
+        });
+      }
+    } catch (e) {
+      log('Error during server startup: $e');
+      if (mounted) {
         setState(() {
           _status = "Error starting server: ${e.toString()}";
           _showRetryButton = true;
         });
-        return;
       }
-    }
-
-    if (running) {
-      setState(
-          () => _status = TranslationKeys.serverRunningLoadingDashboard.tr);
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      if (mounted) {
-        _checkAuthentication();
-      }
-    } else {
-      setState(() {
-        _status = TranslationKeys.failedToStartServer;
-        _showRetryButton = true;
-      });
     }
   }
 
-// check app start
+  // Fixed authentication check - تصحيح فحص التوثيق
   Future<void> _checkAuthentication() async {
-    await Future.delayed(const Duration(seconds: 2)); // show splash effect
-    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    if (_isNavigating) return; // منع التنقل المتكرر
 
-    final prefs = await SharedPreferences.getInstance();
-    final isFirstTime = prefs.getBool('isFirstTime') ?? true;
+    _isNavigating = true; // تحديد أن التنقل قيد التنفيذ
 
-    final accessToken = await secureStorage.read(key: 'accessToken');
-    final refreshToken = await secureStorage.read(key: 'refreshToken');
+    try {
+      await Future.delayed(const Duration(seconds: 2)); // show splash effect
 
-    if (accessToken != null && refreshToken != null) {
-      // ✅ User is already logged in
+      if (!mounted) return; // التحقق من أن الـ widget لا يزال مُركب
 
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()));
-      //MaterialPageRoute(builder: (context) => const DashboardScreen());
-      //  Navigator.pushReplacementNamed(context, '/home');
-      log("Navigating to HomeScreen (already logged in)");
+      const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+      final prefs = await SharedPreferences.getInstance();
+      final isFirstTime = prefs.getBool('isFirstTime') ?? true;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DashboardScreen(
-            projectModel: widget.initialProject,
+      final accessToken = await secureStorage.read(key: 'accessToken');
+      final refreshToken = await secureStorage.read(key: 'refreshToken');
+
+      if (!mounted) return; // التحقق مرة أخرى قبل التنقل
+
+      if (accessToken != null && refreshToken != null) {
+        // ✅ User is already logged in - المستخدم مسجل الدخول
+        log("Navigating to DashboardScreen (already logged in)");
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DashboardScreen(
+              projectModel: widget.initialProject,
+            ),
           ),
-        ),
-      );
+        );
+      } else if (isFirstTime) {
+        // ✅ First-time user - مستخدم جديد
+        await prefs.setBool('isFirstTime', false);
+        log("Navigating to SignUpScreen (first time)");
 
-    } else if (isFirstTime) {
-      // ✅ First-time user, go to sign-up and mark as not first time anymore
-      await prefs.setBool('isFirstTime', false);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const SignupScreen()),
+        );
+      } else {
+        // ✅ Returning user but logged out - مستخدم عائد لكن غير مسجل
+        log("Navigating to SignInScreen (returning user)");
 
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const SignupScreen()));
-
-      //MaterialPageRoute(builder: (context) => const SignupScreen());
-      //  Navigator.pushReplacementNamed(context, '/signUp');
-      log("Navigating to SignUpScreen (first time)");
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SignupScreen()),
-      );
-
-    } else {
-      // ✅ Returning user but logged out, go to sign-in
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()));
-
-      // MaterialPageRoute(builder: (context) => const LoginScreen());
-
-      //  Navigator.pushReplacementNamed(context, '/signIn');
-      log("Navigating to SignInScreen (returning user)");
-
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      }
+    } catch (e) {
+      log('Error during authentication check: $e');
+      if (mounted) {
+        setState(() {
+          _status = "Authentication error: ${e.toString()}";
+          _showRetryButton = true;
+          _isNavigating = false; // إعادة تعيين الـ flag في حالة الخطأ
+        });
+      }
     }
   }
 
   @override
   void dispose() {
-    _animationController
-        .dispose(); // Dispose the controller when the widget is removed
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Colors.white, // Or your desired splash screen background color
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AnimatedBuilder(
-              animation: _animation, // Listen to the animation for rebuilding
+              animation: _animation,
               child: SvgPicture.asset(
-                // The widget that will be animated (your logo/icon)
-                AssetsPaths.projectLogoIcon, // Your actual SVG asset path
-                width: 150, // Adjust size as needed
-                height: 150, // Adjust size as needed
+                AssetsPaths.projectLogoIcon,
+                width: 150,
+                height: 150,
               ),
               builder: (context, child) {
-                // Apply the rotation transformation
                 return Transform.rotate(
-                  angle: _animation
-                      .value, // Current rotation angle from the animation
-                  child: child, // The SvgPicture.asset widget
+                  angle: _animation.value,
+                  child: child,
                 );
               },
             ),
-
-            const SizedBox(height: 20), // Space between icon and text
+            const SizedBox(height: 20),
             const Text(
               AppConstants.appName,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black, // Adjust text color as needed
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 10),
@@ -240,10 +239,13 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            if (_showRetryButton) ...[
+            if (_showRetryButton && !_isNavigating) ...[
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _startServer,
+                onPressed: () {
+                  _isNavigating = false; // إعادة تعيين الـ flag
+                  _startServer();
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,

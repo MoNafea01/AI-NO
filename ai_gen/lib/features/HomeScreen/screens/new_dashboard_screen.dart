@@ -10,11 +10,10 @@ import 'package:ai_gen/features/HomeScreen/widgets/build_side_bar_dashboard.dart
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/dashboard_screens/learnScreen/learn_screen.dart';
 
-
 import 'package:ai_gen/features/dashboard_screens/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider, MultiBlocProvider, ReadContext;
-
+import 'package:flutter_bloc/flutter_bloc.dart'
+    show BlocBuilder, BlocProvider, MultiBlocProvider, ReadContext;
 
 import '../../dashboard_screens/datasetScreen/screens/dataset_screen.dart';
 import '../../dashboard_screens/docsScreen/docs_screen.dart';
@@ -29,16 +28,15 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("DashboardScreen");
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (_) => DashboardCubit(),
         ),
-        
         BlocProvider(
           create: (context) => HomeCubit()..loadHomePage(),
         ),
-        
         BlocProvider(
           create: (context) => ProfileCubit(
             context.read<AuthProvider>(),
@@ -60,16 +58,13 @@ class _DashboardView extends StatelessWidget {
     switch (screen) {
       case AppScreen.explore:
         return HomeScreen(projectModel: projectModel);
-      //return ProjectsScreen();
-      //ProjectsTable
-      // case AppScreen.architectures:
-      //   return const ArchitecturesScreen();
+
       case AppScreen.models:
         return const ModelsScreen();
       case AppScreen.datasets:
         return const DatasetsScreen();
       case AppScreen.learn:
-      //  return const LearnScreen(); LearningScreen
+        //  return const LearnScreen(); LearningScreen
         return const PlaylistScreen();
       case AppScreen.docs:
         return const DocsScreen();
@@ -83,7 +78,6 @@ class _DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: BlocBuilder<DashboardCubit, DashboardState>(
         builder: (context, state) {
           return Row(

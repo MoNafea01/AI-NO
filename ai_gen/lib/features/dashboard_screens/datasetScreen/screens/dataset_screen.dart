@@ -50,11 +50,12 @@ class _DatasetsViewState extends State<DatasetsView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 90),
+            
             Text(
               TranslationKeys.datasets.tr,
               style: const TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.w900,
+                 fontSize: 48,
+                fontWeight: FontWeight.w700,
                 fontFamily: AppConstants.appFontName,
                 color: Colors.black,
               ),

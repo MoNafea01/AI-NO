@@ -9,21 +9,15 @@ import 'package:ai_gen/features/HomeScreen/widgets/project_actions/create_new_pr
 import 'package:ai_gen/features/HomeScreen/widgets/project_actions/export_project_dialog.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/project_actions/import_project_dialog.dart';
 
-
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 
-
-
 Widget buildHeader(BuildContext context) {
-  
   return Row(
     // mainAxisAlignment: MainAxisAlignment.spaceAround,
     children: [
-       Padding(
+      Padding(
         padding: const EdgeInsets.only(top: 68),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,12 +26,12 @@ Widget buildHeader(BuildContext context) {
               TranslationKeys.projects.tr,
               style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
+                fontSize: 48,
+                fontWeight: FontWeight.w700,
                 color: Colors.black87,
               ),
             ),
-             Text(
+            Text(
               TranslationKeys.viewAllProjects.tr,
               style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
@@ -62,11 +56,15 @@ Widget buildHeader(BuildContext context) {
             ImportProjectDialog(cubit: context.read<HomeCubit>()),
           );
         },
-        assetName: AssetsPaths.importIcon,
+        assetName: AssetsPaths.projectLogoIcon,
+        //
+        
         iconColor: AppColors.bluePrimaryColor,
       ),
       CustomIconTextButton(
-        assetName: AssetsPaths.exportIcon,
+        assetName: AssetsPaths.projectLogoIcon,
+        //exportIcon
+        
         text: TranslationKeys.export.tr,
         //   icon: Icons.upload,
         backgroundColor: const Color(0xfff2f2f2),
@@ -86,7 +84,7 @@ Widget buildHeader(BuildContext context) {
         onTap: () {
           Helper.showDialogHelper(context, const CreateNewProjectDialog());
         },
-        assetName: AssetsPaths.addIcon,
+        assetName: AssetsPaths.projectLogoIcon,
         iconColor: Colors.white,
       ),
     ],

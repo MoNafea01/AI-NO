@@ -97,7 +97,7 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                           turns: state.isExpanded ? 0 : 0.5,
                           duration: const Duration(milliseconds: 300),
                           child: SvgPicture.asset(
-                            AssetsPaths.expandedIcon,
+                            AssetsPaths.projectLogoIcon,
                             width: 20,
                             height: 20,
                             color: const Color(0xff666666),
@@ -174,12 +174,12 @@ List<Widget> buildAnimatedSidebarItems(
     //   'screen': AppScreen.architectures
     // },
     {
-      'icon': AssetsPaths.modelIcon,
+      'icon': AssetsPaths.projectLogoIcon,
       'label': TranslationKeys.models.tr,
       'screen': AppScreen.models
     },
     {
-      'icon': AssetsPaths.dataSetsIcon,
+      'icon': AssetsPaths.projectLogoIcon,
       'label': TranslationKeys.datasets.tr,
       'screen': AppScreen.datasets
     },
@@ -246,15 +246,17 @@ Widget animatedSidebarItem(
               isExpanded ? MainAxisAlignment.start : MainAxisAlignment.center,
           children: [
             AnimatedScale(
-              scale: isActive ? 1.1 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              child: SvgPicture.asset(
-                iconPath,
-                width: 20,
-                height: 20,
-                color: isActive ? Colors.white : Colors.grey.shade700,
-              ),
-            ),
+                scale: isActive ? 1.1 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child:
+                 SvgPicture.asset(
+                  iconPath,
+                  width: 20,
+                  height: 20,
+                  color: isActive ? Colors.white : Colors.grey.shade700,
+                ),
+
+                ),
             if (isExpanded) const SizedBox(width: 12),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),

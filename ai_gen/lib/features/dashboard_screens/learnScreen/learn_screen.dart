@@ -1,8 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:convert';
 import 'dart:developer';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -163,192 +166,185 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header Section
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          TranslationKeys.learn.tr,
-                          style: const TextStyle(
-                            fontFamily: AppConstants.appFontName,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 76.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            // Header Section
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        TranslationKeys.learn.tr,
+                        style: const TextStyle(
+                          fontFamily: AppConstants.appFontName,
+                          fontSize: 48,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          TranslationKeys.learnDescription.tr,
-                          style: TextStyle(
-                            fontFamily: AppConstants.appFontName,
-                            fontSize: 16,
-                            color: Color(0xff666666),
-                          ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        TranslationKeys.learnDescription.tr,
+                        style: TextStyle(
+                          fontFamily: AppConstants.appFontName,
+                          fontSize: 16,
+                          color: Color(0xff666666),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    width: 150,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
+                ),
+                // Image.asset(
+                //   AssetsPaths.learnScreenIcon,
+                //   color: Colors.black,
+                //   height: 187,
+                //   width: 400,
+                //   alignment: Alignment.topRight,
+                // ),
+              ],
+            ),
+
+            const SizedBox(height: 32),
+
+            // Search Bar with Filter Icon
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border:
+                      Border.all(color: const Color(0xff999999), width: 1.4),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color(0xffF2F2F2),
+                    hintText: TranslationKeys.search.tr,
+                    hintStyle: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontFamily: AppConstants.appFontName,
+                      fontSize: 16,
+                      color: Color(0xff666666),
                     ),
-                    child: const Icon(
-                      Icons.school_outlined,
-                      size: 60,
-                      color: Colors.grey,
+                    prefixIcon:
+                        const Icon(Icons.search, color: Color(0xff666666)),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.tune, color: Colors.grey),
+                      onPressed: () {
+                        // Add filter functionality here
+                      },
                     ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                   ),
-                ],
+                ),
               ),
+            ),
 
-              const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
-              // Search Bar with Filter Icon
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  height: 50,
+            // View Toggle Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border:
-                        Border.all(color: const Color(0xff999999), width: 1.4),
+                    border: Border.all(color: Colors.grey.shade300),
                   ),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color(0xffF2F2F2),
-                      hintText: TranslationKeys.search.tr,
-                      hintStyle: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontFamily: AppConstants.appFontName,
-                        fontSize: 16,
-                        color: Color(0xff666666),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => setState(() => isGridView = false),
+                        icon: Icon(
+                          Icons.view_list,
+                          color: !isGridView ? Colors.blue : Colors.grey,
+                        ),
                       ),
-                      prefixIcon:
-                          const Icon(Icons.search, color: Color(0xff666666)),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.tune, color: Colors.grey),
-                        onPressed: () {
-                          // Add filter functionality here
-                        },
+                      Container(
+                        width: 1,
+                        height: 24,
+                        color: Colors.grey.shade300,
                       ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                    ),
+                      IconButton(
+                        onPressed: () => setState(() => isGridView = true),
+                        icon: Icon(
+                          Icons.grid_view,
+                          color: isGridView ? Colors.blue : Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+              ],
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-              // View Toggle Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: () => setState(() => isGridView = false),
-                          icon: Icon(
-                            Icons.view_list,
-                            color: !isGridView ? Colors.blue : Colors.grey,
+            // Videos List
+            Expanded(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _playlistVideosFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                        child: CircularProgressIndicator(
+                      color: AppColors.bluePrimaryColor,
+                    ));
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                        child: Text(TranslationKeys.noVideosFound.tr));
+                  }
+
+                  final videos = _filterVideos(snapshot.data!);
+
+                  if (videos.isEmpty) {
+                    return Center(
+                        child: Text(TranslationKeys.noVideosMatchSearch.tr));
+                  }
+
+                  return isGridView
+                      ? GridView.builder(
+                          itemCount: videos.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1.2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
                           ),
-                        ),
-                        Container(
-                          width: 1,
-                          height: 24,
-                          color: Colors.grey.shade300,
-                        ),
-                        IconButton(
-                          onPressed: () => setState(() => isGridView = true),
-                          icon: Icon(
-                            Icons.grid_view,
-                            color: isGridView ? Colors.blue : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                          itemBuilder: (context, index) =>
+                              _buildVideoCard(videos[index], isGrid: true),
+                        )
+                      : ListView.separated(
+                          itemCount: videos.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 16),
+                          itemBuilder: (context, index) =>
+                              _buildVideoCard(videos[index]),
+                        );
+                },
               ),
-
-              const SizedBox(height: 20),
-
-              // Videos List
-              Expanded(
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: _playlistVideosFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                          child: CircularProgressIndicator(
-                        color: AppColors.bluePrimaryColor,
-                      ));
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(
-                          child: Text(TranslationKeys.noVideosFound.tr));
-                    }
-
-                    final videos = _filterVideos(snapshot.data!);
-
-                    if (videos.isEmpty) {
-                      return Center(
-                          child: Text(TranslationKeys.noVideosMatchSearch.tr));
-                    }
-
-                    return isGridView
-                        ? GridView.builder(
-                            itemCount: videos.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 1.2,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                            ),
-                            itemBuilder: (context, index) =>
-                                _buildVideoCard(videos[index], isGrid: true),
-                          )
-                        : ListView.separated(
-                            itemCount: videos.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 16),
-                            itemBuilder: (context, index) =>
-                                _buildVideoCard(videos[index]),
-                          );
-                  },
-                ),
-              )
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

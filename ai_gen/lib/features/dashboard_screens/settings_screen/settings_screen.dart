@@ -1,5 +1,5 @@
-
 import 'package:ai_gen/core/translation/translation_keys.dart';
+import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/features/auth/presentation/change_password_screen/presntation/pages/change_password_screen.dart';
 import 'package:ai_gen/features/dashboard_screens/settings_screen/appearence_screen.dart';
 import 'package:ai_gen/features/dashboard_screens/settings_screen/language_screen.dart';
@@ -20,15 +20,18 @@ class SettingsScreen extends StatelessWidget {
       create: (_) => SettingsCubit(),
       child: Scaffold(
         body: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 76),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 90),
               Text(
                 TranslationKeys.settings.tr,
                 style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 48,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: AppConstants.appFontName,
+                  color: Colors.black87,
                 ),
               ),
               const SizedBox(height: 4),

@@ -1,21 +1,18 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CustomIconTextButton extends StatelessWidget {
   final String text;
-//  final IconData icon;
   final Color backgroundColor;
   final double textSize;
-  // final double iconSize;
+  final double iconSize;
   final Color textColor;
   final Color iconColor;
   final VoidCallback onTap;
-  final String assetName; // Example SVG asset path
+  final String assetName;
 
   const CustomIconTextButton({
     required this.text,
-    // required this.icon,
     required this.backgroundColor,
     required this.textColor,
     required this.iconColor,
@@ -23,7 +20,7 @@ class CustomIconTextButton extends StatelessWidget {
     required this.assetName,
     super.key,
     this.textSize = 16,
-    //this.iconSize = 24,
+    this.iconSize = 20, // Default icon size
   });
 
   @override
@@ -40,16 +37,22 @@ class CustomIconTextButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: 23,
-              height: 24,
-              child: SvgPicture.asset(
-                fit: BoxFit.cover,
-                assetName,
+              width: iconSize,
+              height: iconSize,
+              child:Image.asset(assetName)
+              
+              
+              //  SvgPicture.asset(
+              //   assetName,
+              //   width: iconSize,
+              //   height: iconSize,
+              //   fit: BoxFit.contain, // Changed from cover to contain
+              //   // ignore: deprecated_member_use
+              //   color: iconColor,
+              // ),
 
-                // ignore: deprecated_member_use
-                color: iconColor,
-              ),
-            ), // Using SVG asset
+
+            ),
             const SizedBox(width: 8),
             Text(
               text,

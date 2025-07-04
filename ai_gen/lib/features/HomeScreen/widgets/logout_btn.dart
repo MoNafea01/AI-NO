@@ -18,12 +18,18 @@ Widget logoutButton(BuildContext context, bool isExpanded) {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
+
+
+//logOutIcon
           SvgPicture.asset(
-            AssetsPaths.logOutIcon,
+            AssetsPaths.projectLogoIcon,
             width: 20,
             height: 20,
             color: authProvider.isLoggingOut ? Colors.grey : Colors.red,
           ),
+
+
+
           if (isExpanded) const SizedBox(width: 12),
           if (isExpanded)
             Text(
