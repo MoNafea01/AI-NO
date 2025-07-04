@@ -1,12 +1,16 @@
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
+import 'package:ai_gen/core/utils/themes/textstyles.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/custom_fab.dart';
 import 'package:ai_gen/features/node_view/presentation/widgets/node_view_actions/custom_top_action.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../cubit/grid_node_view_cubit.dart';
+import 'chat/chat_screen.dart';
 import 'widgets/menu_actions.dart';
 import 'widgets/node_properties_widget/node_properties_card.dart';
 import 'widgets/node_view_actions/node_selector_menu.dart';
@@ -26,6 +30,9 @@ class _GridNodeViewState extends State<GridNodeView> {
 
   late final VSNodeDataProvider nodeDataProvider;
   String _appVersion = '';
+
+  // Keep chat controller and screen alive
+  ChatScreen? _chatScreen;
 
   @override
   void initState() {
@@ -59,8 +66,8 @@ class _GridNodeViewState extends State<GridNodeView> {
           _buildNodeView(gridNodeViewCubit),
           _buildTopControls(context),
           _buildBottomControls(),
-          _buildSideBarActionButton(),
-          _buildChatActionButton(),
+          _buildNodesMenuActionButton(),
+          _buildChatActionButton(gridNodeViewCubit),
           _buildVersionInfo(),
         ],
       ),
@@ -102,7 +109,7 @@ class _GridNodeViewState extends State<GridNodeView> {
     );
   }
 
-  Widget _buildSideBarActionButton() {
+  Widget _buildNodesMenuActionButton() {
     final screenHeight = MediaQuery.sizeOf(context).height;
     final screenWidth = MediaQuery.sizeOf(context).width;
     return Positioned(
@@ -125,16 +132,17 @@ class _GridNodeViewState extends State<GridNodeView> {
     );
   }
 
-  Widget _buildChatActionButton() {
+  Widget _buildChatActionButton(GridNodeViewCubit gridNodeViewCubit) {
     final screenHeight = MediaQuery.sizeOf(context).height;
     final screenWidth = MediaQuery.sizeOf(context).width;
+    // Create chat screen once and keep it alive
+    _chatScreen ??= ChatScreen(projectModel: gridNodeViewCubit.projectModel);
     return Positioned(
       top: screenHeight / 30,
       left: (screenWidth / 50) + 50,
       child: CustomTopAction(
-        heroTag: 'sidebar_toggle',
-        activeIcon: Icons.add,
-        inActiveIcon: Icons.close,
+        heroTag: 'Chat with AI',
+        iconWidget: SvgPicture.asset(AssetsPaths.chatBotIcon),
         isActive: _activeAction == ActiveAction.chat,
         onTap: () {
           setState(() {
@@ -143,7 +151,7 @@ class _GridNodeViewState extends State<GridNodeView> {
                 : _activeAction = ActiveAction.chat;
           });
         },
-        child: NodeSelectorMenu(vsNodeDataProvider: nodeDataProvider),
+        child: _chatScreen!,
       ),
     );
   }
@@ -160,7 +168,10 @@ class _GridNodeViewState extends State<GridNodeView> {
     return AppBar(
       backgroundColor: AppColors.grey100,
       surfaceTintColor: AppColors.grey100,
-      title: Text(gridNodeViewCubit.projectModel.name ?? "Project Name"),
+      title: Text(
+        gridNodeViewCubit.projectModel.name ?? "Project Name",
+        style: AppTextStyles.title22,
+      ),
       elevation: 1,
       shadowColor: Colors.black,
       leading: null,

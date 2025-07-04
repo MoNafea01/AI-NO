@@ -6,9 +6,10 @@ enum ActiveAction { none, sidebar, chat }
 class CustomTopAction extends StatelessWidget {
   const CustomTopAction({
     required this.heroTag,
-    required this.activeIcon,
-    required this.inActiveIcon,
     required this.child,
+    this.activeIcon,
+    this.inActiveIcon,
+    this.iconWidget,
     this.isActive = false,
     this.onTap,
     super.key,
@@ -16,8 +17,9 @@ class CustomTopAction extends StatelessWidget {
 
   final Widget child;
   final String heroTag;
-  final IconData activeIcon;
-  final IconData inActiveIcon;
+  final Widget? iconWidget;
+  final IconData? activeIcon;
+  final IconData? inActiveIcon;
   final VoidCallback? onTap;
   final bool isActive;
 
@@ -39,13 +41,16 @@ class CustomTopAction extends StatelessWidget {
           elevation: 0,
           foregroundColor: AppColors.black,
           onPressed: onTap,
-          child: Icon(isActive ? inActiveIcon : activeIcon),
+          child: iconWidget ?? Icon(isActive ? inActiveIcon : activeIcon),
         ),
-        if (isActive)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
+        // if (isActive)
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Offstage(
+            offstage: !isActive,
             child: child,
           ),
+        ),
       ],
     );
   }
