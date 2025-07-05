@@ -1,25 +1,42 @@
 {
-    "ordinal_encoder": {},
-    "nn_fitter": {
-        "compiled_model": "compiled_model_id",
-        "X": "X_id",
-        "y": "y_id",
-        "params": {
-            "batch_size": 10,
-            "epochs": 10
-        }
-    },
-    "preprocessor_fitter": {
+    "bernoulli_nb": {},
+    "fitter_transformer": {
         "preprocessor": "preprocessor_id",
         "data": "data_id",
         "params": {}
     },
-    "lasso": {
-        "alpha": 1.0
-    },
-    "label_binarizer": {},
     "gradient_boosting_classifier": {},
+    "bagging_regressor": {},
+    "binarizer": {},
+    "a_new_one": {
+        "params": {}
+    },
+    "sequential_model": {
+        "layer": "layer_id",
+        "params": {}
+    },
     "standard_scaler": {},
+    "random_forest_regressor": {
+        "n_estimators": 100,
+        "max_depth": 5
+    },
+    "decision_tree_classifier": {
+        "max_depth": 5
+    },
+    "model_compiler": {
+        "nn_model": "nn_model_id",
+        "params": {
+            "optimizer": "adam",
+            "loss": "categorical_crossentropy",
+            "metrics": [
+                "accuracy"
+            ]
+        }
+    },
+    "adaboost_regressor": {},
+    "knn_classifier": {
+        "n_neighbors": 5
+    },
     "maxpool2d_layer": {
         "prev_node": "prev_node_id",
         "params": {
@@ -34,7 +51,164 @@
             "padding": "valid"
         }
     },
-    "rbf_svr": {
+    "linear_svr": {
+        "C": 1.0
+    },
+    "elastic_net": {
+        "alpha": 1.0,
+        "l1_ratio": 0.5
+    },
+    "knn_imputer": {},
+    "label_encoder": {},
+    "decision_tree_regressor": {
+        "max_depth": 5
+    },
+    "onehot_encoder": {},
+    "train_test_split": {
+        "X": "X_id",
+        "y": "y_id",
+        "params": {
+            "test_size": 0.3,
+            "random_state": 42
+        }
+    },
+    "data_loader": {
+        "params": {
+            "dataset_name": "iris",
+            "dataset_path": ""
+        }
+    },
+    "sigmoid_svc": {
+        "C": 1.0
+    },
+    "minmax_scaler": {
+        "feature_range": [
+            0,
+            1
+        ]
+    },
+    "sigmoid_svr": {
+        "C": 1.0
+    },
+    "flatten_layer": {
+        "prev_node": "prev_node_id",
+        "params": {}
+    },
+    "preprocessor_fitter": {
+        "preprocessor": "preprocessor_id",
+        "data": "data_id",
+        "params": {}
+    },
+    "node_loader": {
+        "params": {
+            "node_path": ""
+        }
+    },
+    "maxabs_scaler": {},
+    "model_fitter": {
+        "model": "model_id",
+        "X": "X_id",
+        "y": "y_id",
+        "params": {}
+    },
+    "poly_svr": {
+        "C": 1.0
+    },
+    "label_binarizer": {},
+    "test_1": {
+        "params": {}
+    },
+    "robust_scaler": {
+        "quantile_range": [
+            0.25,
+            0.75
+        ]
+    },
+    "linear_regression": {},
+    "lasso": {
+        "alpha": 1.0
+    },
+    "random_forest_classifier": {
+        "n_estimators": 100,
+        "max_depth": 5
+    },
+    "ridge_classifier": {
+        "alpha": 1.0
+    },
+    "splitter": {
+        "data": "data_id",
+        "params": {}
+    },
+    "node_template_saver": {
+        "node": "node_id",
+        "params": {
+            "name": "Custom Architecture",
+            "description": "Custom Architecture Description"
+        }
+    },
+    "nafea_template": {
+        "params": {}
+    },
+    "transformer": {
+        "fitted_preprocessor": "fitted_preprocessor_id",
+        "data": "data_id",
+        "params": {}
+    },
+    "sgd_regression": {
+        "penalty": "l2"
+    },
+    "dense_layer": {
+        "prev_node": "prev_node_id",
+        "params": {
+            "units": 1,
+            "activation": "relu"
+        }
+    },
+    "multinomial_nb": {},
+    "adaboost_classifier": {},
+    "node_saver": {
+        "node": "node_id",
+        "params": {
+            "node_path": ""
+        }
+    },
+    "ridge": {
+        "alpha": 1.0
+    },
+    "simple_imputer": {},
+    "bagging_classifier": {},
+    "ordinal_encoder": {},
+    "normalizer": {
+        "norm": "l2"
+    },
+    "gradient_boosting_regressor": {},
+    "predictor": {
+        "fitted_model": "fitted_model_id",
+        "X": "X_id",
+        "params": {}
+    },
+    "knn_regressor": {
+        "n_neighbors": 5
+    },
+    "poly_svc": {
+        "C": 1.0
+    },
+    "joiner": {
+        "data_1": "data_1_id",
+        "data_2": "data_2_id",
+        "params": {}
+    },
+    "dropout_layer": {
+        "prev_node": "prev_node_id",
+        "params": {
+            "rate": 0.5
+        }
+    },
+    "logistic_regression": {
+        "penalty": "l2",
+        "C": 1.0
+    },
+    "linear_svc": {
         "C": 1.0
     },
     "evaluator": {
@@ -44,24 +218,33 @@
             "metric": "accuracy"
         }
     },
-    "transformer": {
-        "fitted_preprocessor": "fitted_preprocessor_id",
-        "data": "data_id",
-        "params": {}
-    },
-    "minmax_scaler": {
-        "feature_range": [
-            0,
-            1
-        ]
-    },
-    "data_loader": {
+    "input_layer": {
         "params": {
-            "dataset_name": "iris",
-            "dataset_path": ""
+            "shape": [
+                1,
+                1
+            ]
         }
     },
-    "onehot_encoder": {},
+    "rbf_svc": {
+        "C": 1.0
+    },
+    "gaussian_nb": {},
+    "nn_fitter": {
+        "compiled_model": "compiled_model_id",
+        "X": "X_id",
+        "y": "y_id",
+        "params": {
+            "batch_size": 10,
+            "epochs": 10
+        }
+    },
+    "sgd_classifier": {
+        "penalty": "l2"
+    },
+    "rbf_svr": {
+        "C": 1.0
+    },
     "conv2d_layer": {
         "prev_node": "prev_node_id",
         "params": {
@@ -77,188 +260,5 @@
             "padding": "valid",
             "activation": "relu"
         }
-    },
-    "poly_svc": {
-        "C": 1.0
-    },
-    "linear_svr": {
-        "C": 1.0
-    },
-    "robust_scaler": {
-        "quantile_range": [
-            0.25,
-            0.75
-        ]
-    },
-    "gradient_boosting_regressor": {},
-    "label_encoder": {},
-    "bernoulli_nb": {},
-    "multinomial_nb": {},
-    "gaussian_nb": {},
-    "sequential_model": {
-        "layer": "layer_id",
-        "params": {}
-    },
-    "joiner": {
-        "data_1": "data_1_id",
-        "data_2": "data_2_id",
-        "params": {}
-    },
-    "splitter": {
-        "data": "data_id",
-        "params": {}
-    },
-    "model_compiler": {
-        "nn_model": "nn_model_id",
-        "params": {
-            "optimizer": "adam",
-            "loss": "categorical_crossentropy",
-            "metrics": [
-                "accuracy"
-            ]
-        }
-    },
-    "test_1": {
-        "params": {}
-    },
-    "a_new_one": {
-        "params": {}
-    },
-    "sgd_regression": {
-        "penalty": "l2"
-    },
-    "node_template_saver": {
-        "node": "node_id",
-        "params": {
-            "name": "Custom Architecture",
-            "description": "Custom Architecture Description"
-        }
-    },
-    "predictor": {
-        "fitted_model": "fitted_model_id",
-        "X": "X_id",
-        "params": {}
-    },
-    "model_fitter": {
-        "model": "model_id",
-        "X": "X_id",
-        "y": "y_id",
-        "params": {}
-    },
-    "dense_layer": {
-        "prev_node": "prev_node_id",
-        "params": {
-            "units": 1,
-            "activation": "relu"
-        }
-    },
-    "random_forest_classifier": {
-        "n_estimators": 100,
-        "max_depth": 5
-    },
-    "bagging_regressor": {},
-    "node_loader": {
-        "params": {
-            "node_path": ""
-        }
-    },
-    "sigmoid_svr": {
-        "C": 1.0
-    },
-    "sgd_classifier": {
-        "penalty": "l2"
-    },
-    "train_test_split": {
-        "X": "X_id",
-        "y": "y_id",
-        "params": {
-            "test_size": 0.3,
-            "random_state": 42
-        }
-    },
-    "knn_classifier": {
-        "n_neighbors": 5
-    },
-    "input_layer": {
-        "params": {
-            "shape": [
-                1,
-                1
-            ]
-        }
-    },
-    "elastic_net": {
-        "alpha": 1.0,
-        "l1_ratio": 0.5
-    },
-    "flatten_layer": {
-        "prev_node": "prev_node_id",
-        "params": {}
-    },
-    "decision_tree_regressor": {
-        "max_depth": 5
-    },
-    "linear_regression": {},
-    "normalizer": {
-        "norm": "l2"
-    },
-    "sigmoid_svc": {
-        "C": 1.0
-    },
-    "bagging_classifier": {},
-    "decision_tree_classifier": {
-        "max_depth": 5
-    },
-    "binarizer": {},
-    "ridge_classifier": {
-        "alpha": 1.0
-    },
-    "nafea_template": {
-        "params": {}
-    },
-    "dropout_layer": {
-        "prev_node": "prev_node_id",
-        "params": {
-            "rate": 0.5
-        }
-    },
-    "simple_imputer": {},
-    "random_forest_regressor": {
-        "n_estimators": 100,
-        "max_depth": 5
-    },
-    "poly_svr": {
-        "C": 1.0
-    },
-    "adaboost_regressor": {},
-    "rbf_svc": {
-        "C": 1.0
-    },
-    "node_saver": {
-        "node": "node_id",
-        "params": {
-            "node_path": ""
-        }
-    },
-    "logistic_regression": {
-        "penalty": "l2",
-        "C": 1.0
-    },
-    "fitter_transformer": {
-        "preprocessor": "preprocessor_id",
-        "data": "data_id",
-        "params": {}
-    },
-    "maxabs_scaler": {},
-    "knn_regressor": {
-        "n_neighbors": 5
-    },
-    "knn_imputer": {},
-    "adaboost_classifier": {},
-    "ridge": {
-        "alpha": 1.0
-    },
-    "linear_svc": {
-        "C": 1.0
     }
 }
