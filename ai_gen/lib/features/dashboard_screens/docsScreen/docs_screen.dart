@@ -60,15 +60,7 @@ class _AdvancedSearchViewState extends State<AdvancedSearchView> {
                 color: Colors.black,
               ),
             ),
-            // Description
-            // Text(
-            //   TranslationKeys.advancedSearchDescription.tr,
-            //   style: const TextStyle(
-            //     fontFamily: AppConstants.appFontName,
-            //     fontSize: 14,
-            //     color: Color(0xff666666),
-            //   ),
-            // ),
+            
             const SizedBox(height: 20),
 
             // Search and Filter Section

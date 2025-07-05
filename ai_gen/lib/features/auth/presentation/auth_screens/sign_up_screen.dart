@@ -2,7 +2,7 @@
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
-import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
+import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/social_sign_in_button.dart';

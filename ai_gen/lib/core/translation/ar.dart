@@ -96,7 +96,7 @@ Map<String, String> ar = {
   TranslationKeys.buttonSignUp: 'إنشاء حساب',
   TranslationKeys.retry: 'حاول المحاولة',
   // New translations for Datasets Screen
-  TranslationKeys.datasets: 'مجموعات البيانات',
+  TranslationKeys.datasets: " البيانات",
   TranslationKeys.datasetsDescription:
       'اكتشف واستخدم مجموعات بيانات عالية الجودة لتدريب وتعديل نماذج التعلم الآلي.',
   TranslationKeys.filter: 'تصفية',

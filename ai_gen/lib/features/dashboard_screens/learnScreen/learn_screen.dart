@@ -192,21 +192,25 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                       Text(
                         TranslationKeys.learnDescription.tr,
                         style: TextStyle(
-                          fontFamily: AppConstants.appFontName,
-                          fontSize: 16,
+                             fontFamily: AppConstants.appFontName,
+                          fontWeight: FontWeight.w500,
                           color: Color(0xff666666),
+                          fontSize: 16,
                         ),
                       ),
                     ],
                   ),
                 ),
-                // Image.asset(
-                //   AssetsPaths.learnScreenIcon,
-                //   color: Colors.black,
-                //   height: 187,
-                //   width: 400,
-                //   alignment: Alignment.topRight,
-                // ),
+                Container(
+                  color: Colors.transparent,
+                  child: Image.asset(
+                    AssetsPaths.learnBackground,
+                    //  color: Colors.black,
+                    height: 187,
+                    width: 400,
+                    alignment: Alignment.topRight,
+                  ),
+                ),
               ],
             ),
 

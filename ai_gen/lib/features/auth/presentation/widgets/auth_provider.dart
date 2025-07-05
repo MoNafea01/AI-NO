@@ -11,7 +11,7 @@ import 'package:ai_gen/features/HomeScreen/data/user_profile.dart';
 import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';
 
 import 'package:ai_gen/features/auth/presentation/OtpVerificationScreen/otp_verification_screen.dart';
-import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
+import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

@@ -281,8 +281,7 @@ abstract class TranslationKeys {
   static const String createdAt = "Created At";
   static const String undoSelectionTitle =
       "Click to select/deselect this project for deletion";
-        static const String doYouWantToDelete =
-      "Do you want to delete this project?";
+  static const String doYouWantToDelete = "Do you want to delete this project?";
 
   static const String projectName = "Project Name";
   static const String noDescriptionTitle = "No description";
@@ -290,23 +289,25 @@ abstract class TranslationKeys {
   static const String noModel = "No Model";
   static const String previous = "Previous";
   static const String projects = "Projects";
-   static const String project = "Project";
-    static const String viewAllProjects = 'View all your projects';
-      static const String import = "Import";
-       static const String questionMark = "?";
-        static const String export = "Export";
-          static const String newProject = "New Project";
-          static const String searchHint = "Find a project";
-           
-   static const String projectsToBeDeleted =  'Projects to be deleted:';
-   static const String areYouSure = "Are you sure you want to delete ";
-   static const String thisActionCannotBeUndone = " This action cannot be undone.";
-   static const String deleteEmpty = 'Delete Empty';
-   static const String areYouSureYouWantToDeleteEmptyProjects =  'Are you sure you want to delete all empty projects? This will remove all projects that have no model or dataset assigned. This action cannot be undone.';
-   static const String thisTitle ='this';
-   static const String theseTitle ='these';
-   // في translation_keys.dart
-  static const String advancedSearch = 'advanced_search';
+  static const String project = "Project";
+  static const String viewAllProjects = 'View all your projects';
+  static const String import = "Import";
+  static const String questionMark = "?";
+  static const String export = "Export";
+  static const String newProject = "New Project";
+  static const String searchHint = "Find a project";
+
+  static const String projectsToBeDeleted = 'Projects to be deleted:';
+  static const String areYouSure = "Are you sure you want to delete ";
+  static const String thisActionCannotBeUndone =
+      " This action cannot be undone.";
+  static const String deleteEmpty = 'Delete Empty';
+  static const String areYouSureYouWantToDeleteEmptyProjects =
+      'Are you sure you want to delete all empty projects? This will remove all projects that have no model or dataset assigned. This action cannot be undone.';
+  static const String thisTitle = 'this';
+  static const String theseTitle = 'these';
+  // في translation_keys.dart
+  static const String advancedSearch = 'Advanced_Search';
   static const String advancedSearchDescription = 'advanced_search_description';
   static const String selectModel = 'select_model';
   static const String selectDataset = 'select_dataset';
@@ -319,10 +320,4 @@ abstract class TranslationKeys {
   static const String noProjectsFound = 'no_projects_found';
   static const String searchProjectsModelsDatasetsHint =
       'search_projects_models_datasets_hint';
- 
-
-
-   
-   
-
 }

@@ -146,10 +146,23 @@ class ProjectListItem extends StatelessWidget {
   // Helper to format DateTime
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime == null) return TranslationKeys.na.tr;
-    return "${dateTime.day.toString().padLeft(2, '0')}/"
-        "${dateTime.month.toString().padLeft(2, '0')}/"
-        "${dateTime.year} "
-        "${dateTime.hour.toString().padLeft(2, '0')}:"
-        "${dateTime.minute.toString().padLeft(2, '0')}";
+
+    // List of month names
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+
+    return "${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year}";
   }
 }

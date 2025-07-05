@@ -1,4 +1,5 @@
-// Fixed SplashScreen - تصحيح شاشة البداية
+
+
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:developer';
@@ -9,11 +10,11 @@ import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';
-import 'package:ai_gen/features/auth/presentation/pages/sign_in_screen.dart';
-import 'package:ai_gen/features/auth/presentation/pages/sign_up_screen.dart';
+import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
+import 'package:ai_gen/features/auth/presentation/auth_screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_svg/svg.dart';
+
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -130,16 +131,16 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  // Fixed authentication check - تصحيح فحص التوثيق
+ 
   Future<void> _checkAuthentication() async {
-    if (_isNavigating) return; // منع التنقل المتكرر
+    if (_isNavigating) return; 
 
-    _isNavigating = true; // تحديد أن التنقل قيد التنفيذ
+    _isNavigating = true;
 
     try {
       await Future.delayed(const Duration(seconds: 2)); // show splash effect
 
-      if (!mounted) return; // التحقق من أن الـ widget لا يزال مُركب
+      if (!mounted) return;
 
       const FlutterSecureStorage secureStorage = FlutterSecureStorage();
       final prefs = await SharedPreferences.getInstance();
@@ -148,10 +149,10 @@ class _SplashScreenState extends State<SplashScreen>
       final accessToken = await secureStorage.read(key: 'accessToken');
       final refreshToken = await secureStorage.read(key: 'refreshToken');
 
-      if (!mounted) return; // التحقق مرة أخرى قبل التنقل
+      if (!mounted) return; 
 
       if (accessToken != null && refreshToken != null) {
-        // ✅ User is already logged in - المستخدم مسجل الدخول
+        
         log("Navigating to DashboardScreen (already logged in)");
 
         Navigator.pushReplacement(
@@ -163,7 +164,7 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         );
       } else if (isFirstTime) {
-        // ✅ First-time user - مستخدم جديد
+      
         await prefs.setBool('isFirstTime', false);
         log("Navigating to SignUpScreen (first time)");
 
@@ -172,7 +173,7 @@ class _SplashScreenState extends State<SplashScreen>
           MaterialPageRoute(builder: (context) => const SignupScreen()),
         );
       } else {
-        // ✅ Returning user but logged out - مستخدم عائد لكن غير مسجل
+       
         log("Navigating to SignInScreen (returning user)");
 
         Navigator.pushReplacement(
@@ -186,7 +187,7 @@ class _SplashScreenState extends State<SplashScreen>
         setState(() {
           _status = "Authentication error: ${e.toString()}";
           _showRetryButton = true;
-          _isNavigating = false; // إعادة تعيين الـ flag في حالة الخطأ
+          _isNavigating = false; 
         });
       }
     }
@@ -209,11 +210,14 @@ class _SplashScreenState extends State<SplashScreen>
           children: [
             AnimatedBuilder(
               animation: _animation,
-              child: SvgPicture.asset(
+              child: 
+              Image.asset(
                 AssetsPaths.projectLogoIcon,
-                width: 150,
-                height: 150,
+               
               ),
+              
+
+
               builder: (context, child) {
                 return Transform.rotate(
                   angle: _animation.value,
@@ -243,7 +247,7 @@ class _SplashScreenState extends State<SplashScreen>
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  _isNavigating = false; // إعادة تعيين الـ flag
+                  _isNavigating = false; 
                   _startServer();
                 },
                 style: ElevatedButton.styleFrom(

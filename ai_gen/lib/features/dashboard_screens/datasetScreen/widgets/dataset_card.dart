@@ -30,7 +30,7 @@ class DatasetCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -58,7 +58,7 @@ class DatasetCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 // Dataset Type/Category
-                 Text(
+                Text(
                   TranslationKeys.datasetCollection.tr,
                   style: const TextStyle(
                       fontSize: 12,

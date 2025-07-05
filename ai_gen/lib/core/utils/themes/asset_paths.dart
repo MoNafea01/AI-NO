@@ -10,21 +10,28 @@ abstract class AssetsPaths {
 
    // dashboard icons
    
-    static const String dataSetsIcon = "${baseAssetPath}dataset.svg";
-    static const String docsIcon = "${baseAssetPath}docs.svg";
+    static const String dataSetsIcon = "${baseAssetPath}data_set.png";
+    static const String docsIcon = "${baseAssetPath}docs_sidebar.png";
     //static const String dashboardIcon = "${baseAssetPath}expanded_icon.svg";
-    static const String exploreIcon = "${baseAssetPath}explore.svg";
-    static const String learnIcon = "${baseAssetPath}learn.svg";
-    static const String logOutIcon = "${baseAssetPath}log_out_icon.svg";
+    static const String exploreIcon = "${baseAssetPath}explore.png";
+    //static const String learnIcon = "${baseAssetPath}learn.svg";
+    static const String modelsBackground = "${baseAssetPath}models_background_icon.png";
+ static const String datasetBackground = "${baseAssetPath}dataset_background.png";
+  static const String learnBackground = "${baseAssetPath}learn_background.png";
+
+   
+    static const String logOutIcon = "${baseAssetPath}logout.png";
     static const String notificationIcon = "${baseAssetPath}notifications_icon.svg";
-    static const String modelIcon = "${baseAssetPath}models.svg";
-   static const String projectLogoIcon = "${baseAssetPath}project_logo.svg";
-    static const String settingIcon = "${baseAssetPath}settings.svg";
-    static const String addIcon = "${baseAssetPath}add_icon.svg";
-    static const String importIcon = "${baseAssetPath}import_icon.svg";
-     static const String exportIcon = "${baseAssetPath}explore.svg";
-    static const String collapseIcon = "${baseAssetPath}collapse_icon.svg";
-    static const String learnScreenIcon = "${baseAssetPath}learn.png";
+    static const String modelIcon = "${baseAssetPath}model.png";
+   static const String projectLogoIcon = "${baseAssetPath}project_icon.png";
+    static const String settingIcon = "${baseAssetPath}settings.png";
+    static const String addIcon = "${baseAssetPath}add.png";
+    static const String importIcon = "${baseAssetPath}upload.png";
+     static const String exportIcon = "${baseAssetPath}export.png";
+    static const String collapseIcon = "${baseAssetPath}collapse_expand.png";
+    static const String learnScreenIcon = "${baseAssetPath}learn_sidebar.png";
+    static const String datasetScreenIcon = "${baseAssetPath}dataset_full_icon.png";
+
 
 
 

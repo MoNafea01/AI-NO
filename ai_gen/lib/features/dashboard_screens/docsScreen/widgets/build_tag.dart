@@ -4,7 +4,7 @@ import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:flutter/material.dart';
 
 Widget buildTag({
-  required IconData icon,
+  required String icon,
   required String label,
   required Color color,
   required VoidCallback onCopy,
@@ -13,19 +13,25 @@ Widget buildTag({
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
       color: color.withOpacity(0.1),
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: color.withOpacity(0.3)),
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: const Color(0xff999999)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: color),
+        Image.asset(
+          icon,
+          color: Colors.black,
+          width: 16,
+          height: 16,
+        ),
+        // Icon(icon, size: 14, color: color),
         const SizedBox(width: 4),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
-            color: color,
+            color: Colors.black,
             fontWeight: FontWeight.w500,
             fontFamily: AppConstants.appFontName,
           ),

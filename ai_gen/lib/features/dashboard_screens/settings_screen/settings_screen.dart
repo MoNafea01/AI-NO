@@ -38,9 +38,10 @@ class SettingsScreen extends StatelessWidget {
               Text(
                 TranslationKeys.settingsDescription.tr,
                 style: const TextStyle(
-                  fontSize: 18,
-                  color: Color(0xff666666),
+                  fontFamily: AppConstants.appFontName,
                   fontWeight: FontWeight.w500,
+                  color: Color(0xff666666),
+                  fontSize: 16,
                 ),
               ),
               const SizedBox(height: 24),

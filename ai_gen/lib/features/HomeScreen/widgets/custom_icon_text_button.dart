@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class CustomIconTextButton extends StatelessWidget {
   final String text;
@@ -19,8 +18,8 @@ class CustomIconTextButton extends StatelessWidget {
     required this.onTap,
     required this.assetName,
     super.key,
-    this.textSize = 16,
-    this.iconSize = 20, // Default icon size
+    this.textSize = 20,
+    this.iconSize = 26, // Default icon size
   });
 
   @override
@@ -37,22 +36,15 @@ class CustomIconTextButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: iconSize,
-              height: iconSize,
-              child:Image.asset(assetName)
-              
-              
-              //  SvgPicture.asset(
-              //   assetName,
-              //   width: iconSize,
-              //   height: iconSize,
-              //   fit: BoxFit.contain, // Changed from cover to contain
-              //   // ignore: deprecated_member_use
-              //   color: iconColor,
-              // ),
-
-
-            ),
+                width: iconSize,
+                height: iconSize,
+                child: Image.asset(
+                  color: iconColor,
+                  assetName,
+                  width: iconSize,
+                  height: iconSize,
+                  fit: BoxFit.contain,
+                )),
             const SizedBox(width: 8),
             Text(
               text,

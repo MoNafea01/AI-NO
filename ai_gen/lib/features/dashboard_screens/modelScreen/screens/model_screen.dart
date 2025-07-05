@@ -1,5 +1,6 @@
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/dashboard_screens/modelScreen/cubit/model_screen_cubit.dart';
 import 'package:ai_gen/features/dashboard_screens/modelScreen/cubit/model_screen_state.dart';
 import 'package:ai_gen/features/dashboard_screens/modelScreen/widgets/model_card.dart';
@@ -47,25 +48,50 @@ class _ModelsViewState extends State<ModelsView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 90),
-            Text(
-              TranslationKeys.models.tr,
-              style: const TextStyle(
-                 fontSize: 48,
-                fontWeight: FontWeight.w700,
-                fontFamily: AppConstants.appFontName,
-                color: Colors.black,
-              ),
+            const SizedBox(height: 40),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        TranslationKeys.models.tr,
+                        style: const TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: AppConstants.appFontName,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        TranslationKeys.modelsDescription.tr,
+                        style: const TextStyle(
+                            fontFamily: AppConstants.appFontName,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xff666666),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  color: Colors.transparent,
+                  child: Image.asset(
+                    AssetsPaths.modelsBackground,
+                    //color: Colors.black,
+                    height: 187,
+                    width: 400,
+                    alignment: Alignment.topRight,
+                  ),
+                ),
+              ],
             ),
+
             // Header Text
-            Text(
-              TranslationKeys.modelsDescription.tr,
-              style: const TextStyle(
-                fontFamily: AppConstants.appFontName,
-                fontSize: 14,
-                color: Color(0xff666666),
-              ),
-            ),
+
             const SizedBox(height: 20),
 
             // Search Bar

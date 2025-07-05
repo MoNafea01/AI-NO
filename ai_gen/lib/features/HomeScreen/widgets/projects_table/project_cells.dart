@@ -26,6 +26,7 @@ Widget buildDatasetCell(String? dataset) {
 
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+     margin: const EdgeInsets.symmetric(horizontal: 16),
     decoration: BoxDecoration(
       color: const Color(0xffF2F2F2),
       borderRadius: BorderRadius.circular(4),
@@ -69,6 +70,7 @@ Widget buildModelCell(String? model) {
 
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+     margin: const EdgeInsets.symmetric(horizontal: 20),
     decoration: BoxDecoration(
       color: const Color(0xffF2F2F2),
       borderRadius: BorderRadius.circular(4),

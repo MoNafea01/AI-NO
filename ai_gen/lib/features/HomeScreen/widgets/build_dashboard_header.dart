@@ -56,15 +56,15 @@ Widget buildHeader(BuildContext context) {
             ImportProjectDialog(cubit: context.read<HomeCubit>()),
           );
         },
-        assetName: AssetsPaths.projectLogoIcon,
+        assetName: AssetsPaths.importIcon,
         //
-        
+
         iconColor: AppColors.bluePrimaryColor,
       ),
       CustomIconTextButton(
-        assetName: AssetsPaths.projectLogoIcon,
+        assetName: AssetsPaths.exportIcon,
         //exportIcon
-        
+
         text: TranslationKeys.export.tr,
         //   icon: Icons.upload,
         backgroundColor: const Color(0xfff2f2f2),
@@ -84,7 +84,7 @@ Widget buildHeader(BuildContext context) {
         onTap: () {
           Helper.showDialogHelper(context, const CreateNewProjectDialog());
         },
-        assetName: AssetsPaths.projectLogoIcon,
+        assetName: AssetsPaths.addIcon,
         iconColor: Colors.white,
       ),
     ],
