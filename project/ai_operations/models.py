@@ -53,4 +53,3 @@ class Component(models.Model):
     input_channels = models.JSONField(null=True, blank=True)
     output_channels = models.JSONField(null=True, blank=True)
     api_call = models.CharField(max_length=100)
-
