@@ -25,7 +25,7 @@ class RunButton extends StatelessWidget {
     );
   }
 
-  Widget outputCard(BuildContext context, Map<String, String>? scopeOutput) {
+  Widget outputCard(BuildContext context, Map<String, dynamic>? scopeOutput) {
     if (scopeOutput == null) {
       return const SizedBox.shrink();
     }
@@ -41,7 +41,7 @@ class RunButton extends StatelessWidget {
           Row(
             children: [
               Text(
-                scopeOutput.keys.first.toString(),
+                "${scopeOutput.keys.first.toString()}:",
                 style: AppTextStyles.black14Bold
                     .copyWith(fontWeight: FontWeight.w700),
               ),
@@ -62,7 +62,7 @@ class RunButton extends StatelessWidget {
             ],
           ),
           Text(
-            scopeOutput.values.first.toString(),
+            "${scopeOutput.values.firstOrNull}",
             style: AppTextStyles.black14w400,
           ),
         ],

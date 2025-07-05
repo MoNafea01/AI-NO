@@ -27,7 +27,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   late VSNodeDataProvider nodeDataProvider;
   late VSNodeManager nodeManager;
   // Iterable<String?>? results;
-  Iterable<Map<String, String>?>? results;
+  Iterable<Map<String, dynamic>?>? results;
 
   // UI State
   late bool showGrid;
