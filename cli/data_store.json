@@ -2629,12 +2629,38 @@
                         "project": 40,
                         "node_data": null
                     }
+                ],
+                "63": [
+                    {
+                        "id": 1945,
+                        "node_id": 110953933634732940,
+                        "displayed_name": "Linear Regression",
+                        "node_name": "linear_regression",
+                        "message": "Model linear_regression created",
+                        "params": [],
+                        "task": "regression",
+                        "node_type": "linear_models",
+                        "uid": 1,
+                        "children": [],
+                        "parent": [],
+                        "location_x": 2070.4,
+                        "location_y": 2285.133333333333,
+                        "input_ports": [],
+                        "output_ports": [
+                            {
+                                "name": "model",
+                                "nodeData": 110953933634732940
+                            }
+                        ],
+                        "project": 63,
+                        "node_data": "D:\\College\\4th\\Graduation Project\\simple_task\\project\\core\\saved\\63\\model\\linear_regression_110953933634732940.pkl"
+                    }
                 ]
             }
         }
     },
     "active_user": "mo",
-    "active_project": "39",
+    "active_project": "63",
     "admin": [
         "mo"
     ]
