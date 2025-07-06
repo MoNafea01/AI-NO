@@ -1,9 +1,9 @@
 import 'dart:developer';
 
+import 'package:ai_gen/core/data/network/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/core/data/network/services/interfaces/project_services_interface.dart';
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/network/services/interfaces/node_services_interface.dart';
-import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
 import 'package:ai_gen/features/node_view/presentation/node_builder/builder/node_builder.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
 import 'package:bloc/bloc.dart';
@@ -26,7 +26,8 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   // Node Management
   late VSNodeDataProvider nodeDataProvider;
   late VSNodeManager nodeManager;
-  Iterable<String?>? results;
+  // Iterable<String?>? results;
+  Iterable<Map<String, String>?>? results;
 
   // UI State
   late bool showGrid;
@@ -57,7 +58,7 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
       emit(GridNodeViewLoading());
       await _initializeProject();
       await _initializeNodeManager();
-      await _loadProjectNodes();
+      await _loadOrUpdateProjectNodes();
       _initializeNodeDataProvider();
       emit(NodeViewSuccess());
     } catch (e) {
@@ -95,21 +96,20 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   }
 
   // Node Operations
-  Future<void> _loadProjectNodes() async {
+  Future<void> _loadOrUpdateProjectNodes() async {
     Response responseProjectNodes =
         await _nodeServices.loadProjectNodes(projectModel.id!);
-    nodeManager.myDeSerializedNodes(responseProjectNodes);
 
-    /*
-    newnode= api.listen(url);
-    nodeManager.nodes.add(newNode);
-    */
+    nodeManager.myDeSerializedNodes(responseProjectNodes);
   }
 
   // used in importing other files
   Future<void> updateNodes() async {
     try {
-      await _loadProjectNodes();
+      emit(NodeViewUpdating());
+      nodeManager.clearNodes();
+      log("update nodes");
+      await _loadOrUpdateProjectNodes();
       emit(NodeViewSuccess());
     } catch (e) {
       emit(NodeViewFailure(e.toString()));
@@ -148,7 +148,9 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   }
 
   void _updateRunningStatus() {
-    results = ("Running nodes...").split(",");
+    results = [
+      {"RUN": "Running nodes..."}
+    ];
     emit(NodeViewSuccess());
   }
 
@@ -167,7 +169,12 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
     results = entries.map(
       (output) {
         if (output.value != null) {
-          return "${output.key}: ${output.value}".replaceAll(",", ",\n");
+          if (output.value['node_data'] is String) {
+            return {output.key: output.value['message']};
+          } else {
+            return {output.key: output.value['node_data']};
+          }
+          // return "${output.key}: ${output.value}".replaceAll(",", ",\n");
         }
         return null;
       },
@@ -175,7 +182,9 @@ class GridNodeViewCubit extends Cubit<GridNodeViewState> {
   }
 
   void _handleRunError() {
-    results = ("Wrong parameter type").split(",");
+    results = [
+      {"Run": "Wrong parameter type"}
+    ];
     emit(NodeViewSuccess());
   }
 

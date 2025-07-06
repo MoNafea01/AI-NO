@@ -1,27 +1,23 @@
+import 'package:ai_gen/core/data/cache/cache_data.dart';
+import 'package:ai_gen/core/data/cache/cache_helper.dart';
+import 'package:ai_gen/core/translation/translation_helper.dart';
+import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/helper/bloc_observer.dart';
+import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
+import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_cubit.dart';
+import 'package:ai_gen/features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_state.dart';
 
-import 'core/cache/cache_data.dart';
-import 'core/translation/translation_helper.dart';
-import 'core/utils/app_constants.dart';
-import 'features/HomeScreen/cubit/home_cubit/home_cubit.dart';
-import 'features/auth/presentation/widgets/auth_provider.dart';
-import 'features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_cubit.dart';
-import 'features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'core/cache/cache_helper.dart';
-import 'package:get_it/get_it.dart';
-
-
-
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'core/di/get_it_initialize.dart';
 import 'core/models/project_model.dart';
-import 'core/network/server_manager/server_manager.dart';
+import 'core/data/network/server_manager/server_manager.dart';
 import 'core/utils/helper/check_main_args.dart';
 import 'core/utils/helper/my_windows_manager.dart';
 import 'features/auth/presentation/splashScreen/splash_screen.dart';
@@ -31,6 +27,7 @@ void main(List<String> args) async {
   ProjectModel? initialProject = await checkArgs(args);
   await CacheHelper.init();
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = MyBlocObserver();
   initializeGetIt();
   await initializeWindowsManager();
   await TranslationHelper.setLanguage();

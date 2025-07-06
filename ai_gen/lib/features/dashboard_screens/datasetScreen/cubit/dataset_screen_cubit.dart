@@ -1,8 +1,13 @@
 import 'dart:developer';
 
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/network/services/interfaces/project_services_interface.dart';
+
+
 import 'package:ai_gen/features/dashboard_screens/datasetScreen/cubit/dataset_screen.dart';
+
+import 'package:ai_gen/core/data/network/services/interfaces/project_services_interface.dart';
+
+
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';

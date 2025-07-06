@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'ai_operations',
     'core',
+    'cb.apps.CbConfig',
     'drf_spectacular',
 ]
 

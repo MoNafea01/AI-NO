@@ -4,8 +4,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ai_gen/core/network/network_constants.dart';
-import 'package:ai_gen/core/network/network_helper.dart';
+import 'package:ai_gen/core/data/network/network_constants.dart';
+import 'package:ai_gen/core/data/network/network_helper.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/data/user_profile.dart';
 import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';

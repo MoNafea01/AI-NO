@@ -1,6 +1,6 @@
-import 'package:ai_gen/core/cache/cache_data.dart';
-import 'package:ai_gen/core/cache/cache_helper.dart';
-import 'package:ai_gen/core/cache/cahch_keys.dart';
+import 'package:ai_gen/core/data/cache/cache_data.dart';
+import 'package:ai_gen/core/data/cache/cache_helper.dart';
+import 'package:ai_gen/core/data/cache/cahch_keys.dart';
 import 'package:get/get.dart';
 
 

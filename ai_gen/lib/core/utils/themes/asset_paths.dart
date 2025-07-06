@@ -1,7 +1,8 @@
 abstract class AssetsPaths {
- static const String baseAssetPath="assets/images/";
-  static final  String arrowSelector = "${baseAssetPath}arrow_Selector_Tool.png";
+  static const String baseAssetPath = "assets/images/";
+  static final String arrowSelector = "${baseAssetPath}arrow_Selector_Tool.png";
   static const String refreshIcon = "${baseAssetPath}refresh.svg";
+
    static const String appleLogo = "${baseAssetPath}apple_logo.png";
    static const String googleLogo = "${baseAssetPath}google_logo.png";
    static const String facebookLogo = "${baseAssetPath}facebook_logo.png";
@@ -36,5 +37,23 @@ abstract class AssetsPaths {
 
 
 
-}
+  
 
+
+  // dashboard icons
+  static const String architectureIcon =
+      "${baseAssetPath}architectures_icon.svg";
+  
+  
+  static const String dashboardIcon = "${baseAssetPath}expanded_icon.svg";
+
+  static const String learnIcon = "${baseAssetPath}learn_icon.svg";
+  
+  
+  
+ 
+  static const String expandedIcon = "${baseAssetPath}expanded_icon.svg";
+  
+  static const String chatBotIcon = "${baseAssetPath}chat_bot.svg";
+  static const String chatBotActiveIcon = "${baseAssetPath}chat_bot_active.svg";
+}
