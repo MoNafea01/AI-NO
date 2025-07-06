@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/data/network/services/interfaces/node_services_interface.dart';
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/utils/reusable_widgets/custom_menu_item.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/textstyles.dart';
@@ -155,12 +155,12 @@ class _VSNodeState extends State<VSNode> with AutomaticKeepAliveClientMixin {
           focusTitle();
         }),
       ),
-      _buildMenuItem(
-        'rotate',
-        onTap: () => setState(() {
-          _isRotating = true;
-        }),
-      ),
+      // _buildMenuItem(
+      //   'rotate',
+      //   onTap: () => setState(() {
+      //     _isRotating = true;
+      //   }),
+      // ),
       _buildMenuItem(
         'delete',
         onTap: _handleNodeDeletion,
