@@ -17,7 +17,7 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
   return AnimatedContainer(
     duration: const Duration(milliseconds: 300),
     curve: Curves.easeInOut,
-    width: state.isExpanded ? 250 : 110,
+    width: state.isExpanded ? 230 : 110,
     decoration: BoxDecoration(
       color: Colors.white,
       border: Border(
@@ -30,47 +30,53 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
     child: Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: state.isExpanded
-                ? MainAxisAlignment.start
-                : MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                AssetsPaths.projectLogoIcon,
-                width: 50,
-                height: 50,
-              ),
-              if (state.isExpanded) const SizedBox(width: 8),
-              if (state.isExpanded)
-                Flexible(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SizeTransition(
-                          sizeFactor: animation,
-                          axis: Axis.horizontal,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      AppConstants.appName,
-                      key: ValueKey('expanded'),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+          padding: EdgeInsets.all(state.isExpanded ? 16.0 : 8.0),
+          child: state.isExpanded
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      AssetsPaths.projectLogoIcon,
+                      width: 50,
+                      height: 50,
                     ),
+                    const SizedBox(width: 1),
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SizeTransition(
+                              sizeFactor: animation,
+                              axis: Axis.horizontal,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          AppConstants.appName,
+                          key: ValueKey('expanded'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: Image.asset(
+                    AssetsPaths.projectLogoIcon,
+                    width: 50,
+                    height: 50,
                   ),
                 ),
-            ],
-          ),
         ),
         const SizedBox(height: 10),
         Expanded(
@@ -84,50 +90,47 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                     context.read<DashboardCubit>().toggleSidebar();
                   },
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: state.isExpanded
-                          ? MainAxisAlignment.center
-                          : MainAxisAlignment.center,
-                      children: [
-                        AnimatedRotation(
-                          turns: state.isExpanded ? 0 : 0.5,
-                          duration: const Duration(milliseconds: 300),
-                          child: Image.asset(
-                            AssetsPaths.collapseIcon,
-                            width: 50,
-                            height: 50,
-                          ),
-                        ),
-                        if (state.isExpanded) const SizedBox(width: 8),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SizeTransition(
-                                sizeFactor: animation,
-                                axis: Axis.horizontal,
-                                child: child,
+                    padding: EdgeInsets.symmetric(
+                        horizontal: state.isExpanded ? 16 : 4, vertical: 4),
+                    child: state.isExpanded
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AnimatedRotation(
+                                turns: 0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Image.asset(
+                                  AssetsPaths.collapseIcon,
+                                  width: 50,
+                                  height: 50,
+                                ),
                               ),
-                            );
-                          },
-                          child: state.isExpanded
-                              ? Text(
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
                                   TranslationKeys.collapse.tr,
-                                  key: const ValueKey('collapse-text'),
                                   style: const TextStyle(
                                     fontSize: 18,
                                     color: Color(0xff383838),
                                   ),
-                                )
-                              : const SizedBox.shrink(key: ValueKey('no-text')),
-                        ),
-                      ],
-                    ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Center(
+                            child: AnimatedRotation(
+                              turns: 0.5,
+                              duration: const Duration(milliseconds: 300),
+                              child: Image.asset(
+                                AssetsPaths.collapseIcon,
+                                width: 50,
+                                height: 50,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -144,12 +147,14 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
         Container(
           width: double.infinity,
           alignment: state.isExpanded ? Alignment.centerLeft : Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 8), // Added padding
           child: const ProfileWidget(),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Container(
           width: double.infinity,
-          alignment: state.isExpanded ? Alignment.centerLeft : Alignment.center,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 2), // Added padding
           child: logoutButton(context, state.isExpanded),
         ),
         const SizedBox(height: 16),
@@ -249,9 +254,10 @@ Widget animatedSidebarItem(
                 color: isActive ? Colors.white : Colors.black,
               ),
             ),
-            if (isExpanded) const SizedBox(width: 8),
+            if (isExpanded) const SizedBox(width: 4),
             if (isExpanded)
-              Flexible(
+              Expanded(
+                // Changed from Flexible to Expanded
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   transitionBuilder:

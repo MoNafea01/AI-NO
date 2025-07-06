@@ -7,6 +7,7 @@ import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_state.dart';
 import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/edit_profile_dialog.dart';
+import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:flutter/material.dart';
@@ -175,9 +176,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                       ),
                     ),
                     onPressed: () {
-                      context.read<ProfileCubit>().retry();
+                       Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const LoginScreen()));
+                    //  context.read<ProfileCubit>().retry();
                     },
-                    child: Text(TranslationKeys.tryAgain.tr),
+                    child: Text("${TranslationKeys.retry.tr} ${TranslationKeys.and.tr} ${TranslationKeys.loginAgain.tr}"),
                   ),
                   const SizedBox(width: 12),
                   TextButton(

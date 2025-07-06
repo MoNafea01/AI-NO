@@ -81,7 +81,7 @@ Map<String, String> en = {
   TranslationKeys.createFreeAccount: 'Create free account',
 
   // New keys for signup
-  TranslationKeys.joinModelCraftToday: 'Join Model Craft\nToday',
+  TranslationKeys.joinModelCraftToday: 'Join A I N O\nToday',
   TranslationKeys.createAccountAndStartBringing:
       'Create an account and start bringing your models to life.',
   TranslationKeys.signUp: 'Sign Up',
@@ -140,6 +140,7 @@ Map<String, String> en = {
   TranslationKeys.basicsCategory: 'Basics',
   TranslationKeys.datasetCategory: 'Dataset',
   TranslationKeys.watchLater: 'Watch Later',
+  TranslationKeys.and: 'and',
   TranslationKeys.share: 'Share',
   TranslationKeys.noVideosFound: 'No videos found.',
   TranslationKeys.noVideosMatchSearch: 'No videos match your search.',

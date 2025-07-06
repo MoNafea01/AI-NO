@@ -151,6 +151,7 @@ class ProjectsTableHeader extends StatelessWidget {
             flex: 2,
             child: Text(
               TranslationKeys.description.tr,
+              //  textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
                 fontSize: 14.2,
@@ -163,6 +164,7 @@ class ProjectsTableHeader extends StatelessWidget {
             flex: 2,
             child: Text(
               TranslationKeys.dataset.tr,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
                 fontSize: 14.2,
@@ -175,6 +177,7 @@ class ProjectsTableHeader extends StatelessWidget {
             flex: 2,
             child: Text(
               TranslationKeys.model.tr,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
                 fontSize: 14.2,
@@ -184,7 +187,7 @@ class ProjectsTableHeader extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 2,
+            flex: 1,
             child: Text(
               TranslationKeys.createdAt.tr,
               style: const TextStyle(

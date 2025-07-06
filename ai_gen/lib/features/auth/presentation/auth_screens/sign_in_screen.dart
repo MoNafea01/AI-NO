@@ -1,20 +1,59 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
-import 'package:ai_gen/core/utils/themes/asset_paths.dart';
+
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_up_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/outlinedPrimaryButton.dart';
-import 'package:ai_gen/features/auth/presentation/widgets/social_sign_in_button.dart';
+
 import 'package:ai_gen/features/auth/presentation/request_otp_screen/presentation/pages/request_otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _slideAnimationController;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize slide animation for left side
+    _slideAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1), // Start from bottom
+      end: Offset.zero, // End at original position
+    ).animate(CurvedAnimation(
+      parent: _slideAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    // Start animation after a short delay
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _slideAnimationController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _slideAnimationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,76 +63,70 @@ class LoginScreen extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Responsive layout logic
-        final isTabletOrLarger = constraints.maxWidth > 600;
-
-        return Scaffold(
-          body: isTabletOrLarger
-              ? _buildTabletLayout(context)
-              : _buildMobileLayout(context),
-        );
-      },
+    return Scaffold(
+      body: _buildDesktopLayout(context),
     );
   }
 
-  Widget _buildTabletLayout(BuildContext context) {
+  Widget _buildDesktopLayout(BuildContext context) {
     return Row(
       children: [
-        // Left Side - Blue Banner
+        // Left Side - Blue Banner with Animation
         Expanded(
           flex: 2,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.bluePrimaryColor,
-                  AppColors.bluePrimaryColor.withOpacity(0.8),
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.bluePrimaryColor,
+                    AppColors.bluePrimaryColor.withOpacity(0.8),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 0,
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
                 ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 0,
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(32.0),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Welcome Back to\nA I N O',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+              padding: const EdgeInsets.all(32.0),
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Welcome Back to A I N O',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Sign in to continue designing and refining your models.',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    height: 1.5,
+                  SizedBox(height: 16),
+                  Text(
+                    'Sign in to continue designing and refining your models.',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      height: 1.5,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
 
         // Right Side - Login Form
         Expanded(
-          flex: 3,
+          flex: 2,
           child: Container(
             color: const Color(0xFFF5F5F5),
             padding: const EdgeInsets.all(32.0),
@@ -106,66 +139,6 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildMobileLayout(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFF5F5F5),
-      ),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Mobile Header
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(32.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.bluePrimaryColor,
-                      AppColors.bluePrimaryColor.withOpacity(0.8),
-                    ],
-                  ),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome Back!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Sign in to continue',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Form
-              Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: const LoginForm(),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -186,7 +159,6 @@ class _LoginFormState extends State<LoginForm>
   bool _isFormVisible = true;
   bool _showSuccessAnimation = false;
   late AuthProvider authProvider;
-
 
   @override
   void initState() {
@@ -215,7 +187,6 @@ class _LoginFormState extends State<LoginForm>
   }
 
   void _onFocusChange() {
-  
     setState(() {});
   }
 
@@ -233,24 +204,20 @@ class _LoginFormState extends State<LoginForm>
       });
     }
   }
-@override
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
-
-
-
   @override
   void dispose() {
-
     _animationController.dispose();
     emailFocusNode.dispose();
     passwordFocusNode.dispose();
 
     // Remove listener on dispose
-   //authProvider.removeLoginListener(_onLoginStateChanged); 
     authProvider.removeLoginListener(_onLoginStateChanged);
 
     super.dispose();
@@ -278,7 +245,7 @@ class _LoginFormState extends State<LoginForm>
   }
 
   Widget _buildSuccessAnimation() {
-    return  Column(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Icon(
@@ -317,7 +284,7 @@ class _LoginFormState extends State<LoginForm>
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-           Text(
+          Text(
             TranslationKeys.welcomeBack.tr,
             style: const TextStyle(
               fontSize: 32,
@@ -418,7 +385,7 @@ class _LoginFormState extends State<LoginForm>
                     ),
                   ),
                   const SizedBox(width: 8),
-                   Text(
+                  Text(
                     TranslationKeys.rememberMe.tr,
                     style: const TextStyle(fontSize: 14),
                   ),
@@ -427,13 +394,13 @@ class _LoginFormState extends State<LoginForm>
               TextButton(
                 onPressed: () {
                   // Navigate to forgot password screen
-                   Navigator.push(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const RequestOtpScreen()),
                   );
                 },
-                child:  Text(
-                 TranslationKeys.forgotPassword.tr,
+                child: Text(
+                  TranslationKeys.forgotPassword.tr,
                   style: const TextStyle(
                     color: Color(0xFF1E88E5),
                     fontWeight: FontWeight.w500,
@@ -506,36 +473,11 @@ class _LoginFormState extends State<LoginForm>
           ),
           const SizedBox(height: 24),
 
-          // Social Sign In
-           Text(
-           TranslationKeys.orSignInWith.tr,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.black54,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SocialSignInButton(label: AssetsPaths.googleLogo),
-              SizedBox(width: 8),
-              SocialSignInButton(label: AssetsPaths.appleLogo),
-              SizedBox(width: 8),
-              SocialSignInButton(label: AssetsPaths.facebookLogo),
-              SizedBox(width: 8),
-              SocialSignInButton(label: AssetsPaths.githubLogo),
-            ],
-          ),
-          const SizedBox(height: 24),
-
           // Create Account
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-               Text(
+              Text(
                 TranslationKeys.dontHaveAnAccount.tr,
                 style: const TextStyle(color: Colors.black54),
               ),
@@ -557,7 +499,7 @@ class _LoginFormState extends State<LoginForm>
                     ),
                   );
                 },
-                child:  Text(
+                child: Text(
                   TranslationKeys.createFreeAccount.tr,
                   style: const TextStyle(
                     color: Color(0xFF1E88E5),

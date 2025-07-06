@@ -229,8 +229,10 @@ class AuthProvider with ChangeNotifier {
   UserProfile? get userProfile => _userProfile;
 
   // Constructor to load stored profile details on startup
+  // Update the constructor to load remember me state
   AuthProvider() {
     loadStoredProfile();
+    _loadRememberMeState();
   }
 
   void setRememberMe(bool value) {
@@ -250,9 +252,19 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _saveTokens(String access, String refresh) async {
-    await _storage.write(key: 'accessToken', value: access);
-    await _storage.write(key: 'refreshToken', value: refresh);
+// Update the _saveTokens method to respect rememberMe setting
+ Future<void> _saveTokens(String access, String refresh) async {
+    if (rememberMe) {
+      // Save tokens permanently if remember me is checked
+      await _storage.write(key: 'accessToken', value: access);
+      await _storage.write(key: 'refreshToken', value: refresh);
+      await _storage.write(key: 'rememberMe', value: 'true');
+    } else {
+      // Save tokens temporarily (only in memory or with session flag)
+      await _storage.write(key: 'sessionAccessToken', value: access);
+      await _storage.write(key: 'sessionRefreshToken', value: refresh);
+      await _storage.write(key: 'rememberMe', value: 'false');
+    }
   }
 
   bool get agreeTerms => _agreeTerms;
@@ -310,6 +322,7 @@ class AuthProvider with ChangeNotifier {
       debugPrint('Login response data: $data');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        // Save tokens based on remember me setting
         await _saveTokens(data['access'], data['refresh']);
         await getProfile();
         Navigator.pushReplacement(
@@ -767,10 +780,18 @@ class AuthProvider with ChangeNotifier {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: CircularProgressIndicator(
+        color: AppColors.bluePrimaryColor,
+      )),
     );
 
-    final refreshToken = await _storage.read(key: 'refreshToken');
+    // Get the appropriate refresh token
+    String? refreshToken;
+    if (rememberMe) {
+      refreshToken = await _storage.read(key: 'refreshToken');
+    } else {
+      refreshToken = await _storage.read(key: 'sessionRefreshToken');
+    }
 
     if (refreshToken != null) {
       try {
@@ -789,6 +810,9 @@ class AuthProvider with ChangeNotifier {
     // Clear all data
     await _clearTokens();
 
+    // Reset remember me to false
+    rememberMe = false;
+
     // Dismiss loader
     if (context.mounted) {
       Navigator.of(context).pop();
@@ -799,7 +823,6 @@ class AuthProvider with ChangeNotifier {
     isLoggingOut = false;
     notifyListeners();
   }
-
 // Add these properties for better token management
   bool _isRefreshingToken = false;
   List<Completer<String?>> _refreshCompleters = [];
@@ -876,18 +899,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Get valid token with automatic refresh
-  Future<String?> _getValidToken() async {
-    String? token = await _storage.read(key: 'accessToken');
 
-    if (token == null) {
-      debugPrint('No access token found');
-      return null;
-    }
-
-    // Check if token is about to expire (optional: decode JWT to check expiry)
-    // For now, we'll try to use it and refresh if needed
-    return token;
-  }
 
   //to update user data
 
@@ -937,6 +949,7 @@ class AuthProvider with ChangeNotifier {
 // to handle get profile request
 
 // Enhanced token refresh with race condition handling
+ // Update the refreshAccessToken method
   Future<String?> refreshAccessToken() async {
     // Prevent multiple simultaneous refresh attempts
     if (_isRefreshingToken) {
@@ -949,7 +962,13 @@ class AuthProvider with ChangeNotifier {
     _isRefreshingToken = true;
 
     try {
-      final refreshToken = await _storage.read(key: 'refreshToken');
+      String? refreshToken;
+
+      if (rememberMe) {
+        refreshToken = await _storage.read(key: 'refreshToken');
+      } else {
+        refreshToken = await _storage.read(key: 'sessionRefreshToken');
+      }
 
       if (refreshToken == null) {
         debugPrint('No refresh token found');
@@ -970,12 +989,16 @@ class AuthProvider with ChangeNotifier {
         final newAccessToken = data['access'];
 
         if (newAccessToken != null) {
-          await _storage.write(key: 'accessToken', value: newAccessToken);
+          // Save new token based on remember me setting
+          if (rememberMe) {
+            await _storage.write(key: 'accessToken', value: newAccessToken);
+          } else {
+            await _storage.write(
+                key: 'sessionAccessToken', value: newAccessToken);
+          }
+
           debugPrint('Access token refreshed successfully');
-
-          // Set up timer for proactive refresh (optional)
           _scheduleTokenRefresh();
-
           _completeRefreshCompleters(newAccessToken);
           return newAccessToken;
         }
@@ -1008,7 +1031,6 @@ class AuthProvider with ChangeNotifier {
     _completeRefreshCompleters(null);
     return null;
   }
-
   // Force refresh token (when we know current token is invalid)
   Future<String?> _forceRefreshToken() async {
     debugPrint('Force refreshing token...');
@@ -1058,12 +1080,16 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Clear all tokens
-  Future<void> _clearTokens() async {
-    await _storage.delete(key: 'accessToken');
-    await _storage.delete(key: 'refreshToken');
-    _userProfile = null;
-    notifyListeners();
-  }
+  
+Future<void> _clearTokens() async {
+  await _storage.delete(key: 'accessToken');
+  await _storage.delete(key: 'refreshToken');
+  await _storage.delete(key: 'sessionAccessToken');
+  await _storage.delete(key: 'sessionRefreshToken');
+  await _storage.delete(key: 'rememberMe');
+  _userProfile = null;
+  notifyListeners();
+}
 
   // Optional: Schedule proactive token refresh
   void _scheduleTokenRefresh() {
@@ -1075,17 +1101,32 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Check if user is authenticated
+ // Update the isAuthenticated method
   Future<bool> isAuthenticated() async {
-    final accessToken = await _storage.read(key: 'accessToken');
-    final refreshToken = await _storage.read(key: 'refreshToken');
+    String? accessToken;
+    String? refreshToken;
+
+    final rememberMeValue = await _storage.read(key: 'rememberMe');
+    final isRemembered = rememberMeValue == 'true';
+
+    if (isRemembered) {
+      accessToken = await _storage.read(key: 'accessToken');
+      refreshToken = await _storage.read(key: 'refreshToken');
+    } else {
+      accessToken = await _storage.read(key: 'sessionAccessToken');
+      refreshToken = await _storage.read(key: 'sessionRefreshToken');
+    }
 
     if (accessToken == null || refreshToken == null) {
       return false;
     }
 
-    // Optionally validate token by making a lightweight API call
+    // Update rememberMe state
+    rememberMe = isRemembered;
+
     return true;
   }
+
 
 //change password
   Future<bool> changePassword({
@@ -1235,5 +1276,50 @@ class AuthProvider with ChangeNotifier {
       throw Exception(
           jsonDecode(response.body)['detail'] ?? 'Failed to reset password');
     }
+  }
+  // Add method to load remember me state
+  Future<void> _loadRememberMeState() async {
+    final rememberMeValue = await _storage.read(key: 'rememberMe');
+    rememberMe = rememberMeValue == 'true';
+    notifyListeners();
+  }
+
+// Update the _getValidToken method to check remember me setting
+  Future<String?> _getValidToken() async {
+    String? token;
+
+    if (rememberMe) {
+      // Get permanent token
+      token = await _storage.read(key: 'accessToken');
+    } else {
+      // Get session token
+      token = await _storage.read(key: 'sessionAccessToken');
+    }
+
+    if (token == null) {
+      debugPrint('No access token found');
+      return null;
+    }
+
+    return token;
+  }
+  Future<bool> checkAutoLogin() async {
+    final rememberMeValue = await _storage.read(key: 'rememberMe');
+    if (rememberMeValue != 'true') {
+      // If remember me is not checked, clear any existing tokens
+      await _clearTokens();
+      return false;
+    }
+
+    // If remember me is checked, check if tokens exist
+    final accessToken = await _storage.read(key: 'accessToken');
+    final refreshToken = await _storage.read(key: 'refreshToken');
+
+    if (accessToken != null && refreshToken != null) {
+      rememberMe = true;
+      return true;
+    }
+
+    return false;
   }
 }

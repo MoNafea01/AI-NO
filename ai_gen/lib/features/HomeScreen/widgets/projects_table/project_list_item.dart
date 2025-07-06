@@ -1,3 +1,4 @@
+
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
@@ -86,6 +87,7 @@ class ProjectListItem extends StatelessWidget {
             child: highlightSearchText(
               project.description ?? TranslationKeys.noDescriptionTitle.tr,
               context.read<HomeCubit>().currentSearchQuery,
+              
               const TextStyle(
                 fontSize: 14,
                 color: Color(0xFF374151),
@@ -102,17 +104,21 @@ class ProjectListItem extends StatelessWidget {
             flex: 2,
             child: buildModelCell(project.model),
           ),
-          // Created At column
+          // Created At column - Moved to the left
           Expanded(
-            flex: 2,
-            child: Text(
-              _formatDateTime(project.createdAt),
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF6B7280),
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 8), // Reduced padding to move left
+              child: Text(
+                _formatDateTime(project.createdAt),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF6B7280),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

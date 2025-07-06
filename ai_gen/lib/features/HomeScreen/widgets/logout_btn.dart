@@ -15,42 +15,48 @@ Widget logoutButton(BuildContext context, bool isExpanded) {
     onTap:
         authProvider.isLoggingOut ? null : () => authProvider.logout(context),
     child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-      child: Row(
-        children: [
-          Image.asset(
-            AssetsPaths.logOutIcon,
-            width: 80,
-            height: 80,
-            color: authProvider.isLoggingOut
-                ? Colors.grey
-                : const Color(0xffFF3333),
-          ),
-
-//logOutIcon
-          // SvgPicture.asset(
-          //   AssetsPaths.projectLogoIcon,
-          //   width: 20,
-          //   height: 20,
-          //   color: authProvider.isLoggingOut ? Colors.grey : Colors.red,
-          // ),
-
-          if (isExpanded) const SizedBox(width: 2),
-          if (isExpanded)
-            Text(
-              authProvider.isLoggingOut
-                  ? 'Logging out...'
-                  : TranslationKeys.logOut.tr,
-              style: TextStyle(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      child: isExpanded
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Image.asset(
+                  AssetsPaths.logOutIcon,
+                  width: 40,
+                  height: 40,
                   color: authProvider.isLoggingOut
                       ? Colors.grey
                       : const Color(0xffFF3333),
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18,
-                  fontFamily: AppConstants.appFontName),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    authProvider.isLoggingOut
+                        ? 'Logging out...'
+                        : TranslationKeys.logOut.tr,
+                    style: TextStyle(
+                        color: authProvider.isLoggingOut
+                            ? Colors.grey
+                            : const Color(0xffFF3333),
+                        fontWeight: FontWeight.w400,
+                        fontSize: 18,
+                        fontFamily: AppConstants.appFontName),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ],
+            )
+          : Center(
+              child: Image.asset(
+                AssetsPaths.logOutIcon,
+                width: 90,
+                height: 90,
+                color: authProvider.isLoggingOut
+                    ? Colors.grey
+                    : const Color(0xffFF3333),
+              ),
             ),
-        ],
-      ),
     ),
   );
 }

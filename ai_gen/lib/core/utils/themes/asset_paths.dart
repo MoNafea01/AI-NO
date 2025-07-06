@@ -56,4 +56,9 @@ abstract class AssetsPaths {
   
   static const String chatBotIcon = "${baseAssetPath}chat_bot.svg";
   static const String chatBotActiveIcon = "${baseAssetPath}chat_bot_active.svg";
+
+
+
+ 
+
 }

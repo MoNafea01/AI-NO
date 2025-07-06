@@ -1,26 +1,66 @@
 // ignore_for_file: avoid_print
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
-import 'package:ai_gen/core/utils/themes/asset_paths.dart';
+
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/custom_text_field.dart';
-import 'package:ai_gen/features/auth/presentation/widgets/social_sign_in_button.dart';
+import 'package:ai_gen/features/auth/presentation/widgets/auth_layout.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/user_testimonal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _slideAnimationController;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize slide animation for left side
+    _slideAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1), // Start from bottom
+      end: Offset.zero, // End at original position
+    ).animate(CurvedAnimation(
+      parent: _slideAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    // Start animation after a short delay
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _slideAnimationController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _slideAnimationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return  AuthLayout(
+    return AuthLayout(
       title: TranslationKeys.joinModelCraftToday.tr,
       subtitle: TranslationKeys.createAccountAndStartBringing.tr,
       form: const SignupForm(),
       testimonial: const UserTestimonial(),
+      slideAnimation: _slideAnimation,
     );
   }
 }
@@ -217,29 +257,6 @@ class SignupForm extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
-
-          // Social Sign In
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SocialSignInButton(
-                label: AssetsPaths.googleLogo,
-              ),
-              SizedBox(width: 8),
-              SocialSignInButton(
-                label: AssetsPaths.appleLogo,
-              ),
-              SizedBox(width: 8),
-              SocialSignInButton(
-                label: AssetsPaths.facebookLogo,
-              ),
-              SizedBox(width: 8),
-              SocialSignInButton(
-                label: AssetsPaths.githubLogo,
-              ),
-            ],
-          ),
           const SizedBox(height: 24),
 
           // Sign In Link

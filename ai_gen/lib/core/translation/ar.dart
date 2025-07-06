@@ -213,6 +213,7 @@ Map<String, String> ar = {
   TranslationKeys.trySearchingWithDifferentKeywords:
       'حاول بحث مختلف بالكلمات الدلالية.',
   TranslationKeys.showAllProjects: 'اظهار جميع المشاريع',
+  TranslationKeys.and: 'و',
   TranslationKeys.newPasswordAndConfirmationMustMatch:
       "كلمه السر وتاكيد كلمه السر يجب ان تتطابق",
   TranslationKeys.passwordChangedSuccessfully: "تم تغيير كلمه السر بنجاح",
