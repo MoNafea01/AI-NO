@@ -69,7 +69,7 @@ class LoginScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome Back to\nModel Craft!',
+                  'Welcome Back to\nA I N O',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 32,
