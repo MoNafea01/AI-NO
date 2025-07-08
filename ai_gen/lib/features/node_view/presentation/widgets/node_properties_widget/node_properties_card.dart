@@ -32,7 +32,7 @@ class NodePropertiesCard extends StatelessWidget {
                     child: IntrinsicWidth(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        spacing: 38,
+                        spacing: 24,
                         children: [
                           if (node.params.isNotEmpty)
                             PropertiesSection(
@@ -52,7 +52,7 @@ class NodePropertiesCard extends StatelessWidget {
                                 node.outputDots ?? [],
                               ),
                             ),
-                          if (node.payload != null)
+                          if (node.userOutput != null)
                             PropertiesSection(
                               title: 'Payload',
                               children: _buildPayloadWidget(node),
@@ -78,7 +78,7 @@ class NodePropertiesCard extends StatelessWidget {
   List<Widget> _buildPayloadWidget(NodeModel node) {
     return [
       Text(
-        "${node.payload}",
+        "${node.userOutput}",
         style: AppTextStyles.black16w400,
       )
     ];

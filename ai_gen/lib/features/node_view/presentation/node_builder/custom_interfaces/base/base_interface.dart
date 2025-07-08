@@ -45,7 +45,13 @@ abstract class BaseOutputData extends VSOutputData {
       final Map<String, dynamic> apiBody = buildApiBody(data);
       final nodeServices = GetIt.I.get<INodeServices>();
       final response = await nodeServices.runNode(node, apiBody);
-      node.payload = response['node_data'];
+
+      if (response['node_data'] is String) {
+        node.userOutput = response['message'];
+      } else {
+        node.userOutput = response['node_data'];
+      }
+
       return response;
     } catch (e) {
       // Log error and rethrow for proper error handling

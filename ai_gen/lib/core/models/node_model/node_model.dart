@@ -20,7 +20,7 @@ class NodeModel {
   List<String>? outputDots;
   String? endPoint;
   Offset? offset;
-  dynamic payload;
+  dynamic userOutput;
 
   NodeModel(
       {required this.id,
@@ -39,7 +39,7 @@ class NodeModel {
       this.projectId,
       this.nodeId,
       this.offset,
-      this.payload});
+      this.userOutput});
 
   NodeModel copyWith({
     required int projectId,
