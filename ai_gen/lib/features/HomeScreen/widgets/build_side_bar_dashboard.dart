@@ -11,6 +11,7 @@ import 'package:ai_gen/features/HomeScreen/widgets/logout_btn.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 Widget buildSidebar(BuildContext context, DashboardState state) {
@@ -36,10 +37,10 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.center,
             children: [
-              Image.asset(
+              SvgPicture.asset(
                 AssetsPaths.projectLogoIcon,
-                width: 50,
-                height: 50,
+                width: 24,
+                height: 24,
               ),
               if (state.isExpanded) const SizedBox(width: 8),
               if (state.isExpanded)
