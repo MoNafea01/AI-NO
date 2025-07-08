@@ -20,25 +20,26 @@ class NodeModel {
   List<String>? outputDots;
   String? endPoint;
   Offset? offset;
+  dynamic payload;
 
-  NodeModel({
-    required this.id,
-    this.index,
-    this.order,
-    this.name = "Node",
-    this.displayName,
-    this.description,
-    this.category = "others",
-    this.type = "others",
-    this.task = "others",
-    this.params = const [],
-    this.inputDots,
-    this.outputDots,
-    this.endPoint,
-    this.projectId,
-    this.nodeId,
-    this.offset,
-  });
+  NodeModel(
+      {required this.id,
+      this.index,
+      this.order,
+      this.name = "Node",
+      this.displayName,
+      this.description,
+      this.category = "others",
+      this.type = "others",
+      this.task = "others",
+      this.params = const [],
+      this.inputDots,
+      this.outputDots,
+      this.endPoint,
+      this.projectId,
+      this.nodeId,
+      this.offset,
+      this.payload});
 
   NodeModel copyWith({
     required int projectId,
