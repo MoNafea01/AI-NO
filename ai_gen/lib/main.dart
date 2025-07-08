@@ -22,12 +22,14 @@ import 'core/utils/helper/my_windows_manager.dart';
 import 'features/auth/presentation/splashScreen/splash_screen.dart';
 
 void main(List<String> args) async {
-  // to check if the project is opened from an a project file with .ainoprj extension
-  ProjectModel? initialProject = await checkArgs(args);
-  await CacheHelper.init();
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
   initializeGetIt();
+
+  // to check if the project is opened from an a project file with .ainoprj extension
+  await CacheHelper.init();
+  ProjectModel? initialProject = await checkArgs(args);
+
   await initializeWindowsManager();
   await TranslationHelper.setLanguage();
 
