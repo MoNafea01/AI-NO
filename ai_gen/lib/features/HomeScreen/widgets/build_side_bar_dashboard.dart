@@ -11,6 +11,7 @@ import 'package:ai_gen/features/HomeScreen/widgets/logout_btn.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 Widget buildSidebar(BuildContext context, DashboardState state) {
@@ -30,53 +31,47 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
     child: Column(
       children: [
         Padding(
-          padding: EdgeInsets.all(state.isExpanded ? 16.0 : 8.0),
-          child: state.isExpanded
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Image.asset(
-                      AssetsPaths.projectLogoIcon,
-                      width: 50,
-                      height: 50,
-                    ),
-                    const SizedBox(width: 1),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: SizeTransition(
-                              sizeFactor: animation,
-                              axis: Axis.horizontal,
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          AppConstants.appName,
-                          key: ValueKey('expanded'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: state.isExpanded
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                AssetsPaths.projectLogoIcon,
+                width: 24,
+                height: 24,
+              ),
+              if (state.isExpanded) const SizedBox(width: 8),
+              if (state.isExpanded)
+                Flexible(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SizeTransition(
+                          sizeFactor: animation,
+                          axis: Axis.horizontal,
+                          child: child,
                         ),
+                      );
+                    },
+                    child: const Text(
+                      AppConstants.appName,
+                      key: ValueKey('expanded'),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                )
-              : Center(
-                  child: Image.asset(
-                    AssetsPaths.projectLogoIcon,
-                    width: 50,
-                    height: 50,
                   ),
                 ),
+            ],
+          ),
         ),
         const SizedBox(height: 10),
         Expanded(

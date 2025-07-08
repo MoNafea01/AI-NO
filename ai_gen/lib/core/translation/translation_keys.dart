@@ -22,6 +22,7 @@ abstract class TranslationKeys {
   static const String search = 'Search';
   static const String searchAnyProduct = 'Search any Product..';
   static const String Items = 'Items';
+  static const String projectDescription = 'project Description';
 
   static const String userFullName = 'User full Name';
   static const String myProfile = 'My Profile';

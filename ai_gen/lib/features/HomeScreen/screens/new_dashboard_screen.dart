@@ -1,4 +1,6 @@
-// ignore_for_file: deprecated_member_use
+
+
+import 'dart:developer';
 
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/dashboard_cubit/dash_board_cubit.dart';
@@ -9,7 +11,6 @@ import 'package:ai_gen/features/HomeScreen/screens/profile_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_side_bar_dashboard.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/dashboard_screens/learnScreen/learn_screen.dart';
-
 import 'package:ai_gen/features/dashboard_screens/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
@@ -17,7 +18,6 @@ import 'package:flutter_bloc/flutter_bloc.dart'
 
 import '../../dashboard_screens/datasetScreen/screens/dataset_screen.dart';
 import '../../dashboard_screens/docsScreen/docs_screen.dart';
-
 import '../../dashboard_screens/modelScreen/screens/model_screen.dart';
 import '../data/enum_app_screens.dart';
 
@@ -28,7 +28,7 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("DashboardScreen");
+    log("DashboardScreen");
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -58,13 +58,11 @@ class _DashboardView extends StatelessWidget {
     switch (screen) {
       case AppScreen.explore:
         return HomeScreen(projectModel: projectModel);
-
       case AppScreen.models:
         return const ModelsScreen();
       case AppScreen.datasets:
         return const DatasetsScreen();
       case AppScreen.learn:
-        
         return const PlaylistScreen();
       case AppScreen.docs:
         return const DocsScreen();
@@ -78,22 +76,134 @@ class _DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<DashboardCubit, DashboardState>(
-        builder: (context, state) {
-          return Row(
-            children: [
-              // Left Sidebar
-              buildSidebar(context, state),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+         
+          final isVerySmallScreen = constraints.maxWidth < 600;
+          final isSmallScreen = constraints.maxWidth < 900;
 
-              // Main Content
-              Expanded(
-                child: _getScreenWidget(state
-                    .selectedScreen), // Dynamically display the selected screen
-              ),
-            ],
+          return BlocBuilder<DashboardCubit, DashboardState>(
+            builder: (context, state) {
+              if (isVerySmallScreen) {
+              
+                return _buildMobileLayout(context, state);
+              } else {
+             
+                return _buildDesktopLayout(context, state, isSmallScreen);
+              }
+            },
           );
         },
       ),
     );
   }
+
+  Widget _buildDesktopLayout(
+      BuildContext context, DashboardState state, bool isSmallScreen) {
+    return Row(
+      children: [
+       
+        buildSidebar(context, state),
+
+        // Main Content
+        Expanded(
+          child: Container(
+            
+            constraints: const BoxConstraints(
+              minWidth: 200,
+            ),
+            child: ClipRect(
+              child: _getScreenWidget(state.selectedScreen),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context, DashboardState state) {
+    return Column(
+      children: [
+     
+        Container(
+          height: 60,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Menu Button
+              IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                
+                  Scaffold.of(context).openDrawer();
+                },
+              ),
+
+              // Title
+              Expanded(
+                child: Text(
+                  _getScreenTitle(state.selectedScreen),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Main Content
+        Expanded(
+          child: _getScreenWidget(state.selectedScreen),
+        ),
+      ],
+    );
+  }
+
+  String _getScreenTitle(AppScreen screen) {
+    switch (screen) {
+      case AppScreen.explore:
+        return 'Projects';
+      case AppScreen.models:
+        return 'Models';
+      case AppScreen.datasets:
+        return 'Datasets';
+      case AppScreen.learn:
+        return 'Learn';
+      case AppScreen.docs:
+        return 'Docs';
+      case AppScreen.settings:
+        return 'Settings';
+      case AppScreen.profile:
+        return 'Profile';
+    }
+  }
+}
+
+
+Widget buildResponsiveSidebar(BuildContext context, DashboardState state) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final parentConstraints = MediaQuery.of(context).size;
+      final isSmallScreen = parentConstraints.width < 800;
+
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: isSmallScreen
+            ? 60
+            : 250, 
+        child: buildSidebar(context, state),
+      );
+    },
+  );
 }

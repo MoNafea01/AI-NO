@@ -14,8 +14,8 @@ Widget buildProjectCard(ProjectModel project, BuildContext context) {
     elevation: 2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
-      side: BorderSide(
-        color: const Color(0xff999999),
+      side: const BorderSide(
+        color: Color(0xff999999),
         width: 1,
       ),
     ),

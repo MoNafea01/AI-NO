@@ -14,79 +14,188 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 
 Widget buildHeader(BuildContext context) {
-  return Row(
-    // mainAxisAlignment: MainAxisAlignment.spaceAround,
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(top: 68),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final isSmallScreen = constraints.maxWidth < 900;
+      final isVerySmallScreen = constraints.maxWidth < 600;
+
+      return SizedBox(
+        width: double.infinity,
+        child: Flex(
+          direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
+          mainAxisAlignment: isSmallScreen
+              ? MainAxisAlignment.start
+              : MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: isSmallScreen
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
-            Text(
-              TranslationKeys.projects.tr,
-              style: const TextStyle(
-                fontFamily: AppConstants.appFontName,
-                fontSize: 48,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
+            
+            Flexible(
+              flex: isSmallScreen ? 0 : 1,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: isSmallScreen ? 20 : 68,
+                  bottom: isSmallScreen ? 20 : 0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        TranslationKeys.projects.tr,
+                        style: TextStyle(
+                          fontFamily: AppConstants.appFontName,
+                          fontSize: isVerySmallScreen
+                              ? 32
+                              : (isSmallScreen ? 36 : 48),
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        TranslationKeys.viewAllProjects.tr,
+                        style: TextStyle(
+                          fontFamily: AppConstants.appFontName,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xff666666),
+                          fontSize: isVerySmallScreen ? 12 : 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Text(
-              TranslationKeys.viewAllProjects.tr,
-              style: const TextStyle(
-                fontFamily: AppConstants.appFontName,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff666666),
-                fontSize: 16,
+
+            if (!isSmallScreen) const SizedBox(),
+
+            Flexible(
+              flex: isSmallScreen ? 0 : 1,
+              child: _BuildActionButtons(
+                isSmallScreen: isSmallScreen,
+                isVerySmallScreen: isVerySmallScreen,
               ),
             ),
           ],
         ),
-      ),
-      const Spacer(),
-      CustomIconTextButton(
+      );
+    },
+  );
+}
+
+class _BuildActionButtons extends StatelessWidget {
+  final bool isSmallScreen;
+  final bool isVerySmallScreen;
+
+  const _BuildActionButtons({
+    required this.isSmallScreen,
+    required this.isVerySmallScreen,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final buttons = [
+      _buildButton(
+        context: context,
         text: TranslationKeys.import.tr,
-        // icon: Icons.download,
         backgroundColor: const Color(0xfff2f2f2),
         textColor: AppColors.bluePrimaryColor,
-        //  iconColor: AppColors.bluePrimaryColor,
+        assetName: AssetsPaths.importIcon,
+        iconColor: AppColors.bluePrimaryColor,
         onTap: () {
           Helper.showDialogHelper(
             context,
             ImportProjectDialog(cubit: context.read<HomeCubit>()),
           );
         },
-        assetName: AssetsPaths.importIcon,
-        //
-
-        iconColor: AppColors.bluePrimaryColor,
       ),
-      CustomIconTextButton(
-        assetName: AssetsPaths.exportIcon,
-        //exportIcon
-
+      _buildButton(
+        context: context,
         text: TranslationKeys.export.tr,
-        //   icon: Icons.upload,
         backgroundColor: const Color(0xfff2f2f2),
         textColor: AppColors.bluePrimaryColor,
-        //   iconColor: AppColors.bluePrimaryColor,
+        assetName: AssetsPaths.exportIcon,
+        iconColor: AppColors.bluePrimaryColor,
         onTap: () {
           Helper.showDialogHelper(context, const ExportProjectDialog());
         },
-        iconColor: AppColors.bluePrimaryColor,
       ),
-      CustomIconTextButton(
+      _buildButton(
+        context: context,
         text: TranslationKeys.newProject.tr,
-        // icon: Icons.add,
         backgroundColor: AppColors.bluePrimaryColor,
         textColor: Colors.white,
-        //  iconColor: Colors.white,
+        assetName: AssetsPaths.addIcon,
+        iconColor: Colors.white,
         onTap: () {
           Helper.showDialogHelper(context, const CreateNewProjectDialog());
         },
-        assetName: AssetsPaths.addIcon,
-        iconColor: Colors.white,
       ),
-    ],
-  );
+    ];
+
+    if (isSmallScreen) {
+      
+      return isVerySmallScreen
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: buttons
+                  .map((button) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: button,
+                      ))
+                  .toList(),
+            )
+          : Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: buttons,
+            );
+    } else {
+      
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: buttons
+            .map((button) => Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: button,
+                ))
+            .toList(),
+      );
+    }
+  }
+
+  Widget _buildButton({
+    required BuildContext context,
+    required String text,
+    required Color backgroundColor,
+    required Color textColor,
+    required String assetName,
+    required Color iconColor,
+    required VoidCallback onTap,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: isVerySmallScreen ? 0 : 60,
+            maxWidth: isVerySmallScreen ? double.infinity : 140,
+          ),
+          child: CustomIconTextButton(
+            text: text,
+            backgroundColor: backgroundColor,
+            textColor: textColor,
+            assetName: assetName,
+            iconColor: iconColor,
+            onTap: onTap,
+          ),
+        );
+      },
+    );
+  }
 }

@@ -1,3 +1,4 @@
+
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,7 +36,7 @@ class ProjectsTableHeader extends StatelessWidget {
             child: Row(
               children: [
                 // Select All / Deselect All Button
-                Tooltip(
+                WhatsAppBubbleTooltip(
                   message: selectedProjectIds.isEmpty
                       ? TranslationKeys.selectAllProjects.tr
                       : TranslationKeys.deselectAllProjects.tr,
@@ -69,7 +70,7 @@ class ProjectsTableHeader extends StatelessWidget {
 
                 // Delete Selected Button
                 if (selectedProjectIds.isNotEmpty) ...[
-                  Tooltip(
+                  WhatsAppBubbleTooltip(
                     message:
                         "${TranslationKeys.deleteSelectedProjects.tr}(${selectedProjectIds.length})",
                     child: InkWell(
@@ -108,7 +109,7 @@ class ProjectsTableHeader extends StatelessWidget {
                 ],
 
                 // Delete Empty Projects Button
-                Tooltip(
+                WhatsAppBubbleTooltip(
                   message: TranslationKeys.deleteAllEmptyProjects.tr,
                   child: InkWell(
                     onTap: showDeleteEmptyProjectsDialog,
@@ -147,11 +148,11 @@ class ProjectsTableHeader extends StatelessWidget {
               ],
             ),
           ),
+          // ... rest of your code remains the same
           Expanded(
             flex: 2,
             child: Text(
               TranslationKeys.description.tr,
-              //  textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: AppConstants.appFontName,
                 fontSize: 14.2,
@@ -202,4 +203,130 @@ class ProjectsTableHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+
+class WhatsAppBubbleTooltip extends StatefulWidget {
+  final String message;
+  final Widget child;
+
+  const WhatsAppBubbleTooltip({
+    required this.message,
+    required this.child,
+    super.key,
+  });
+
+  @override
+  _WhatsAppBubbleTooltipState createState() => _WhatsAppBubbleTooltipState();
+}
+
+class _WhatsAppBubbleTooltipState extends State<WhatsAppBubbleTooltip> {
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    super.dispose();
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  void _showOverlay() {
+    _removeOverlay();
+
+    final renderBox = context.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: offset.dx -
+            8, // Adjust this value to align the triangle with the icon
+        top: offset.dy + size.height,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: Offset(
+              8, size.height), // Adjust this offset to fine-tune positioning
+          child: Material(
+            color: Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // The right-angled triangle pointer
+                CustomPaint(
+                  painter: _TrianglePainter(),
+                  child: const SizedBox(width: 16, height: 8),
+                ),
+                // The bubble
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1F2937),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    widget.message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: MouseRegion(
+        onEnter: (_) => _showOverlay(),
+        onExit: (_) => _removeOverlay(),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+class _TrianglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF1F2937)
+      ..style = PaintingStyle.fill;
+
+    // Compact right-angled triangle (like WhatsApp)
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width * 0.7, 0)
+      ..lineTo(0, size.height)
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -1,5 +1,6 @@
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 
 import 'package:ai_gen/features/dashboard_screens/datasetScreen/cubit/dataset_screen.dart';
@@ -42,6 +43,8 @@ class _DatasetsViewState extends State<DatasetsView> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xffF2F2F2),
       body: Padding(
@@ -69,7 +72,7 @@ class _DatasetsViewState extends State<DatasetsView> {
                         Text(
                           TranslationKeys.datasetsDescription.tr,
                           style: const TextStyle(
-                               fontFamily: AppConstants.appFontName,
+                            fontFamily: AppConstants.appFontName,
                             fontWeight: FontWeight.w500,
                             color: Color(0xff666666),
                             fontSize: 16,
@@ -209,7 +212,10 @@ class _DatasetsViewState extends State<DatasetsView> {
               child: BlocBuilder<DatasetsCubit, DatasetsState>(
                 builder: (context, state) {
                   if (state is DatasetsLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: CircularProgressIndicator(
+                      color: AppColors.bluePrimaryColor,
+                    ));
                   } else if (state is DatasetsFailure) {
                     return Center(
                       child: Column(
@@ -266,10 +272,12 @@ class _DatasetsViewState extends State<DatasetsView> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 4 / 1.8,
+                          childAspectRatio:
+                              width > 1500 // Threshold for expanded window
+                                  ? 4 / 1.65 // Expanded window ratio
+                                  : width * .16 / height * 4.6,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),

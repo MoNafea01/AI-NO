@@ -70,7 +70,7 @@ class ChatController extends ChangeNotifier {
         _messages.add(ChatMessage(sender: 'bot', text: output.toString()));
       }
     } catch (e) {
-      _messages.add(ChatMessage(sender: 'bot', text: 'Error: ${e.toString()}'));
+      _messages.add(ChatMessage(sender: 'bot', text: 'Error: No Response'));
     }
     _isLoading = false;
     notifyListeners();

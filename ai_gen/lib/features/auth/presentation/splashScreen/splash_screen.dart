@@ -1,11 +1,9 @@
-
-
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:developer';
 
-import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/data/network/server_manager/server_manager.dart';
+import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
@@ -14,7 +12,7 @@ import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.da
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -131,9 +129,8 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
- 
   Future<void> _checkAuthentication() async {
-    if (_isNavigating) return; 
+    if (_isNavigating) return;
 
     _isNavigating = true;
 
@@ -149,10 +146,9 @@ class _SplashScreenState extends State<SplashScreen>
       final accessToken = await secureStorage.read(key: 'accessToken');
       final refreshToken = await secureStorage.read(key: 'refreshToken');
 
-      if (!mounted) return; 
+      if (!mounted) return;
 
       if (accessToken != null && refreshToken != null) {
-        
         log("Navigating to DashboardScreen (already logged in)");
 
         Navigator.pushReplacement(
@@ -164,7 +160,6 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         );
       } else if (isFirstTime) {
-      
         await prefs.setBool('isFirstTime', false);
         log("Navigating to SignUpScreen (first time)");
 
@@ -173,7 +168,6 @@ class _SplashScreenState extends State<SplashScreen>
           MaterialPageRoute(builder: (context) => const SignupScreen()),
         );
       } else {
-       
         log("Navigating to SignInScreen (returning user)");
 
         Navigator.pushReplacement(
@@ -187,7 +181,7 @@ class _SplashScreenState extends State<SplashScreen>
         setState(() {
           _status = "Authentication error: ${e.toString()}";
           _showRetryButton = true;
-          _isNavigating = false; 
+          _isNavigating = false;
         });
       }
     }
@@ -210,14 +204,11 @@ class _SplashScreenState extends State<SplashScreen>
           children: [
             AnimatedBuilder(
               animation: _animation,
-              child: 
-              Image.asset(
+              child: SvgPicture.asset(
                 AssetsPaths.projectLogoIcon,
-               
+                width: 150,
+                height: 150,
               ),
-              
-
-
               builder: (context, child) {
                 return Transform.rotate(
                   angle: _animation.value,
@@ -247,7 +238,7 @@ class _SplashScreenState extends State<SplashScreen>
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  _isNavigating = false; 
+                  _isNavigating = false;
                   _startServer();
                 },
                 style: ElevatedButton.styleFrom(

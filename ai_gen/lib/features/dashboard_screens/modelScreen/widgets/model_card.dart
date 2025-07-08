@@ -1,6 +1,8 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/dashboard_screens/modelScreen/widgets/show_project_dialog.dart';
 import 'package:flutter/material.dart';
@@ -36,28 +38,36 @@ class ModelCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Model Name
-                Text(
-                  modelName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: AppConstants.appFontName,
-                    color: Color(0xff666666),
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Image.asset(
+                      AssetsPaths.modelIcon,
+                      color: AppColors.bluePrimaryColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      modelName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: AppConstants.appFontName,
+                        color: Color(0xff666666),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
 
-                
                 Text(
                   userProfile?.username ?? TranslationKeys.guest.tr,
                   maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xff666666),
-                    fontFamily: AppConstants.appFontName
-                  ),
+                      fontSize: 12,
+                      color: Color(0xff666666),
+                      fontFamily: AppConstants.appFontName),
                 ),
                 const SizedBox(height: 8),
 
@@ -65,10 +75,9 @@ class ModelCard extends StatelessWidget {
                 Text(
                   '${projects.length} ${TranslationKeys.variation.tr} ${projects.length} Projects',
                   style: const TextStyle(
-                    fontSize: 12,
-                     color: Color(0xff666666),
-                      fontFamily: AppConstants.appFontName
-                  ),
+                      fontSize: 12,
+                      color: Color(0xff666666),
+                      fontFamily: AppConstants.appFontName),
                 ),
                 const SizedBox(height: 8),
 
@@ -76,10 +85,9 @@ class ModelCard extends StatelessWidget {
                 Text(
                   "${TranslationKeys.modelDescriptionPrefix.tr}${projects.isNotEmpty && projects.first.description != null ? projects.first.description! : TranslationKeys.defaultModelDescription.tr}",
                   style: const TextStyle(
-                    fontSize: 12,
+                      fontSize: 12,
                       color: Color(0xff666666),
-                      fontFamily: AppConstants.appFontName
-                  ),
+                      fontFamily: AppConstants.appFontName),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -135,13 +143,13 @@ class ModelCard extends StatelessWidget {
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
-                        color: Colors.purple[100],
+                        color: AppColors.grey100,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.person,
                         size: 19,
-                        color: Colors.purple[600],
+                        color: AppColors.bluePrimaryColor,
                       ),
                     ),
                     const SizedBox(width: 8),

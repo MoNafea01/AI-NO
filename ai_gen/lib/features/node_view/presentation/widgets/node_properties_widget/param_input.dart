@@ -129,23 +129,17 @@ class _ParamInputState extends State<ParamInput>
           onTapCancel: () => _controller.reverse(),
           child: Padding(
             padding: const EdgeInsets.all(4.0),
-            
+
             //refreshIcon
-            child:Image.asset(AssetsPaths.dataSetsIcon)
-            
-            
-            //  SvgPicture.asset(
-            //   AssetsPaths.refreshIcon,
-            //   width: 16,
-            //   height: 16,
-            //   colorFilter: ColorFilter.mode(
-            //     hasValue ? Colors.black : Colors.grey[700]!,
-            //     BlendMode.srcIn,
-            //   ),
-            // ),
-
-
-
+            child: SvgPicture.asset(
+              AssetsPaths.refreshIcon,
+              width: 16,
+              height: 16,
+              colorFilter: ColorFilter.mode(
+                hasValue ? Colors.black : Colors.grey[700]!,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
         ),
       ),

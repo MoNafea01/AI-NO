@@ -22,6 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late final ChatController _controller;
   final TextEditingController _textController = TextEditingController();
 
+  bool _showRecommendedChats = true;
   @override
   void initState() {
     super.initState();
@@ -67,14 +68,15 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: ChatMessageList(messages: controller.messages),
                 ),
                 // Workflow buttons
-                ChatWorkflowButtons(
-                  chatController: _controller,
-                  recommendedMessages: const [
-                    "Create workflow",
-                    "Edit the workflow",
-                    "Explain me this workflow",
-                  ],
-                ),
+                if (_showRecommendedChats == true)
+                  ChatWorkflowButtons(
+                    chatController: _controller,
+                    recommendedMessages: const [
+                      "Hi",
+                      "Explain this workflow",
+                      "Make a new node of standard scaler",
+                    ],
+                  ),
                 // Input field
                 ChatInputField(
                   textController: _textController,
@@ -90,6 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _sendMessage() {
+    _showRecommendedChats = false;
     final text = _textController.text.trim();
     if (text.isNotEmpty && !_controller.isLoading) {
       _controller.sendMessage(text);

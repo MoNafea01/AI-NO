@@ -1,6 +1,6 @@
-
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
+import 'package:ai_gen/features/HomeScreen/widgets/projects_table/projects_table_header.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 
 import 'package:flutter/material.dart';
@@ -44,7 +44,7 @@ class ProjectListItem extends StatelessWidget {
             flex: 3,
             child: Row(
               children: [
-                Tooltip(
+                WhatsAppBubbleTooltip(
                   message: isSelected
                       ? TranslationKeys.undoSelectionTitle.tr
                       : TranslationKeys.doYouWantToDelete.tr,
@@ -87,7 +87,6 @@ class ProjectListItem extends StatelessWidget {
             child: highlightSearchText(
               project.description ?? TranslationKeys.noDescriptionTitle.tr,
               context.read<HomeCubit>().currentSearchQuery,
-              
               const TextStyle(
                 fontSize: 14,
                 color: Color(0xFF374151),

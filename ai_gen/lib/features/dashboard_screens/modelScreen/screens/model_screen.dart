@@ -1,5 +1,6 @@
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/dashboard_screens/modelScreen/cubit/model_screen_cubit.dart';
 import 'package:ai_gen/features/dashboard_screens/modelScreen/cubit/model_screen_state.dart';
@@ -41,6 +42,8 @@ class _ModelsViewState extends State<ModelsView> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xffF2F2F2),
       body: Padding(
@@ -68,7 +71,7 @@ class _ModelsViewState extends State<ModelsView> {
                       Text(
                         TranslationKeys.modelsDescription.tr,
                         style: const TextStyle(
-                            fontFamily: AppConstants.appFontName,
+                          fontFamily: AppConstants.appFontName,
                           fontWeight: FontWeight.w500,
                           color: Color(0xff666666),
                           fontSize: 16,
@@ -211,7 +214,10 @@ class _ModelsViewState extends State<ModelsView> {
               child: BlocBuilder<ModelsCubit, ModelsState>(
                 builder: (context, state) {
                   if (state is ModelsLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: CircularProgressIndicator(
+                      color: AppColors.bluePrimaryColor,
+                    ));
                   } else if (state is ModelsFailure) {
                     return Center(
                       child: Column(
@@ -223,6 +229,13 @@ class _ModelsViewState extends State<ModelsView> {
                           Text('${TranslationKeys.error.tr} ${state.errMsg}'),
                           const SizedBox(height: 16),
                           ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.bluePrimaryColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
                             onPressed: () =>
                                 context.read<ModelsCubit>().loadModels(),
                             child: Text(TranslationKeys.retry.tr),
@@ -261,13 +274,18 @@ class _ModelsViewState extends State<ModelsView> {
                     }
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8),
                       child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio:
-                              4 / 1.8, // details width to height ratio
+                              width > 1500 // Threshold for expanded window
+                                  ? 4 / 1.5 // Expanded window ratio
+                                  : width *
+                                      .16 /
+                                      height *
+                                      4.6, // Minimized window ratio
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),

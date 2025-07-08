@@ -1,6 +1,8 @@
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
 import 'package:ai_gen/features/dashboard_screens/datasetScreen/widgets/show_project_dialog.dart';
 import 'package:flutter/material.dart';
@@ -35,18 +37,27 @@ class DatasetCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Dataset Name
-                Text(
-                  datasetName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: AppConstants.appFontName,
-                    color: Color(0xff666666),
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Image.asset(
+                      AssetsPaths.dataSetsIcon,
+                      color: AppColors.bluePrimaryColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      datasetName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: AppConstants.appFontName,
+                        color: Color(0xff666666),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
 
                 Text(
                   userProfile?.username ?? TranslationKeys.guest.tr,
@@ -79,9 +90,7 @@ class DatasetCard extends StatelessWidget {
 
                 // Description (using first project's info or general description)
                 Text(
-                  projects.isNotEmpty && projects.first.description != null
-                      ? projects.first.description!
-                      : TranslationKeys.comprehensiveDatasetDescription.tr,
+                  "${TranslationKeys.modelDescriptionPrefix.tr}${projects.isNotEmpty && projects.first.description != null ? projects.first.description! : TranslationKeys.comprehensiveDatasetDescription.tr}",
                   style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xff666666),
@@ -141,13 +150,13 @@ class DatasetCard extends StatelessWidget {
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
-                        color: Colors.green[100],
+                        color: AppColors.grey100,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.person,
                         size: 14,
-                        color: Colors.green[600],
+                        color: AppColors.bluePrimaryColor,
                       ),
                     ),
                     const SizedBox(width: 8),
