@@ -1,8 +1,6 @@
 // en.dart
 import 'package:ai_gen/core/translation/translation_keys.dart';
 
-import 'translation_keys.dart';
-
 Map<String, String> en = {
   TranslationKeys.chooseProducts: 'Choose Products',
   TranslationKeys.makePayment: 'Make Payment',
@@ -50,7 +48,7 @@ Map<String, String> en = {
   TranslationKeys.search: 'Search',
   TranslationKeys.searchAnyProduct: 'Search any product..',
   TranslationKeys.home: 'Home',
-  TranslationKeys.items: 'Items',
+  // TranslationKeys.items: 'Items',
 
   // New keys for server status
   TranslationKeys.loadingServer: 'Loading Server....',
@@ -138,7 +136,7 @@ Map<String, String> en = {
   TranslationKeys.noDescription: 'No Description',
   TranslationKeys.na: 'N/A',
   TranslationKeys.basicsCategory: 'Basics',
-  TranslationKeys.datasetCategory: 'Dataset',
+  // TranslationKeys.datasetCategory: 'Dataset',
   TranslationKeys.watchLater: 'Watch Later',
   TranslationKeys.and: 'and',
   TranslationKeys.share: 'Share',
@@ -167,7 +165,7 @@ Map<String, String> en = {
   TranslationKeys.errorLoadingProfile: 'Error Loading Profile',
   TranslationKeys.tryAgain: 'Try Again',
   TranslationKeys.goToDashboard: 'Go to Dashboard',
-  TranslationKeys.profileScreenTitle: 'Profile',
+  // TranslationKeys.profileScreenTitle: 'Profile',
   TranslationKeys.loadingProfile: 'Loading profile...',
   TranslationKeys.nameLabel: 'Name:',
   TranslationKeys.usernameLabel: 'Username:',
@@ -202,14 +200,14 @@ Map<String, String> en = {
   TranslationKeys.selectedProjects: 'Selected',
   TranslationKeys.deleteSelected: 'Delete Selected',
   TranslationKeys.deleteEmptyProjects: 'Delete Empty Projects',
-  TranslationKeys.projectNameHeader: 'Name',
-  TranslationKeys.createdAtHeader: 'Created At',
+  // TranslationKeys.projectNameHeader: 'Name',
+  // TranslationKeys.createdAtHeader: 'Created At',
   TranslationKeys.lastModifiedHeader: 'Last Modified',
   TranslationKeys.actionsHeader: 'Actions',
   TranslationKeys.openProject: 'Open Project',
   TranslationKeys.editProject: 'Edit',
-  TranslationKeys.previousPage: 'Previous',
-  TranslationKeys.nextPage: 'Next',
+  // TranslationKeys.previousPage: 'Previous',
+  // TranslationKeys.nextPage: 'Next',
 
   TranslationKeys.trySearchingWithDifferentKeywords:
       'Try searching with different keywords.',
