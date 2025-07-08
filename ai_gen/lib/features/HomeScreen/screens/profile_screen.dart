@@ -5,7 +5,7 @@ import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_state.dart';
-import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';
+import 'package:ai_gen/features/HomeScreen/screens/dashboard_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/edit_profile_dialog.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 

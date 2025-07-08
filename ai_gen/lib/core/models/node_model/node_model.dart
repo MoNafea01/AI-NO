@@ -1,4 +1,4 @@
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
+import 'package:ai_gen/features/node_view/data/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'parameter_model.dart';

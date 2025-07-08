@@ -7,7 +7,7 @@ import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
-import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';
+import 'package:ai_gen/features/HomeScreen/screens/dashboard_screen.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
