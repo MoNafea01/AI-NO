@@ -1,16 +1,15 @@
+import 'package:ai_gen/core/data/network/services/interfaces/project_services_interface.dart';
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/utils/reusable_widgets/custom_dialog.dart';
 import 'package:ai_gen/core/utils/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/core/utils/reusable_widgets/pick_folder_icon.dart';
-import 'package:ai_gen/core/data/network/services/interfaces/project_services_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 class ExportProjectDialog extends StatefulWidget {
-  const ExportProjectDialog({this.projectModel, super.key});
+  const ExportProjectDialog({required this.projectModel, super.key});
 
-  //TODO: this should be made required
-  final ProjectModel? projectModel;
+  final ProjectModel projectModel;
   @override
   State<ExportProjectDialog> createState() => _ExportProjectDialogState();
 }
@@ -27,7 +26,7 @@ class _ExportProjectDialogState extends State<ExportProjectDialog>
   void initState() {
     super.initState();
     _projectNameController =
-        TextEditingController(text: widget.projectModel?.name ?? "");
+        TextEditingController(text: widget.projectModel.name ?? "");
     _projectPathController = TextEditingController();
     _projectFormatController = TextEditingController(text: "ainoprj");
     _projectPasswordController = TextEditingController();
@@ -52,7 +51,7 @@ class _ExportProjectDialogState extends State<ExportProjectDialog>
     final IProjectServices projectServices = GetIt.I.get<IProjectServices>();
     try {
       final String message = await projectServices.exportProject(
-        projectId: widget.projectModel!.id!,
+        projectId: widget.projectModel.id!,
         fileName: _projectNameController.text,
         filePath: _projectPathController.text,
         format: _projectFormatController.text,
