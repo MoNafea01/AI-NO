@@ -1,6 +1,6 @@
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_state.dart';
 import 'package:ai_gen/features/HomeScreen/data/user_profile.dart';
-import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/auth/data/auth_provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 

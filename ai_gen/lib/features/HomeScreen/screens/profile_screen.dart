@@ -8,7 +8,7 @@ import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile
 import 'package:ai_gen/features/HomeScreen/screens/dashboard_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/edit_profile_dialog.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
-import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/auth/data/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/utils.dart';

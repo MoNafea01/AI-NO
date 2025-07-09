@@ -9,7 +9,7 @@ import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile
 import 'package:ai_gen/features/HomeScreen/screens/home_screen.dart';
 import 'package:ai_gen/features/HomeScreen/screens/profile_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_side_bar_dashboard.dart';
-import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/auth/data/auth_provider.dart';
 import 'package:ai_gen/features/dashboard_screens/learnScreen/learn_screen.dart';
 import 'package:ai_gen/features/dashboard_screens/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';

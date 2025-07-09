@@ -9,14 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
-class SearchAndActionsRow extends StatefulWidget {
-  const SearchAndActionsRow({super.key});
+class SearchTextField extends StatefulWidget {
+  const SearchTextField({super.key});
 
   @override
-  State<SearchAndActionsRow> createState() => _SearchAndActionsRowState();
+  State<SearchTextField> createState() => _SearchTextFieldState();
 }
 
-class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
+class _SearchTextFieldState extends State<SearchTextField> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
 

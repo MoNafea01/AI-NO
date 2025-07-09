@@ -4,7 +4,7 @@ import 'package:ai_gen/core/translation/translation_helper.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/helper/bloc_observer.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
-import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/auth/data/auth_provider.dart';
 import 'package:ai_gen/features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_cubit.dart';
 import 'package:ai_gen/features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
