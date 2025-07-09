@@ -1,5 +1,7 @@
+// ignore_for_file: deprecated_member_use, library_private_types_in_public_api
 
 import 'package:ai_gen/core/translation/translation_keys.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../core/utils/app_constants.dart';
@@ -205,7 +207,6 @@ class ProjectsTableHeader extends StatelessWidget {
   }
 }
 
-
 class WhatsAppBubbleTooltip extends StatefulWidget {
   final String message;
   final Widget child;
@@ -268,7 +269,7 @@ class _WhatsAppBubbleTooltipState extends State<WhatsAppBubbleTooltip> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1F2937),
+                    color: AppColors.bluePrimaryColor,
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
@@ -284,6 +285,7 @@ class _WhatsAppBubbleTooltipState extends State<WhatsAppBubbleTooltip> {
                       color: Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
+                      fontFamily: AppConstants.appFontName,
                     ),
                   ),
                 ),
@@ -314,14 +316,13 @@ class _TrianglePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF1F2937)
+      ..color = Colors.transparent
       ..style = PaintingStyle.fill;
 
-    // Compact right-angled triangle (like WhatsApp)
     final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width * 0.7, 0)
-      ..lineTo(0, size.height)
+      ..moveTo(0, size.height)
+      ..lineTo(size.width, size.height)
+      ..lineTo(size.width * 0.5, 0)
       ..close();
 
     canvas.drawPath(path, paint);

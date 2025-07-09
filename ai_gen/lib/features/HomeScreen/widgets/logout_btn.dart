@@ -28,6 +28,7 @@ Widget logoutButton(BuildContext context, bool isExpanded) {
                       ? Colors.grey
                       : const Color(0xffFF3333),
                 ),
+                
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

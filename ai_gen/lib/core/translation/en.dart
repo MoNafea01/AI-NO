@@ -162,7 +162,7 @@ Map<String, String> en = {
   TranslationKeys.sessionExpiredMessage:
       'Your session has expired. You need to log in again.',
   TranslationKeys.cancel: 'Cancel',
-  TranslationKeys.loginAgain: 'Logi, Again',
+  TranslationKeys.loginAgain: 'Login, Again',
   TranslationKeys.sessionExpired: 'Session Expired',
   TranslationKeys.errorLoadingProfile: 'Error Loading Profile',
   TranslationKeys.tryAgain: 'Try Again',
@@ -231,7 +231,7 @@ Map<String, String> en = {
   TranslationKeys.deselectAllProjects: 'Deselect all projects',
   TranslationKeys.deleteSelectedProjects: 'Delete selected projects',
   TranslationKeys.deleteAllEmptyProjects:
-      'Delete all empty projects (projects with no model or dataset)',
+      'Delete all empty projects [ projects with no model or dataset ]',
   TranslationKeys.name: 'Name',
   TranslationKeys.description: 'Description',
   TranslationKeys.dataset: 'Dataset',
