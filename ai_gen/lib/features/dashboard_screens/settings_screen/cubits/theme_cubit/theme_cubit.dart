@@ -4,9 +4,7 @@
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 // 2. Theme cubit with SharedPreferences instead of HydratedBloc
@@ -17,8 +15,8 @@ class ThemeCubit extends Cubit<ThemeState> {
   ThemeCubit() : super(const ThemeState(isDarkMode: false)) {
     _loadTheme();
   }
-  
-  static ThemeCubit get(context)  => BlocProvider.of(context);
+
+  static ThemeCubit get(context) => BlocProvider.of(context);
   // Load saved theme
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -70,7 +68,8 @@ class ThemeCubit extends Cubit<ThemeState> {
       bodyLarge: TextStyle(color: Colors.black87),
       bodyMedium: TextStyle(color: Colors.black54),
     ),
-    cardTheme: const CardTheme(color: Colors.white, shadowColor: Colors.black26),
+    cardTheme:
+        const CardThemeData(color: Colors.white, shadowColor: Colors.black26),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,
@@ -103,14 +102,14 @@ class ThemeCubit extends Cubit<ThemeState> {
       bodyLarge: TextStyle(color: Colors.white70),
       bodyMedium: TextStyle(color: Colors.white54),
     ),
-    cardTheme: const CardTheme(color: Color(0xFF1F1F1F), shadowColor: Colors.black45),
+    cardTheme: const CardThemeData(
+        color: Color(0xFF1F1F1F), shadowColor: Colors.black45),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF2F80ED),
         foregroundColor: Colors.white,
       ),
     ),
-
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       elevation: 5,
       backgroundColor: Color.fromARGB(255, 141, 146, 153),
