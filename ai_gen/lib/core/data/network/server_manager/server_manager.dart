@@ -65,8 +65,7 @@ class ServerManager {
 
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        log(
-            'Attempting to connect to server (attempt $attempt of $maxAttempts)...');
+        log('Attempting to connect to server (attempt $attempt of $maxAttempts)...');
 
         // First try the base URL with increased timeout
         final response = await _dio.get('http://127.0.0.1:8000/api/projects/',
@@ -94,13 +93,11 @@ class ServerManager {
       }
 
       if (attempt < maxAttempts) {
-        log(
-            'Waiting ${waitBetweenAttempts.inSeconds} seconds before next attempt...');
+        log('Waiting ${waitBetweenAttempts.inSeconds} seconds before next attempt...');
         await Future.delayed(waitBetweenAttempts);
       }
     }
-    log(
-        'Failed to start server after $maxAttempts attempts. Please check if the backend server is properly configured and running.');
+    log('Failed to start server after $maxAttempts attempts. Please check if the backend server is properly configured and running.');
   }
 
   Future<void> _killExistingServers() async {
@@ -169,8 +166,7 @@ class ServerManager {
       // Check if the script file exists
       if (!await scriptFile.exists()) {
         log('ERROR: Server script not found at: $scriptPath');
-        log(
-            'Please ensure run_server.bat exists in the project root directory.');
+        log('Please ensure run_server.bat exists in the project root directory.');
         return -2; // Special error code for missing script
       }
 
@@ -184,14 +180,18 @@ class ServerManager {
       );
       _isServerRunning = true;
 
-      _serverProcess!.stdout.transform(SystemEncoding().decoder).listen((data) {
+      _serverProcess!.stdout
+          .transform(const SystemEncoding().decoder)
+          .listen((data) {
         log('Script stdout: $data');
         // You can parse output and make decisions here
       });
 
       log('Server process: ${_serverProcess?.runtimeType}');
 
-      _serverProcess!.stderr.transform(SystemEncoding().decoder).listen((data) {
+      _serverProcess!.stderr
+          .transform(const SystemEncoding().decoder)
+          .listen((data) {
         log('Script stderr: $data');
         // You can parse errors and make decisions here
       });
@@ -238,7 +238,6 @@ class ServerManager {
     }
   }
 
-  @override
   Future<void> stopServer() async {
     if (_serverProcess != null) {
       log('Stopping server...');

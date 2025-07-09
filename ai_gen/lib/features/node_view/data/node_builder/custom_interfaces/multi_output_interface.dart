@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/data/network/services/interfaces/node_services_interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/base/base_interface.dart';
+import 'package:ai_gen/features/node_view/data/node_builder/custom_interfaces/base/base_interface.dart';
 import 'package:get_it/get_it.dart';
 
 import 'base/universal_accepted_types.dart';

@@ -35,8 +35,7 @@ abstract class TranslationKeys {
   static const String createAccount = 'Create Account';
   static const String login = 'Login';
 
-   
-    static const String and = 'and';
+  static const String and = 'and';
 
   static const String register = 'Register';
 
@@ -71,7 +70,7 @@ abstract class TranslationKeys {
   static const String checkAllFieldsMsg = 'Please fill all fields';
 
   static const String home = 'Home';
-  static const String items = 'Items';
+  // static const String items = 'Items';
   static const String addToCart = 'Add To Cart';
   static const String MyFavorites = 'My Favorites';
   static const String NoFavouritesYet = 'No Favourites Yet';
@@ -179,7 +178,7 @@ abstract class TranslationKeys {
   static const String noDescription = 'No Description';
   static const String na = 'N/A'; // Not Applicable for duration
   static const String basicsCategory = 'Basics';
-  static const String datasetCategory = 'Dataset';
+  // static const String datasetCategory = 'Dataset';
   static const String watchLater = 'Watch Later';
   static const String share = 'Share';
   static const String noVideosFound = 'No videos found.';
@@ -207,8 +206,7 @@ abstract class TranslationKeys {
   static const String errorLoadingProfile = 'Error Loading Profile';
   static const String tryAgain = 'Try Again';
   static const String goToDashboard = 'Go to Dashboard';
-  static const String profileScreenTitle =
-      'Profile'; // Distinct from general 'profile'
+  // static const String profileScreenTitle = 'Profile';
   static const String loadingProfile = 'Loading profile...';
   static const String nameLabel = 'Name:';
 
@@ -252,14 +250,14 @@ abstract class TranslationKeys {
   static const String selectedProjects = 'Selected';
   static const String deleteSelected = 'Delete Selected';
   static const String deleteEmptyProjects = 'Delete Empty Projects';
-  static const String projectNameHeader = 'Name';
-  static const String createdAtHeader = 'Created At';
+  // static const String projectNameHeader = 'Name';
+  // static const String createdAtHeader = 'Created At';
   static const String lastModifiedHeader = 'Last Modified';
   static const String actionsHeader = 'Actions';
   static const String openProject = 'Open Project';
   static const String editProject = 'Edit';
-  static const String previousPage = 'Previous';
-  static const String nextPage = 'Next';
+  // static const String previousPage = 'Previous';
+  // static const String nextPage = 'Next';
   static const String trySearchingWithDifferentKeywords =
       'Try searching with different keywords';
   static const String showAllProjects = 'Show All Projects';

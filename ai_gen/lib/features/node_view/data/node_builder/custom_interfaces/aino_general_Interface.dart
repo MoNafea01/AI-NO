@@ -1,6 +1,6 @@
 import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 
-import 'custom_interfaces.dart';
+import '../../../data/node_builder/custom_interfaces/custom_interfaces.dart';
 
 /// Input data interface for general AINO nodes.
 class VSAINOGeneralInputData extends BaseInputData {

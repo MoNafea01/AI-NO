@@ -5,11 +5,6 @@ import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 
-import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/utils/app_constants.dart';
-import 'package:ai_gen/features/node_view/presentation/node_view.dart';
-import 'package:flutter/material.dart';
-
 Widget buildProjectItem(BuildContext context, ProjectModel project) {
   return InkWell(
     onTap: () {

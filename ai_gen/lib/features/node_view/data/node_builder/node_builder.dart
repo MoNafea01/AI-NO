@@ -1,15 +1,27 @@
 import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/features/node_view/data/serialization/node_serializer.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/fitter_interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/network_interface.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/vs_node_view.dart';
+import 'package:ai_gen/main.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../main.dart';
-import 'custom_interfaces/aino_general_interface.dart';
-import 'custom_interfaces/model_interface.dart';
-import 'custom_interfaces/multi_output_interface.dart';
-import 'custom_interfaces/preprocessor_interface.dart';
+import 'custom_interfaces/custom_interfaces.dart';
+
+/* 
+Nodes Scheme
+ Map<String, Map<String, Map<String, List<NodeModel>>>> mapScheme = {
+   "Models": {
+        "linear_models": {
+                "regression": [NodeModel(), NodeModel()],
+                "classification": [NodeModel()],
+          },
+          "svm": {
+                "regression": [NodeModel(), NodeModel()],
+                "classification": [NodeModel()],
+                "clustering": [NodeModel()],
+          }
+   },
+ };
+*/
 
 class NodeBuilder {
   NodeBuilder({required this.projectId});
@@ -29,21 +41,6 @@ class NodeBuilder {
       ..._buildCategorizedNodes(allNodes),
     ];
   }
-
-  // Nodes Scheme
-  // Map<String, Map<String, Map<String, List<NodeModel>>>> mapScheme = {
-  //   "Models": {
-  //        "linear_models": {
-  //                "regression": [NodeModel(), NodeModel()],
-  //                "classification": [NodeModel()],
-  //          },
-  //          "svm": {
-  //                "regression": [NodeModel(), NodeModel()],
-  //                "classification": [NodeModel()],
-  //                "clustering": [NodeModel()],
-  //          }
-  //   },
-  // };
 
   // first subgroup that contains the types
   List<VSSubgroup> _buildCategorizedNodes(Map<String, Map> allNodes) {
@@ -79,8 +76,6 @@ class NodeBuilder {
   //build the node itself
   Function(Offset, VSOutputData?) buildNode(NodeModel node) {
     return (Offset offset, VSOutputData? ref) {
-      // print(ref);
-
       NodeModel newNode = node.copyWith(projectId: projectId);
       return VSNodeData(
         id: newNode.nodeId?.toString(),

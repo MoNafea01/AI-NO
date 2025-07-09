@@ -1,6 +1,6 @@
-import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/data/network/services/interfaces/node_services_interface.dart';
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
+import 'package:ai_gen/core/models/node_model/node_model.dart';
+import 'package:ai_gen/features/node_view/data/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:ai_gen/local_pcakages/vs_node_view/data/vs_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -45,6 +45,13 @@ abstract class BaseOutputData extends VSOutputData {
       final Map<String, dynamic> apiBody = buildApiBody(data);
       final nodeServices = GetIt.I.get<INodeServices>();
       final response = await nodeServices.runNode(node, apiBody);
+
+      if (response['node_data'] is String) {
+        node.userOutput = response['message'];
+      } else {
+        node.userOutput = response['node_data'];
+      }
+
       return response;
     } catch (e) {
       // Log error and rethrow for proper error handling

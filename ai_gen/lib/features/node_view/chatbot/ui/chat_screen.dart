@@ -1,5 +1,5 @@
 import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
+import 'package:ai_gen/features/node_view/presentation/cubit/grid_node_view_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

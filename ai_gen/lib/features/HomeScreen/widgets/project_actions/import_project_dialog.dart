@@ -5,7 +5,7 @@ import 'package:ai_gen/core/utils/reusable_widgets/custom_text_form_field.dart';
 import 'package:ai_gen/core/utils/reusable_widgets/pick_folder_icon.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
-import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
+import 'package:ai_gen/features/node_view/presentation/cubit/grid_node_view_cubit.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

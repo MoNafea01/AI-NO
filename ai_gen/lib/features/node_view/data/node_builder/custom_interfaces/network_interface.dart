@@ -1,9 +1,4 @@
-import 'package:ai_gen/test/presentation/node_builder/custom_interfaces/aino_general_Interface.dart';
-
-import 'base/base_interface.dart';
-import 'base/universal_accepted_types.dart';
-import 'multi_output_interface.dart';
-import 'node_loader_interface.dart';
+import 'custom_interfaces.dart';
 
 /// Input data interface for network nodes.
 /// Handles connections to network outputs and other compatible data types.
