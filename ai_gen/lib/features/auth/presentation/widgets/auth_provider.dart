@@ -9,13 +9,12 @@ import 'package:ai_gen/core/data/network/network_helper.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/data/user_profile.dart';
 import 'package:ai_gen/features/HomeScreen/screens/dashboard_screen.dart';
-
 import 'package:ai_gen/features/auth/presentation/OtpVerificationScreen/otp_verification_screen.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 
 // Enum to track login states
 enum LoginState {
@@ -122,8 +121,6 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  
-
   // Email validation with improved regex
   bool validateEmail(String email) {
     if (email.isEmpty) {
@@ -200,7 +197,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-
   final _storage = const FlutterSecureStorage();
   bool rememberMe = false;
 
@@ -253,7 +249,7 @@ class AuthProvider with ChangeNotifier {
   }
 
 // Update the _saveTokens method to respect rememberMe setting
- Future<void> _saveTokens(String access, String refresh) async {
+  Future<void> _saveTokens(String access, String refresh) async {
     if (rememberMe) {
       // Save tokens permanently if remember me is checked
       await _storage.write(key: 'accessToken', value: access);
@@ -288,7 +284,7 @@ class AuthProvider with ChangeNotifier {
       agreeTerms;
 
   // Enhanced signIn method
- Future signIn(BuildContext context) async {
+  Future signIn(BuildContext context) async {
     // Clear previous errors
     _signInError = null;
     _emailError = null;
@@ -364,12 +360,12 @@ class AuthProvider with ChangeNotifier {
 // Add these helper methods to your AuthProvider class if they don't exist
   void setFieldError(String field, String error) {
     _fieldErrors[field] = error;
-      notifyListeners();
+    notifyListeners();
   }
 
   void clearFieldErrors() {
     _fieldErrors.clear();
-      notifyListeners();
+    notifyListeners();
   }
 
   void clearFieldError(String field) {
@@ -402,15 +398,10 @@ class AuthProvider with ChangeNotifier {
     _passwordError = error;
     notifyListeners();
   }
-  
-
-  
 
 // Add these properties to your AuthProvider class
   Map<String, String> _fieldErrors = {};
   Map<String, String> get fieldErrors => _fieldErrors;
-
- 
 
 // Updated signUp method
   Future<void> signUp(BuildContext context) async {
@@ -722,8 +713,6 @@ class AuthProvider with ChangeNotifier {
     );
   }
 
-  
-
   void setOtp(String value) => _otp = value;
 
   Future<void> verifyOtp(BuildContext context, String email) async {
@@ -780,7 +769,8 @@ class AuthProvider with ChangeNotifier {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator(
+      builder: (_) => const Center(
+          child: CircularProgressIndicator(
         color: AppColors.bluePrimaryColor,
       )),
     );
@@ -823,6 +813,7 @@ class AuthProvider with ChangeNotifier {
     isLoggingOut = false;
     notifyListeners();
   }
+
 // Add these properties for better token management
   bool _isRefreshingToken = false;
   List<Completer<String?>> _refreshCompleters = [];
@@ -886,6 +877,7 @@ class AuthProvider with ChangeNotifier {
     final firstName = await _storage.read(key: 'firstName');
     final lastName = await _storage.read(key: 'lastName');
     final email = await _storage.read(key: 'email');
+    final bio = await _storage.read(key: 'bio');
 
     if (username != null && email != null) {
       _userProfile = UserProfile(
@@ -893,13 +885,13 @@ class AuthProvider with ChangeNotifier {
         firstName: firstName!,
         lastName: lastName!,
         email: email,
+        bio: bio ?? "",
       );
       notifyListeners();
     }
   }
 
   // Get valid token with automatic refresh
-
 
   //to update user data
 
@@ -908,11 +900,28 @@ class AuthProvider with ChangeNotifier {
     required String firstName,
     required String lastName,
     required String email,
+    required String bio,
   }) async {
-    final token = await _storage.read(key: 'accessToken');
+    late final String? token;
+    if (rememberMe) {
+      token = await _storage.read(key: 'accessToken');
+    } else {
+      token = await _storage.read(key: 'sessionAccessToken');
+    }
+
     if (token == null) {
       throw Exception('No access token found');
     }
+
+    final body = {
+      'username': username,
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      "profile": {
+        'bio': bio,
+      }
+    };
 
     final response = await http.put(
       Uri.parse('${NetworkConstants.remoteBaseUrl}/profile/'),
@@ -920,12 +929,7 @@ class AuthProvider with ChangeNotifier {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({
-        'username': username,
-        'first_name': firstName,
-        'last_name': lastName,
-        'email': email,
-      }),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {
@@ -937,6 +941,7 @@ class AuthProvider with ChangeNotifier {
       await _storage.write(key: 'firstName', value: _userProfile!.firstName);
       await _storage.write(key: 'lastName', value: _userProfile!.lastName);
       await _storage.write(key: 'email', value: _userProfile!.email);
+      await _storage.write(key: 'bio', value: _userProfile!.bio);
 
       notifyListeners();
     } else if (response.statusCode == 401) {
@@ -949,7 +954,7 @@ class AuthProvider with ChangeNotifier {
 // to handle get profile request
 
 // Enhanced token refresh with race condition handling
- // Update the refreshAccessToken method
+  // Update the refreshAccessToken method
   Future<String?> refreshAccessToken() async {
     // Prevent multiple simultaneous refresh attempts
     if (_isRefreshingToken) {
@@ -1031,6 +1036,7 @@ class AuthProvider with ChangeNotifier {
     _completeRefreshCompleters(null);
     return null;
   }
+
   // Force refresh token (when we know current token is invalid)
   Future<String?> _forceRefreshToken() async {
     debugPrint('Force refreshing token...');
@@ -1080,16 +1086,16 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Clear all tokens
-  
-Future<void> _clearTokens() async {
-  await _storage.delete(key: 'accessToken');
-  await _storage.delete(key: 'refreshToken');
-  await _storage.delete(key: 'sessionAccessToken');
-  await _storage.delete(key: 'sessionRefreshToken');
-  await _storage.delete(key: 'rememberMe');
-  _userProfile = null;
-  notifyListeners();
-}
+
+  Future<void> _clearTokens() async {
+    await _storage.delete(key: 'accessToken');
+    await _storage.delete(key: 'refreshToken');
+    await _storage.delete(key: 'sessionAccessToken');
+    await _storage.delete(key: 'sessionRefreshToken');
+    await _storage.delete(key: 'rememberMe');
+    _userProfile = null;
+    notifyListeners();
+  }
 
   // Optional: Schedule proactive token refresh
   void _scheduleTokenRefresh() {
@@ -1101,7 +1107,7 @@ Future<void> _clearTokens() async {
   }
 
   // Check if user is authenticated
- // Update the isAuthenticated method
+  // Update the isAuthenticated method
   Future<bool> isAuthenticated() async {
     String? accessToken;
     String? refreshToken;
@@ -1126,7 +1132,6 @@ Future<void> _clearTokens() async {
 
     return true;
   }
-
 
 //change password
   Future<bool> changePassword({
@@ -1277,6 +1282,7 @@ Future<void> _clearTokens() async {
           jsonDecode(response.body)['detail'] ?? 'Failed to reset password');
     }
   }
+
   // Add method to load remember me state
   Future<void> _loadRememberMeState() async {
     final rememberMeValue = await _storage.read(key: 'rememberMe');
@@ -1303,6 +1309,7 @@ Future<void> _clearTokens() async {
 
     return token;
   }
+
   Future<bool> checkAutoLogin() async {
     final rememberMeValue = await _storage.read(key: 'rememberMe');
     if (rememberMeValue != 'true') {

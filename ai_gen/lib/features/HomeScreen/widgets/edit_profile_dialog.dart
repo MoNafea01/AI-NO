@@ -82,6 +82,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             firstName: _firstNameController.text.trim(),
             lastName: _lastNameController.text.trim(),
             email: _emailController.text.trim(),
+            bio: _bioController.text.trim(),
           );
 
       if (mounted) {
