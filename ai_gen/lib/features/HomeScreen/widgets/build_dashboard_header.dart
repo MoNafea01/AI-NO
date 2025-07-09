@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/helper/helper.dart';
@@ -6,97 +7,141 @@ import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/custom_icon_text_button.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/project_actions/create_new_project_dialog.dart';
-import 'package:ai_gen/features/HomeScreen/widgets/project_actions/export_project_dialog.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/project_actions/import_project_dialog.dart';
-
+import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 
-Widget buildHeader(BuildContext context) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      final isSmallScreen = constraints.maxWidth < 900;
-      final isVerySmallScreen = constraints.maxWidth < 600;
+class BuildDashboardHeader extends StatelessWidget {
+  const BuildDashboardHeader({this.projectModel, super.key});
 
-      return SizedBox(
-        width: double.infinity,
-        child: Flex(
-          direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
-          mainAxisAlignment: isSmallScreen
-              ? MainAxisAlignment.start
-              : MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: isSmallScreen
-              ? CrossAxisAlignment.start
-              : CrossAxisAlignment.center,
-          children: [
-            
-            Flexible(
-              flex: isSmallScreen ? 0 : 1,
-              child: Padding(
-                padding: EdgeInsets.only(
-                  top: isSmallScreen ? 20 : 68,
-                  bottom: isSmallScreen ? 20 : 0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        TranslationKeys.projects.tr,
-                        style: TextStyle(
-                          fontFamily: AppConstants.appFontName,
-                          fontSize: isVerySmallScreen
-                              ? 32
-                              : (isSmallScreen ? 36 : 48),
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+  final ProjectModel? projectModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 900;
+        final isVerySmallScreen = constraints.maxWidth < 600;
+
+        return SizedBox(
+          width: double.infinity,
+          child: Flex(
+            direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
+            mainAxisAlignment: isSmallScreen
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: isSmallScreen
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                flex: isSmallScreen ? 0 : 1,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: isSmallScreen ? 20 : 68,
+                    bottom: isSmallScreen ? 20 : 0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          TranslationKeys.projects.tr,
+                          style: TextStyle(
+                            fontFamily: AppConstants.appFontName,
+                            fontSize: isVerySmallScreen
+                                ? 32
+                                : (isSmallScreen ? 36 : 48),
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        TranslationKeys.viewAllProjects.tr,
-                        style: TextStyle(
-                          fontFamily: AppConstants.appFontName,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff666666),
-                          fontSize: isVerySmallScreen ? 12 : 16,
+                      const SizedBox(height: 4),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          TranslationKeys.viewAllProjects.tr,
+                          style: TextStyle(
+                            fontFamily: AppConstants.appFontName,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xff666666),
+                            fontSize: isVerySmallScreen ? 12 : 16,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-
-            if (!isSmallScreen) const SizedBox(),
-
-            Flexible(
-              flex: isSmallScreen ? 0 : 1,
-              child: _BuildActionButtons(
-                isSmallScreen: isSmallScreen,
-                isVerySmallScreen: isVerySmallScreen,
+              if (!isSmallScreen) const SizedBox(),
+              Flexible(
+                flex: isSmallScreen ? 0 : 1,
+                child: _BuildActionButtons(
+                  isSmallScreen: isSmallScreen,
+                  isVerySmallScreen: isVerySmallScreen,
+                  projectModel: projectModel,
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
-class _BuildActionButtons extends StatelessWidget {
+class _BuildActionButtons extends StatefulWidget {
   final bool isSmallScreen;
   final bool isVerySmallScreen;
+  final ProjectModel? projectModel;
 
   const _BuildActionButtons({
     required this.isSmallScreen,
     required this.isVerySmallScreen,
+    this.projectModel,
   });
+
+  @override
+  State<_BuildActionButtons> createState() => _BuildActionButtonsState();
+}
+
+class _BuildActionButtonsState extends State<_BuildActionButtons> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (widget.projectModel != null) {
+        // to trigger when oppening the project from the main args
+        if (widget.projectModel?.id != null) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => NodeView(
+                projectModel: widget.projectModel!,
+              ),
+            ),
+          );
+        } else {
+          _triggerImport(context);
+        }
+      }
+    });
+  }
+
+  void _triggerImport(BuildContext context) {
+    Helper.showDialogHelper(
+      context,
+      ImportProjectDialog(
+        cubit: context.read<HomeCubit>(),
+        projectModel: widget.projectModel,
+        outsourceProject: true,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,23 +154,20 @@ class _BuildActionButtons extends StatelessWidget {
         assetName: AssetsPaths.importIcon,
         iconColor: AppColors.bluePrimaryColor,
         onTap: () {
-          Helper.showDialogHelper(
-            context,
-            ImportProjectDialog(cubit: context.read<HomeCubit>()),
-          );
+          _triggerImport(context);
         },
       ),
-      _buildButton(
-        context: context,
-        text: TranslationKeys.export.tr,
-        backgroundColor: const Color(0xfff2f2f2),
-        textColor: AppColors.bluePrimaryColor,
-        assetName: AssetsPaths.exportIcon,
-        iconColor: AppColors.bluePrimaryColor,
-        onTap: () {
-          Helper.showDialogHelper(context, const ExportProjectDialog());
-        },
-      ),
+      // _buildButton(
+      //   context: context,
+      //   text: TranslationKeys.export.tr,
+      //   backgroundColor: const Color(0xfff2f2f2),
+      //   textColor: AppColors.bluePrimaryColor,
+      //   assetName: AssetsPaths.exportIcon,
+      //   iconColor: AppColors.bluePrimaryColor,
+      //   onTap: () {
+      //     Helper.showDialogHelper(context, const ExportProjectDialog());
+      //   },
+      // ),
       _buildButton(
         context: context,
         text: TranslationKeys.newProject.tr,
@@ -139,9 +181,8 @@ class _BuildActionButtons extends StatelessWidget {
       ),
     ];
 
-    if (isSmallScreen) {
-      
-      return isVerySmallScreen
+    if (widget.isSmallScreen) {
+      return widget.isVerySmallScreen
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: buttons
@@ -157,7 +198,6 @@ class _BuildActionButtons extends StatelessWidget {
               children: buttons,
             );
     } else {
-      
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: buttons
@@ -183,8 +223,8 @@ class _BuildActionButtons extends StatelessWidget {
       builder: (context, constraints) {
         return ConstrainedBox(
           constraints: BoxConstraints(
-            minWidth: isVerySmallScreen ? 0 : 60,
-            maxWidth: isVerySmallScreen ? double.infinity : 140,
+            minWidth: widget.isVerySmallScreen ? 0 : 60,
+            maxWidth: widget.isVerySmallScreen ? double.infinity : 140,
           ),
           child: CustomIconTextButton(
             text: text,

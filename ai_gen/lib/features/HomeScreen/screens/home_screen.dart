@@ -1,14 +1,12 @@
-
 import 'package:ai_gen/core/models/project_model.dart';
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/reusable_widgets/failure_screen.dart';
 import 'package:ai_gen/core/utils/reusable_widgets/loading_screen.dart';
-import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/build_dashboard_header.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/projects_table/projects_table.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/search_and_action.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -26,7 +24,6 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: const Color(0xfff2f2f2),
         body: LayoutBuilder(
           builder: (context, constraints) {
-            
             final isSmallScreen = constraints.maxWidth < 800;
             final horizontalPadding = isSmallScreen ? 16.0 : 65.0;
             final verticalPadding = isSmallScreen ? 10.0 : 20.0;
@@ -52,15 +49,12 @@ class HomeScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                            
-                              buildHeader(context),
+                              BuildDashboardHeader(projectModel: projectModel),
 
                               SizedBox(height: isSmallScreen ? 16 : 20),
 
                               // Search and Actions Row
-                              SearchAndActionsRow(
-                                projectModel: projectModel,
-                              ),
+                              const SearchAndActionsRow(),
 
                               SizedBox(height: isSmallScreen ? 16 : 20),
 
@@ -123,8 +117,6 @@ class _Content extends StatelessWidget {
               color: AppColors.bluePrimaryColor,
             ),
             SizedBox(height: isSmallScreen ? 12 : 16),
-
-            
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: FittedBox(
@@ -140,9 +132,7 @@ class _Content extends StatelessWidget {
                 ),
               ),
             ),
-
             SizedBox(height: isSmallScreen ? 6 : 8),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: FittedBox(
@@ -157,10 +147,7 @@ class _Content extends StatelessWidget {
                 ),
               ),
             ),
-
             SizedBox(height: isSmallScreen ? 12 : 16),
-
-           
             ConstrainedBox(
               constraints: BoxConstraints(
                 minWidth: isSmallScreen ? 120 : 150,

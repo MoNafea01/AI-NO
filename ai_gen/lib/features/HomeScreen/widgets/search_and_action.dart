@@ -1,68 +1,22 @@
 // Search and Actions Row Widget
-import 'package:ai_gen/core/models/project_model.dart';
-import 'package:ai_gen/core/translation/translation_keys.dart';
-
 // Search and Actions Row Widget - Fixed Border Issue
 import 'dart:async';
 
+import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
-
-import 'package:ai_gen/core/utils/helper/helper.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
-import 'package:ai_gen/features/HomeScreen/widgets/project_actions/import_project_dialog.dart';
-
-import 'package:ai_gen/features/node_view/presentation/node_view.dart';
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
-
-
 class SearchAndActionsRow extends StatefulWidget {
-  const SearchAndActionsRow({super.key, this.projectModel});
-
-  final ProjectModel? projectModel;
+  const SearchAndActionsRow({super.key});
 
   @override
   State<SearchAndActionsRow> createState() => _SearchAndActionsRowState();
 }
 
 class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (widget.projectModel != null) {
-        // to trigger when oppening the project from the main args
-        if (widget.projectModel?.id != null) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => NodeView(
-                projectModel: widget.projectModel!,
-              ),
-            ),
-          );
-        } else {
-          _triggerImport(context);
-        }
-      }
-    });
-  }
-
-  void _triggerImport(BuildContext context) {
-    Helper.showDialogHelper(
-      context,
-      ImportProjectDialog(
-        cubit: context.read<HomeCubit>(),
-        projectModel: widget.projectModel,
-        outsourceProject: true,
-      ),
-    );
-  }
-
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
 
@@ -137,7 +91,6 @@ class _SearchAndActionsRowState extends State<SearchAndActionsRow> {
             ),
           ),
         ),
-     
       ],
     );
   }
