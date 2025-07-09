@@ -309,7 +309,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final stopwatch = Stopwatch()..start();
       final response = await http.post(
-        Uri.parse('${NetworkConstants.apiAuthBaseUrl}/login/'),
+        Uri.parse('${NetworkConstants.remoteBaseUrl}/login/'),
         body: {
           'email': _email,
           'password': _password,
@@ -420,7 +420,7 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final response = await http.post(
-        Uri.parse('${NetworkConstants.apiAuthBaseUrl}/register/'),
+        Uri.parse('${NetworkConstants.remoteBaseUrl}/register/'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _email,
@@ -729,7 +729,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> verifyOtp(BuildContext context, String email) async {
     try {
       final response = await authorizedPost(
-        '${NetworkConstants.apiAuthBaseUrl}/verify-email/',
+        '${NetworkConstants.remoteBaseUrl}/verify-email/',
         {'email': email, 'otp': _otp},
       );
 
@@ -749,7 +749,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> requestOtpAgain(String email) async {
     try {
       final response = await authorizedPost(
-        '${NetworkConstants.apiAuthBaseUrl}/request-otp/',
+        '${NetworkConstants.remoteBaseUrl}/request-otp/',
         {'email': email},
       );
 
@@ -797,7 +797,7 @@ class AuthProvider with ChangeNotifier {
       try {
         await http
             .post(
-              Uri.parse('${NetworkConstants.apiAuthBaseUrl}/token/blacklist/'),
+              Uri.parse('${NetworkConstants.remoteBaseUrl}/token/blacklist/'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({'refresh': refreshToken}),
             )
@@ -839,7 +839,7 @@ class AuthProvider with ChangeNotifier {
       }
 
       final profileUrl =
-          Uri.parse('${NetworkConstants.apiAuthBaseUrl}/profile/');
+          Uri.parse('${NetworkConstants.remoteBaseUrl}/profile/');
 
       final response = await http.get(
         profileUrl,
@@ -915,7 +915,7 @@ class AuthProvider with ChangeNotifier {
     }
 
     final response = await http.put(
-      Uri.parse('${NetworkConstants.apiAuthBaseUrl}/profile/'),
+      Uri.parse('${NetworkConstants.remoteBaseUrl}/profile/'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -978,7 +978,7 @@ class AuthProvider with ChangeNotifier {
 
       final response = await http
           .post(
-            Uri.parse('${NetworkConstants.apiAuthBaseUrl}/token/refresh/'),
+            Uri.parse('${NetworkConstants.remoteBaseUrl}/token/refresh/'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'refresh': refreshToken}),
           )
@@ -1049,7 +1049,7 @@ class AuthProvider with ChangeNotifier {
 
   // Retry profile request with new token
   Future<UserProfile> _retryGetProfile(String token) async {
-    final profileUrl = Uri.parse('${NetworkConstants.apiAuthBaseUrl}/profile/');
+    final profileUrl = Uri.parse('${NetworkConstants.remoteBaseUrl}/profile/');
 
     final response = await http.get(
       profileUrl,
@@ -1145,7 +1145,7 @@ Future<void> _clearTokens() async {
 
       // Construct the request URL
       final changePasswordUrl =
-          '${NetworkConstants.apiAuthBaseUrl}/change-password/';
+          '${NetworkConstants.remoteBaseUrl}/change-password/';
 
       // Add confirm_password field as required by the backend
       final requestBody = {
@@ -1234,7 +1234,7 @@ Future<void> _clearTokens() async {
     if (refreshToken == null) return null;
 
     final response = await http.post(
-      Uri.parse('${NetworkConstants.apiAuthBaseUrl}/token/refresh/'),
+      Uri.parse('${NetworkConstants.remoteBaseUrl}/token/refresh/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'refresh': refreshToken}),
     );
@@ -1255,7 +1255,7 @@ Future<void> _clearTokens() async {
 // still not designed in backend yet
   Future<void> verifyOtpForPassword(String email, String otp) async {
     final response = await authorizedPost(
-      '${NetworkConstants.apiAuthBaseUrl}/verify-otp-for-password/',
+      '${NetworkConstants.remoteBaseUrl}/verify-otp-for-password/',
       {'email': email, 'otp': otp},
     );
     if (response.statusCode != 200) {
@@ -1266,7 +1266,7 @@ Future<void> _clearTokens() async {
 
   Future<void> resetPassword(String email, String newPassword) async {
     final response = await authorizedPost(
-      '${NetworkConstants.apiAuthBaseUrl}/reset-password/',
+      '${NetworkConstants.remoteBaseUrl}/reset-password/',
       {
         'email': email,
         'new_password': newPassword,
