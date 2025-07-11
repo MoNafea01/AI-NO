@@ -71,9 +71,9 @@ class SettingsScreen extends StatelessWidget {
                                   currentTab),
                               buildTab(context, TranslationKeys.account.tr, 1,
                                   currentTab),
-                              buildTab(context, TranslationKeys.appearance.tr,
-                                  2, currentTab),
-                              buildTab(context, TranslationKeys.language.tr, 3,
+                              // buildTab(context, TranslationKeys.appearance.tr,
+                              //     2, currentTab),
+                              buildTab(context, TranslationKeys.language.tr, 2,
                                   currentTab),
                             ],
                           ),
@@ -92,7 +92,7 @@ class SettingsScreen extends StatelessWidget {
                             children: const [
                               ProfileScreen(),
                               ChangePasswordScreen(),
-                              PreferenceModeSelector(),
+                              //  PreferenceModeSelector(),
                               LanguageView()
                             ],
                           ),

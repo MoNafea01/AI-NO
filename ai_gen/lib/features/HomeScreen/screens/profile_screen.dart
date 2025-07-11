@@ -1,4 +1,4 @@
-// Enhanced ProfileScreen with better error handling and user experience
+
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:ai_gen/core/translation/translation_keys.dart';
@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/utils.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -36,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadBioFromPrefs();
+
 
     // Load profile when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -68,30 +68,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
-  Future<void> _loadBioFromPrefs() async {
-    //cancelled
-    return;
-    // try {
-    //   final prefs = await SharedPreferences.getInstance();
-    //   final savedBio = prefs.getString('user_bio') ?? '';
-    //   if (mounted) {
-    //     setState(() {
-    //       bioController.text = savedBio;
-    //     });
-    //   }
-    // } catch (e) {
-    //   debugPrint('Error loading bio: $e');
-    // }
-  }
-
-  Future<void> _saveBioToPrefs() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('user_bio', bioController.text.trim());
-    } catch (e) {
-      debugPrint('Error saving bio: $e');
-    }
-  }
 
   Future<void> _handleLogout() async {
     final shouldLogout = await showDialog<bool>(
@@ -357,7 +333,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                       ),
                       onChanged: (value) {
-                        _saveBioToPrefs();
+                       // _saveBioToPrefs();
                       },
                     ),
                     const SizedBox(height: 30),
@@ -383,7 +359,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                           if (result == true && mounted) {
                             context.read<ProfileCubit>().loadProfile();
-                            await _loadBioFromPrefs();
+                           // await _loadBioFromPrefs();
                           }
                         },
                         child: Text(TranslationKeys.saveChanges.tr,
