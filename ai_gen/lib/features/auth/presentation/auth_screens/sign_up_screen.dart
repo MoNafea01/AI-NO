@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print, deprecated_member_use
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
-import 'package:ai_gen/features/auth/manager/auth_providers.dart';
+
 
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/data/auth_provider.dart';
@@ -71,8 +71,8 @@ class SignupForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   // final authProvider = Provider.of<AuthProvider>(context);
-    final authProvider = Provider.of<AuthProviders>(context);
+    // final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context);
 
     return SingleChildScrollView(
       child: Column(

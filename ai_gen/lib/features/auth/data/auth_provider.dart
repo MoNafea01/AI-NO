@@ -113,7 +113,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Email validation with improved regex
+  
   bool validateEmail(String email) {
     if (email.isEmpty) {
       _emailError = 'Email is required';
@@ -192,19 +192,19 @@ class AuthProvider with ChangeNotifier {
   // final _storage = const FlutterSecureStorage();
   bool rememberMe = false;
 
-  //  Getters and Setters
-  // String get email => _email;
-  // String get userName => _username;
-  // String get firstName => _firstName;
-  // String get lastName => _lastName;
-  // String get fullName => _fullName;
-  // String get password => _password;
+   //Getters and Setters
+  String get email => _email;
+  String get userName => _username;
+  String get firstName => _firstName;
+  String get lastName => _lastName;
+  String get fullName => _fullName;
+  String get password => _password;
 
-  // void setUsername(String value) => _username = value;
-  // void setFirstName(String value) => _firstName = value;
-  // void setLastName(String value) => _lastName = value;
-  // void setFullName(String value) => _fullName = value;
-  //void setEmail(String value) => _email = value;
+  void setUsername(String value) => _username = value;
+  void setFirstName(String value) => _firstName = value;
+  void setLastName(String value) => _lastName = value;
+  void setFullName(String value) => _fullName = value;
+  // void setEmail(String value) => _email = value;
   // void setPassword(String value) => _password = value;
   void setConfirmPassword(String value) => _confirmPassword = value;
   void setAgreeTerms(bool value) {
@@ -228,17 +228,17 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // void resetForm() {
-  //   _username = '';
-  //   _firstName = '';
-  //   _lastName = '';
-  //   _fullName = '';
-  //   _email = '';
-  //   _password = '';
-  //   _confirmPassword = '';
-  //   _agreeTerms = false;
-  //   notifyListeners();
-  // }
+  void resetForm() {
+    _username = '';
+    _firstName = '';
+    _lastName = '';
+    _fullName = '';
+    _email = '';
+    _password = '';
+    _confirmPassword = '';
+    _agreeTerms = false;
+    notifyListeners();
+  }
 
 // Update the _saveTokens method to respect rememberMe setting
   Future<void> _saveTokens(String access, String refresh) async {
