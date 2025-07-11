@@ -1,30 +1,22 @@
-// ignore_for_file: use_build_context_synchronously, unused_field
+// ignore_for_file: use_build_context_synchronously, prefer_final_fields, unused_local_variable
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:ai_gen/core/data/cache/cache_helper.dart';
+import 'package:ai_gen/core/data/cache/cahch_keys.dart';
 import 'package:ai_gen/core/data/network/network_constants.dart';
 import 'package:ai_gen/core/data/network/network_helper.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/data/user_profile.dart';
 import 'package:ai_gen/features/HomeScreen/screens/dashboard_screen.dart';
+import 'package:ai_gen/features/auth/data/models/login_state_enum.dart';
+import 'package:ai_gen/features/auth/data/models/register_response_model.dart';
 import 'package:ai_gen/features/auth/presentation/OtpVerificationScreen/otp_verification_screen.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-
-// Enum to track login states
-enum LoginState {
-  idle,
-  validating,
-  connecting,
-  authenticating,
-  success,
-  failed
-}
 
 typedef LoginStateCallback = void Function(LoginState state);
 
@@ -59,7 +51,7 @@ class AuthProvider with ChangeNotifier {
   String? _loginStatus;
 
   // Connection info
-  Timer? _connectionTimer;
+ // Timer? _connectionTimer;
   final Connectivity _connectivity = Connectivity();
 
   // Success navigation delay
@@ -197,21 +189,21 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  final _storage = const FlutterSecureStorage();
+  // final _storage = const FlutterSecureStorage();
   bool rememberMe = false;
 
   //  Getters and Setters
-  String get email => _email;
-  String get userName => _username;
-  String get firstName => _firstName;
-  String get lastName => _lastName;
-  String get fullName => _fullName;
-  String get password => _password;
+  // String get email => _email;
+  // String get userName => _username;
+  // String get firstName => _firstName;
+  // String get lastName => _lastName;
+  // String get fullName => _fullName;
+  // String get password => _password;
 
-  void setUsername(String value) => _username = value;
-  void setFirstName(String value) => _firstName = value;
-  void setLastName(String value) => _lastName = value;
-  void setFullName(String value) => _fullName = value;
+  // void setUsername(String value) => _username = value;
+  // void setFirstName(String value) => _firstName = value;
+  // void setLastName(String value) => _lastName = value;
+  // void setFullName(String value) => _fullName = value;
   //void setEmail(String value) => _email = value;
   // void setPassword(String value) => _password = value;
   void setConfirmPassword(String value) => _confirmPassword = value;
@@ -220,7 +212,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  UserProfile? _userProfile; // Add this to your provider class
+  UserProfile? _userProfile;
 
   UserProfile? get userProfile => _userProfile;
 
@@ -236,30 +228,54 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void resetForm() {
-    _username = '';
-    _firstName = '';
-    _lastName = '';
-    _fullName = '';
-    _email = '';
-    _password = '';
-    _confirmPassword = '';
-    _agreeTerms = false;
-    notifyListeners();
-  }
+  // void resetForm() {
+  //   _username = '';
+  //   _firstName = '';
+  //   _lastName = '';
+  //   _fullName = '';
+  //   _email = '';
+  //   _password = '';
+  //   _confirmPassword = '';
+  //   _agreeTerms = false;
+  //   notifyListeners();
+  // }
 
 // Update the _saveTokens method to respect rememberMe setting
   Future<void> _saveTokens(String access, String refresh) async {
     if (rememberMe) {
+      await CacheHelper.saveData(
+        key: CacheKeys.accessToken,
+        value: access,
+      );
+      await CacheHelper.saveData(
+        key: CacheKeys.refreshToken,
+        value: refresh,
+      );
+      await CacheHelper.saveData(
+        key: CacheKeys.rememberMe,
+        value: true,
+      );
       // Save tokens permanently if remember me is checked
-      await _storage.write(key: 'accessToken', value: access);
-      await _storage.write(key: 'refreshToken', value: refresh);
-      await _storage.write(key: 'rememberMe', value: 'true');
+      // await _storage.write(key: 'accessToken', value: access);
+      // await _storage.write(key: 'refreshToken', value: refresh);
+      // await _storage.write(key: 'rememberMe', value: 'true');
     } else {
       // Save tokens temporarily (only in memory or with session flag)
-      await _storage.write(key: 'sessionAccessToken', value: access);
-      await _storage.write(key: 'sessionRefreshToken', value: refresh);
-      await _storage.write(key: 'rememberMe', value: 'false');
+      await CacheHelper.saveData(
+        key: CacheKeys.accessToken,
+        value: access,
+      );
+      await CacheHelper.saveData(
+        key: CacheKeys.refreshToken,
+        value: refresh,
+      );
+      await CacheHelper.saveData(
+        key: CacheKeys.rememberMe,
+        value: true,
+      );
+      // await _storage.write(key: 'sessionAccessToken', value: access);
+      // await _storage.write(key: 'sessionRefreshToken', value: refresh);
+      //await _storage.write(key: 'rememberMe', value: 'false');
     }
   }
 
@@ -357,7 +373,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-// Add these helper methods to your AuthProvider class if they don't exist
+
   void setFieldError(String field, String error) {
     _fieldErrors[field] = error;
     notifyListeners();
@@ -399,11 +415,9 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-// Add these properties to your AuthProvider class
   Map<String, String> _fieldErrors = {};
   Map<String, String> get fieldErrors => _fieldErrors;
 
-// Updated signUp method
   Future<void> signUp(BuildContext context) async {
     isLoading = true;
     clearFieldErrors(); // Clear previous errors
@@ -424,9 +438,28 @@ class AuthProvider with ChangeNotifier {
       );
 
       final data = jsonDecode(response.body);
+      debugPrint('Sign Up response data: $data');
+      RegisterResponseModel registerResponseModel =
+          RegisterResponseModel.fromJson(data);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        await _saveTokens(data['access'], data['refresh']);
+        //show snackbar to tell user his account should be verified
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(data['message']),
+            backgroundColor: AppColors.black,
+          ),
+        );
+
+        await CacheHelper.saveData(
+          key: CacheKeys.accessToken,
+          value: registerResponseModel.access,
+        );
+        await CacheHelper.saveData(
+          key: CacheKeys.refreshToken,
+          value: registerResponseModel.refresh,
+        );
+        // await _saveTokens(data['access'], data['refresh']);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -719,12 +752,31 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await authorizedPost(
         '${NetworkConstants.remoteBaseUrl}/verify-email/',
-        {'email': email, 'otp': _otp},
+        {
+          // 'email': email,
+          'otp': _otp
+        },
       );
 
       final data = jsonDecode(response.body);
+      debugPrint('OTP verification response data: $data');
       if (response.statusCode == 200) {
-        await _saveTokens(data['access'], data['refresh']);
+        // show message that account is verified
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(data['message'] ?? 'Account verified successfully!'),
+            backgroundColor: AppColors.black,
+          ),
+        );
+        await CacheHelper.saveData(
+          key: CacheKeys.accessToken,
+          value: data['access'],
+        );
+        await CacheHelper.saveData(
+          key: CacheKeys.refreshToken,
+          value: data['refresh'],
+        );
+        //await _saveTokens(data['access'], data['refresh']);
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (_) => const DashboardScreen()));
       } else {
@@ -778,9 +830,12 @@ class AuthProvider with ChangeNotifier {
     // Get the appropriate refresh token
     String? refreshToken;
     if (rememberMe) {
-      refreshToken = await _storage.read(key: 'refreshToken');
+      refreshToken = await CacheHelper.getData(key: CacheKeys.refreshToken);
+
+      // refreshToken = await _storage.read(key: 'refreshToken');
     } else {
-      refreshToken = await _storage.read(key: 'sessionRefreshToken');
+      refreshToken = await CacheHelper.getData(key: CacheKeys.refreshToken);
+      //   refreshToken = await _storage.read(key: 'sessionRefreshToken');
     }
 
     if (refreshToken != null) {
@@ -814,7 +869,6 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-// Add these properties for better token management
   bool _isRefreshingToken = false;
   List<Completer<String?>> _refreshCompleters = [];
   Timer? _tokenExpiryTimer;
@@ -873,11 +927,16 @@ class AuthProvider with ChangeNotifier {
 
   //to get user data when reopen the app
   Future<void> loadStoredProfile() async {
-    final username = await _storage.read(key: 'username');
-    final firstName = await _storage.read(key: 'firstName');
-    final lastName = await _storage.read(key: 'lastName');
-    final email = await _storage.read(key: 'email');
-    final bio = await _storage.read(key: 'bio');
+    final username = await CacheHelper.getData(key: CacheKeys.userName);
+    final firstName = await CacheHelper.getData(key: CacheKeys.firstName);
+    final lastName = await CacheHelper.getData(key: CacheKeys.lastName);
+    final email = await CacheHelper.getData(key: CacheKeys.email);
+    final bio = await CacheHelper.getData(key: CacheKeys.bio);
+    // final username = await _storage.read(key: 'username');
+    // final firstName = await _storage.read(key: 'firstName');
+    // final lastName = await _storage.read(key: 'lastName');
+    // final email = await _storage.read(key: 'email');
+    // final bio = await _storage.read(key: 'bio');
 
     if (username != null && email != null) {
       _userProfile = UserProfile(
@@ -903,10 +962,16 @@ class AuthProvider with ChangeNotifier {
     required String bio,
   }) async {
     late final String? token;
+    final String? accessToken = await CacheHelper.getData(
+      key: CacheKeys.accessToken,
+    );
+    
     if (rememberMe) {
-      token = await _storage.read(key: 'accessToken');
+      token = await CacheHelper.getData(key: CacheKeys.accessToken);
+      //  token = await _storage.read(key: 'accessToken');
     } else {
-      token = await _storage.read(key: 'sessionAccessToken');
+      token = await CacheHelper.getData(key: CacheKeys.accessToken);
+      //  token = await _storage.read(key: 'sessionAccessToken');
     }
 
     if (token == null) {
@@ -935,13 +1000,41 @@ class AuthProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       _userProfile = UserProfile.fromJson(data);
+      //username
+      await CacheHelper.saveData(
+        key: CacheKeys.userName,
+        value: _userProfile!.username,
+      );
+      //first name
+      await CacheHelper.saveData(
+        key: CacheKeys.userName,
+        value: _userProfile!.firstName,
+      );
+
+      //last name
+      await CacheHelper.saveData(
+        key: CacheKeys.userName,
+        value: _userProfile!.lastName,
+      );
+
+      //email
+      await CacheHelper.saveData(
+        key: CacheKeys.userName,
+        value: _userProfile!.email,
+      );
+
+      //bio
+      await CacheHelper.saveData(
+        key: CacheKeys.userName,
+        value: _userProfile!.bio,
+      );
 
       // Update secure storage
-      await _storage.write(key: 'username', value: _userProfile!.username);
-      await _storage.write(key: 'firstName', value: _userProfile!.firstName);
-      await _storage.write(key: 'lastName', value: _userProfile!.lastName);
-      await _storage.write(key: 'email', value: _userProfile!.email);
-      await _storage.write(key: 'bio', value: _userProfile!.bio);
+      // await _storage.write(key: 'username', value: _userProfile!.username);
+      // await _storage.write(key: 'firstName', value: _userProfile!.firstName);
+      // await _storage.write(key: 'lastName', value: _userProfile!.lastName);
+      // await _storage.write(key: 'email', value: _userProfile!.email);
+      // await _storage.write(key: 'bio', value: _userProfile!.bio);
 
       notifyListeners();
     } else if (response.statusCode == 401) {
@@ -970,9 +1063,11 @@ class AuthProvider with ChangeNotifier {
       String? refreshToken;
 
       if (rememberMe) {
-        refreshToken = await _storage.read(key: 'refreshToken');
+        refreshToken = await CacheHelper.getData(key: CacheKeys.refreshToken);
+        // refreshToken = await _storage.read(key: 'refreshToken');
       } else {
-        refreshToken = await _storage.read(key: 'sessionRefreshToken');
+        refreshToken = await CacheHelper.getData(key: CacheKeys.refreshToken);
+        // refreshToken = await _storage.read(key: 'sessionRefreshToken');
       }
 
       if (refreshToken == null) {
@@ -996,10 +1091,18 @@ class AuthProvider with ChangeNotifier {
         if (newAccessToken != null) {
           // Save new token based on remember me setting
           if (rememberMe) {
-            await _storage.write(key: 'accessToken', value: newAccessToken);
+            await CacheHelper.saveData(
+              key: CacheKeys.accessToken,
+              value: newAccessToken,
+            );
+            //   await _storage.write(key: 'accessToken', value: newAccessToken);
           } else {
-            await _storage.write(
-                key: 'sessionAccessToken', value: newAccessToken);
+            await CacheHelper.saveData(
+              key: CacheKeys.accessToken,
+              value: newAccessToken,
+            );
+            // await _storage.write(
+            //     key: 'sessionAccessToken', value: newAccessToken);
           }
 
           debugPrint('Access token refreshed successfully');
@@ -1079,20 +1182,44 @@ class AuthProvider with ChangeNotifier {
 
   // Save user profile to secure storage
   Future<void> _saveUserProfile(UserProfile profile) async {
-    await _storage.write(key: 'username', value: profile.username);
-    await _storage.write(key: 'firstName', value: profile.firstName);
-    await _storage.write(key: 'lastName', value: profile.lastName);
-    await _storage.write(key: 'email', value: profile.email);
+    await CacheHelper.saveData(
+      key: CacheKeys.userName,
+      value: profile.username,
+    );
+    await CacheHelper.saveData(
+      key: CacheKeys.firstName,
+      value: profile.firstName,
+    );
+    await CacheHelper.saveData(
+      key: CacheKeys.lastName,
+      value: profile.lastName,
+    );
+    await CacheHelper.saveData(
+      key: CacheKeys.email,
+      value: profile.email,
+    );
+    await CacheHelper.saveData(
+      key: CacheKeys.bio,
+      value: profile.bio,
+    );
+    // await _storage.write(key: 'username', value: profile.username);
+    // await _storage.write(key: 'firstName', value: profile.firstName);
+    // await _storage.write(key: 'lastName', value: profile.lastName);
+    // await _storage.write(key: 'email', value: profile.email);
   }
 
   // Clear all tokens
 
   Future<void> _clearTokens() async {
-    await _storage.delete(key: 'accessToken');
-    await _storage.delete(key: 'refreshToken');
-    await _storage.delete(key: 'sessionAccessToken');
-    await _storage.delete(key: 'sessionRefreshToken');
-    await _storage.delete(key: 'rememberMe');
+    await CacheHelper.removeData(key: CacheKeys.accessToken);
+    await CacheHelper.removeData(key: CacheKeys.refreshToken);
+
+    await CacheHelper.removeData(key: CacheKeys.rememberMe);
+    // await _storage.delete(key: 'accessToken');
+    // await _storage.delete(key: 'refreshToken');
+    // await _storage.delete(key: 'sessionAccessToken');
+    // await _storage.delete(key: 'sessionRefreshToken');
+    // await _storage.delete(key: 'rememberMe');
     _userProfile = null;
     notifyListeners();
   }
@@ -1112,15 +1239,22 @@ class AuthProvider with ChangeNotifier {
     String? accessToken;
     String? refreshToken;
 
-    final rememberMeValue = await _storage.read(key: 'rememberMe');
+    //final rememberMeValue = await _storage.read(key: 'rememberMe');
+    final rememberMeValue =
+        await CacheHelper.getData(key: CacheKeys.rememberMe);
     final isRemembered = rememberMeValue == 'true';
 
     if (isRemembered) {
-      accessToken = await _storage.read(key: 'accessToken');
-      refreshToken = await _storage.read(key: 'refreshToken');
+      accessToken = await CacheHelper.getData(key: CacheKeys.accessToken);
+      refreshToken = await CacheHelper.getData(key: CacheKeys.refreshToken);
+
+      // accessToken = await _storage.read(key: 'accessToken');
+      // refreshToken = await _storage.read(key: 'refreshToken');
     } else {
-      accessToken = await _storage.read(key: 'sessionAccessToken');
-      refreshToken = await _storage.read(key: 'sessionRefreshToken');
+      accessToken = await CacheHelper.getData(key: CacheKeys.accessToken);
+      refreshToken = await CacheHelper.getData(key: CacheKeys.refreshToken);
+      // accessToken = await _storage.read(key: 'sessionAccessToken');
+      // refreshToken = await _storage.read(key: 'sessionRefreshToken');
     }
 
     if (accessToken == null || refreshToken == null) {
@@ -1141,8 +1275,8 @@ class AuthProvider with ChangeNotifier {
   }) async {
     try {
       // Get current token
-      String? token = await _storage.read(key: 'accessToken');
-
+      String? token = await CacheHelper.getData(key: CacheKeys.accessToken);
+// String? token = await _storage.read(key: 'accessToken');
       if (token == null) {
         _showErrorDialog(context, 'Access token not found.');
         return false;
@@ -1234,7 +1368,8 @@ class AuthProvider with ChangeNotifier {
 
 //refresh token if needed
   Future<String?> refreshAccessTokenIfNeeded() async {
-    final refreshToken = await _storage.read(key: 'refreshToken');
+    final refreshToken = await CacheHelper.getData(key: CacheKeys.refreshToken);
+    //final refreshToken = await _storage.read(key: 'refreshToken');
 
     if (refreshToken == null) return null;
 
@@ -1249,7 +1384,11 @@ class AuthProvider with ChangeNotifier {
       final newAccessToken = data['access'];
 
       if (newAccessToken != null) {
-        await _storage.write(key: 'accessToken', value: newAccessToken);
+        await CacheHelper.saveData(
+          key: CacheKeys.accessToken,
+          value: newAccessToken,
+        );
+        // await _storage.write(key: 'accessToken', value: newAccessToken);
         return newAccessToken;
       }
     }
@@ -1273,8 +1412,9 @@ class AuthProvider with ChangeNotifier {
     final response = await authorizedPost(
       '${NetworkConstants.remoteBaseUrl}/reset-password/',
       {
-        'email': email,
+        // 'email': email,
         'new_password': newPassword,
+        'confirm_password': newPassword
       },
     );
     if (response.statusCode != 200) {
@@ -1285,7 +1425,9 @@ class AuthProvider with ChangeNotifier {
 
   // Add method to load remember me state
   Future<void> _loadRememberMeState() async {
-    final rememberMeValue = await _storage.read(key: 'rememberMe');
+    // final rememberMeValue = await _storage.read(key: 'rememberMe');
+    final rememberMeValue =
+        await CacheHelper.getData(key: CacheKeys.rememberMe);
     rememberMe = rememberMeValue == 'true';
     notifyListeners();
   }
@@ -1296,10 +1438,11 @@ class AuthProvider with ChangeNotifier {
 
     if (rememberMe) {
       // Get permanent token
-      token = await _storage.read(key: 'accessToken');
+      token = await CacheHelper.getData(key: CacheKeys.accessToken);
     } else {
       // Get session token
-      token = await _storage.read(key: 'sessionAccessToken');
+      token = await CacheHelper.getData(key: CacheKeys.accessToken);
+      // token = await _storage.read(key: 'sessionAccessToken');
     }
 
     if (token == null) {
@@ -1311,7 +1454,9 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<bool> checkAutoLogin() async {
-    final rememberMeValue = await _storage.read(key: 'rememberMe');
+    final rememberMeValue =
+        await CacheHelper.getData(key: CacheKeys.rememberMe);
+    //  final rememberMeValue = await _storage.read(key: 'rememberMe');
     if (rememberMeValue != 'true') {
       // If remember me is not checked, clear any existing tokens
       await _clearTokens();
@@ -1319,8 +1464,10 @@ class AuthProvider with ChangeNotifier {
     }
 
     // If remember me is checked, check if tokens exist
-    final accessToken = await _storage.read(key: 'accessToken');
-    final refreshToken = await _storage.read(key: 'refreshToken');
+    final accessToken = await CacheHelper.getData(key: CacheKeys.accessToken);
+    final refreshToken = await CacheHelper.getData(key: CacheKeys.refreshToken);
+    // final accessToken = await _storage.read(key: 'accessToken');
+    // final refreshToken = await _storage.read(key: 'refreshToken');
 
     if (accessToken != null && refreshToken != null) {
       rememberMe = true;

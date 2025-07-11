@@ -210,6 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           TranslationKeys.profile.tr,
           style: const TextStyle(color: Color(0xff666666)),
@@ -336,6 +337,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         style: const TextStyle(fontSize: 18)),
                     const SizedBox(height: 8),
                     TextFormField(
+                      readOnly: true,
                       controller: bioController,
                       maxLines: 4,
                       decoration: InputDecoration(
@@ -438,6 +440,7 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: true,
       controller: controller,
       onChanged: onChanged,
       decoration: InputDecoration(

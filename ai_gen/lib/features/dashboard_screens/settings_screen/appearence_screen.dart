@@ -2,6 +2,7 @@
 
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/features/auth/presentation/request_otp_screen/presentation/pages/request_otp_screen.dart';
 import 'package:ai_gen/features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_cubit.dart';
 import 'package:ai_gen/features/dashboard_screens/settings_screen/cubits/theme_cubit/theme_state.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,6 @@ class _PreferenceModeSelectorState extends State<PreferenceModeSelector> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      
                       const SizedBox(width: 16), // Spacing between cards
                       _buildCard(
                         icon: Icons.wb_sunny_outlined,

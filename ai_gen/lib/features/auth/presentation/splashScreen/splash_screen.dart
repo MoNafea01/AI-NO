@@ -2,6 +2,8 @@
 
 import 'dart:developer';
 
+import 'package:ai_gen/core/data/cache/cache_helper.dart';
+import 'package:ai_gen/core/data/cache/cahch_keys.dart';
 import 'package:ai_gen/core/data/network/server_manager/server_manager.dart';
 import 'package:ai_gen/core/models/project_model.dart';
 import 'package:ai_gen/core/translation/translation_keys.dart';
@@ -11,7 +13,7 @@ import 'package:ai_gen/features/HomeScreen/screens/dashboard_screen.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -138,13 +140,21 @@ class _SplashScreenState extends State<SplashScreen>
       await Future.delayed(const Duration(seconds: 2)); // show splash effect
 
       if (!mounted) return;
+    final accessToken = await CacheHelper.getData(
+        key: CacheKeys.accessToken,
+        
+      );     
 
-      const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+      final refreshToken= await CacheHelper.getData(
+        key: CacheKeys.refreshToken,
+       
+      );
+      //const FlutterSecureStorage secureStorage = FlutterSecureStorage();
       final prefs = await SharedPreferences.getInstance();
       final isFirstTime = prefs.getBool('isFirstTime') ?? true;
 
-      final accessToken = await secureStorage.read(key: 'accessToken');
-      final refreshToken = await secureStorage.read(key: 'refreshToken');
+      // final accessToken = await secureStorage.read(key: 'accessToken');
+      // final refreshToken = await secureStorage.read(key: 'refreshToken');
 
       if (!mounted) return;
 
@@ -166,6 +176,7 @@ class _SplashScreenState extends State<SplashScreen>
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const SignupScreen()),
+        
         );
       } else {
         log("Navigating to SignInScreen (returning user)");

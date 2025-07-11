@@ -1,8 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:ai_gen/core/translation/translation_keys.dart';
+import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/auth/presentation/change_password_screen/presntation/widgets/build_password_field.dart';
+import 'package:ai_gen/features/auth/presentation/request_otp_screen/presentation/pages/request_otp_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,8 +37,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       // Make sure new password and confirm password match
       if (_newPasswordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-              content: Text(TranslationKeys.newPasswordAndConfirmationMustMatch.tr),),
+          SnackBar(
+            content:
+                Text(TranslationKeys.newPasswordAndConfirmationMustMatch.tr),
+          ),
         );
         setState(() => _isLoading = false);
         return;
@@ -52,7 +56,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         // Show success message with custom style
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:  Row(
+            content: Row(
               children: [
                 const Icon(Icons.check_circle, color: Colors.white),
                 const SizedBox(width: 10),
@@ -85,7 +89,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             children: [
               const Icon(Icons.error_outline, color: Colors.white),
               const SizedBox(width: 10),
-              Expanded(child: Text("${TranslationKeys.error.tr}${e.toString()}")),
+              Expanded(
+                  child: Text("${TranslationKeys.error.tr}${e.toString()}")),
             ],
           ),
           backgroundColor: Colors.red,
@@ -163,7 +168,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 strokeWidth: 2,
                               ),
                             )
-                          :  Text(TranslationKeys.confirm.tr,
+                          : Text(TranslationKeys.confirm.tr,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -171,6 +176,24 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               )),
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                   onPressed: () {
+                    // Navigate to forgot password screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const RequestOtpScreen()),
+                    );
+                  },
+                  child: Text(
+                    TranslationKeys.forgotPassword.tr,
+                    style: const TextStyle(
+                        color: AppColors.bluePrimaryColor,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: AppConstants.appFontName),
+                  ),
                 ),
               ],
             ),

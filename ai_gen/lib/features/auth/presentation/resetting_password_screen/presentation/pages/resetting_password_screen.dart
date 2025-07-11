@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/auth/data/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +39,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Reset Password')),
+      appBar: AppBar(
+        title: const Text('Reset Password'),
+        automaticallyImplyLeading: false,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -57,7 +61,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             ElevatedButton(
               onPressed: isLoading ? null : _resetPassword,
               child: isLoading
-                  ? const CircularProgressIndicator()
+                  ? const CircularProgressIndicator(
+                      color: AppColors.bluePrimaryColor,
+                    )
                   : const Text("Reset Password"),
             ),
           ],

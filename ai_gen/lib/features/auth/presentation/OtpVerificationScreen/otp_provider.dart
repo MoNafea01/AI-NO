@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:ai_gen/core/data/network/network_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -22,7 +23,7 @@ class OTPProvider extends ChangeNotifier {
 
     try {
       final response = await http.post(
-        Uri.parse("https://your-api-url.com/verify-email/"),
+        Uri.parse("${NetworkConstants.remoteBaseUrl}/verify-email/"),
         body: {
           "email": email,
           "otp": otp,
@@ -34,6 +35,7 @@ class OTPProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         final access = data["access"];
         final refresh = data["refresh"];
+
         await storage.write(key: "accessToken", value: access);
         await storage.write(key: "refreshToken", value: refresh);
 
@@ -59,30 +61,4 @@ class OTPProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> requestNewOTP(BuildContext context) async {
-    try {
-      final response = await http.post(
-        Uri.parse("https://your-api-url.com/request-otp/"),
-        body: {
-          "email": email,
-        },
-      );
-
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("OTP Sent Again!")),
-        );
-      } else {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data["message"] ?? "Failed to resend OTP")),
-        );
-      }
-    } catch (e) {
-      // ignore: avoid_print
-      print("Request OTP error: $e");
-    }
-  }
 }

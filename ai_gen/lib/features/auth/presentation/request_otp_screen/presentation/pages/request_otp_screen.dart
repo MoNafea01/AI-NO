@@ -39,7 +39,9 @@ class _RequestOtpScreenState extends State<RequestOtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Request OTP')
+      appBar: AppBar(title: const Text('Request OTP',),
+      automaticallyImplyLeading: false, // Disable back button
+
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),

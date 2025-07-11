@@ -175,7 +175,7 @@ Map<String, String> ar = {
   TranslationKeys.emailAddressLabel: 'عنوان البريد الإلكتروني:',
   TranslationKeys.bioLabel: 'السيرة الذاتية:',
   TranslationKeys.writeAboutYourself: 'اكتب عن نفسك',
-  TranslationKeys.saveChanges: 'حفظ التغييرات',
+  TranslationKeys.saveChanges: 'تغيير',
   TranslationKeys.loadProfile: 'تحميل الملف الشخصي',
   TranslationKeys.refresh: 'تحديث',
   // New translations for Projects Table

@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/features/auth/data/models/login_state_enum.dart';
 
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_up_screen.dart';
 import 'package:ai_gen/features/auth/data/auth_provider.dart';

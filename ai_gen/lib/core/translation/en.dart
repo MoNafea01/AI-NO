@@ -172,7 +172,7 @@ Map<String, String> en = {
   TranslationKeys.emailAddressLabel: 'Email Address:',
   TranslationKeys.bioLabel: 'Bio:',
   TranslationKeys.writeAboutYourself: 'Write about yourself',
-  TranslationKeys.saveChanges: 'Save changes',
+  TranslationKeys.saveChanges: 'change',
   TranslationKeys.loadProfile: 'Load Profile',
   TranslationKeys.refresh: 'Refresh',
   // New keys for Projects Table
