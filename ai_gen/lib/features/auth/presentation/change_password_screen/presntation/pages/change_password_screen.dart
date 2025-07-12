@@ -178,21 +178,29 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                TextButton(
-                   onPressed: () {
-                    // Navigate to forgot password screen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const RequestOtpScreen()),
-                    );
-                  },
-                  child: Text(
-                    TranslationKeys.forgotPassword.tr,
-                    style: const TextStyle(
-                        color: AppColors.bluePrimaryColor,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: AppConstants.appFontName),
+                Tooltip(
+                  decoration: BoxDecoration(
+                    color: AppColors.bluePrimaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.textSecondary),
+                  ),
+                  message: TranslationKeys.forgotPasswordToolTipDescription.tr,
+                  child: TextButton(
+                    onPressed: () {
+                      // Navigate to forgot password screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const RequestOtpScreen()),
+                      );
+                    },
+                    child: Text(
+                      TranslationKeys.forgotPassword.tr,
+                      style: const TextStyle(
+                          color: AppColors.bluePrimaryColor,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: AppConstants.appFontName),
+                    ),
                   ),
                 ),
               ],

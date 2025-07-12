@@ -17,6 +17,8 @@ abstract class TranslationKeys {
   static const String language = 'Language';
   static const String settings = 'Settings';
   static const String settingsDescription = 'Manage your account settings';
+  static const String forgotPasswordToolTipDescription =
+      'If you forgot your password, click here to reset it';
 
   static const String profile = 'Profile';
   static const String search = 'Search';

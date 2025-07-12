@@ -269,6 +269,10 @@ class _WhatsAppBubbleTooltipState extends State<WhatsAppBubbleTooltip> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppColors.textSecondary,
+                      width: 1,
+                    ),
                     color: AppColors.bluePrimaryColor,
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [

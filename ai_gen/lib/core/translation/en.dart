@@ -13,6 +13,8 @@ Map<String, String> en = {
   TranslationKeys.getStarted: 'Get Started',
   TranslationKeys.register: 'Register',
   TranslationKeys.login: 'Login',
+  TranslationKeys.forgotPasswordToolTipDescription:
+      'If you forgot your password, click here to reset it',
   TranslationKeys.findItHereHuyItNow: 'Find it here, buy it now!',
   TranslationKeys.youWantAuthenticHereYouGo: 'You want Authentic, here you go!',
   TranslationKeys.welcomeBack: 'Welcome \nBack!',

@@ -11,6 +11,8 @@ Map<String, String> ar = {
   TranslationKeys.doYouWantToDelete: "هل تريد حذف هذا المشروع؟",
 
   TranslationKeys.skip: 'تخطي',
+  TranslationKeys.forgotPasswordToolTipDescription:
+      'إذا نسيت كلمة المرور الخاصة بك، انقر هنا لإعادة تعيينها',
   TranslationKeys.undoSelectionTitle: "هل تريد التراجع عن الحذف؟",
   TranslationKeys.getStarted: 'ابدأ الآن',
   TranslationKeys.register: 'تسجيل',
