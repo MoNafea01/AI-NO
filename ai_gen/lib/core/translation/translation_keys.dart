@@ -17,11 +17,14 @@ abstract class TranslationKeys {
   static const String language = 'Language';
   static const String settings = 'Settings';
   static const String settingsDescription = 'Manage your account settings';
+  static const String forgotPasswordToolTipDescription =
+      'If you forgot your password, click here to reset it';
 
   static const String profile = 'Profile';
   static const String search = 'Search';
   static const String searchAnyProduct = 'Search any Product..';
   static const String Items = 'Items';
+  static const String projectDescription = 'project Description';
 
   static const String userFullName = 'User full Name';
   static const String myProfile = 'My Profile';
@@ -33,6 +36,9 @@ abstract class TranslationKeys {
   static const String getStarted = 'Get Started';
   static const String createAccount = 'Create Account';
   static const String login = 'Login';
+
+  static const String and = 'and';
+
   static const String register = 'Register';
 
   static const String emailHintText = 'Email';
@@ -66,7 +72,7 @@ abstract class TranslationKeys {
   static const String checkAllFieldsMsg = 'Please fill all fields';
 
   static const String home = 'Home';
-  static const String items = 'Items';
+  // static const String items = 'Items';
   static const String addToCart = 'Add To Cart';
   static const String MyFavorites = 'My Favorites';
   static const String NoFavouritesYet = 'No Favourites Yet';
@@ -96,7 +102,7 @@ abstract class TranslationKeys {
       'Failed to start server. Please check if the backend is properly configured.';
 
   // New keys for login/welcome
-  static const String welcomeBackToModelCraft = 'Welcome Back to\nModel Craft!';
+  static const String welcomeBackToAINO = 'Welcome Back to A I N O';
   static const String signInToContinueDesigning =
       'Sign in to continue designing and refining your models.';
   static const String signInToContinue = 'Sign in to continue';
@@ -111,7 +117,7 @@ abstract class TranslationKeys {
   static const String createFreeAccount = 'Create free account';
 
   // New keys for signup
-  static const String joinModelCraftToday = 'Join Model Craft\nToday';
+  static const String joinAINOToday = 'Join A I N O\nToday';
   static const String createAccountAndStartBringing =
       'Create an account and start bringing your models to life.';
   static const String signUp = 'Sign Up';
@@ -174,7 +180,7 @@ abstract class TranslationKeys {
   static const String noDescription = 'No Description';
   static const String na = 'N/A'; // Not Applicable for duration
   static const String basicsCategory = 'Basics';
-  static const String datasetCategory = 'Dataset';
+  // static const String datasetCategory = 'Dataset';
   static const String watchLater = 'Watch Later';
   static const String share = 'Share';
   static const String noVideosFound = 'No videos found.';
@@ -202,8 +208,7 @@ abstract class TranslationKeys {
   static const String errorLoadingProfile = 'Error Loading Profile';
   static const String tryAgain = 'Try Again';
   static const String goToDashboard = 'Go to Dashboard';
-  static const String profileScreenTitle =
-      'Profile'; // Distinct from general 'profile'
+  // static const String profileScreenTitle = 'Profile';
   static const String loadingProfile = 'Loading profile...';
   static const String nameLabel = 'Name:';
 
@@ -247,14 +252,14 @@ abstract class TranslationKeys {
   static const String selectedProjects = 'Selected';
   static const String deleteSelected = 'Delete Selected';
   static const String deleteEmptyProjects = 'Delete Empty Projects';
-  static const String projectNameHeader = 'Name';
-  static const String createdAtHeader = 'Created At';
+  // static const String projectNameHeader = 'Name';
+  // static const String createdAtHeader = 'Created At';
   static const String lastModifiedHeader = 'Last Modified';
   static const String actionsHeader = 'Actions';
   static const String openProject = 'Open Project';
   static const String editProject = 'Edit';
-  static const String previousPage = 'Previous';
-  static const String nextPage = 'Next';
+  // static const String previousPage = 'Previous';
+  // static const String nextPage = 'Next';
   static const String trySearchingWithDifferentKeywords =
       'Try searching with different keywords';
   static const String showAllProjects = 'Show All Projects';
@@ -281,8 +286,7 @@ abstract class TranslationKeys {
   static const String createdAt = "Created At";
   static const String undoSelectionTitle =
       "Click to select/deselect this project for deletion";
-        static const String doYouWantToDelete =
-      "Do you want to delete this project?";
+  static const String doYouWantToDelete = "Do you want to delete this project?";
 
   static const String projectName = "Project Name";
   static const String noDescriptionTitle = "No description";
@@ -290,23 +294,25 @@ abstract class TranslationKeys {
   static const String noModel = "No Model";
   static const String previous = "Previous";
   static const String projects = "Projects";
-   static const String project = "Project";
-    static const String viewAllProjects = 'View all your projects';
-      static const String import = "Import";
-       static const String questionMark = "?";
-        static const String export = "Export";
-          static const String newProject = "New Project";
-          static const String searchHint = "Find a project";
-           
-   static const String projectsToBeDeleted =  'Projects to be deleted:';
-   static const String areYouSure = "Are you sure you want to delete ";
-   static const String thisActionCannotBeUndone = " This action cannot be undone.";
-   static const String deleteEmpty = 'Delete Empty';
-   static const String areYouSureYouWantToDeleteEmptyProjects =  'Are you sure you want to delete all empty projects? This will remove all projects that have no model or dataset assigned. This action cannot be undone.';
-   static const String thisTitle ='this';
-   static const String theseTitle ='these';
-   // في translation_keys.dart
-  static const String advancedSearch = 'advanced_search';
+  static const String project = "Project";
+  static const String viewAllProjects = 'View all your projects';
+  static const String import = "Import";
+  static const String questionMark = "?";
+  static const String export = "Export";
+  static const String newProject = "New Project";
+  static const String searchHint = "Find a project";
+
+  static const String projectsToBeDeleted = 'Projects to be deleted:';
+  static const String areYouSure = "Are you sure you want to delete ";
+  static const String thisActionCannotBeUndone =
+      " This action cannot be undone.";
+  static const String deleteEmpty = 'Delete Empty';
+  static const String areYouSureYouWantToDeleteEmptyProjects =
+      'Are you sure you want to delete all empty projects? This will remove all projects that have no model or dataset assigned. This action cannot be undone.';
+  static const String thisTitle = 'this';
+  static const String theseTitle = 'these';
+  // في translation_keys.dart
+  static const String advancedSearch = 'Advanced_Search';
   static const String advancedSearchDescription = 'advanced_search_description';
   static const String selectModel = 'select_model';
   static const String selectDataset = 'select_dataset';
@@ -319,10 +325,4 @@ abstract class TranslationKeys {
   static const String noProjectsFound = 'no_projects_found';
   static const String searchProjectsModelsDatasetsHint =
       'search_projects_models_datasets_hint';
- 
-
-
-   
-   
-
 }

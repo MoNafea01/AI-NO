@@ -11,6 +11,8 @@ Map<String, String> ar = {
   TranslationKeys.doYouWantToDelete: "هل تريد حذف هذا المشروع؟",
 
   TranslationKeys.skip: 'تخطي',
+  TranslationKeys.forgotPasswordToolTipDescription:
+      'إذا نسيت كلمة المرور الخاصة بك، انقر هنا لإعادة تعيينها',
   TranslationKeys.undoSelectionTitle: "هل تريد التراجع عن الحذف؟",
   TranslationKeys.getStarted: 'ابدأ الآن',
   TranslationKeys.register: 'تسجيل',
@@ -50,7 +52,7 @@ Map<String, String> ar = {
   TranslationKeys.search: 'بحث',
   TranslationKeys.searchAnyProduct: 'ابحث عن منتج..',
   TranslationKeys.home: 'الرئيسية',
-  TranslationKeys.items: 'المنتجات',
+  // TranslationKeys.items: 'المنتجات',
 
   // New translations for server status
   TranslationKeys.loadingServer: 'جاري تحميل الخادم....',
@@ -66,7 +68,7 @@ Map<String, String> ar = {
       'فشل في بدء تشغيل الخادم. يرجى التحقق مما إذا كانت الواجهة الخلفية مهيأة بشكل صحيح.',
 
   // New translations for login/welcome
-  TranslationKeys.welcomeBackToModelCraft: 'مرحباً بعودتك إلى\nModel Craft!',
+  TranslationKeys.welcomeBackToAINO: 'مرحباً بعودتك إلى\nAINO!',
   TranslationKeys.signInToContinueDesigning:
       'سجل الدخول لمواصلة تصميم وتطوير نماذجك.',
   TranslationKeys.signInToContinue: 'سجل الدخول للمتابعة',
@@ -82,7 +84,7 @@ Map<String, String> ar = {
   TranslationKeys.createFreeAccount: 'إنشاء حساب مجاني',
 
   // New translations for signup
-  TranslationKeys.joinModelCraftToday: 'انضم إلى Model Craft\nاليوم',
+  TranslationKeys.joinAINOToday: 'انضم إلى AINO\nاليوم',
   TranslationKeys.createAccountAndStartBringing:
       'أنشئ حساباً وابدأ في إحياء نماذجك.',
   TranslationKeys.signUp: 'إنشاء حساب',
@@ -96,7 +98,7 @@ Map<String, String> ar = {
   TranslationKeys.buttonSignUp: 'إنشاء حساب',
   TranslationKeys.retry: 'حاول المحاولة',
   // New translations for Datasets Screen
-  TranslationKeys.datasets: 'مجموعات البيانات',
+  TranslationKeys.datasets: " البيانات",
   TranslationKeys.datasetsDescription:
       'اكتشف واستخدم مجموعات بيانات عالية الجودة لتدريب وتعديل نماذج التعلم الآلي.',
   TranslationKeys.filter: 'تصفية',
@@ -138,7 +140,7 @@ Map<String, String> ar = {
   TranslationKeys.noDescription: 'لا يوجد وصف',
   TranslationKeys.na: 'غير متوفر',
   TranslationKeys.basicsCategory: 'أساسيات',
-  TranslationKeys.datasetCategory: 'مجموعة بيانات',
+  // TranslationKeys.datasetCategory: 'مجموعة بيانات',
   TranslationKeys.watchLater: 'المشاهدة لاحقاً',
   TranslationKeys.share: 'مشاركة',
   TranslationKeys.noVideosFound: 'لم يتم العثور على مقاطع فيديو.',
@@ -175,7 +177,7 @@ Map<String, String> ar = {
   TranslationKeys.emailAddressLabel: 'عنوان البريد الإلكتروني:',
   TranslationKeys.bioLabel: 'السيرة الذاتية:',
   TranslationKeys.writeAboutYourself: 'اكتب عن نفسك',
-  TranslationKeys.saveChanges: 'حفظ التغييرات',
+  TranslationKeys.saveChanges: 'تغيير',
   TranslationKeys.loadProfile: 'تحميل الملف الشخصي',
   TranslationKeys.refresh: 'تحديث',
   // New translations for Projects Table
@@ -202,17 +204,18 @@ Map<String, String> ar = {
   TranslationKeys.selectedProjects: 'المحدد',
   TranslationKeys.deleteSelected: 'حذف المحدد',
   TranslationKeys.deleteEmptyProjects: 'حذف المشاريع الفارغة',
-  TranslationKeys.projectNameHeader: 'الاسم',
-  TranslationKeys.createdAtHeader: 'تاريخ الإنشاء',
+  // TranslationKeys.projectNameHeader: 'الاسم',
+  // TranslationKeys.createdAtHeader: 'تاريخ الإنشاء',
   TranslationKeys.lastModifiedHeader: 'آخر تعديل',
   TranslationKeys.actionsHeader: 'الإجراءات',
   TranslationKeys.openProject: 'فتح المشروع',
   TranslationKeys.editProject: 'تعديل',
-  TranslationKeys.previousPage: 'السابق',
-  TranslationKeys.nextPage: 'التالي',
+  // TranslationKeys.previousPage: 'السابق',
+  // TranslationKeys.nextPage: 'التالي',
   TranslationKeys.trySearchingWithDifferentKeywords:
       'حاول بحث مختلف بالكلمات الدلالية.',
   TranslationKeys.showAllProjects: 'اظهار جميع المشاريع',
+  TranslationKeys.and: 'و',
   TranslationKeys.newPasswordAndConfirmationMustMatch:
       "كلمه السر وتاكيد كلمه السر يجب ان تتطابق",
   TranslationKeys.passwordChangedSuccessfully: "تم تغيير كلمه السر بنجاح",

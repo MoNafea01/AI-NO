@@ -1,5 +1,6 @@
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/home_cubit/home_cubit.dart';
+import 'package:ai_gen/features/HomeScreen/widgets/projects_table/projects_table_header.dart';
 import 'package:ai_gen/features/node_view/presentation/node_view.dart';
 
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class ProjectListItem extends StatelessWidget {
             flex: 3,
             child: Row(
               children: [
-                Tooltip(
+                WhatsAppBubbleTooltip(
                   message: isSelected
                       ? TranslationKeys.undoSelectionTitle.tr
                       : TranslationKeys.doYouWantToDelete.tr,
@@ -102,17 +103,21 @@ class ProjectListItem extends StatelessWidget {
             flex: 2,
             child: buildModelCell(project.model),
           ),
-          // Created At column
+          // Created At column - Moved to the left
           Expanded(
-            flex: 2,
-            child: Text(
-              _formatDateTime(project.createdAt),
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF6B7280),
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 8), // Reduced padding to move left
+              child: Text(
+                _formatDateTime(project.createdAt),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF6B7280),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -146,10 +151,23 @@ class ProjectListItem extends StatelessWidget {
   // Helper to format DateTime
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime == null) return TranslationKeys.na.tr;
-    return "${dateTime.day.toString().padLeft(2, '0')}/"
-        "${dateTime.month.toString().padLeft(2, '0')}/"
-        "${dateTime.year} "
-        "${dateTime.hour.toString().padLeft(2, '0')}:"
-        "${dateTime.minute.toString().padLeft(2, '0')}";
+
+    // List of month names
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+
+    return "${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year}";
   }
 }

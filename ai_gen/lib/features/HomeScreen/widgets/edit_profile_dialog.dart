@@ -1,6 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
-import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
-import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/auth/data/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -81,6 +82,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             firstName: _firstNameController.text.trim(),
             lastName: _lastNameController.text.trim(),
             email: _emailController.text.trim(),
+            bio: _bioController.text.trim(),
           );
 
       if (mounted) {

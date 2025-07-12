@@ -22,7 +22,7 @@ class UserTestimonial extends StatelessWidget {
 
         // Quote
         const Text(
-          '"Model Craft helps me keep AI workflows smooth and time-saving. The tool lets me skip the tedious prep work, saving hours to focus on improving each model I build."',
+          '"AINO helps me keep AI workflows smooth and time-saving. The tool lets me skip the tedious prep work, saving hours to focus on improving each model I build."',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,

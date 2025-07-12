@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 class ProjectRepository {
@@ -6,7 +7,7 @@ class ProjectRepository {
 
   Future<bool> deleteProjects(List<int> projectIds) async {
     try {
-      print('Attempting to delete projects: $projectIds');
+      log('Attempting to delete projects: $projectIds');
       final response = await http.delete(
         Uri.parse('$_baseUrl/projects/bulk-delete/'),
         headers: {
@@ -18,8 +19,8 @@ class ProjectRepository {
         }),
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      log('Response status: ${response.statusCode}');
+      log('Response body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         return true;
@@ -27,14 +28,14 @@ class ProjectRepository {
         throw Exception('Failed to delete projects: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error deleting projects: $e');
+      log('Error deleting projects: $e');
       throw Exception('Network error or server issue: $e');
     }
   }
 
   Future<bool> deleteEmptyProjects() async {
     try {
-      print('Attempting to delete empty projects');
+      log('Attempting to delete empty projects');
       final response = await http.delete(
         Uri.parse('$_baseUrl/projects/delete-empty-projects/'),
         headers: {
@@ -43,8 +44,8 @@ class ProjectRepository {
         },
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      log('Response status: ${response.statusCode}');
+      log('Response body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         return true;
@@ -53,19 +54,10 @@ class ProjectRepository {
             'Failed to delete empty projects: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error deleting empty projects: $e');
+      log('Error deleting empty projects: $e');
       throw Exception('Network error or server issue: $e');
     }
   }
 
-  // You would also add methods here to fetch projects, e.g.,
-  // Future<List<ProjectModel>> fetchProjects() async {
-  //   final response = await http.get(Uri.parse('$_baseUrl/projects/'));
-  //   if (response.statusCode == 200) {
-  //     List<dynamic> body = json.decode(response.body);
-  //     return body.map((dynamic item) => ProjectModel.fromJson(item)).toList();
-  //   } else {
-  //     throw Exception('Failed to load projects');
-  //   }
-  // }
+  
 }

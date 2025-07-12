@@ -1,4 +1,4 @@
-import 'package:ai_gen/features/node_view/presentation/node_builder/custom_interfaces/interface_colors.dart';
+import 'package:ai_gen/features/node_view/data/node_builder/custom_interfaces/interface_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'parameter_model.dart';
@@ -20,25 +20,26 @@ class NodeModel {
   List<String>? outputDots;
   String? endPoint;
   Offset? offset;
+  dynamic userOutput;
 
-  NodeModel({
-    required this.id,
-    this.index,
-    this.order,
-    this.name = "Node",
-    this.displayName,
-    this.description,
-    this.category = "others",
-    this.type = "others",
-    this.task = "others",
-    this.params = const [],
-    this.inputDots,
-    this.outputDots,
-    this.endPoint,
-    this.projectId,
-    this.nodeId,
-    this.offset,
-  });
+  NodeModel(
+      {required this.id,
+      this.index,
+      this.order,
+      this.name = "Node",
+      this.displayName,
+      this.description,
+      this.category = "others",
+      this.type = "others",
+      this.task = "others",
+      this.params = const [],
+      this.inputDots,
+      this.outputDots,
+      this.endPoint,
+      this.projectId,
+      this.nodeId,
+      this.offset,
+      this.userOutput});
 
   NodeModel copyWith({
     required int projectId,

@@ -1,17 +1,19 @@
-// Enhanced ProfileScreen with better error handling and user experience
+
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_cubit.dart';
 import 'package:ai_gen/features/HomeScreen/cubit/user_profile_cubit/user_profile_state.dart';
-import 'package:ai_gen/features/HomeScreen/screens/new_dashboard_screen.dart';
+import 'package:ai_gen/features/HomeScreen/screens/dashboard_screen.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/edit_profile_dialog.dart';
-
-import 'package:ai_gen/features/auth/presentation/widgets/auth_provider.dart';
+import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
+import 'package:ai_gen/features/auth/data/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -34,12 +36,17 @@ class _ProfileScreenState extends State<ProfileScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadBioFromPrefs();
+    _loadProfile();
+
 
     // Load profile when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProfileCubit>().loadProfile();
     });
+  }
+
+  void _loadProfile() {
+    context.read<AuthProvider>().getProfile();
   }
 
   @override
@@ -66,28 +73,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
-  Future<void> _loadBioFromPrefs() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final savedBio = prefs.getString('user_bio') ?? '';
-      if (mounted) {
-        setState(() {
-          bioController.text = savedBio;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error loading bio: $e');
-    }
-  }
-
-  Future<void> _saveBioToPrefs() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('user_bio', bioController.text.trim());
-    } catch (e) {
-      debugPrint('Error saving bio: $e');
-    }
-  }
 
   Future<void> _handleLogout() async {
     final shouldLogout = await showDialog<bool>(
@@ -173,9 +158,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                       ),
                     ),
                     onPressed: () {
-                      context.read<ProfileCubit>().retry();
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const LoginScreen()));
+                      //  context.read<ProfileCubit>().retry();
                     },
-                    child: Text(TranslationKeys.tryAgain.tr),
+                    child: Text(
+                        "${TranslationKeys.retry.tr} ${TranslationKeys.and.tr} ${TranslationKeys.loginAgain.tr}"),
                   ),
                   const SizedBox(width: 12),
                   TextButton(
@@ -201,6 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           TranslationKeys.profile.tr,
           style: const TextStyle(color: Color(0xff666666)),
@@ -259,6 +250,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 fullNameLastController.text = profile.lastName;
                 usernameController.text = profile.username;
                 emailController.text = profile.email;
+                bioController.text = profile.bio;
               }
             });
 
@@ -326,6 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         style: const TextStyle(fontSize: 18)),
                     const SizedBox(height: 8),
                     TextFormField(
+                      readOnly: true,
                       controller: bioController,
                       maxLines: 4,
                       decoration: InputDecoration(
@@ -345,7 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                       ),
                       onChanged: (value) {
-                        _saveBioToPrefs();
+                       // _saveBioToPrefs();
                       },
                     ),
                     const SizedBox(height: 30),
@@ -371,7 +364,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                           if (result == true && mounted) {
                             context.read<ProfileCubit>().loadProfile();
-                            await _loadBioFromPrefs();
+                           // await _loadBioFromPrefs();
                           }
                         },
                         child: Text(TranslationKeys.saveChanges.tr,
@@ -428,11 +421,13 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: true,
       controller: controller,
       onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hintText ?? controller.text,
-        prefixIcon: icon != null ? Icon(icon, color: Color(0xff666666)) : null,
+        prefixIcon:
+            icon != null ? Icon(icon, color: const Color(0xff666666)) : null,
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.all(16),

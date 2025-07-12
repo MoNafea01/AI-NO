@@ -2,7 +2,7 @@ import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../cubit/grid_node_view_cubit.dart';
+import '../cubit/grid_node_view_cubit.dart';
 import 'custom_button.dart';
 
 class CustomFAB extends StatefulWidget {

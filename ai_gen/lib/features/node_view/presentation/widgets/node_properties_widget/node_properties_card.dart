@@ -1,7 +1,8 @@
+import 'package:ai_gen/core/models/node_model/node_model.dart';
 import 'package:ai_gen/core/models/node_model/parameter_model.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/core/utils/themes/textstyles.dart';
-import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
+import 'package:ai_gen/features/node_view/presentation/cubit/grid_node_view_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,30 +24,41 @@ class NodePropertiesCard extends StatelessWidget {
           child: CardContainer(
             child: Stack(
               children: [
-                SingleChildScrollView(
-                  child: IntrinsicWidth(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      spacing: 38,
-                      children: [
-                        if (node.params.isNotEmpty)
-                          PropertiesSection(
-                            title: 'Parameters',
-                            children: _buildParametersList(node.params),
-                          ),
-                        if (node.inputDots?.isNotEmpty ?? false)
-                          PropertiesSection(
-                            title: 'Inputs',
-                            children:
-                                _buildInputsOutputsWidget(node.inputDots ?? []),
-                          ),
-                        if (node.outputDots?.isNotEmpty ?? false)
-                          PropertiesSection(
-                            title: 'Outputs',
-                            children: _buildInputsOutputsWidget(
-                                node.outputDots ?? []),
-                          ),
-                      ],
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.sizeOf(context).height * .6,
+                  ),
+                  child: SingleChildScrollView(
+                    child: IntrinsicWidth(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 24,
+                        children: [
+                          if (node.params.isNotEmpty)
+                            PropertiesSection(
+                              title: 'Parameters',
+                              children: _buildParametersList(node.params),
+                            ),
+                          if (node.inputDots?.isNotEmpty ?? false)
+                            PropertiesSection(
+                              title: 'Inputs',
+                              children: _buildInputsOutputsWidget(
+                                  node.inputDots ?? []),
+                            ),
+                          if (node.outputDots?.isNotEmpty ?? false)
+                            PropertiesSection(
+                              title: 'Outputs',
+                              children: _buildInputsOutputsWidget(
+                                node.outputDots ?? [],
+                              ),
+                            ),
+                          if (node.userOutput != null)
+                            PropertiesSection(
+                              title: 'Payload',
+                              children: _buildPayloadWidget(node),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -61,6 +73,15 @@ class NodePropertiesCard extends StatelessWidget {
         );
       },
     );
+  }
+
+  List<Widget> _buildPayloadWidget(NodeModel node) {
+    return [
+      Text(
+        "${node.userOutput}",
+        style: AppTextStyles.black16w400,
+      )
+    ];
   }
 
   List<Widget> _buildParametersList(List<ParameterModel> parameters) {
