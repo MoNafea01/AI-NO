@@ -36,12 +36,17 @@ class _ProfileScreenState extends State<ProfileScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _loadProfile();
 
 
     // Load profile when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProfileCubit>().loadProfile();
     });
+  }
+
+  void _loadProfile() {
+    context.read<AuthProvider>().getProfile();
   }
 
   @override

@@ -10,9 +10,11 @@ import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/asset_paths.dart';
 import 'package:ai_gen/features/HomeScreen/screens/dashboard_screen.dart';
+import 'package:ai_gen/features/auth/data/auth_provider.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_in_screen.dart';
 import 'package:ai_gen/features/auth/presentation/auth_screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -34,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _animation;
   String _status = "Loading Server....";
   bool _showRetryButton = false;
-  bool _isNavigating = false; // إضافة flag لمنع التنقل المتكرر
+  bool _isNavigating = false; 
 
   @override
   void initState() {
@@ -52,6 +54,9 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _animationController.repeat(reverse: true);
     _startServer();
+  }
+   void _loadProfile() {
+    context.read<AuthProvider>().getProfile();
   }
 
   Future<void> _startServer() async {
@@ -159,6 +164,7 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
 
       if (accessToken != null && refreshToken != null) {
+        _loadProfile();
         log("Navigating to DashboardScreen (already logged in)");
 
         Navigator.pushReplacement(

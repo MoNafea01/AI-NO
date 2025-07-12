@@ -68,7 +68,7 @@ Map<String, String> ar = {
       'فشل في بدء تشغيل الخادم. يرجى التحقق مما إذا كانت الواجهة الخلفية مهيأة بشكل صحيح.',
 
   // New translations for login/welcome
-  TranslationKeys.welcomeBackToModelCraft: 'مرحباً بعودتك إلى\nModel Craft!',
+  TranslationKeys.welcomeBackToAINO: 'مرحباً بعودتك إلى\nModel Craft!',
   TranslationKeys.signInToContinueDesigning:
       'سجل الدخول لمواصلة تصميم وتطوير نماذجك.',
   TranslationKeys.signInToContinue: 'سجل الدخول للمتابعة',
@@ -84,7 +84,7 @@ Map<String, String> ar = {
   TranslationKeys.createFreeAccount: 'إنشاء حساب مجاني',
 
   // New translations for signup
-  TranslationKeys.joinModelCraftToday: 'انضم إلى Model Craft\nاليوم',
+  TranslationKeys.joinAINOToday: 'انضم إلى Model Craft\nاليوم',
   TranslationKeys.createAccountAndStartBringing:
       'أنشئ حساباً وابدأ في إحياء نماذجك.',
   TranslationKeys.signUp: 'إنشاء حساب',
