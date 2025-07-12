@@ -73,7 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     chatController: _controller,
                     recommendedMessages: const [
                       "Hi",
-                      "Explain this workflow",
+                      "How many 'r' in strawberry",
                       "Make a new node of standard scaler",
                     ],
                   ),
