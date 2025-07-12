@@ -102,7 +102,7 @@ abstract class TranslationKeys {
       'Failed to start server. Please check if the backend is properly configured.';
 
   // New keys for login/welcome
-  static const String welcomeBackToModelCraft = 'Welcome Back to\nModel Craft!';
+  static const String welcomeBackToAINO = 'Welcome Back to A I N O';
   static const String signInToContinueDesigning =
       'Sign in to continue designing and refining your models.';
   static const String signInToContinue = 'Sign in to continue';
@@ -117,7 +117,7 @@ abstract class TranslationKeys {
   static const String createFreeAccount = 'Create free account';
 
   // New keys for signup
-  static const String joinModelCraftToday = 'Join A I N O\nToday';
+  static const String joinAINOToday = 'Join A I N O\nToday';
   static const String createAccountAndStartBringing =
       'Create an account and start bringing your models to life.';
   static const String signUp = 'Sign Up';

@@ -66,7 +66,7 @@ Map<String, String> en = {
       'Failed to start server. Please check if the backend is properly configured.',
 
   // New keys for login/welcome
-  TranslationKeys.welcomeBackToModelCraft: 'Welcome Back to\nModel Craft!',
+  TranslationKeys.welcomeBackToAINO: 'Welcome Back to A I N O',
   TranslationKeys.signInToContinueDesigning:
       'Sign in to continue designing and refining your models.',
   TranslationKeys.signInToContinue: 'Sign in to continue',
@@ -81,7 +81,7 @@ Map<String, String> en = {
   TranslationKeys.createFreeAccount: 'Create free account',
 
   // New keys for signup
-  TranslationKeys.joinModelCraftToday: 'Join A I N O\nToday',
+  TranslationKeys.joinAINOToday: 'Join A I N O\nToday',
   TranslationKeys.createAccountAndStartBringing:
       'Create an account and start bringing your models to life.',
   TranslationKeys.signUp: 'Sign Up',

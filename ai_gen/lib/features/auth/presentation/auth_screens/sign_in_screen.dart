@@ -97,21 +97,21 @@ class _LoginScreenState extends State<LoginScreen>
                 ],
               ),
               padding: const EdgeInsets.all(32.0),
-              child: const Column(
+              child:  Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome Back to A I N O',
-                    style: TextStyle(
+                    TranslationKeys.welcomeBackToAINO.tr,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Sign in to continue designing and refining your models.',
                     style: TextStyle(
                       color: Colors.white,

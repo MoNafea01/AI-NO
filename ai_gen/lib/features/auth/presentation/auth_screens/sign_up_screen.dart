@@ -57,7 +57,7 @@ class _SignupScreenState extends State<SignupScreen>
   @override
   Widget build(BuildContext context) {
     return AuthLayout(
-      title: TranslationKeys.joinModelCraftToday.tr,
+      title: TranslationKeys.joinAINOToday.tr,
       subtitle: TranslationKeys.createAccountAndStartBringing.tr,
       form: const SignupForm(),
       testimonial: const UserTestimonial(),
