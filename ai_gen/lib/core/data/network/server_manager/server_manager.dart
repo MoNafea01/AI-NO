@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -15,7 +16,7 @@ class ServerManager {
     String backendPath = Directory.current.path;
     // String backendPath = '${projectPath.replaceAll('\\ai_gen', '')}\\backend';
     try {
-      print('Starting server from path: $backendPath');
+      log('Starting server from path: $backendPath');
       await _killExistingServers();
 
       // Change to the backend directory first
@@ -27,22 +28,22 @@ class ServerManager {
 
       _serverProcess!.stdout.listen((data) {
         String output = String.fromCharCodes(data);
-        // Only print if it's not a standard Django request log
+        // Only log if it's not a standard Django request log
         if (!output.contains('"GET /api/') && !output.contains('"POST /api/')) {
-          print('Server output: $output');
+          log('Server output: $output');
         }
       });
 
       _serverProcess!.stderr.listen((data) {
         String error = String.fromCharCodes(data);
-        // Only print if it's not a standard Django request log
+        // Only log if it's not a standard Django request log
         if (!error.contains('"GET /api/') && !error.contains('"POST /api/')) {
-          print('Server error: $error');
+          log('Server error: $error');
         }
       });
 
       _serverProcess!.exitCode.then((exitCode) {
-        print('Server process exited with code: $exitCode');
+        log('Server process exited with code: $exitCode');
         _isServerRunning = false;
         _serverProcess = null;
       });
@@ -50,7 +51,7 @@ class ServerManager {
       // Wait and verify server is running with increased timeout and retries
       await _waitForServerToStart();
     } catch (e) {
-      print('Failed to start backend server: $e');
+      log('Failed to start backend server: $e');
       _isServerRunning = false;
     } finally {
       // Restore the original directory
@@ -64,8 +65,7 @@ class ServerManager {
 
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        print(
-            'Attempting to connect to server (attempt $attempt of $maxAttempts)...');
+        log('Attempting to connect to server (attempt $attempt of $maxAttempts)...');
 
         // First try the base URL with increased timeout
         final response = await _dio.get('http://127.0.0.1:8000/api/projects/',
@@ -80,31 +80,29 @@ class ServerManager {
         if (response.statusCode != null &&
             response.statusCode! >= 200 &&
             response.statusCode! <= 301) {
-          print('Server is up and running successfully');
+          log('Server is up and running successfully');
           return;
         }
-        print('Server responded with status code: ${response.statusCode}');
+        log('Server responded with status code: ${response.statusCode}');
       } catch (e) {
-        print('Connection attempt $attempt failed: $e');
+        log('Connection attempt $attempt failed: $e');
         if (e is DioException) {
-          print('DioError type: ${e.type}');
-          print('DioError message: ${e.message}');
+          log('DioError type: ${e.type}');
+          log('DioError message: ${e.message}');
         }
       }
 
       if (attempt < maxAttempts) {
-        print(
-            'Waiting ${waitBetweenAttempts.inSeconds} seconds before next attempt...');
+        log('Waiting ${waitBetweenAttempts.inSeconds} seconds before next attempt...');
         await Future.delayed(waitBetweenAttempts);
       }
     }
-    print(
-        'Failed to start server after $maxAttempts attempts. Please check if the backend server is properly configured and running.');
+    log('Failed to start server after $maxAttempts attempts. Please check if the backend server is properly configured and running.');
   }
 
   Future<void> _killExistingServers() async {
     try {
-      print('Attempting to kill existing servers...');
+      log('Attempting to kill existing servers...');
       // Kill all Python processes and processes on port 8000
       if (Platform.isWindows) {
         await Process.run('taskkill', ['/F', '/IM', 'python.exe']);
@@ -112,14 +110,14 @@ class ServerManager {
           '/c',
           'for /f "tokens=5" %a in (\'netstat -ano ^| findstr :8000\') do taskkill /PID %a /F'
         ]);
-        print('Successfully killed existing servers');
+        log('Successfully killed existing servers');
       } else {
         await Process.run('pkill', ['-f', 'python']);
         await Process.run('fuser', ['-k', '8000/tcp']);
-        print('Successfully killed existing servers');
+        log('Successfully killed existing servers');
       }
     } catch (e) {
-      print('Error killing existing servers: $e');
+      log('Error killing existing servers: $e');
       // Don't rethrow here, as we want to continue even if killing fails
     }
   }
@@ -163,17 +161,16 @@ class ServerManager {
       final scriptPath = '$projectRoot\\run_server.bat';
       final scriptFile = File(scriptPath);
 
-      print('Checking script: $scriptPath in $projectRoot');
+      log('Checking script: $scriptPath in $projectRoot');
 
       // Check if the script file exists
       if (!await scriptFile.exists()) {
-        print('ERROR: Server script not found at: $scriptPath');
-        print(
-            'Please ensure run_server.bat exists in the project root directory.');
+        log('ERROR: Server script not found at: $scriptPath');
+        log('Please ensure run_server.bat exists in the project root directory.');
         return -2; // Special error code for missing script
       }
 
-      print('Running script: $scriptPath in $projectRoot');
+      log('Running script: $scriptPath in $projectRoot');
 
       _serverProcess = await Process.start(
         'cmd',
@@ -183,15 +180,19 @@ class ServerManager {
       );
       _isServerRunning = true;
 
-      _serverProcess!.stdout.transform(SystemEncoding().decoder).listen((data) {
-        print('Script stdout: $data');
+      _serverProcess!.stdout
+          .transform(const SystemEncoding().decoder)
+          .listen((data) {
+        log('Script stdout: $data');
         // You can parse output and make decisions here
       });
 
-      print('Server process: ${_serverProcess?.runtimeType}');
+      log('Server process: ${_serverProcess?.runtimeType}');
 
-      _serverProcess!.stderr.transform(SystemEncoding().decoder).listen((data) {
-        print('Script stderr: $data');
+      _serverProcess!.stderr
+          .transform(const SystemEncoding().decoder)
+          .listen((data) {
+        log('Script stderr: $data');
         // You can parse errors and make decisions here
       });
 
@@ -214,38 +215,37 @@ class ServerManager {
 
           // If we got an exit code, the process failed quickly
           if (exitCode != null && exitCode != 0) {
-            print('ERROR: Server script failed with exit code: $exitCode');
+            log('ERROR: Server script failed with exit code: $exitCode');
             _isServerRunning = false;
             _serverProcess = null;
             return exitCode;
           }
         } catch (e) {
           // If we can't get the exit code, the process might still be running
-          print('Process status check: $e');
+          log('Process status check: $e');
         }
       }
 
       // Don't wait for the process to exit, just start it and return
       // The process will continue running in the background
-      print('Server script started successfully');
+      log('Server script started successfully');
       return 0;
     } catch (e) {
-      print('Error running server script: $e');
+      log('Error running server script: $e');
       _isServerRunning = false;
       _serverProcess = null;
       return -1;
     }
   }
 
-  @override
   Future<void> stopServer() async {
     if (_serverProcess != null) {
-      print('Stopping server...');
+      log('Stopping server...');
       _serverProcess!.kill(ProcessSignal.sigterm);
       await _killExistingServers();
       _isServerRunning = false;
       _serverProcess = null;
-      print('Server stopped');
+      log('Server stopped');
     }
   }
 

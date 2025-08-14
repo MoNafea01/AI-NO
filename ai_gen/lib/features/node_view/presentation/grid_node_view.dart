@@ -10,7 +10,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../chatbot/ui/chat_screen.dart';
-import '../cubit/grid_node_view_cubit.dart';
+import 'cubit/grid_node_view_cubit.dart';
 import 'widgets/menu_actions.dart';
 import 'widgets/node_properties_widget/node_properties_card.dart';
 import 'widgets/node_view_actions/node_selector_menu.dart';
