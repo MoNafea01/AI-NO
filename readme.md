@@ -101,7 +101,7 @@ aino --node create logistic_regression penalty=l1 C=1.0
                        ┌─────────────────┐
                        │ Natural Language│
                        │                 │
-                       │    Chat Bot     │
+                       │    AI Agent     │
                        └─────────────────┘
                                ▲
                                │
@@ -147,11 +147,19 @@ The project includes comprehensive testing infrastructure:
 Custom text-based format for workflow persistence:
 ```
 AINOPRJ_START
-NODE_START
-node_id=123=int
-displayed_name=LogisticRegression=str
-params={"penalty": "l1"}=dict
-NODE_END
+  NODE_START
+		node_id=1713756015072=int
+		displayed_name=Conv2D Layer=str
+		node_name=conv2d_layer=str
+		message=Conv2D layer created=str
+		params=[{'filters': 32}, {'kernel_size': [3, 3]}, {'strides': [1, 1]}, {'padding': 'valid'}, {'activation': 'relu'}]=dict
+		children=[1713752969184]=list
+		location_x=692.691909665341=int
+		location_y=2755.5500376012906=int
+		input_ports=[{'name': 'prev_node', 'connectedNode': {'name': 'layer', 'nodeData': 1713752969184}}]=list
+		output_ports=[{'name': 'layer', 'nodeData': 1713756015072}]=list
+		project=200=int
+  NODE_END
 AINOPRJ_END
 ```
 
@@ -177,20 +185,8 @@ aino --general help
 ```
 
 ## Directory Tree
+### Windows Flutter App
 ```
-├── .github
-    └── workflows
-    │   └── django-tests.yml
-├── .gitignore
-├── .idea
-    ├── .gitignore
-    ├── AI-NO.iml
-    ├── misc.xml
-    ├── modules.xml
-    └── vcs.xml
-├── .vscode
-    ├── launch.json
-    └── settings.json
 ├── ai_gen
     ├── .gitignore
     ├── .metadata
@@ -764,26 +760,29 @@ aino --general help
     │   ├── index.html
     │   └── manifest.json
     └── windows
-    │   ├── .gitignore
-    │   ├── CMakeLists.txt
-    │   ├── flutter
-    │       ├── CMakeLists.txt
-    │       └── generated_plugin_registrant.h
-    │   └── runner
-    │       ├── CMakeLists.txt
-    │       ├── RCa31108
-    │       ├── Runner.rc
-    │       ├── flutter_window.cpp
-    │       ├── flutter_window.h
-    │       ├── main.cpp
-    │       ├── resource.h
-    │       ├── resources
-    │           └── app_icon.ico
-    │       ├── runner.exe.manifest
-    │       ├── utils.cpp
-    │       ├── utils.h
-    │       ├── win32_window.cpp
-    │       └── win32_window.h
+       ├── .gitignore
+       ├── CMakeLists.txt
+       ├── flutter
+           ├── CMakeLists.txt
+           └── generated_plugin_registrant.h
+       └── runner
+           ├── CMakeLists.txt
+           ├── RCa31108
+           ├── Runner.rc
+           ├── flutter_window.cpp
+           ├── flutter_window.h
+           ├── main.cpp
+           ├── resource.h
+           ├── resources
+               └── app_icon.ico
+           ├── runner.exe.manifest
+           ├── utils.cpp
+           ├── utils.h
+           ├── win32_window.cpp
+           └── win32_window.h
+```
+### AI Agent
+```
 ├── chatbot
     ├── .gradio
     │   └── certificate.pem
@@ -842,7 +841,10 @@ aino --general help
     │   ├── select_mode_template.txt
     │   └── steps_estimate_template.txt
     └── utils.py
-├── cli
+```
+### Tool (Used by AI Agent to send API requests to the Desktop DRF for Node Management)
+```
+├── cli 
     ├── __init__.py
     ├── call_cli.py
     ├── data_store.json
@@ -858,11 +860,13 @@ aino --general help
     │   ├── help.txt
     │   ├── mapper.json
     │   └── mapper.py
-├── project
+```
+### Desktop Backend (Based on Django Restful API. Applied Controller-Service-Repository Design Pattern)
+```
+├── project (Desktop Backend)
     ├── ai_operations
     │   ├── __init__.py
     │   ├── admin.py
-    │   ├── ai_operations.code-workspace
     │   ├── apps.py
     │   ├── migrations
     │   │   ├── 0001_initial.py
@@ -882,9 +886,7 @@ aino --general help
     ├── core
     │   ├── __init__.py
     │   ├── blueprint
-    │   │   ├── a_new_one.pkl
-    │   │   ├── nafea_template.pkl
-    │   │   └── test_1.pkl
+    │   │   └── nafea_template.pkl
     │   ├── data.csv
     │   ├── nodes
     │   │   ├── __init__.py
@@ -927,17 +929,6 @@ aino --general help
     │   │   │   ├── preprocessor.py
     │   │   │   ├── transform.py
     │   │   │   └── utils.py
-    │   │   ├── saved
-    │   │   │   ├── data
-    │   │   │   │   ├── train_test_split_2530080747712.pkl
-    │   │   │   │   ├── train_test_split_2530080747713.pkl
-    │   │   │   │   └── train_test_split_2530080747714.pkl
-    │   │   │   ├── models
-    │   │   │   │   ├── lasso_1884557810560.pkl
-    │   │   │   │   └── sgd_regression_1884557187968.pkl
-    │   │   │   └── preprocessors
-    │   │   │   │   ├── label_encoder_1816791067360.pkl
-    │   │   │   │   └── standard_scaler_2430720503312.pkl
     │   │   └── utils.py
     │   ├── repositories
     │   │   ├── __init__.py
@@ -968,19 +959,17 @@ aino --general help
     │   ├── AICON.png
     │   └── AINO.ico
     └── testing
-    │   ├── data.csv
-    │   ├── data_loader_1464733871296.pkl
-    │   ├── linear_regression_2144678909792.pkl
-    │   ├── logistic_regression_2144678917760.pkl
-    │   ├── model_fitter_2291558202736.pkl
-    │   ├── predictor_1661637284016.pkl
-    │   └── standard_scaler_2358630242720.pkl
+    │   ├── *.csv
+    │   ├── *.pkl
 ├── readme.md
 ├── requirements.txt
 ├── run_server.bat
 ├── setup_project.bat
 ├── test.ipynb
-└── website
+```
+### Website Backend
+```
+└── website (Backend)
     └── backend
         ├── .gitignore
         ├── accounts
@@ -989,9 +978,6 @@ aino --general help
             ├── apps.py
             ├── migrations
             │   ├── 0001_initial.py
-            │   ├── 0002_comment_updated_at.py
-            │   ├── 0003_alter_comment_options.py
-            │   ├── 0004_alter_comment_post.py
             │   └── __init__.py
             ├── models.py
             ├── serializers.py
@@ -1020,8 +1006,6 @@ aino --general help
             ├── consumers.py
             ├── migrations
             │   ├── 0001_initial.py
-            │   ├── 0002_alter_message_sender.py
-            │   ├── 0003_room_alter_message_room_name.py
             │   └── __init__.py
             ├── models.py
             ├── routing.py
