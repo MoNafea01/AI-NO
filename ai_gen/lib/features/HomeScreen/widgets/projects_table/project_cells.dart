@@ -1,3 +1,4 @@
+
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,8 +6,9 @@ import 'package:get/get.dart';
 Widget buildDatasetCell(String? dataset) {
   if (dataset == null || dataset.isEmpty) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      margin:
+          const EdgeInsets.symmetric(horizontal: 8), // Moved more to the left
       decoration: BoxDecoration(
         color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(4),
@@ -26,6 +28,7 @@ Widget buildDatasetCell(String? dataset) {
 
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    margin: const EdgeInsets.symmetric(horizontal: 4), // Moved more to the left
     decoration: BoxDecoration(
       color: const Color(0xffF2F2F2),
       borderRadius: BorderRadius.circular(4),
@@ -49,7 +52,8 @@ Widget buildModelCell(String? model) {
   if (model == null || model.isEmpty) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin:
+          const EdgeInsets.symmetric(horizontal: 4), // Moved more to the left
       decoration: BoxDecoration(
         color: const Color(0xffF2F2F2),
         borderRadius: BorderRadius.circular(4),
@@ -69,6 +73,7 @@ Widget buildModelCell(String? model) {
 
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    margin: const EdgeInsets.symmetric(horizontal: 4), // Moved more to the left
     decoration: BoxDecoration(
       color: const Color(0xffF2F2F2),
       borderRadius: BorderRadius.circular(4),

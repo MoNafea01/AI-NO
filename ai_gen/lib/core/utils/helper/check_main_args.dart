@@ -8,7 +8,7 @@ import 'package:ai_gen/core/data/cache/cache_services/cache_service.dart';
 import '../../models/project_model.dart';
 
 ///to pass arguments to test it
-/// flutter run -d windows --dart-define=file_path="C:\Users\mahmo\Desktop\ELDemy.ainoprj"
+/// flutter run -d windows --dart-define=file_path="D:\College\4th\Graduation Project\test\AINO 2.ainoprj"
 Future<ProjectModel?> checkArgs(List<String> args) async {
   print("Command line args: $args");
 

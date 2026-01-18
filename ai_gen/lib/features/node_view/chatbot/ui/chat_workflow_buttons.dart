@@ -1,3 +1,4 @@
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
 import 'package:ai_gen/features/node_view/chatbot/controller/chat_controller.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,9 @@ class ChatWorkflowButtons extends StatelessWidget {
         children: List.generate(
           recommendedMessages.length,
           (index) => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor.withValues(alpha: .8),
+            ),
             onPressed: () {
               chatController.sendMessage(recommendedMessages[index]);
             },

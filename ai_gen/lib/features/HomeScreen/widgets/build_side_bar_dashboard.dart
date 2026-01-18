@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:ai_gen/core/translation/translation_keys.dart';
 import 'package:ai_gen/core/utils/app_constants.dart';
 import 'package:ai_gen/core/utils/themes/app_colors.dart';
@@ -9,14 +11,14 @@ import 'package:ai_gen/features/HomeScreen/widgets/logout_btn.dart';
 import 'package:ai_gen/features/HomeScreen/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 Widget buildSidebar(BuildContext context, DashboardState state) {
   return AnimatedContainer(
     duration: const Duration(milliseconds: 300),
     curve: Curves.easeInOut,
-    width: state.isExpanded ? 230 : 110,
+    width: state.isExpanded ? 200 : 110,
     decoration: BoxDecoration(
       color: Colors.white,
       border: Border(
@@ -32,7 +34,7 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             mainAxisAlignment: state.isExpanded
-                ? MainAxisAlignment.start
+                ? MainAxisAlignment.center
                 : MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
@@ -83,51 +85,50 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
                     context.read<DashboardCubit>().toggleSidebar();
                   },
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: state.isExpanded
-                          ? MainAxisAlignment.center
-                          : MainAxisAlignment.center,
-                      children: [
-                        AnimatedRotation(
-                          turns: state.isExpanded ? 0 : 0.5,
-                          duration: const Duration(milliseconds: 300),
-                          child: SvgPicture.asset(
-                            AssetsPaths.expandedIcon,
-                            width: 20,
-                            height: 20,
-                            color: const Color(0xff666666),
-                          ),
-                        ),
-                        if (state.isExpanded) const SizedBox(width: 8),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SizeTransition(
-                                sizeFactor: animation,
-                                axis: Axis.horizontal,
-                                child: child,
+                    padding: EdgeInsets.symmetric(
+                        horizontal: state.isExpanded ? 20 : 4, vertical: 4),
+                    child: state.isExpanded
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AnimatedRotation(
+                                turns: 0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Image.asset(
+                                  AssetsPaths.collapseIcon,
+                                  width: 50,
+                                  height: 50,
+                                  color: const Color(0xff383838),
+                                ),
                               ),
-                            );
-                          },
-                          child: state.isExpanded
-                              ? Text(
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
                                   TranslationKeys.collapse.tr,
-                                  key: const ValueKey('collapse-text'),
                                   style: const TextStyle(
-                                    fontSize: 18,
-                                    color: Color(0xff383838),
-                                  ),
-                                )
-                              : const SizedBox.shrink(key: ValueKey('no-text')),
-                        ),
-                      ],
-                    ),
+                                      fontSize: 18,
+                                      color: Color(0xff383838),
+                                      fontWeight: FontWeight.w600,
+                                      overflow: TextOverflow.ellipsis,
+                                      fontFamily: AppConstants.appFontName),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Center(
+                            child: AnimatedRotation(
+                              turns: 0.5,
+                              duration: const Duration(milliseconds: 300),
+                              child: Image.asset(
+                                AssetsPaths.collapseIcon,
+                                width: 50,
+                                height: 50,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -144,12 +145,14 @@ Widget buildSidebar(BuildContext context, DashboardState state) {
         Container(
           width: double.infinity,
           alignment: state.isExpanded ? Alignment.centerLeft : Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 1),
           child: const ProfileWidget(),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Container(
           width: double.infinity,
-          alignment: state.isExpanded ? Alignment.centerLeft : Alignment.center,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 2),
           child: logoutButton(context, state.isExpanded),
         ),
         const SizedBox(height: 16),
@@ -166,11 +169,6 @@ List<Widget> buildAnimatedSidebarItems(
       'label': TranslationKeys.explore.tr,
       'screen': AppScreen.explore
     },
-    // {
-    //   'icon': AssetsPaths.architectureIcon,
-    //   'label': 'Architectures',
-    //   'screen': AppScreen.architectures
-    // },
     {
       'icon': AssetsPaths.modelIcon,
       'label': TranslationKeys.models.tr,
@@ -182,7 +180,7 @@ List<Widget> buildAnimatedSidebarItems(
       'screen': AppScreen.datasets
     },
     {
-      'icon': AssetsPaths.learnIcon,
+      'icon': AssetsPaths.learnScreenIcon,
       'label': TranslationKeys.learn.tr,
       'screen': AppScreen.learn
     },
@@ -231,8 +229,8 @@ Widget animatedSidebarItem(
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
+        padding: EdgeInsets.symmetric(
+          horizontal: isExpanded ? 32 : 16,
           vertical: 12,
         ),
         decoration: BoxDecoration(
@@ -242,43 +240,48 @@ Widget animatedSidebarItem(
         child: Row(
           mainAxisAlignment:
               isExpanded ? MainAxisAlignment.start : MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             AnimatedScale(
               scale: isActive ? 1.1 : 1.0,
               duration: const Duration(milliseconds: 200),
-              child: SvgPicture.asset(
+              child: Image.asset(
                 iconPath,
-                width: 20,
-                height: 20,
-                color: isActive ? Colors.white : Colors.grey.shade700,
+                width: isExpanded ? 24 : 50,
+                height: isExpanded ? 24 : 50,
+                color: isActive ? Colors.white : Colors.black,
               ),
             ),
             if (isExpanded) const SizedBox(width: 12),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: SizeTransition(
-                    sizeFactor: animation,
-                    axis: Axis.horizontal,
-                    child: child,
-                  ),
-                );
-              },
-              child: isExpanded
-                  ? Text(
-                      label,
-                      key: ValueKey('$label-expanded'),
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight:
-                            isActive ? FontWeight.w500 : FontWeight.normal,
-                        color: isActive ? Colors.white : Colors.black,
+            if (isExpanded)
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SizeTransition(
+                        sizeFactor: animation,
+                        axis: Axis.horizontal,
+                        child: child,
                       ),
-                    )
-                  : const SizedBox.shrink(key: ValueKey('collapsed-text')),
-            ),
+                    );
+                  },
+                  child: Text(
+                    label,
+                    key: ValueKey('$label-expanded'),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight:
+                            isActive ? FontWeight.w700 : FontWeight.w600,
+                        color: isActive ? Colors.white : Colors.black,
+                        fontFamily: AppConstants.appFontName),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

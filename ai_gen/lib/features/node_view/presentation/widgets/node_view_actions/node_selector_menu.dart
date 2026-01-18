@@ -144,10 +144,17 @@ class _NodeSelectorMenuState extends State<NodeSelectorMenu> {
         scale: 1 / widget.vsNodeDataProvider.viewportScale,
         child: Card(
           // key: _anchor,
+          color: AppColors.grey100,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              children: [Text(entry.key), const SizedBox(width: 100)],
+              children: [
+                Text(
+                  entry.key,
+                  style: AppTextStyles.black14Bold,
+                ),
+                const SizedBox(width: 100)
+              ],
             ),
           ),
         ),

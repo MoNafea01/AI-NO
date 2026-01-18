@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ai_gen/features/node_view/cubit/grid_node_view_cubit.dart';
+import 'package:ai_gen/features/node_view/presentation/cubit/grid_node_view_cubit.dart';
 import 'package:flutter/material.dart';
 
 import '../services/chat_service.dart';
@@ -70,7 +70,7 @@ class ChatController extends ChangeNotifier {
         _messages.add(ChatMessage(sender: 'bot', text: output.toString()));
       }
     } catch (e) {
-      _messages.add(ChatMessage(sender: 'bot', text: 'Error: ${e.toString()}'));
+      _messages.add(ChatMessage(sender: 'bot', text: 'Error: No Response'));
     }
     _isLoading = false;
     notifyListeners();

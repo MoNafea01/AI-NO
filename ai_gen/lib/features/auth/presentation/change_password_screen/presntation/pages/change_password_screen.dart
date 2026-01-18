@@ -1,0 +1,213 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:ai_gen/core/translation/translation_keys.dart';
+import 'package:ai_gen/core/utils/app_constants.dart';
+import 'package:ai_gen/core/utils/themes/app_colors.dart';
+import 'package:ai_gen/features/auth/presentation/change_password_screen/presntation/widgets/build_password_field.dart';
+import 'package:ai_gen/features/auth/presentation/request_otp_screen/presentation/pages/request_otp_screen.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:ai_gen/features/auth/data/auth_provider.dart';
+
+class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
+
+  @override
+  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+}
+
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _oldPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  bool _isLoading = false;
+  bool _obscureOld = true;
+  bool _obscureNew = true;
+  bool _obscureConfirm = true;
+
+  void _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+    try {
+      // Make sure new password and confirm password match
+      if (_newPasswordController.text != _confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text(TranslationKeys.newPasswordAndConfirmationMustMatch.tr),
+          ),
+        );
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      bool success = await context.read<AuthProvider>().changePassword(
+            oldPassword: _oldPasswordController.text.trim(),
+            newPassword: _newPasswordController.text.trim(),
+            context: context,
+          );
+
+      if (success) {
+        // Show success message with custom style
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 10),
+                Text(TranslationKeys.passwordChangedSuccessfully.tr),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+        // Clear the password fields
+        _oldPasswordController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
+
+        setState(() {
+          _obscureOld = true;
+          _obscureNew = true;
+          _obscureConfirm = true;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white),
+              const SizedBox(width: 10),
+              Expanded(
+                  child: Text("${TranslationKeys.error.tr}${e.toString()}")),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                buildLabel(TranslationKeys.currentPasswordTitle.tr),
+                buildPasswordField(_oldPasswordController, _obscureOld, () {
+                  setState(() => _obscureOld = !_obscureOld);
+                }),
+                const SizedBox(height: 24),
+                buildLabel(TranslationKeys.changePasswordTitle.tr),
+                buildPasswordField(_newPasswordController, _obscureNew, () {
+                  setState(() => _obscureNew = !_obscureNew);
+                }),
+                const SizedBox(height: 24),
+                buildLabel(TranslationKeys.confirmPasswordTitle.tr),
+                Row(
+                  children: [
+                    Expanded(
+                      child: buildPasswordField(
+                          _confirmPasswordController, _obscureConfirm, () {
+                        setState(() => _obscureConfirm = !_obscureConfirm);
+                      }),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        backgroundColor: AppColors.bluePrimaryColor,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 18),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: AppColors.primaryColor,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(TranslationKeys.confirm.tr,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              )),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Tooltip(
+                  decoration: BoxDecoration(
+                    color: AppColors.bluePrimaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.textSecondary),
+                  ),
+                  message: TranslationKeys.forgotPasswordToolTipDescription.tr,
+                  child: TextButton(
+                    onPressed: () {
+                      // Navigate to forgot password screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const RequestOtpScreen()),
+                      );
+                    },
+                    child: Text(
+                      TranslationKeys.forgotPassword.tr,
+                      style: const TextStyle(
+                          color: AppColors.bluePrimaryColor,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: AppConstants.appFontName),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
