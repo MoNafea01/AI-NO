@@ -61,6 +61,11 @@ jobs:
       run:
         working-directory: src
     env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+      POSTGRES_MAIN_DB: aino_test
+      POSTGRES_USERNAME: aino
+      POSTGRES_PASSWORD: aino_test
       DATABASE_URL: postgresql+asyncpg://aino:aino_test@localhost:5432/aino_test
       REDIS_URL: redis://localhost:6379/0
       SECRET_KEY: test-secret-key-ci
@@ -82,7 +87,7 @@ jobs:
 
       - name: Apply migrations
         run: |
-          alembic upgrade head
+          alembic -c app/db/sql/alembic.ini upgrade head
 
       - name: Run tests
         run: |
