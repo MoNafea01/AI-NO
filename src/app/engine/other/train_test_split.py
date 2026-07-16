@@ -79,7 +79,9 @@ class TrainTestSplit(BaseNode):
                 displayed_name=self.displayed_name,
             )
 
-            EnginePersistence.save_result(payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
         except Exception as e:

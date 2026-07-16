@@ -52,12 +52,8 @@ class Settings(BaseSettings):
         alias="SECRET_KEY",
     )
     algorithm: str = "HS256"
-    access_token_expire_minutes: int = Field(
-        default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
-    )
-    refresh_token_expire_days: int = Field(
-        default=7, alias="REFRESH_TOKEN_EXPIRE_DAYS"
-    )
+    access_token_expire_minutes: int = Field(default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    refresh_token_expire_days: int = Field(default=7, alias="REFRESH_TOKEN_EXPIRE_DAYS")
 
     # AI Services
     GENERATION_BACKEND: str = "GROQ"

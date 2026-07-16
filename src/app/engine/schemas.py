@@ -24,9 +24,7 @@ class NodePayload(BaseModel):
     """Validated structure for a saved/returned node payload."""
 
     message: str
-    node_id: int = Field(
-        default_factory=lambda: uuid.uuid4().int & ((1 << 63) - 1)
-    )
+    node_id: int = Field(default_factory=lambda: uuid.uuid4().int & ((1 << 63) - 1))
     node_name: str
     node_data: Any = None
     task: str = "general"

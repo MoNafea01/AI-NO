@@ -1,4 +1,3 @@
-
 from typing import Any
 
 from pydantic import Field
@@ -6,6 +5,7 @@ from pydantic import Field
 from .base import BaseSchema, EmailStr, JSONOrInt
 
 # ── Component Schemas ──
+
 
 class ComponentCreate(BaseSchema):
     id: int
@@ -89,10 +89,12 @@ class NodeTemplateLoadRequest(BaseSchema):
     project_id: int | None = None
     workflow_id: int | None = None
 
+
 # ── Workflow Schemas ──
 class WorkflowCreate(BaseSchema):
     name: str = Field(..., max_length=255)
     description: str = ""
+
 
 class WorkflowUpdate(BaseSchema):
     name: str | None = Field(None, max_length=255)

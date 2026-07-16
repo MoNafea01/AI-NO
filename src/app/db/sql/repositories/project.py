@@ -1,5 +1,4 @@
-﻿"""Project repository."""
-
+"""Project repository."""
 
 from sqlalchemy import delete, select
 
@@ -22,13 +21,9 @@ class ProjectRepository(BaseRepository[Project]):
         async with self.session_factory() as session:
             query = select(Project).where(Project.user_id == user_id)
             if model_name:
-                query = query.where(
-                    Project.model == model_name
-                )
+                query = query.where(Project.model == model_name)
             if dataset_name:
-                query = query.where(
-                    Project.dataset == dataset_name
-                )
+                query = query.where(Project.dataset == dataset_name)
             result = await session.execute(query.offset(skip).limit(limit))
             return list(result.scalars().all())
 
@@ -37,13 +32,7 @@ class ProjectRepository(BaseRepository[Project]):
             from app.db.sql.models.node import Node
 
             subq = select(Node.project_id).where(Node.project_id.is_not(None))
-            statement = (
-                delete(Project)
-                .where(
-                    Project.user_id == user_id,
-                    Project.id.notin_(subq)
-                )
-            )
+            statement = delete(Project).where(Project.user_id == user_id, Project.id.notin_(subq))
             result = await session.execute(statement)
             await session.commit()
 
@@ -53,11 +42,7 @@ class ProjectRepository(BaseRepository[Project]):
         async with self.session_factory() as session:
             query = (
                 select(Project.model)
-                .where(
-                    Project.user_id == user_id,
-                    Project.model.is_not(None),
-                    Project.model != ''
-                )
+                .where(Project.user_id == user_id, Project.model.is_not(None), Project.model != "")
                 .distinct()
                 .order_by(Project.model)
             )
@@ -69,9 +54,7 @@ class ProjectRepository(BaseRepository[Project]):
             query = (
                 select(Project.dataset)
                 .where(
-                    Project.user_id == user_id,
-                    Project.dataset.is_not(None),
-                    Project.dataset != ''
+                    Project.user_id == user_id, Project.dataset.is_not(None), Project.dataset != ""
                 )
                 .distinct()
                 .order_by(Project.dataset)

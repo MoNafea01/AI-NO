@@ -26,9 +26,7 @@ class Node(SQLAlchemyBase, TimestampMixin):
     type = Column(String(255), default="general")
 
     # Foreign key
-    project_id = Column(
-        Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=True
-    )
+    project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=True)
     component_id = Column(
         BigInteger,
         ForeignKey("components.id", ondelete="SET NULL"),

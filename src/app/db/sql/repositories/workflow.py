@@ -1,7 +1,6 @@
 """Workflow repository — async CRUD for API layer,
 sync helpers for Celery engine layer."""
 
-
 import logging
 import uuid
 
@@ -169,7 +168,9 @@ class WorkflowStepRepository(BaseRepository[WorkflowStep]):
             status="pending",
         )
 
-    async def update_step_status(self, step_id: int, status: str, error: str | None = None, result: dict | None = None):
+    async def update_step_status(
+        self, step_id: int, status: str, error: str | None = None, result: dict | None = None
+    ):
         kwargs = {"status": status}
         if error is not None:
             kwargs["error"] = error
@@ -216,4 +217,3 @@ class WorkflowStepRepository(BaseRepository[WorkflowStep]):
                     session.commit()
         except Exception:
             logger.exception("Failed to update step for node %s", node_id)
-

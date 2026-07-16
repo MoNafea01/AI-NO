@@ -12,8 +12,10 @@ class WorkflowSnapshot(SQLAlchemyBase, TimestampMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     workflow_id = Column(
-        Integer, ForeignKey("workflows.id", ondelete="CASCADE"),
-        nullable=False, index=True,
+        Integer,
+        ForeignKey("workflows.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     version = Column(Integer, nullable=False)
     snapshot = Column(JSONB, nullable=False)

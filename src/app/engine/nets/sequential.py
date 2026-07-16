@@ -4,8 +4,12 @@ from ..repositories.execution import EnginePersistence
 from .base_layer import BaseLayer
 
 _VALID_LAYER_NAMES = {
-    "input_layer", "dense_layer", "dropout_layer", "conv2d_layer",
-    "maxpool2d_layer", "flatten_layer",
+    "input_layer",
+    "dense_layer",
+    "dropout_layer",
+    "conv2d_layer",
+    "maxpool2d_layer",
+    "flatten_layer",
 }
 
 
@@ -69,8 +73,7 @@ class SequentialNet(BaseLayer):
             type_name = _LAYER_TYPE_MAP.get(type(layer))
             if type_name not in _VALID_LAYER_NAMES:
                 self._err = (
-                    f"Layer at position {i} ({type(layer).__name__}) "
-                    f"is not a valid network layer"
+                    f"Layer at position {i} ({type(layer).__name__}) is not a valid network layer"
                 )
                 return
 
@@ -96,8 +99,7 @@ class SequentialNet(BaseLayer):
                 break
             layers_ids.append(cur_id)
         layers = [
-            EnginePersistence.load_data(layer_id, project_id=project_id)
-            for layer_id in layers_ids
+            EnginePersistence.load_data(layer_id, project_id=project_id) for layer_id in layers_ids
         ][::-1]
         layers_names = list(map(lambda x: x.name, layers))
         return layers, layers_names, layers_ids[0]

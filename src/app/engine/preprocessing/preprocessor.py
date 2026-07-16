@@ -6,6 +6,7 @@ from ..utils import NodeNameHandler
 
 class Preprocessor(BaseNode):
     """Handles preprocessors creation and parameter management."""
+
     def __init__(self, **kwargs):
         self.preprocessor_name = kwargs.pop("preprocessor_name", "")
         self.preprocessor_type = kwargs.pop("preprocessor_type", "")
@@ -34,13 +35,13 @@ class Preprocessor(BaseNode):
 
     def _get_default_params(self) -> dict:
         try:
-            return preprocessors.get(self.preprocessor_name, {}).get('params', {})
+            return preprocessors.get(self.preprocessor_name, {}).get("params", {})
         except AttributeError:
             return f"Invalid configuration for preprocessor type: {self.preprocessor_type}, task: {self.task}, preprocessor name: {self.preprocessor_name}."
 
     @property
     def node_class(self):
-        return preprocessors.get(self.preprocessor_name, {}).get('node', None)
+        return preprocessors.get(self.preprocessor_name, {}).get("node", None)
 
     def node_params(self):
         exclude = {"preprocessor_name", "preprocessor_type", "task"}

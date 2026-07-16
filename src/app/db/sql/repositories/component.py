@@ -1,4 +1,4 @@
-﻿"""Component repository."""
+"""Component repository."""
 
 from collections.abc import Iterable
 from typing import Any
@@ -63,9 +63,7 @@ class ComponentRepository(BaseRepository[Component]):
 
     async def get_by_name(self, name: str):
         async with self.session_factory() as session:
-            result = await session.execute(
-                select(Component).where(Component.name == name)
-            )
+            result = await session.execute(select(Component).where(Component.name == name))
             return result.scalar_one_or_none()
 
     async def get_by_category(self, category: str) -> list[Component]:
@@ -80,9 +78,7 @@ class ComponentRepository(BaseRepository[Component]):
 
     async def get_by_task(self, task: str) -> list[Component]:
         async with self.session_factory() as session:
-            result = await session.execute(
-                select(Component).where(Component.task == task)
-            )
+            result = await session.execute(select(Component).where(Component.task == task))
             return list(result.scalars().all())
 
     async def clear_all(self) -> int:
@@ -169,4 +165,3 @@ class ComponentRepository(BaseRepository[Component]):
             "created_components": created_components,
             "updated_components": updated_components,
         }
-

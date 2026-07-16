@@ -37,9 +37,7 @@ def _build_snapshot(node) -> dict:
 
 
 @workflow_router.get("/runs/{run_id}")
-async def get_run_status(
-    request: Request, run_id: int, user: dict = Depends(get_current_user)
-):
+async def get_run_status(request: Request, run_id: int, user: dict = Depends(get_current_user)):
     """Get the current status of a workflow run."""
     repo = WorkflowRunRepository(request.app.state.db_client)
     run = await repo.get_with_steps(run_id)
@@ -68,7 +66,7 @@ async def get_run_status(
 
 @workflow_router.get("/{project_id}/", response_model=list[WorkflowResponse])
 async def list_workflows(
-    request: Request, project_id: int=None, user: dict = Depends(get_current_user)
+    request: Request, project_id: int = None, user: dict = Depends(get_current_user)
 ):
     """List all workflow tabs for a project."""
     repo = WorkflowRepository(request.app.state.db_client)
@@ -88,11 +86,13 @@ async def create_workflow(
     return await repo.create(project_id=project_id, name=body.name, description=body.description)
 
 
-
 @workflow_router.get("/{project_id}/{workflow_id}", response_model=WorkflowDetailResponse)
 async def get_workflow(
-    request: Request, project_id: int, workflow_id: int,
-    include_nodes: int = 0, user: dict = Depends(get_current_user),
+    request: Request,
+    project_id: int,
+    workflow_id: int,
+    include_nodes: int = 0,
+    user: dict = Depends(get_current_user),
 ):
     """Get workflow details including its nodes."""
     repo = WorkflowRepository(request.app.state.db_client)
@@ -135,7 +135,9 @@ async def update_workflow(
 
 @workflow_router.delete("/{project_id}/{workflow_id}")
 async def delete_workflow(
-    request: Request, project_id: int, workflow_id: int,
+    request: Request,
+    project_id: int,
+    workflow_id: int,
     user: dict = Depends(get_current_user),
 ):
     """Delete a workflow and its associated nodes + cache entries."""
@@ -143,9 +145,7 @@ async def delete_workflow(
     wf = await repo.get(workflow_id)
     if not wf or wf.project_id != project_id:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    await asyncio.to_thread(
-        EnginePersistence.cache_invalidate_workflow, workflow_id
-    )
+    await asyncio.to_thread(EnginePersistence.cache_invalidate_workflow, workflow_id)
     await repo.delete(workflow_id)
     return MessageResponse(message="Workflow deleted")
 
@@ -207,8 +207,11 @@ async def run_workflow(
 
 @workflow_router.get("/{project_id}/{workflow_id}/runs")
 async def list_runs(
-    request: Request, project_id: int, workflow_id: int,
-    user: dict = Depends(get_current_user), limit: int = 50,
+    request: Request,
+    project_id: int,
+    workflow_id: int,
+    user: dict = Depends(get_current_user),
+    limit: int = 50,
 ):
     """List all runs for a workflow."""
     repo = WorkflowRunRepository(request.app.state.db_client)
@@ -293,9 +296,7 @@ async def list_snapshots(
     ]
 
 
-@workflow_router.post(
-    "/{project_id}/{workflow_id}/snapshots/{snapshot_id}/restore"
-)
+@workflow_router.post("/{project_id}/{workflow_id}/snapshots/{snapshot_id}/restore")
 async def restore_snapshot(
     request: Request,
     project_id: int,
@@ -367,9 +368,7 @@ async def restore_snapshot(
     await wf_repo.update(workflow_id, current_version=snap.version)
 
     # 4. Invalidate cache for this workflow
-    await asyncio.to_thread(
-        EnginePersistence.cache_invalidate_workflow, workflow_id
-    )
+    await asyncio.to_thread(EnginePersistence.cache_invalidate_workflow, workflow_id)
 
     return {
         "message": f"Restored from version {snap.version}",
@@ -400,7 +399,13 @@ async def undo_snapshot(
         raise HTTPException(status_code=404, detail="Previous snapshot not found")
 
     return await _apply_snapshot(
-        request, wf_repo, snap_repo, project_id, workflow_id, wf, snap,
+        request,
+        wf_repo,
+        snap_repo,
+        project_id,
+        workflow_id,
+        wf,
+        snap,
     )
 
 
@@ -425,12 +430,24 @@ async def redo_snapshot(
         raise HTTPException(status_code=400, detail="Nothing to redo")
 
     return await _apply_snapshot(
-        request, wf_repo, snap_repo, project_id, workflow_id, wf, snap,
+        request,
+        wf_repo,
+        snap_repo,
+        project_id,
+        workflow_id,
+        wf,
+        snap,
     )
 
 
 async def _apply_snapshot(
-    request, wf_repo, snap_repo, project_id, workflow_id, wf, snap,
+    request,
+    wf_repo,
+    snap_repo,
+    project_id,
+    workflow_id,
+    wf,
+    snap,
 ):
     """Shared logic for restore/undo/redo: replace nodes + update current_version."""
     node_repo = NodeRepository(request.app.state.db_client)
@@ -482,9 +499,7 @@ async def _apply_snapshot(
 
     await wf_repo.update(workflow_id, current_version=snap.version)
 
-    await asyncio.to_thread(
-        EnginePersistence.cache_invalidate_workflow, workflow_id
-    )
+    await asyncio.to_thread(EnginePersistence.cache_invalidate_workflow, workflow_id)
 
     return {
         "message": f"Restored from version {snap.version}",

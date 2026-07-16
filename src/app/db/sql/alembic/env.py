@@ -13,12 +13,11 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 _env_path = Path(__file__).resolve().parents[3] / ".env"
 if _env_path.exists():
     from dotenv import load_dotenv
+
     load_dotenv(_env_path)
 
 sys.path.append(
-    os.path.realpath(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../../../")
-    )
+    os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../../../"))
 )
 
 from app.db.sql.models import SQLAlchemyBase  # noqa: E402
@@ -26,6 +25,7 @@ from app.db.sql.models import SQLAlchemyBase  # noqa: E402
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
 
 # Override sqlalchemy.url from environment variables if available
 def get_database_url():
@@ -39,6 +39,7 @@ def get_database_url():
     if all([host, db, user, password]):
         return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"
     return None
+
 
 # Require environment variables for database URL
 db_url = get_database_url()

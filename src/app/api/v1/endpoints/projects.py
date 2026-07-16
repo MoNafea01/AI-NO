@@ -1,5 +1,4 @@
-﻿"""Project CRUD endpoints."""
-
+"""Project CRUD endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
@@ -36,9 +35,7 @@ async def list_projects(
     )
 
 
-@projects_router.post(
-    "/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED
-)
+@projects_router.post("/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
 async def create_project(
     request: Request, body: ProjectCreate, user: dict = Depends(get_current_user)
 ):
@@ -76,6 +73,7 @@ async def delete_empty_projects(request: Request, user: dict = Depends(get_curre
     count = await repo.delete_empty_projects(user_id=user_id)
     return MessageResponse(message=f"Deleted {count} empty projects")
 
+
 @projects_router.get("/models")
 async def list_project_models(request: Request, user: dict = Depends(get_current_user)):
     repo = _get_repo(request)
@@ -99,6 +97,7 @@ async def list_project_datasets(request: Request, user: dict = Depends(get_curre
     datasets = await repo.get_distinct_datasets(user_id=user_id)
     return {"success": True, "datasets": datasets, "count": len(datasets)}
 
+
 @projects_router.post("/multi-project-nodes")
 async def multi_project_nodes(
     request: Request, body: list[dict], user: dict = Depends(get_current_user)
@@ -121,10 +120,7 @@ async def multi_project_nodes(
         repo = _get_repo(request)
         project = await repo.get_by_id(project_id)
         if not project:
-            project = await repo.create(
-                name=project_name,
-                description=project_description
-            )
+            project = await repo.create(name=project_name, description=project_description)
             project_id = project.id
 
         node_repo = NodeRepository(request.app.state.db_client)
@@ -141,18 +137,22 @@ async def multi_project_nodes(
             except Exception as e:
                 logger.warning(
                     "Failed to create node %s in project %s: %s",
-                    node_data.get("id"), project_id, e,
+                    node_data.get("id"),
+                    project_id,
+                    e,
                 )
-                project_results.append({
-                    "id": node_data.get("id"),
-                    "status": "failed",
-                    "error": str(e),
-                })
+                project_results.append(
+                    {
+                        "id": node_data.get("id"),
+                        "status": "failed",
+                        "error": str(e),
+                    }
+                )
 
         results[str(project_id)] = {
             "project_name": project_name,
             "nodes_processed": len(project_results),
-            "results": project_results
+            "results": project_results,
         }
 
     return results
@@ -186,7 +186,9 @@ async def get_project(
 
 @projects_router.put("/{project_id}", response_model=ProjectResponse)
 async def update_project(
-    request: Request, project_id: int, body: ProjectUpdate,
+    request: Request,
+    project_id: int,
+    body: ProjectUpdate,
     user: dict = Depends(get_current_user),
 ):
     repo = _get_repo(request)

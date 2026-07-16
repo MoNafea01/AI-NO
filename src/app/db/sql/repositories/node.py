@@ -18,15 +18,10 @@ class NodeRepository(BaseRepository[Node]):
 
     # ── Read ──────────────────────────────────────────────────────────────
 
-    async def get_by_project(
-        self, project_id: int, skip: int = 0, limit: int = 1000
-    ) -> list[Node]:
+    async def get_by_project(self, project_id: int, skip: int = 0, limit: int = 1000) -> list[Node]:
         async with self.session_factory() as session:
             result = await session.execute(
-                select(Node)
-                .where(Node.project_id == project_id)
-                .offset(skip)
-                .limit(limit)
+                select(Node).where(Node.project_id == project_id).offset(skip).limit(limit)
             )
             return list(result.scalars().all())
 
@@ -49,9 +44,7 @@ class NodeRepository(BaseRepository[Node]):
             )
             return result.scalar_one_or_none()
 
-    async def get_by_node_id(
-        self, node_id: int, project_id: int | None = None
-    ) -> Node | None:
+    async def get_by_node_id(self, node_id: int, project_id: int | None = None) -> Node | None:
         async with self.session_factory() as session:
             query = select(Node).where(Node.id == node_id)
             if project_id is not None:
@@ -81,9 +74,7 @@ class NodeRepository(BaseRepository[Node]):
 
     async def clear_project_nodes(self, project_id: int) -> int:
         async with self.session_factory() as session:
-            result = await session.execute(
-                delete(Node).where(Node.project_id == project_id)
-            )
+            result = await session.execute(delete(Node).where(Node.project_id == project_id))
             await session.commit()
             return result.rowcount
 
@@ -196,7 +187,9 @@ class NodeRepository(BaseRepository[Node]):
 
         return await self.delete(node_id)
 
-    async def clear_workflow_with_files(self, workflow_id: int, project_id: int | None = None) -> int:
+    async def clear_workflow_with_files(
+        self, workflow_id: int, project_id: int | None = None
+    ) -> int:
         """Delete all nodes for a workflow and remove their .pkl files."""
         nodes = await self.get_by_workflow(workflow_id, project_id)
         for node in nodes:
@@ -231,6 +224,7 @@ class NodeRepository(BaseRepository[Node]):
 
         # Clean up the saving directory
         import shutil
+
         saving_dir = os.path.abspath(SAVING_DIR)
         if os.path.exists(saving_dir):
             shutil.rmtree(saving_dir, ignore_errors=True)
@@ -246,10 +240,12 @@ class NodeRepository(BaseRepository[Node]):
 
         with get_sync_session() as session:
             return list(
-                session.query(Node).filter(
+                session.query(Node)
+                .filter(
                     Node.project_id == project_id,
                     Node.workflow_id == workflow_id,
-                ).all()
+                )
+                .all()
             )
 
     @staticmethod

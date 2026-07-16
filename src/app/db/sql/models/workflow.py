@@ -31,7 +31,9 @@ class Workflow(SQLAlchemyBase, TimestampMixin):
     project = relationship("Project", back_populates="workflows")
     nodes = relationship("Node", back_populates="workflow", cascade="all, delete-orphan")
     runs = relationship("WorkflowRun", back_populates="workflow", cascade="all, delete-orphan")
-    snapshots = relationship("WorkflowSnapshot", back_populates="workflow", cascade="all, delete-orphan")
+    snapshots = relationship(
+        "WorkflowSnapshot", back_populates="workflow", cascade="all, delete-orphan"
+    )
 
 
 class WorkflowRun(SQLAlchemyBase, TimestampMixin):

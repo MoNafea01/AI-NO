@@ -54,6 +54,7 @@ def execute_workflow(
     Hash-based caching skips nodes whose inputs haven't changed.
     """
     import tensorflow as tf
+
     tf.get_logger().setLevel("ERROR")
 
     from app.services.node_service import NODE_CLASS_REGISTRY
@@ -92,7 +93,8 @@ def execute_workflow(
                     if node.type not in NODE_CLASS_REGISTRY:
                         logger.warning(
                             "Skipping node %s — unknown type '%s'",
-                            node_id, node.type,
+                            node_id,
+                            node.type,
                         )
                         continue
 
@@ -126,9 +128,7 @@ def execute_workflow(
                             with error_lock:
                                 error_count += 1
                     except Exception:
-                        logger.exception(
-                            "Thread failed for node %s", node_id
-                        )
+                        logger.exception("Thread failed for node %s", node_id)
                         with error_lock:
                             error_count += 1
                         parent_hashes[node_id] = f"error:{node_id}"
@@ -137,9 +137,7 @@ def execute_workflow(
         final_status = "completed" if error_count == 0 else "completed_with_errors"
         WorkflowRunRepository.sync_update_status(run_id, final_status)
 
-        logger.info(
-            "Workflow run %s — %s (%d errors)", run_id, final_status, error_count
-        )
+        logger.info("Workflow run %s — %s (%d errors)", run_id, final_status, error_count)
         return {"status": final_status, "run_id": run_id}
 
     except Exception as exc:
@@ -218,7 +216,9 @@ def _execute_node(
 
     # ── Update DB status ────────────────────────────────────────────
     WorkflowStepRepository.sync_update(
-        run_id, node_id, step_status,
+        run_id,
+        node_id,
+        step_status,
         error=(result or {}).get("message") if not success else None,
         result=result,
     )

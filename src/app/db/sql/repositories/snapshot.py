@@ -34,14 +34,10 @@ class WorkflowSnapshotRepository(BaseRepository[WorkflowSnapshot]):
             )
             return result.scalar_one_or_none()
 
-    async def get_by_version(
-        self, workflow_id: int, version: int
-    ) -> WorkflowSnapshot | None:
+    async def get_by_version(self, workflow_id: int, version: int) -> WorkflowSnapshot | None:
         async with self.session_factory() as session:
             result = await session.execute(
-                select(WorkflowSnapshot).filter_by(
-                    workflow_id=workflow_id, version=version
-                )
+                select(WorkflowSnapshot).filter_by(workflow_id=workflow_id, version=version)
             )
             return result.scalar_one_or_none()
 
@@ -111,9 +107,7 @@ class WorkflowSnapshotRepository(BaseRepository[WorkflowSnapshot]):
             if len(ids) > 10:
                 ids_to_delete = ids[10:]
                 await session.execute(
-                    delete(WorkflowSnapshot).where(
-                        WorkflowSnapshot.id.in_(ids_to_delete)
-                    )
+                    delete(WorkflowSnapshot).where(WorkflowSnapshot.id.in_(ids_to_delete))
                 )
 
             # Update workflow.current_version

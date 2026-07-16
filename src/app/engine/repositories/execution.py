@@ -78,9 +78,7 @@ class EnginePersistence:
         if to_db and node_id and project_id:
             with get_sync_session() as session:
                 existing = (
-                    session.query(NodeModel)
-                    .filter_by(id=node_id, project_id=project_id)
-                    .first()
+                    session.query(NodeModel).filter_by(id=node_id, project_id=project_id).first()
                 )
                 payload_content = {"message": message, "node_data": save_path}
                 gui_meta = {
@@ -175,9 +173,7 @@ class EnginePersistence:
         try:
             with get_sync_session() as session:
                 entry = (
-                    session.query(NodeModel)
-                    .filter_by(id=node_id, project_id=project_id)
-                    .first()
+                    session.query(NodeModel).filter_by(id=node_id, project_id=project_id).first()
                 )
                 if not entry:
                     return None
@@ -218,9 +214,7 @@ class EnginePersistence:
         try:
             with get_sync_session() as session:
                 entry = (
-                    session.query(NodeModel)
-                    .filter_by(id=node_id, project_id=project_id)
-                    .first()
+                    session.query(NodeModel).filter_by(id=node_id, project_id=project_id).first()
                 )
                 if not entry:
                     return False, f"Node {node_id} not found in project {project_id}."
@@ -251,8 +245,11 @@ class EnginePersistence:
 
     @staticmethod
     def load_node_data(
-        node_id=None, project_id=None, path=None,
-        return_serialized=False, return_path=False,
+        node_id=None,
+        project_id=None,
+        path=None,
+        return_serialized=False,
+        return_path=False,
     ) -> tuple:
         """Load full node payload: metadata from DB + deserialized .pkl.
 
@@ -282,9 +279,7 @@ class EnginePersistence:
             # ── Load from database ──
             with get_sync_session() as session:
                 entry = (
-                    session.query(NodeModel)
-                    .filter_by(id=node_id, project_id=project_id)
-                    .first()
+                    session.query(NodeModel).filter_by(id=node_id, project_id=project_id).first()
                 )
                 if not entry:
                     return False, f"Node {node_id} not found in project {project_id}."
@@ -390,9 +385,7 @@ class EnginePersistence:
         group_idx = int(parts[1]) if len(parts) > 1 else None
         port_idx = int(parts[2]) if len(parts) > 2 else None
 
-        success, payload = EnginePersistence.load_node_data(
-            node_id=node_id, project_id=project_id
-        )
+        success, payload = EnginePersistence.load_node_data(node_id=node_id, project_id=project_id)
         if not success:
             return f"Failed to load port {port_ref}: {payload}"
 
@@ -414,11 +407,7 @@ class EnginePersistence:
         """Delete .pkl files for a node."""
         try:
             with get_sync_session() as session:
-                node = (
-                    session.query(NodeModel)
-                    .filter_by(id=node_id, project_id=project_id)
-                    .first()
-                )
+                node = session.query(NodeModel).filter_by(id=node_id, project_id=project_id).first()
                 if node:
                     pld = node.payload or {}
                     node_path = pld.get("node_data")

@@ -20,9 +20,7 @@ def generate_random_string(length: int = 12) -> str:
     return "".join(random.choice(chars) for _ in range(length))
 
 
-def generate_unique_filepath(
-    original_filename: str, project_path: str
-) -> dict[str, str]:
+def generate_unique_filepath(original_filename: str, project_path: str) -> dict[str, str]:
     """Generate a unique file path for storing uploads."""
     random_str = generate_random_string()
     original_filename = get_clean_file_name(original_filename)
@@ -50,8 +48,10 @@ def is_empty(value) -> bool:
         return all(is_empty(v) for v in value)
     return False
 
+
 class NodeGUIMeta(BaseModel):
     """Metadata for visual editor GUI."""
+
     component_id: int
     displayed_name: str = ""
     location_x: float = 0.0
@@ -59,11 +59,13 @@ class NodeGUIMeta(BaseModel):
     inputs: list[int] | None = []
     outputs: list[int] | None = []
 
+
 class NodePort(BaseModel):
     _id: int
     name: str
     type: str  # "input" or "output"
     description: str | None = ""
+
 
 class NodeModel(BaseModel):
     node_id: int

@@ -4,9 +4,17 @@ from .base_layer import BaseLayer
 
 
 class DenseLayer(BaseLayer):
-    '''Handles dense layer creation.'''
-    def __init__(self, units: int = 128, activation: str = "relu", path: str = None, name: str = None,
-                 cur_id=None, **kwargs):
+    """Handles dense layer creation."""
+
+    def __init__(
+        self,
+        units: int = 128,
+        activation: str = "relu",
+        path: str = None,
+        name: str = None,
+        cur_id=None,
+        **kwargs,
+    ):
         self.units = units
         self.activation = activation
         self.name = name
@@ -29,10 +37,7 @@ class DenseLayer(BaseLayer):
         return f"dense_layer_{self.cur_id}"
 
     def get_params(self):
-        return {
-            "units": self.units,
-            "activation": self.activation
-        }
+        return {"units": self.units, "activation": self.activation}
 
     def payload_configs(self):
         return {
@@ -49,8 +54,11 @@ class DenseLayer(BaseLayer):
 
 
 class DropoutLayer(BaseLayer):
-    '''Handles dropout layer creation.'''
-    def __init__(self, rate: float = 0.5, path: str = None, name: str = None, cur_id=None, **kwargs):
+    """Handles dropout layer creation."""
+
+    def __init__(
+        self, rate: float = 0.5, path: str = None, name: str = None, cur_id=None, **kwargs
+    ):
         self.rate = rate
         self.layer_path = path
         self.name = name
@@ -72,8 +80,7 @@ class DropoutLayer(BaseLayer):
         return f"dropout_{self.cur_id}"
 
     def get_params(self):
-        return {"rate": self.rate
-                }
+        return {"rate": self.rate}
 
     def payload_configs(self):
         return {

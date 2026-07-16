@@ -44,9 +44,7 @@ class CustomDataLoader:
                 return f"dataset not found: {self.dataset_path}", None
 
             if self.dataset_path.endswith(".pkl"):
-                data = EnginePersistence.load_data(
-                    self.dataset_path, project_id=self.project_id
-                )
+                data = EnginePersistence.load_data(self.dataset_path, project_id=self.project_id)
                 X, y = data
 
             elif (
@@ -85,6 +83,7 @@ class CustomDataLoader:
 
 class UnSupportedDataLoader(BaseDataLoader):
     """Data loader for unsupported datasets."""
+
     def __init__(self, dataset_name):
         self.dataset_name = dataset_name
 
@@ -94,6 +93,7 @@ class UnSupportedDataLoader(BaseDataLoader):
 
 class DataLoaderFactory:
     """Factory class for creating data loaders."""
+
     @staticmethod
     def create(dataset_name=None, dataset_path=None, project_id=None):
         if dataset_path:
@@ -152,7 +152,9 @@ class DataLoader(BaseNode):
                 displayed_name=self.displayed_name,
             )
 
-            EnginePersistence.save_result(payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
         except Exception as e:

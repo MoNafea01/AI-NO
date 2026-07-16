@@ -19,20 +19,31 @@ def _validate_model(data: dict) -> list[str]:
     for entry in NODE_REGISTRY.values():
         if entry["node_type"] == "create_model":
             meta = entry.get("metadata", {})
-            if (meta.get("model_name") == model_name
-                    and meta.get("model_type") == model_type
-                    and meta.get("task") == task):
+            if (
+                meta.get("model_name") == model_name
+                and meta.get("model_type") == model_type
+                and meta.get("task") == task
+            ):
                 valid = True
                 break
 
     if not valid:
         # Check individually for better error messages
-        names = [e.get("metadata", {}).get("model_name")
-                 for e in NODE_REGISTRY.values() if e["node_type"] == "create_model"]
-        types = set(e.get("metadata", {}).get("model_type")
-                    for e in NODE_REGISTRY.values() if e["node_type"] == "create_model")
-        tasks = set(e.get("metadata", {}).get("task")
-                    for e in NODE_REGISTRY.values() if e["node_type"] == "create_model")
+        names = [
+            e.get("metadata", {}).get("model_name")
+            for e in NODE_REGISTRY.values()
+            if e["node_type"] == "create_model"
+        ]
+        types = set(
+            e.get("metadata", {}).get("model_type")
+            for e in NODE_REGISTRY.values()
+            if e["node_type"] == "create_model"
+        )
+        tasks = set(
+            e.get("metadata", {}).get("task")
+            for e in NODE_REGISTRY.values()
+            if e["node_type"] == "create_model"
+        )
 
         if model_type not in types:
             errors.append(f"Unknown model_type: '{model_type}'")
@@ -54,19 +65,30 @@ def _validate_preprocessor(data: dict) -> list[str]:
     for entry in NODE_REGISTRY.values():
         if entry["node_type"] == "create_preprocessor":
             meta = entry.get("metadata", {})
-            if (meta.get("preprocessor_name") == ppname
-                    and meta.get("preprocessor_type") == pptype
-                    and meta.get("task") == pptask):
+            if (
+                meta.get("preprocessor_name") == ppname
+                and meta.get("preprocessor_type") == pptype
+                and meta.get("task") == pptask
+            ):
                 valid = True
                 break
 
     if not valid:
-        names = [e.get("metadata", {}).get("preprocessor_name")
-                 for e in NODE_REGISTRY.values() if e["node_type"] == "create_preprocessor"]
-        types = set(e.get("metadata", {}).get("preprocessor_type")
-                    for e in NODE_REGISTRY.values() if e["node_type"] == "create_preprocessor")
-        tasks = set(e.get("metadata", {}).get("task")
-                    for e in NODE_REGISTRY.values() if e["node_type"] == "create_preprocessor")
+        names = [
+            e.get("metadata", {}).get("preprocessor_name")
+            for e in NODE_REGISTRY.values()
+            if e["node_type"] == "create_preprocessor"
+        ]
+        types = set(
+            e.get("metadata", {}).get("preprocessor_type")
+            for e in NODE_REGISTRY.values()
+            if e["node_type"] == "create_preprocessor"
+        )
+        tasks = set(
+            e.get("metadata", {}).get("task")
+            for e in NODE_REGISTRY.values()
+            if e["node_type"] == "create_preprocessor"
+        )
 
         if pptype not in types:
             errors.append(f"Unknown preprocessor_type: '{pptype}'")

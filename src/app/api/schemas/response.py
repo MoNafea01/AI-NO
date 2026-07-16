@@ -19,6 +19,7 @@ class ProjectResponse(BaseSchema):
 class ProjectDetailResponse(ProjectResponse):
     content: list[Any] = []
 
+
 # ── Workflow ──
 
 
@@ -31,8 +32,10 @@ class WorkflowResponse(BaseSchema):
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
+
 class WorkflowDetailResponse(WorkflowResponse):
     content: list[Any] = []
+
 
 # ── Node ──
 
@@ -89,4 +92,3 @@ class TokenPairResponse(BaseSchema):
 class RegisterResponse(BaseSchema):
     id: int
     email: str
-

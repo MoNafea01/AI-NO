@@ -155,6 +155,10 @@ def compute_node_hash(
 
 
 __all__ = [
-    "build_dag", "extract_node_ids", "find_downstream",
-    "topological_sort", "topological_levels", "compute_node_hash",
+    "build_dag",
+    "extract_node_ids",
+    "find_downstream",
+    "topological_sort",
+    "topological_levels",
+    "compute_node_hash",
 ]

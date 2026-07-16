@@ -58,7 +58,9 @@ class Joiner(BaseNode):
                 location_y=self.location_y,
             )
 
-            EnginePersistence.save_result(payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
         except Exception as e:
@@ -112,7 +114,9 @@ class Splitter(BaseNode):
                 location_y=self.location_y,
             )
 
-            EnginePersistence.save_result(payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
         except Exception as e:
@@ -135,7 +139,9 @@ class NodeTemplateSaver(BaseNode):
         node_ref = in_ports.get("node")
         if node_ref:
             node_id = str(node_ref).split(":")[0]
-            success, self.node = EnginePersistence.load_node_meta(int(node_id), project_id=self.project_id)
+            success, self.node = EnginePersistence.load_node_meta(
+                int(node_id), project_id=self.project_id
+            )
         else:
             success = False
             self.node = None
@@ -227,9 +233,7 @@ class NodeTemplateSaver(BaseNode):
                             else ("bool" if isinstance(value, bool) else "str")
                         )
                     )
-                    transformed.append(
-                        {"name": key, "type": param_type, "default": value}
-                    )
+                    transformed.append({"name": key, "type": param_type, "default": value})
         return transformed
 
 
@@ -294,7 +298,9 @@ class NodeTemplateLoader(BaseNode):
                 location_y=self.location_y,
             )
 
-            EnginePersistence.save_result(payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
 
             return payload

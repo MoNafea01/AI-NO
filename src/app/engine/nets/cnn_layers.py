@@ -4,9 +4,20 @@ from .base_layer import BaseLayer
 
 
 class Conv2DLayer(BaseLayer):
-    '''Handles Conv2D layer creation.'''
-    def __init__(self, filters: int = 32, kernel_size=None, strides=None, padding: str = "valid",
-                 activation: str = "relu", path: str = None, name: str = None, cur_id=None, **kwargs):
+    """Handles Conv2D layer creation."""
+
+    def __init__(
+        self,
+        filters: int = 32,
+        kernel_size=None,
+        strides=None,
+        padding: str = "valid",
+        activation: str = "relu",
+        path: str = None,
+        name: str = None,
+        cur_id=None,
+        **kwargs,
+    ):
         self.filters = filters
         self.kernel_size = kernel_size or [3, 3]
         self.strides = strides or [1, 1]
@@ -32,12 +43,13 @@ class Conv2DLayer(BaseLayer):
         return f"conv2d_{self.cur_id}"
 
     def get_params(self):
-        return {"filters": self.filters,
-                "kernel_size": self.kernel_size,
-                "strides": self.strides,
-                "padding": self.padding,
-                "activation": self.activation
-                }
+        return {
+            "filters": self.filters,
+            "kernel_size": self.kernel_size,
+            "strides": self.strides,
+            "padding": self.padding,
+            "activation": self.activation,
+        }
 
     def payload_configs(self):
         return {
@@ -54,9 +66,18 @@ class Conv2DLayer(BaseLayer):
 
 
 class MaxPool2DLayer(BaseLayer):
-    '''Handles MaxPooling2D layer creation.'''
-    def __init__(self, pool_size=None, strides=None, padding: str = "valid", path: str = None,
-                 name: str = None, cur_id=None, **kwargs):
+    """Handles MaxPooling2D layer creation."""
+
+    def __init__(
+        self,
+        pool_size=None,
+        strides=None,
+        padding: str = "valid",
+        path: str = None,
+        name: str = None,
+        cur_id=None,
+        **kwargs,
+    ):
         self.pool_size = pool_size or [2, 2]
         self.strides = strides or [2, 2]
         self.padding = padding
@@ -80,10 +101,7 @@ class MaxPool2DLayer(BaseLayer):
         return f"maxpool2d_{self.cur_id}"
 
     def get_params(self):
-        return {"pool_size": self.pool_size,
-                "strides": self.strides,
-                "padding": self.padding
-                }
+        return {"pool_size": self.pool_size, "strides": self.strides, "padding": self.padding}
 
     def payload_configs(self):
         return {

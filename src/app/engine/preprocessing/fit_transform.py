@@ -45,7 +45,9 @@ class FitTransform(BaseNode, ActionMixin):
         if preprocessor_ref:
             preprocessor_obj = EnginePersistence.load_port(preprocessor_ref, self.project_id)
         elif preprocessor_path:
-            preprocessor_obj = EnginePersistence.load_data(preprocessor_path, project_id=self.project_id)
+            preprocessor_obj = EnginePersistence.load_data(
+                preprocessor_path, project_id=self.project_id
+            )
         else:
             self.payload = "No preprocessor reference provided."
             return self.payload
@@ -56,9 +58,7 @@ class FitTransform(BaseNode, ActionMixin):
     def _fit_transform_handler(self, preprocessor):
         try:
             fitter_transformer = PreprocessorFitterTransformer(preprocessor, self.data)
-            fitted_preprocessor, output = (
-                fitter_transformer.fit_transform_preprocessor()
-            )
+            fitted_preprocessor, output = fitter_transformer.fit_transform_preprocessor()
             if isinstance(fitted_preprocessor, str):
                 return f"Preprocessor fitting and transformation failed. {fitted_preprocessor}"
 
@@ -80,7 +80,9 @@ class FitTransform(BaseNode, ActionMixin):
                 displayed_name=self.displayed_name,
             )
 
-            EnginePersistence.save_result(payload, build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
         except Exception as e:

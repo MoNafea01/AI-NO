@@ -29,9 +29,7 @@ _PG_URL = (
 )
 
 _sync_engine = create_engine(_PG_URL, pool_pre_ping=True)
-_SyncSessionLocal = sessionmaker(
-    bind=_sync_engine, autoflush=False, expire_on_commit=False
-)
+_SyncSessionLocal = sessionmaker(bind=_sync_engine, autoflush=False, expire_on_commit=False)
 
 
 @contextmanager

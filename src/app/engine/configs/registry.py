@@ -24,21 +24,33 @@ NODE_REGISTRY = {
         "category": "linear_models",
         "task": "regression",
         "defaults": {"alpha": 1.0, "l1_ratio": 0.5},
-        "metadata": {"model_name": "elastic_net", "model_type": "linear_models", "task": "regression"},
+        "metadata": {
+            "model_name": "elastic_net",
+            "model_type": "linear_models",
+            "task": "regression",
+        },
     },
     "linear_regression": {
         "node_type": "create_model",
         "category": "linear_models",
         "task": "regression",
         "defaults": {},
-        "metadata": {"model_name": "linear_regression", "model_type": "linear_models", "task": "regression"},
+        "metadata": {
+            "model_name": "linear_regression",
+            "model_type": "linear_models",
+            "task": "regression",
+        },
     },
     "sgd_regression": {
         "node_type": "create_model",
         "category": "linear_models",
         "task": "regression",
         "defaults": {"penalty": "l2"},
-        "metadata": {"model_name": "sgd_regression", "model_type": "linear_models", "task": "regression"},
+        "metadata": {
+            "model_name": "sgd_regression",
+            "model_type": "linear_models",
+            "task": "regression",
+        },
     },
     "svr": {
         "node_type": "create_model",
@@ -52,35 +64,55 @@ NODE_REGISTRY = {
         "category": "tree",
         "task": "regression",
         "defaults": {"max_depth": None},
-        "metadata": {"model_name": "decision_tree_regressor", "model_type": "tree", "task": "regression"},
+        "metadata": {
+            "model_name": "decision_tree_regressor",
+            "model_type": "tree",
+            "task": "regression",
+        },
     },
     "random_forest_regressor": {
         "node_type": "create_model",
         "category": "tree",
         "task": "regression",
         "defaults": {"n_estimators": 100, "max_depth": None},
-        "metadata": {"model_name": "random_forest_regressor", "model_type": "tree", "task": "regression"},
+        "metadata": {
+            "model_name": "random_forest_regressor",
+            "model_type": "tree",
+            "task": "regression",
+        },
     },
     "gradient_boosting_regressor": {
         "node_type": "create_model",
         "category": "tree",
         "task": "regression",
         "defaults": {},
-        "metadata": {"model_name": "gradient_boosting_regressor", "model_type": "tree", "task": "regression"},
+        "metadata": {
+            "model_name": "gradient_boosting_regressor",
+            "model_type": "tree",
+            "task": "regression",
+        },
     },
     "adaboost_regressor": {
         "node_type": "create_model",
         "category": "ensemble",
         "task": "regression",
         "defaults": {},
-        "metadata": {"model_name": "adaboost_regressor", "model_type": "ensemble", "task": "regression"},
+        "metadata": {
+            "model_name": "adaboost_regressor",
+            "model_type": "ensemble",
+            "task": "regression",
+        },
     },
     "bagging_regressor": {
         "node_type": "create_model",
         "category": "ensemble",
         "task": "regression",
         "defaults": {},
-        "metadata": {"model_name": "bagging_regressor", "model_type": "ensemble", "task": "regression"},
+        "metadata": {
+            "model_name": "bagging_regressor",
+            "model_type": "ensemble",
+            "task": "regression",
+        },
     },
     "knn_regressor": {
         "node_type": "create_model",
@@ -94,42 +126,66 @@ NODE_REGISTRY = {
         "category": "naive_bayes",
         "task": "classification",
         "defaults": {},
-        "metadata": {"model_name": "gaussian_nb", "model_type": "naive_bayes", "task": "classification"},
+        "metadata": {
+            "model_name": "gaussian_nb",
+            "model_type": "naive_bayes",
+            "task": "classification",
+        },
     },
     "bernoulli_nb": {
         "node_type": "create_model",
         "category": "naive_bayes",
         "task": "classification",
         "defaults": {},
-        "metadata": {"model_name": "bernoulli_nb", "model_type": "naive_bayes", "task": "classification"},
+        "metadata": {
+            "model_name": "bernoulli_nb",
+            "model_type": "naive_bayes",
+            "task": "classification",
+        },
     },
     "multinomial_nb": {
         "node_type": "create_model",
         "category": "naive_bayes",
         "task": "classification",
         "defaults": {},
-        "metadata": {"model_name": "multinomial_nb", "model_type": "naive_bayes", "task": "classification"},
+        "metadata": {
+            "model_name": "multinomial_nb",
+            "model_type": "naive_bayes",
+            "task": "classification",
+        },
     },
     "sgd_classifier": {
         "node_type": "create_model",
         "category": "linear_models",
         "task": "classification",
         "defaults": {"penalty": "l2"},
-        "metadata": {"model_name": "sgd_classifier", "model_type": "linear_models", "task": "classification"},
+        "metadata": {
+            "model_name": "sgd_classifier",
+            "model_type": "linear_models",
+            "task": "classification",
+        },
     },
     "ridge_classifier": {
         "node_type": "create_model",
         "category": "linear_models",
         "task": "classification",
         "defaults": {"alpha": 1.0},
-        "metadata": {"model_name": "ridge_classifier", "model_type": "linear_models", "task": "classification"},
+        "metadata": {
+            "model_name": "ridge_classifier",
+            "model_type": "linear_models",
+            "task": "classification",
+        },
     },
     "logistic_regression": {
         "node_type": "create_model",
         "category": "linear_models",
         "task": "classification",
         "defaults": {"penalty": "l2", "C": 1.0},
-        "metadata": {"model_name": "logistic_regression", "model_type": "linear_models", "task": "classification"},
+        "metadata": {
+            "model_name": "logistic_regression",
+            "model_type": "linear_models",
+            "task": "classification",
+        },
     },
     "svc": {
         "node_type": "create_model",
@@ -143,35 +199,55 @@ NODE_REGISTRY = {
         "category": "tree",
         "task": "classification",
         "defaults": {"max_depth": None},
-        "metadata": {"model_name": "decision_tree_classifier", "model_type": "tree", "task": "classification"},
+        "metadata": {
+            "model_name": "decision_tree_classifier",
+            "model_type": "tree",
+            "task": "classification",
+        },
     },
     "random_forest_classifier": {
         "node_type": "create_model",
         "category": "tree",
         "task": "classification",
         "defaults": {"n_estimators": 100, "max_depth": None},
-        "metadata": {"model_name": "random_forest_classifier", "model_type": "tree", "task": "classification"},
+        "metadata": {
+            "model_name": "random_forest_classifier",
+            "model_type": "tree",
+            "task": "classification",
+        },
     },
     "gradient_boosting_classifier": {
         "node_type": "create_model",
         "category": "tree",
         "task": "classification",
         "defaults": {},
-        "metadata": {"model_name": "gradient_boosting_classifier", "model_type": "tree", "task": "classification"},
+        "metadata": {
+            "model_name": "gradient_boosting_classifier",
+            "model_type": "tree",
+            "task": "classification",
+        },
     },
     "adaboost_classifier": {
         "node_type": "create_model",
         "category": "ensemble",
         "task": "classification",
         "defaults": {},
-        "metadata": {"model_name": "adaboost_classifier", "model_type": "ensemble", "task": "classification"},
+        "metadata": {
+            "model_name": "adaboost_classifier",
+            "model_type": "ensemble",
+            "task": "classification",
+        },
     },
     "bagging_classifier": {
         "node_type": "create_model",
         "category": "ensemble",
         "task": "classification",
         "defaults": {},
-        "metadata": {"model_name": "bagging_classifier", "model_type": "ensemble", "task": "classification"},
+        "metadata": {
+            "model_name": "bagging_classifier",
+            "model_type": "ensemble",
+            "task": "classification",
+        },
     },
     "knn_classifier": {
         "node_type": "create_model",
@@ -180,93 +256,139 @@ NODE_REGISTRY = {
         "defaults": {"n_neighbors": 5},
         "metadata": {"model_name": "knn_classifier", "model_type": "knn", "task": "classification"},
     },
-
     # ── Preprocessors ──
     "standard_scaler": {
         "node_type": "create_preprocessor",
         "category": "scaler",
         "task": "scale",
         "defaults": {"with_mean": True, "with_std": True},
-        "metadata": {"preprocessor_name": "standard_scaler", "preprocessor_type": "scaler", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "standard_scaler",
+            "preprocessor_type": "scaler",
+            "task": "preprocessing",
+        },
     },
     "maxabs_scaler": {
         "node_type": "create_preprocessor",
         "category": "scaler",
         "task": "scale",
         "defaults": {},
-        "metadata": {"preprocessor_name": "maxabs_scaler", "preprocessor_type": "scaler", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "maxabs_scaler",
+            "preprocessor_type": "scaler",
+            "task": "preprocessing",
+        },
     },
     "normalizer": {
         "node_type": "create_preprocessor",
         "category": "scaler",
         "task": "scale",
         "defaults": {"norm": "l2"},
-        "metadata": {"preprocessor_name": "normalizer", "preprocessor_type": "scaler", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "normalizer",
+            "preprocessor_type": "scaler",
+            "task": "preprocessing",
+        },
     },
     "minmax_scaler": {
         "node_type": "create_preprocessor",
         "category": "scaler",
         "task": "scale",
         "defaults": {"feature_range": [0, 1]},
-        "metadata": {"preprocessor_name": "minmax_scaler", "preprocessor_type": "scaler", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "minmax_scaler",
+            "preprocessor_type": "scaler",
+            "task": "preprocessing",
+        },
     },
     "robust_scaler": {
         "node_type": "create_preprocessor",
         "category": "scaler",
         "task": "scale",
         "defaults": {"quantile_range": [25.0, 75.0]},
-        "metadata": {"preprocessor_name": "robust_scaler", "preprocessor_type": "scaler", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "robust_scaler",
+            "preprocessor_type": "scaler",
+            "task": "preprocessing",
+        },
     },
     "label_encoder": {
         "node_type": "create_preprocessor",
         "category": "encoder",
         "task": "encode",
         "defaults": {},
-        "metadata": {"preprocessor_name": "label_encoder", "preprocessor_type": "encoder", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "label_encoder",
+            "preprocessor_type": "encoder",
+            "task": "preprocessing",
+        },
     },
     "onehot_encoder": {
         "node_type": "create_preprocessor",
         "category": "encoder",
         "task": "encode",
         "defaults": {},
-        "metadata": {"preprocessor_name": "onehot_encoder", "preprocessor_type": "encoder", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "onehot_encoder",
+            "preprocessor_type": "encoder",
+            "task": "preprocessing",
+        },
     },
     "ordinal_encoder": {
         "node_type": "create_preprocessor",
         "category": "encoder",
         "task": "encode",
         "defaults": {},
-        "metadata": {"preprocessor_name": "ordinal_encoder", "preprocessor_type": "encoder", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "ordinal_encoder",
+            "preprocessor_type": "encoder",
+            "task": "preprocessing",
+        },
     },
     "label_binarizer": {
         "node_type": "create_preprocessor",
         "category": "encoder",
         "task": "encode",
         "defaults": {},
-        "metadata": {"preprocessor_name": "label_binarizer", "preprocessor_type": "encoder", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "label_binarizer",
+            "preprocessor_type": "encoder",
+            "task": "preprocessing",
+        },
     },
     "knn_imputer": {
         "node_type": "create_preprocessor",
         "category": "imputer",
         "task": "impute",
         "defaults": {"n_neighbors": 5},
-        "metadata": {"preprocessor_name": "knn_imputer", "preprocessor_type": "imputer", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "knn_imputer",
+            "preprocessor_type": "imputer",
+            "task": "preprocessing",
+        },
     },
     "simple_imputer": {
         "node_type": "create_preprocessor",
         "category": "imputer",
         "task": "impute",
         "defaults": {"strategy": "mean"},
-        "metadata": {"preprocessor_name": "simple_imputer", "preprocessor_type": "imputer", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "simple_imputer",
+            "preprocessor_type": "imputer",
+            "task": "preprocessing",
+        },
     },
     "binarizer": {
         "node_type": "create_preprocessor",
         "category": "binarizer",
         "task": "binarize",
         "defaults": {"threshold": 0.5},
-        "metadata": {"preprocessor_name": "binarizer", "preprocessor_type": "binarizer", "task": "preprocessing"},
+        "metadata": {
+            "preprocessor_name": "binarizer",
+            "preprocessor_type": "binarizer",
+            "task": "preprocessing",
+        },
     },
-
     # ── NN Layers ──
     "input_layer": {
         "node_type": "create_input",
@@ -286,7 +408,13 @@ NODE_REGISTRY = {
         "node_type": "conv2d",
         "category": "layer",
         "task": "nn",
-        "defaults": {"filters": 32, "kernel_size": [3, 3], "strides": [1, 1], "padding": "valid", "activation": "relu"},
+        "defaults": {
+            "filters": 32,
+            "kernel_size": [3, 3],
+            "strides": [1, 1],
+            "padding": "valid",
+            "activation": "relu",
+        },
         "metadata": {},
     },
     "maxpool2d_layer": {
@@ -321,7 +449,11 @@ NODE_REGISTRY = {
         "node_type": "compile",
         "category": "compiler",
         "task": "compile",
-        "defaults": {"optimizer": "adam", "loss": "categorical_crossentropy", "metrics": ["accuracy"]},
+        "defaults": {
+            "optimizer": "adam",
+            "loss": "categorical_crossentropy",
+            "metrics": ["accuracy"],
+        },
         "metadata": {},
     },
     "nn_fitter": {
@@ -331,7 +463,6 @@ NODE_REGISTRY = {
         "defaults": {"batch_size": 32, "epochs": 10, "validation_split": 0.2},
         "metadata": {},
     },
-
     # ── Core Action Nodes ──
     "model_fitter": {
         "node_type": "fit_model",
@@ -382,7 +513,6 @@ NODE_REGISTRY = {
         "defaults": {"test_size": 0.3, "random_state": 42},
         "metadata": {},
     },
-
     # ── Data / I/O ──
     "data_loader": {
         "node_type": "data_loader",
@@ -398,7 +528,6 @@ NODE_REGISTRY = {
         "defaults": {},
         "metadata": {},
     },
-
     # ── Custom ──
     "splitter": {
         "node_type": "splitter",
