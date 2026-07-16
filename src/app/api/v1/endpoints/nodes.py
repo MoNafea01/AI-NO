@@ -1,7 +1,6 @@
-﻿"""Node CRUD + I/O endpoints."""
+"""Node CRUD + I/O endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from typing import Optional
 
 from app.core.auth import get_current_user
 from app.db.sql.repositories.node import NodeRepository
@@ -44,18 +43,21 @@ def _to_response(node) -> NodeResponse:
 
 # ── CRUD ─────────────────────────────────────────────────────────────────
 
+
 @nodes_router.get("/", response_model=list[NodeResponse])
 async def list_nodes(
     request: Request,
     user: dict = Depends(get_current_user),
-    project_id: Optional[int] = None,
-    workflow_id: Optional[int] = None,
+    project_id: int | None = None,
+    workflow_id: int | None = None,
     skip: int = 0,
     limit: int = 1000,
 ):
     repo = _get_repo(request)
     if workflow_id is not None:
-        nodes = await repo.get_by_workflow(workflow_id=workflow_id, project_id=project_id, skip=skip, limit=limit)
+        nodes = await repo.get_by_workflow(
+            workflow_id=workflow_id, project_id=project_id, skip=skip, limit=limit
+        )
     elif project_id is not None:
         nodes = await repo.get_by_project(project_id=project_id, skip=skip, limit=limit)
     else:
@@ -63,13 +65,13 @@ async def list_nodes(
     return [_to_response(n) for n in nodes]
 
 
-@nodes_router.post(
-    "/", response_model=NodeResponse, status_code=status.HTTP_201_CREATED
-)
+@nodes_router.post("/", response_model=NodeResponse, status_code=status.HTTP_201_CREATED)
 async def create_node(
-    request: Request, body: NodeCreate, 
-    project_id: Optional[int] = None, workflow_id: Optional[int] = None, 
-    user: dict = Depends(get_current_user)
+    request: Request,
+    body: NodeCreate,
+    project_id: int | None = None,
+    workflow_id: int | None = None,
+    user: dict = Depends(get_current_user),
 ):
     """Unified node creation — resolves type/defaults/metadata from registry."""
     from ._helpers import create_pending_node
@@ -81,6 +83,7 @@ async def create_node(
 
 
 # ── Static paths BEFORE /{node_pk} to avoid route shadowing ──
+
 
 @nodes_router.delete("/clear-all", response_model=MessageResponse)
 async def clear_all_nodes(
@@ -96,7 +99,10 @@ async def clear_all_nodes(
 
 @nodes_router.delete("/clear-project/", response_model=MessageResponse)
 async def clear_project_nodes(
-    request: Request, project_id: int, with_files: bool = False, user: dict = Depends(get_current_user)
+    request: Request,
+    project_id: int,
+    with_files: bool = False,
+    user: dict = Depends(get_current_user),
 ):
     repo = _get_repo(request)
     if with_files:
@@ -108,7 +114,11 @@ async def clear_project_nodes(
 
 @nodes_router.delete("/clear-workflow/", response_model=MessageResponse)
 async def clear_workflow_nodes(
-    request: Request, workflow_id: int, project_id: int | None = None, with_files: bool = False, user: dict = Depends(get_current_user)
+    request: Request,
+    workflow_id: int,
+    project_id: int | None = None,
+    with_files: bool = False,
+    user: dict = Depends(get_current_user),
 ):
     repo = _get_repo(request)
     if with_files:
@@ -120,12 +130,14 @@ async def clear_workflow_nodes(
 
 # ── I/O endpoints (moved from io.py) ──
 
+
 @nodes_router.post("/save")
 async def save_node(
     request: Request, body: NodeSaveRequest, user: dict = Depends(get_current_user)
 ):
     """Save a node payload to disk."""
     import asyncio
+
     from app.engine.repositories.execution import EnginePersistence
 
     payload = body.node
@@ -152,6 +164,7 @@ async def load_node(
 ):
     """Load a node from disk and create a DB record."""
     import asyncio
+
     from app.engine.repositories.execution import EnginePersistence
 
     path = body.params.get("node_path", "")
@@ -177,7 +190,8 @@ async def load_node(
 
 @nodes_router.post("/save-template")
 async def save_template(
-    request: Request, body: NodeTemplateSaveRequest,
+    request: Request,
+    body: NodeTemplateSaveRequest,
     user: dict = Depends(get_current_user),
 ):
     """Save a node as a reusable template."""
@@ -189,7 +203,8 @@ async def save_template(
 
 @nodes_router.post("/load-template")
 async def load_template(
-    request: Request, body: NodeTemplateLoadRequest,
+    request: Request,
+    body: NodeTemplateLoadRequest,
     user: dict = Depends(get_current_user),
 ):
     """Load a reusable template."""
@@ -200,6 +215,7 @@ async def load_template(
 
 
 # ── Dynamic paths AFTER static paths ──
+
 
 @nodes_router.get("/{node_pk}", response_model=NodeResponse)
 async def get_node(request: Request, node_pk: int, user: dict = Depends(get_current_user)):
@@ -241,7 +257,9 @@ async def update_node(
 
 
 @nodes_router.delete("/{node_pk}", response_model=MessageResponse)
-async def delete_node(request: Request, node_pk: int, with_files: bool = False, user: dict = Depends(get_current_user)):
+async def delete_node(
+    request: Request, node_pk: int, with_files: bool = False, user: dict = Depends(get_current_user)
+):
     repo = _get_repo(request)
     if with_files:
         deleted = await repo.delete_with_files(node_pk)

@@ -1,11 +1,14 @@
-﻿"""Component repository."""
+"""Component repository."""
 
-from typing import Any, Dict, Iterable, List, Tuple
+from collections.abc import Iterable
+from typing import Any
+
 from sqlalchemy import delete, select
 from sqlalchemy.orm import selectinload
 
-from .base import BaseRepository
 from app.db.sql.models.component import Category, Component
+
+from .base import BaseRepository
 
 
 class ComponentRepository(BaseRepository[Component]):
@@ -13,7 +16,7 @@ class ComponentRepository(BaseRepository[Component]):
 
     def _iter_catalog_categories(
         self, catalog: Any
-    ) -> Iterable[Tuple[str, List[Dict[str, Any]], int]]:
+    ) -> Iterable[tuple[str, list[dict[str, Any]], int]]:
         """Yield normalized (category_name, components, order) tuples from any catalog shape."""
         if isinstance(catalog, dict):
             for order, (category_name, components) in enumerate(catalog.items()):
@@ -38,7 +41,7 @@ class ComponentRepository(BaseRepository[Component]):
 
         raise TypeError("Catalog must be a dict or list")
 
-    async def get_all(self, skip: int = 0, limit: int = 100) -> List[Component]:
+    async def get_all(self, skip: int = 0, limit: int = 100) -> list[Component]:
         async with self.session_factory() as session:
             result = await session.execute(
                 select(Component)
@@ -60,12 +63,10 @@ class ComponentRepository(BaseRepository[Component]):
 
     async def get_by_name(self, name: str):
         async with self.session_factory() as session:
-            result = await session.execute(
-                select(Component).where(Component.name == name)
-            )
+            result = await session.execute(select(Component).where(Component.name == name))
             return result.scalar_one_or_none()
 
-    async def get_by_category(self, category: str) -> List[Component]:
+    async def get_by_category(self, category: str) -> list[Component]:
         async with self.session_factory() as session:
             result = await session.execute(
                 select(Component)
@@ -75,11 +76,9 @@ class ComponentRepository(BaseRepository[Component]):
             )
             return list(result.scalars().all())
 
-    async def get_by_task(self, task: str) -> List[Component]:
+    async def get_by_task(self, task: str) -> list[Component]:
         async with self.session_factory() as session:
-            result = await session.execute(
-                select(Component).where(Component.task == task)
-            )
+            result = await session.execute(select(Component).where(Component.task == task))
             return list(result.scalars().all())
 
     async def clear_all(self) -> int:
@@ -88,7 +87,7 @@ class ComponentRepository(BaseRepository[Component]):
             await session.commit()
             return result.rowcount
 
-    async def sync_components_catalog(self, catalog: Any) -> Dict[str, int]:
+    async def sync_components_catalog(self, catalog: Any) -> dict[str, int]:
         """Idempotently sync categories and components from the architecture catalog."""
         created_categories = 0
         updated_categories = 0
@@ -166,4 +165,3 @@ class ComponentRepository(BaseRepository[Component]):
             "created_components": created_components,
             "updated_components": updated_components,
         }
-

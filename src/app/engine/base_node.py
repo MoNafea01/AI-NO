@@ -38,9 +38,7 @@ class BaseNode:
             if attr in kwargs:
                 value = kwargs.pop(attr)
                 # Skip if subclass defines a read-only property
-                if attr in type(self).__dict__ and isinstance(
-                    type(self).__dict__[attr], property
-                ):
+                if attr in type(self).__dict__ and isinstance(type(self).__dict__[attr], property):
                     continue
                 setattr(self, attr, value)
 
@@ -72,9 +70,7 @@ class BaseNode:
         try:
             node = EnginePersistence.load_data(self.node_path, project_id=self.project_id)
             if isinstance(node, str):
-                raise NodeNotFoundError(
-                    "Failed to load node. Please check the provided path."
-                )
+                raise NodeNotFoundError("Failed to load node. Please check the provided path.")
             return self.load_handler(node)
         except EngineError:
             raise
@@ -169,8 +165,6 @@ class BaseNode:
             self.execute()
         return_serialized = kwargs.get("return_serialized", False)
         if return_serialized:
-            node_data = EnginePersistence.load_serialized(
-                self.payload, project_id=self.project_id
-            )
+            node_data = EnginePersistence.load_serialized(self.payload, project_id=self.project_id)
             self.payload.update({"node_data": node_data})
         return self.payload

@@ -1,10 +1,10 @@
 """Shared utility functions."""
 
-import re
 import os
 import random
+import re
 import string
-from typing import Dict, List, Optional
+
 from pydantic import BaseModel
 
 
@@ -20,9 +20,7 @@ def generate_random_string(length: int = 12) -> str:
     return "".join(random.choice(chars) for _ in range(length))
 
 
-def generate_unique_filepath(
-    original_filename: str, project_path: str
-) -> Dict[str, str]:
+def generate_unique_filepath(original_filename: str, project_path: str) -> dict[str, str]:
     """Generate a unique file path for storing uploads."""
     random_str = generate_random_string()
     original_filename = get_clean_file_name(original_filename)
@@ -46,33 +44,37 @@ def is_empty(value) -> bool:
         return True
     if isinstance(value, dict):
         return all(is_empty(v) for v in value.values())
-    if isinstance(value, (list, tuple, set)):
+    if isinstance(value, list | tuple | set):
         return all(is_empty(v) for v in value)
     return False
 
+
 class NodeGUIMeta(BaseModel):
     """Metadata for visual editor GUI."""
+
     component_id: int
     displayed_name: str = ""
     location_x: float = 0.0
     location_y: float = 0.0
-    inputs: Optional[List[int]] = []
-    outputs: Optional[List[int]] = []
+    inputs: list[int] | None = []
+    outputs: list[int] | None = []
+
 
 class NodePort(BaseModel):
     _id: int
     name: str
     type: str  # "input" or "output"
-    description: Optional[str] = ""
+    description: str | None = ""
+
 
 class NodeModel(BaseModel):
     node_id: int
     node_name: str
-    payload: Dict
-    params: Dict
+    payload: dict
+    params: dict
     task: str
     type: str
     project_id: int
     gui_meta: NodeGUIMeta
-    in_ports: List[NodePort]
-    out_ports: List[NodePort]
+    in_ports: list[NodePort]
+    out_ports: list[NodePort]

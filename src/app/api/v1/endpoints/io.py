@@ -1,14 +1,15 @@
-﻿"""I/O endpoints (project export/import only)."""
+"""I/O endpoints (project export/import only)."""
 
 import asyncio
+import datetime
+import json
 import logging
 import os
-import json
-import datetime
-import tempfile
 import sys
+import tempfile
 from pathlib import Path
-from fastapi import APIRouter, Depends, Request, HTTPException
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import Response
 
 from app.core.auth import get_current_user
@@ -36,11 +37,11 @@ def _validate_path(path: str, allowed_base: str | None = None) -> str:
 def _resolve_converter_path() -> str:
     """Find jsonAinoConverter.py relative to project root."""
     candidates = [
-        Path(__file__).resolve().parent.parent.parent.parent.parent
-        / "jsonAinoConverter.py",
+        Path(__file__).resolve().parent.parent.parent.parent.parent / "jsonAinoConverter.py",
         (
             Path(__file__).resolve().parent.parent.parent.parent.parent.parent
-            / "project" / "jsonAinoConverter.py"
+            / "project"
+            / "jsonAinoConverter.py"
         ),
     ]
     for c in candidates:
@@ -51,7 +52,8 @@ def _resolve_converter_path() -> str:
 
 @io_router.post("/export-project")
 async def export_project(
-    request: Request, body: ExportProjectRequest,
+    request: Request,
+    body: ExportProjectRequest,
     user: dict = Depends(get_current_user),
 ):
     """Export a project to JSON or AINOPRJ format."""
@@ -69,21 +71,23 @@ async def export_project(
     nodes_data = []
     for n in nodes:
         gui_meta = n.gui_meta or {}
-        nodes_data.append({
-            "id": n.id,
-            "node_name": n.node_name,
-            "message": gui_meta.get("message", "Done"),
-            "payload": n.payload,
-            "params": n.params,
-            "task": n.task,
-            "type": n.type,
-            "project_id": n.project_id,
-            "workflow_id": n.workflow_id,
-            "component_id": n.component_id,
-            "gui_meta": gui_meta,
-            "in_ports": n.in_ports or {},
-            "out_ports": n.out_ports or {},
-        })
+        nodes_data.append(
+            {
+                "id": n.id,
+                "node_name": n.node_name,
+                "message": gui_meta.get("message", "Done"),
+                "payload": n.payload,
+                "params": n.params,
+                "task": n.task,
+                "type": n.type,
+                "project_id": n.project_id,
+                "workflow_id": n.workflow_id,
+                "component_id": n.component_id,
+                "gui_meta": gui_meta,
+                "in_ports": n.in_ports or {},
+                "out_ports": n.out_ports or {},
+            }
+        )
 
     export_data = {
         "project_id": body.project_id,
@@ -98,7 +102,7 @@ async def export_project(
     json_str = json.dumps(export_data, indent=4)
     folder_path = body.folder_path or ""
     fmt = (body.format or "json").lower()
-    file_name = (body.file_name or project.name.replace(" ", "_") + "_export")
+    file_name = body.file_name or project.name.replace(" ", "_") + "_export"
     password = body.password or ""
 
     if fmt == "json":
@@ -171,7 +175,8 @@ async def export_project(
 
 @io_router.post("/import-project")
 async def import_project(
-    request: Request, body: ImportProjectRequest,
+    request: Request,
+    body: ImportProjectRequest,
     user: dict = Depends(get_current_user),
 ):
     """Import a project from file."""
@@ -198,7 +203,7 @@ async def import_project(
 
     json_data = None
     if fmt == "json":
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             raw = json.load(f)
         json_data = raw if isinstance(raw, list) else raw.get("nodes", [])
 
@@ -224,7 +229,7 @@ async def import_project(
             stdout, stderr = await process.communicate()
             if process.returncode != 0:
                 raise Exception(stderr.decode())
-            with open(tmp_json_path, "r", encoding="utf-8") as f:
+            with open(tmp_json_path, encoding="utf-8") as f:
                 raw = json.load(f)
             json_data = raw if isinstance(raw, list) else raw.get("nodes", [])
             os.unlink(tmp_json_path)
@@ -238,11 +243,7 @@ async def import_project(
         raise HTTPException(status_code=400, detail="No nodes found in import file")
 
     project_repo = ProjectRepository(request.app.state.db_client)
-    project = (
-        await project_repo.get_by_id(body.project_id)
-        if body.project_id
-        else None
-    )
+    project = await project_repo.get_by_id(body.project_id) if body.project_id else None
     if not project:
         project = await project_repo.create(name=project_name, description=project_description)
 

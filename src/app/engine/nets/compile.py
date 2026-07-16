@@ -37,9 +37,7 @@ class CompileModel(BaseNode, ActionMixin):
             if not all([self.loss, self.optimizer, self.metrics]):
                 return "Loss, optimizer, and metrics must be provided for compilation."
 
-            model.compile(
-                loss=self.loss, optimizer=self.optimizer, metrics=self.metrics
-            )
+            model.compile(loss=self.loss, optimizer=self.optimizer, metrics=self.metrics)
             payload = PayloadBuilder.build_payload(
                 "Model Compiled",
                 model,
@@ -61,7 +59,9 @@ class CompileModel(BaseNode, ActionMixin):
                 location_y=self.location_y,
             )
 
-            EnginePersistence.save_result(payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
 

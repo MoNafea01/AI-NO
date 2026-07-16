@@ -1,30 +1,50 @@
-# Ignore Python cache
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
-# Ignore Django-specific cache and migration files
-db.sqlite3
-*.log
-*.pot
-*.py[co]
+*.egg-info/
+dist/
+build/
+*.egg
 
+# Virtual environments
+.venv/
+venv/
+env/
 
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
-#Ignore saved nodes
-project/saved/*
-project/core/test_saved/*
-project/exports/*
-project/core/saved/*
-src/app/engine/saved/*/*
-project/core/exports/*
-chatbot/credentials/*
-chatbot/logs/*
-
-#Ignore environment folder
-backend/*
-arch/*
-
-# Ignore env files containing secrets
+# Environment & secrets
 .env
 *.env
 
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Saved nodes / pickles
+src/app/engine/saved/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ruff
+.ruff_cache/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+chatbot/credentials/google_credentials.json

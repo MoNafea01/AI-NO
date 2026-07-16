@@ -1,8 +1,9 @@
 """Custom middleware for the application."""
 
-import time
 import logging
-from typing import Callable
+import time
+from collections.abc import Callable
+
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 

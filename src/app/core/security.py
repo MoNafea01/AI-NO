@@ -42,9 +42,7 @@ def get_client_identifier(request: Request) -> str:
 limiter = Limiter(key_func=get_client_identifier)
 
 
-def rate_limit_exceeded_handler(
-    request: Request, exc: RateLimitExceeded
-) -> JSONResponse:
+def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
     """Custom handler for rate limit exceeded errors."""
     return JSONResponse(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -52,9 +50,7 @@ def rate_limit_exceeded_handler(
             "error": "Rate limit exceeded",
             "detail": str(exc.detail),
             "retry_after": (
-                exc.detail.split(" per ")[1]
-                if " per " in str(exc.detail)
-                else "1 minute"
+                exc.detail.split(" per ")[1] if " per " in str(exc.detail) else "1 minute"
             ),
         },
     )
@@ -120,9 +116,7 @@ def add_security_headers(response):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Strict-Transport-Security"] = (
-        "max-age=31536000; includeSubDomains"
-    )
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
     return response
 

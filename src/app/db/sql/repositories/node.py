@@ -18,18 +18,13 @@ class NodeRepository(BaseRepository[Node]):
 
     # ── Read ──────────────────────────────────────────────────────────────
 
-    async def get_by_project(
-        self, project_id: int, skip: int = 0, limit: int = 1000
-    ) -> list[Node]:
+    async def get_by_project(self, project_id: int, skip: int = 0, limit: int = 1000) -> list[Node]:
         async with self.session_factory() as session:
             result = await session.execute(
-                select(Node)
-                .where(Node.project_id == project_id)
-                .offset(skip)
-                .limit(limit)
+                select(Node).where(Node.project_id == project_id).offset(skip).limit(limit)
             )
             return list(result.scalars().all())
-    
+
     async def get_by_workflow(
         self, workflow_id: int, project_id: int | None = None, skip: int = 0, limit: int = 1000
     ) -> list[Node]:
@@ -49,9 +44,7 @@ class NodeRepository(BaseRepository[Node]):
             )
             return result.scalar_one_or_none()
 
-    async def get_by_node_id(
-        self, node_id: int, project_id: int | None = None
-    ) -> Node | None:
+    async def get_by_node_id(self, node_id: int, project_id: int | None = None) -> Node | None:
         async with self.session_factory() as session:
             query = select(Node).where(Node.id == node_id)
             if project_id is not None:
@@ -81,12 +74,10 @@ class NodeRepository(BaseRepository[Node]):
 
     async def clear_project_nodes(self, project_id: int) -> int:
         async with self.session_factory() as session:
-            result = await session.execute(
-                delete(Node).where(Node.project_id == project_id)
-            )
+            result = await session.execute(delete(Node).where(Node.project_id == project_id))
             await session.commit()
             return result.rowcount
-    
+
     async def clear_workflow_nodes(self, workflow_id: int, project_id: int | None = None) -> int:
         async with self.session_factory() as session:
             result = await session.execute(
@@ -196,7 +187,9 @@ class NodeRepository(BaseRepository[Node]):
 
         return await self.delete(node_id)
 
-    async def clear_workflow_with_files(self, workflow_id: int, project_id: int | None = None) -> int:
+    async def clear_workflow_with_files(
+        self, workflow_id: int, project_id: int | None = None
+    ) -> int:
         """Delete all nodes for a workflow and remove their .pkl files."""
         nodes = await self.get_by_workflow(workflow_id, project_id)
         for node in nodes:
@@ -231,8 +224,50 @@ class NodeRepository(BaseRepository[Node]):
 
         # Clean up the saving directory
         import shutil
+
         saving_dir = os.path.abspath(SAVING_DIR)
         if os.path.exists(saving_dir):
             shutil.rmtree(saving_dir, ignore_errors=True)
 
         return count
+
+    # ── Sync (Celery engine layer) ────────────────────────────────────
+
+    @staticmethod
+    def sync_get_by_workflow(project_id: int, workflow_id: int) -> list[Node]:
+        """Fetch all nodes for a workflow synchronously."""
+        from app.engine.repositories.db import get_sync_session
+
+        with get_sync_session() as session:
+            return list(
+                session.query(Node)
+                .filter(
+                    Node.project_id == project_id,
+                    Node.workflow_id == workflow_id,
+                )
+                .all()
+            )
+
+    @staticmethod
+    def sync_set_status(node_id: int, status: str):
+        """Set a single node's status synchronously."""
+        from app.engine.repositories.db import get_sync_session
+
+        with get_sync_session() as session:
+            node = session.query(Node).filter_by(id=node_id).first()
+            if node:
+                node.status = status
+                session.commit()
+
+    @staticmethod
+    def sync_reset_status_batch(node_ids: set[int], node_map: dict):
+        """Reset a batch of nodes to 'pending' using a pre-fetched node_map."""
+        from app.engine.repositories.db import get_sync_session
+
+        with get_sync_session() as session:
+            for nid in node_ids:
+                node = node_map.get(nid)
+                if node:
+                    session.merge(node)
+                    node.status = "pending"
+            session.commit()

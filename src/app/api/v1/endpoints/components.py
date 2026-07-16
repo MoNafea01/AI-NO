@@ -1,4 +1,4 @@
-﻿"""Component CRUD endpoints."""
+"""Component CRUD endpoints."""
 
 import json
 import logging
@@ -69,9 +69,7 @@ async def list_components(
     return [_to_component_response(c) for c in components]
 
 
-@components_router.post(
-    "/", response_model=ComponentResponse, status_code=status.HTTP_201_CREATED
-)
+@components_router.post("/", response_model=ComponentResponse, status_code=status.HTTP_201_CREATED)
 async def create_component(
     request: Request, body: ComponentCreate, user: dict = Depends(get_current_user)
 ):
@@ -129,7 +127,9 @@ async def get_component(request: Request, id: int, user: dict = Depends(get_curr
 
 @components_router.put("/{id}", response_model=ComponentResponse)
 async def update_component(
-    request: Request, id: int, body: ComponentUpdate,
+    request: Request,
+    id: int,
+    body: ComponentUpdate,
     user: dict = Depends(get_current_user),
 ):
     repo = _get_repo(request)
@@ -146,4 +146,3 @@ async def delete_component(request: Request, id: int, user: dict = Depends(get_c
     if not deleted:
         raise HTTPException(status_code=404, detail="Component not found")
     return MessageResponse(message="Component deleted")
-

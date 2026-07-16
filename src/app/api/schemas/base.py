@@ -1,7 +1,8 @@
 """Base Pydantic schemas with common configuration."""
 
 from typing import Any, Union
-from pydantic import BaseModel, ConfigDict, EmailStr
+
+from pydantic import BaseModel, ConfigDict, EmailStr  # noqa: F401
 
 
 class BaseSchema(BaseModel):

@@ -41,7 +41,9 @@ class Fit(BaseNode, ActionMixin):
         if preprocessor_ref:
             preprocessor_obj = EnginePersistence.load_port(preprocessor_ref, self.project_id)
         elif preprocessor_path:
-            preprocessor_obj = EnginePersistence.load_data(preprocessor_path, project_id=self.project_id)
+            preprocessor_obj = EnginePersistence.load_data(
+                preprocessor_path, project_id=self.project_id
+            )
         else:
             self.payload = "No preprocessor reference provided."
             return self.payload
@@ -72,7 +74,9 @@ class Fit(BaseNode, ActionMixin):
                 location_y=self.location_y,
             )
 
-            EnginePersistence.save_result(payload, build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
         except Exception as e:

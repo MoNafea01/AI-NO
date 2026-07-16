@@ -1,8 +1,7 @@
-from typing import Optional, Any, Dict, List
 from datetime import datetime
+from typing import Any
+
 from .base import BaseSchema
-
-
 
 # ── Project ──
 
@@ -10,15 +9,16 @@ from .base import BaseSchema
 class ProjectResponse(BaseSchema):
     id: int
     name: str
-    description: Optional[str] = ""
-    model: Optional[str] = None
-    dataset: Optional[str] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    description: str | None = ""
+    model: str | None = None
+    dataset: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class ProjectDetailResponse(ProjectResponse):
-    content: List[Any] = []
+    content: list[Any] = []
+
 
 # ── Workflow ──
 
@@ -26,13 +26,16 @@ class ProjectDetailResponse(ProjectResponse):
 class WorkflowResponse(BaseSchema):
     id: int
     name: str
-    description: Optional[str] = ""
+    description: str | None = ""
     project_id: int
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    current_version: int | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
 
 class WorkflowDetailResponse(WorkflowResponse):
-    content: List[Any] = []
+    content: list[Any] = []
+
 
 # ── Node ──
 
@@ -41,16 +44,16 @@ class NodeResponse(BaseSchema):
     id: int
     node_name: str
     message: str = "Done"
-    payload: Optional[Any] = None
-    params: Optional[Dict[str, Any]] = {}
+    payload: Any | None = None
+    params: dict[str, Any] | None = {}
     task: str = "general"
     type: str = "general"
-    project_id: Optional[int] = None
-    workflow_id: Optional[int] = None
-    component_id: Optional[str | int] = None
-    gui_meta: Optional[Dict[str, Any]] = {}
-    in_ports: Optional[Dict[str, str]] = {}
-    out_ports: Optional[Dict[str, str]] = {}
+    project_id: int | None = None
+    workflow_id: int | None = None
+    component_id: str | int | None = None
+    gui_meta: dict[str, Any] | None = {}
+    in_ports: dict[str, str] | None = {}
+    out_ports: dict[str, str] | None = {}
 
 
 # ── Component ──
@@ -62,13 +65,13 @@ class ComponentResponse(BaseSchema):
     description: str = ""
     order: int = 0
     category_name: str = ""
-    category_id: Optional[int] = None
+    category_id: int | None = None
     name: str
     type: str = "general"
     task: str = "general"
-    params: Optional[Any] = None
-    inputs: Optional[List] = None
-    outputs: Optional[List] = None
+    params: Any | None = None
+    inputs: list | None = None
+    outputs: list | None = None
     api_call: str
 
 
@@ -77,7 +80,7 @@ class ComponentResponse(BaseSchema):
 
 class MessageResponse(BaseSchema):
     message: str
-    data: Optional[Any] = None
+    data: Any | None = None
 
 
 class TokenPairResponse(BaseSchema):
@@ -89,4 +92,3 @@ class TokenPairResponse(BaseSchema):
 class RegisterResponse(BaseSchema):
     id: int
     email: str
-

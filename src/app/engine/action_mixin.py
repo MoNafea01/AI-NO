@@ -21,41 +21,31 @@ class ActionMixin:
         Returns the loaded object on success.
         Raises DataLoadError or ValidationError on failure.
         """
-        if isinstance(resource, (dict, int, str)):
+        if isinstance(resource, dict | int | str):
             return self._load_by_id(resource, error_prefix)
         elif resource_path and isinstance(resource_path, str):
             return self._load_by_path(resource_path, error_prefix)
         else:
-            raise ValidationError(
-                [f"Invalid {error_prefix} or path provided."]
-            )
+            raise ValidationError([f"Invalid {error_prefix} or path provided."])
 
     def _load_by_id(self, resource_id, error_prefix):
         try:
             resource = EnginePersistence.load_data(resource_id, project_id=self.project_id)
             if isinstance(resource, str):
-                raise DataLoadError(
-                    f"Failed to load {error_prefix}. Check the provided ID."
-                )
+                raise DataLoadError(f"Failed to load {error_prefix}. Check the provided ID.")
             return resource
         except EngineError:
             raise
         except Exception as e:
-            raise DataLoadError(
-                f"Error loading {error_prefix} by ID: {e}"
-            ) from e
+            raise DataLoadError(f"Error loading {error_prefix} by ID: {e}") from e
 
     def _load_by_path(self, path, error_prefix):
         try:
             resource = EnginePersistence.load_data(path, project_id=self.project_id)
             if isinstance(resource, str):
-                raise DataLoadError(
-                    f"Failed to load {error_prefix}. Check the provided path."
-                )
+                raise DataLoadError(f"Failed to load {error_prefix}. Check the provided path.")
             return resource
         except EngineError:
             raise
         except Exception as e:
-            raise DataLoadError(
-                f"Error loading {error_prefix} by path: {e}"
-            ) from e
+            raise DataLoadError(f"Error loading {error_prefix} by path: {e}") from e

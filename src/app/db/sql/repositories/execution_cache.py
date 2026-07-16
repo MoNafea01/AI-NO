@@ -20,9 +20,7 @@ class ExecutionCacheRepository(BaseRepository[ExecutionCache]):
     async def lookup(self, project_id: int, node_hash: str) -> ExecutionCache | None:
         async with self.session_factory() as session:
             result = await session.execute(
-                select(ExecutionCache).filter_by(
-                    project_id=project_id, hash=node_hash
-                )
+                select(ExecutionCache).filter_by(project_id=project_id, hash=node_hash)
             )
             return result.scalar_one_or_none()
 
@@ -37,9 +35,7 @@ class ExecutionCacheRepository(BaseRepository[ExecutionCache]):
         async with self.session_factory() as session:
             existing = (
                 await session.execute(
-                    select(ExecutionCache).filter_by(
-                        project_id=project_id, hash=node_hash
-                    )
+                    select(ExecutionCache).filter_by(project_id=project_id, hash=node_hash)
                 )
             ).scalar_one_or_none()
 
@@ -146,9 +142,9 @@ class ExecutionCacheRepository(BaseRepository[ExecutionCache]):
                 if len(entries) <= keep:
                     return
                 ids_to_delete = [e.id for e in entries[keep:]]
-                session.query(ExecutionCache).filter(
-                    ExecutionCache.id.in_(ids_to_delete)
-                ).delete(synchronize_session=False)
+                session.query(ExecutionCache).filter(ExecutionCache.id.in_(ids_to_delete)).delete(
+                    synchronize_session=False
+                )
                 session.commit()
         except Exception as e:
             logger.warning("Failed to evict cache entries: %s", e)
@@ -160,11 +156,7 @@ class ExecutionCacheRepository(BaseRepository[ExecutionCache]):
 
         try:
             with get_sync_session() as session:
-                result = (
-                    session.query(ExecutionCache)
-                    .filter_by(workflow_id=workflow_id)
-                    .delete()
-                )
+                result = session.query(ExecutionCache).filter_by(workflow_id=workflow_id).delete()
                 session.commit()
                 return result
         except Exception:

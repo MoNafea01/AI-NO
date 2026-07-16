@@ -57,7 +57,9 @@ class BaseLayer(BaseNode):
             if hasattr(self, "node_id") and self.node_id is not None:
                 payload["node_id"] = self.node_id
 
-            EnginePersistence.save_result(payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, path=build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
 

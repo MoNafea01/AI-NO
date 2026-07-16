@@ -5,18 +5,17 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.auth import create_access_token
-from app.core.security import hash_password, verify_password
 from app.core.config import settings
-
+from app.core.security import hash_password, verify_password
 from app.db.sql.models.refresh_token import RefreshToken
 from app.db.sql.repositories.user import UserRepository
-    
-from ...schemas.request import RegisterRequest, RefreshRequest
+
+from ...schemas.request import RefreshRequest, RegisterRequest
 from ...schemas.response import RegisterResponse, TokenPairResponse
 
 logger = logging.getLogger(__name__)
@@ -27,12 +26,14 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 def _get_user_repo(request: Request) -> UserRepository:
     return UserRepository(request.app.state.db_client)
 
+
 def _get_session_factory(request: Request) -> async_sessionmaker[AsyncSession]:
     return request.app.state.db_client
 
 
 async def _create_refresh_token(
-    sf: async_sessionmaker[AsyncSession], user_id: int,
+    sf: async_sessionmaker[AsyncSession],
+    user_id: int,
 ) -> str:
     token_str = secrets.token_urlsafe(64)
     expires_at = datetime.now(timezone.utc) + timedelta(
@@ -49,33 +50,35 @@ async def _create_refresh_token(
             .values(revoked=True)
         )
 
-        session.add(RefreshToken(
-            token=token_str,
-            user_id=user_id,
-            expires_at=expires_at,
-        ))
+        session.add(
+            RefreshToken(
+                token=token_str,
+                user_id=user_id,
+                expires_at=expires_at,
+            )
+        )
         await session.commit()
     return token_str
 
+
 async def _revoke_refresh_token(
-    sf: async_sessionmaker[AsyncSession], token_str: str,
+    sf: async_sessionmaker[AsyncSession],
+    token_str: str,
 ) -> None:
     async with sf() as session:
-        result = await session.execute(
-            select(RefreshToken).where(RefreshToken.token == token_str)
-        )
+        result = await session.execute(select(RefreshToken).where(RefreshToken.token == token_str))
         rt = result.scalar_one_or_none()
         if rt:
             rt.revoked = True
             await session.commit()
 
+
 async def _validate_refresh_token(
-    sf: async_sessionmaker[AsyncSession], token_str: str,
+    sf: async_sessionmaker[AsyncSession],
+    token_str: str,
 ) -> int:
     async with sf() as session:
-        result = await session.execute(
-            select(RefreshToken).where(RefreshToken.token == token_str)
-        )
+        result = await session.execute(select(RefreshToken).where(RefreshToken.token == token_str))
         rt = result.scalar_one_or_none()
         if not rt:
             raise HTTPException(
@@ -96,6 +99,7 @@ async def _validate_refresh_token(
 
 
 # ── Routes ───────────────────────────────────────────────────
+
 
 @auth_router.post("/register", response_model=RegisterResponse, status_code=201)
 async def register(body: RegisterRequest, request: Request):

@@ -118,8 +118,7 @@ def topological_levels(dag: dict[int, set[int]], subset: set[int]) -> list[list[
 
 
 def compute_node_hash(
-    node_type: str,
-    task: str,
+    node_name: str,
     params: dict,
     out_ports: dict,
     in_ports: dict,
@@ -127,7 +126,7 @@ def compute_node_hash(
 ) -> str:
     """Compute content-addressable hash for a node's execution inputs.
 
-    Includes everything that affects output: type, task, params,
+    Includes everything that affects output: node_name, params,
     topology (ports), and parent content hashes.  Changing any of these
     produces a different hash, invalidating the cache for this node and
     all its downstream dependents.
@@ -145,8 +144,7 @@ def compute_node_hash(
     parent_hash_list.sort()
 
     content = {
-        "type": node_type,
-        "task": task,
+        "node_name": node_name,
         "params": params or {},
         "out_ports": out_ports or {},
         "in_ports": in_ports or {},
@@ -157,6 +155,10 @@ def compute_node_hash(
 
 
 __all__ = [
-    "build_dag", "extract_node_ids", "find_downstream",
-    "topological_sort", "topological_levels", "compute_node_hash",
+    "build_dag",
+    "extract_node_ids",
+    "find_downstream",
+    "topological_sort",
+    "topological_levels",
+    "compute_node_hash",
 ]

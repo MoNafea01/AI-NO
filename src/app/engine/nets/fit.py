@@ -22,7 +22,9 @@ class Fit(BaseNode, ActionMixin):
         self.y = EnginePersistence.load_port(y_ref, self.project_id) if y_ref else None
 
         if any(isinstance(i, str) for i in [self.X, self.y]):
-            self.payload = "Failed to load Nodes (X, y) at least one of them. Please check the provided IDs."
+            self.payload = (
+                "Failed to load Nodes (X, y) at least one of them. Please check the provided IDs."
+            )
             return self.payload
 
         # Load model from port or from path
@@ -61,7 +63,9 @@ class Fit(BaseNode, ActionMixin):
                 location_y=self.location_y,
             )
 
-            EnginePersistence.save_result(payload, build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
         except Exception as e:

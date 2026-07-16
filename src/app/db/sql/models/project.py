@@ -1,6 +1,6 @@
 """Project SQLAlchemy model."""
 
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from .base import SQLAlchemyBase, TimestampMixin
@@ -12,7 +12,9 @@ class Project(SQLAlchemyBase, TimestampMixin):
     __tablename__ = "projects"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True, default="")
     model = Column(String(255), nullable=True)

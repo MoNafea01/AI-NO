@@ -1,4 +1,4 @@
-﻿"""Node execution service orchestration layer over the engine.
+"""Node execution service orchestration layer over the engine.
 
 Maps node type keys to real engine classes and executes them.
 """
@@ -87,4 +87,5 @@ class NodeService:
     @staticmethod
     async def async_execute_node(node_type: str, data: dict[str, Any]) -> dict[str, Any]:
         import asyncio
+
         return await asyncio.to_thread(NodeService.execute_node, node_type, data)

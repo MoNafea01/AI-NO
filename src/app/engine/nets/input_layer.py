@@ -4,7 +4,8 @@ from .base_layer import BaseLayer
 
 
 class InputLayer(BaseLayer):
-    '''Handles input layer creation.'''
+    """Handles input layer creation."""
+
     def __init__(self, shape=None, name: str = None, path: str = None, cur_id=None, **kwargs):
         self.shape = shape or (None,)
         self.name = name
@@ -36,5 +37,5 @@ class InputLayer(BaseLayer):
             "out_ports": self.out_ports,
             "location_x": self.location_x,
             "location_y": self.location_y,
-            "displayed_name": self.displayed_name
+            "displayed_name": self.displayed_name,
         }

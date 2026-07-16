@@ -27,9 +27,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 def verify_token(token: str) -> dict:
     """Decode and validate a JWT token. Raises HTTPException on failure."""
     try:
-        payload = jwt.decode(
-            token, settings.secret_key, algorithms=[settings.algorithm]
-        )
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         return payload
     except JWTError as e:
         logger.warning("JWT validation failed: %s", e)

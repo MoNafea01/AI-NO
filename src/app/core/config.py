@@ -2,10 +2,9 @@
 
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 ENV_FILE_PATH = Path(__file__).parent.parent / ".env"
 
@@ -27,7 +26,7 @@ class Settings(BaseSettings):
     environment: str = Field(default="development", alias="ENV")
 
     FILE_MAX_SIZE_MB: int = 50
-    FILE_ALLOWED_TYPES: List[str] = ["application/json", "text/csv"]
+    FILE_ALLOWED_TYPES: list[str] = ["application/json", "text/csv"]
     FILE_STORAGE_PATH: str = "data/files"
     FILE_DEFAULT_CHUNK_SIZE: int = 524288
 
@@ -53,12 +52,8 @@ class Settings(BaseSettings):
         alias="SECRET_KEY",
     )
     algorithm: str = "HS256"
-    access_token_expire_minutes: int = Field(
-        default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
-    )
-    refresh_token_expire_days: int = Field(
-        default=7, alias="REFRESH_TOKEN_EXPIRE_DAYS"
-    )
+    access_token_expire_minutes: int = Field(default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    refresh_token_expire_days: int = Field(default=7, alias="REFRESH_TOKEN_EXPIRE_DAYS")
 
     # AI Services
     GENERATION_BACKEND: str = "GROQ"
@@ -94,7 +89,7 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str | None = None
     CELERY_TASK_SERIALIZER: str = "json"
     CELERY_RESULT_SERIALIZER: str = "json"
-    CELERY_ACCEPT_CONTENT: List[str] = ["json"]
+    CELERY_ACCEPT_CONTENT: list[str] = ["json"]
     CELERY_TASK_TIME_LIMIT: int = 600
     CELERY_ACKS_LATE: bool = True
     CELERY_WORKER_CONCURRENCY: int = 2

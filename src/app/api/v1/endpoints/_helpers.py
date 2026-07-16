@@ -3,9 +3,6 @@
 import logging
 
 from fastapi import HTTPException, Request
-from typing import Optional
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -14,8 +11,8 @@ async def create_pending_node(
     request: Request,
     node_name: str,
     body_data: dict,
-    project_id: Optional[int] = None,
-    workflow_id: Optional[int] = None,
+    project_id: int | None = None,
+    workflow_id: int | None = None,
 ) -> dict:
     """Unified node creation with registry lookup, defaults merge, and validation.
 
@@ -78,6 +75,7 @@ async def create_pending_node(
     if component_id is None:
         try:
             from pathlib import Path
+
             catalog_path = None
             current_file = Path(__file__).resolve()
             for parent in [current_file.parent] + list(current_file.parents):
@@ -87,17 +85,20 @@ async def create_pending_node(
                     break
             if catalog_path:
                 import json
+
                 with catalog_path.open("r", encoding="utf-8") as f:
                     catalog = json.load(f)
                 for category, items in catalog.items():
-                    for item in (items if isinstance(items, list) else []):
+                    for item in items if isinstance(items, list) else []:
                         if isinstance(item, dict) and item.get("name") == node_name:
                             component_id = item.get("component_id")
                             break
                     if component_id is not None:
                         break
         except Exception:
-            logger.warning("Failed to resolve component_id from catalog for node_name=%s", node_name)
+            logger.warning(
+                "Failed to resolve component_id from catalog for node_name=%s", node_name
+            )
 
     # Ports
     in_ports = body_data.get("in_ports") or {}
@@ -132,4 +133,3 @@ async def create_pending_node(
         "in_ports": node.in_ports or {},
         "out_ports": node.out_ports or {},
     }
-

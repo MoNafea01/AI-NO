@@ -7,7 +7,7 @@ Runs the full DAG defined by the workflow's nodes in topological order with
 Uses **hash-based execution caching** — if a node's inputs haven't changed
 since the last run, the cached result is returned without re-execution.
 
-Node and run status is written to the DB via per-thread sync sessions.
+Node and run status is written to the DB via repository sync methods.
 """
 
 import logging
@@ -15,17 +15,15 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from app.celery_app import celery_app
-from app.db.sql.models.node import Node
-from app.db.sql.models.workflow import WorkflowRun, WorkflowStep
+from app.db.sql.repositories.node import NodeRepository
+from app.db.sql.repositories.workflow import WorkflowRunRepository, WorkflowStepRepository
 from app.engine.dag import (
     build_dag,
     compute_node_hash,
     find_downstream,
     topological_levels,
 )
-from app.engine.repositories.db import get_sync_session
 from app.engine.repositories.execution import EnginePersistence
-
 
 logger = logging.getLogger(__name__)
 
@@ -56,28 +54,25 @@ def execute_workflow(
     Hash-based caching skips nodes whose inputs haven't changed.
     """
     import tensorflow as tf
+
     tf.get_logger().setLevel("ERROR")
 
     from app.services.node_service import NODE_CLASS_REGISTRY
 
     try:
         # ── Sequential setup ──────────────────────────────────────────
-        with get_sync_session() as session:
-            _update_run_status(session, run_id, "running")
+        WorkflowRunRepository.sync_update_status(run_id, "running")
 
-            nodes = session.query(Node).filter(
-                Node.project_id == project_id,
-                Node.workflow_id == workflow_id,
-            ).all()
+        nodes = NodeRepository.sync_get_by_workflow(project_id, workflow_id)
 
-            dag = build_dag(nodes)
-            node_map = {n.id: n for n in nodes}
+        dag = build_dag(nodes)
+        node_map = {n.id: n for n in nodes}
 
-            if changed_node_ids:
-                subset = find_downstream(dag, changed_node_ids)
-                _reset_nodes_status(session, subset, node_map)
-            else:
-                subset = {n.id for n in nodes if n.status == "pending"}
+        if changed_node_ids:
+            subset = find_downstream(dag, changed_node_ids)
+            NodeRepository.sync_reset_status_batch(subset, node_map)
+        else:
+            subset = {n.id for n in nodes if n.status == "pending"}
 
         # ── Parallel execution by level ───────────────────────────────
         levels = topological_levels(dag, subset)
@@ -98,7 +93,8 @@ def execute_workflow(
                     if node.type not in NODE_CLASS_REGISTRY:
                         logger.warning(
                             "Skipping node %s — unknown type '%s'",
-                            node_id, node.type,
+                            node_id,
+                            node.type,
                         )
                         continue
 
@@ -114,8 +110,7 @@ def execute_workflow(
                         out_ports=node.out_ports or {},
                         run_id=run_id,
                         node_hash=compute_node_hash(
-                            node_type=node.type,
-                            task=node.task or "general",
+                            node_name=node.node_name,
                             params=node.params or {},
                             out_ports=node.out_ports or {},
                             in_ports=node.in_ports or {},
@@ -133,30 +128,21 @@ def execute_workflow(
                             with error_lock:
                                 error_count += 1
                     except Exception:
-                        logger.exception(
-                            "Thread failed for node %s", node_id
-                        )
+                        logger.exception("Thread failed for node %s", node_id)
                         with error_lock:
                             error_count += 1
                         parent_hashes[node_id] = f"error:{node_id}"
 
         # ── Sequential finalization ───────────────────────────────────
         final_status = "completed" if error_count == 0 else "completed_with_errors"
-        with get_sync_session() as session:
-            _update_run_status(session, run_id, final_status)
+        WorkflowRunRepository.sync_update_status(run_id, final_status)
 
-        logger.info(
-            "Workflow run %s — %s (%d errors)", run_id, final_status, error_count
-        )
+        logger.info("Workflow run %s — %s (%d errors)", run_id, final_status, error_count)
         return {"status": final_status, "run_id": run_id}
 
     except Exception as exc:
         logger.exception("Workflow run %s failed entirely", run_id)
-        try:
-            with get_sync_session() as session:
-                _update_run_status(session, run_id, "failed", error=str(exc))
-        except Exception:
-            logger.exception("Failed to update run status for %s", run_id)
+        WorkflowRunRepository.sync_update_status(run_id, "failed", error=str(exc))
         try:
             self.retry(exc=exc)
         except Exception as retry_exc:
@@ -189,31 +175,14 @@ def _execute_node(
     # ── Cache lookup ────────────────────────────────────────────────
     cached = EnginePersistence.cache_lookup(project_id, node_hash)
     if cached is not None:
-        with get_sync_session() as session:
-            node = session.query(Node).filter_by(id=node_id).first()
-            if node:
-                node.status = "completed"
-            _create_step(session, run_id, node_id, node_type)
-            step = (
-                session.query(WorkflowStep)
-                .filter_by(run_id=run_id, node_id=node_id)
-                .order_by(WorkflowStep.id.desc())
-                .first()
-            )
-            if step:
-                step.status = "completed"
-                step.result = cached
-            session.commit()
+        NodeRepository.sync_set_status(node_id, "completed")
+        WorkflowStepRepository.sync_create(run_id, node_id, node_type)
+        WorkflowStepRepository.sync_update(run_id, node_id, "completed", result=cached)
         return True, node_hash
 
     # ── Fresh execution ─────────────────────────────────────────────
-    with get_sync_session() as session:
-        node = session.query(Node).filter_by(id=node_id).first()
-        if node:
-            node.status = "running"
-            session.commit()
-
-        _create_step(session, run_id, node_id, node_type)
+    NodeRepository.sync_set_status(node_id, "running")
+    WorkflowStepRepository.sync_create(run_id, node_id, node_type)
 
     data = dict(params)
     data.update(
@@ -246,67 +215,13 @@ def _execute_node(
         EnginePersistence.cache_evict_lru(project_id, node_id, keep=10)
 
     # ── Update DB status ────────────────────────────────────────────
-    with get_sync_session() as session:
-        _update_step(
-            session, run_id, node_id, step_status,
-            error=(result or {}).get("message") if not success else None,
-            result=result,
-        )
-        node = session.query(Node).filter_by(id=node_id).first()
-        if node:
-            node.status = step_status
-            session.commit()
+    WorkflowStepRepository.sync_update(
+        run_id,
+        node_id,
+        step_status,
+        error=(result or {}).get("message") if not success else None,
+        result=result,
+    )
+    NodeRepository.sync_set_status(node_id, step_status)
 
     return success, node_hash
-
-
-# ── Status helpers (accept session parameter) ─────────────────────────────
-
-
-def _update_run_status(session, run_id: int, status: str, error: str = None):
-    run = session.query(WorkflowRun).filter(WorkflowRun.id == run_id).first()
-    if run:
-        run.status = status
-        if error is not None:
-            run.error = error
-        session.commit()
-
-
-def _create_step(session, run_id: int, node_id: int, node_type: str):
-    step = WorkflowStep(
-        run_id=run_id, node_id=node_id, node_type=node_type, status="pending"
-    )
-    session.add(step)
-    session.commit()
-
-
-def _update_step(
-    session, run_id: int, node_id: int, status: str,
-    error: str = None, result: dict = None,
-):
-    step = (
-        session.query(WorkflowStep)
-        .filter_by(run_id=run_id, node_id=node_id)
-        .order_by(WorkflowStep.id.desc())
-        .first()
-    )
-    if step:
-        step.status = status
-        if error is not None:
-            step.error = error
-        if result is not None:
-            step.result = result
-        session.commit()
-
-
-def _set_node_status(session, node: Node, status: str):
-    node.status = status
-    session.commit()
-
-
-def _reset_nodes_status(session, node_ids: set[int], node_map: dict[int, Node]):
-    for nid in node_ids:
-        node = node_map.get(nid)
-        if node:
-            node.status = "pending"
-    session.commit()

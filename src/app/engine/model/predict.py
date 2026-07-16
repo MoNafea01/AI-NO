@@ -72,7 +72,9 @@ class Predict(BaseNode, ActionMixin):
                 location_y=self.location_y,
             )
 
-            EnginePersistence.save_result(payload, build_save_path(SAVING_DIR, self.project_id, self.workflow_id))
+            EnginePersistence.save_result(
+                payload, build_save_path(SAVING_DIR, self.project_id, self.workflow_id)
+            )
             payload.pop("node_data", None)
             return payload
         except Exception as e:

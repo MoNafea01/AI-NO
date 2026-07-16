@@ -1,3 +1,11 @@
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
 [project]
 name = "aino"
 version = "0.1.0"
@@ -16,6 +24,7 @@ dependencies = [
     "tensorflow>=2.19.0",
     "joblib>=1.4.0",
     "pydantic>=2.10.0",
+    "pydantic-settings>=2.6.0",
     "celery>=5.5.0",
     "redis>=6.2.0",
     "python-dotenv>=1.0.0",
@@ -24,6 +33,13 @@ dependencies = [
     "groq>=0.33.0",
     "openai>=1.35.0",
     "cohere>=4.45.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "bcrypt>=4.0.0",
+    "email-validator>=2.0.0",
+    "slowapi>=0.1.9",
+    "qdrant-client>=1.10.0",
+    "prometheus-fastapi-instrumentator>=7.0.0",
 ]
 
 [project.optional-dependencies]
@@ -41,13 +57,25 @@ indent-width = 4
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "*/alembic/versions/*.py" = ["E501"]
-"app/engine/model/predict.py" = ["N803"]
-"app/tasks/workflow.py" = ["N806"]
+"app/main.py" = ["E402"]
+"app/celery_app.py" = ["E402"]
 "app/services/node_service.py" = ["E402"]
+"app/engine/model/predict.py" = ["N803", "N806"]
+"app/api/schemas/base.py" = ["UP007"]
+"app/engine/model/fit.py" = ["N803", "N806"]
+"app/engine/model/evaluator.py" = ["N806", "N811"]
+"app/engine/model/model.py" = ["N811"]
+"app/engine/preprocessing/preprocessor.py" = ["N811"]
+"app/engine/other/dataLoader.py" = ["N806", "N803", "N811", "N999"]
+"app/engine/other/train_test_split.py" = ["N806", "N803"]
+"app/engine/nets/sequential.py" = ["N806"]
+"app/engine/nets/fit.py" = ["N806"]
+"app/tasks/workflow.py" = ["N806"]
 
 [tool.ruff.format]
 quote-style = "double"

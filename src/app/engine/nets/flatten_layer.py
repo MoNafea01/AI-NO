@@ -4,7 +4,8 @@ from .base_layer import BaseLayer
 
 
 class FlattenLayer(BaseLayer):
-    '''Handles flatten layer creation.'''
+    """Handles flatten layer creation."""
+
     def __init__(self, path: str = None, name: str = None, cur_id=None, **kwargs):
         self.layer_path = path
         self.name = name
