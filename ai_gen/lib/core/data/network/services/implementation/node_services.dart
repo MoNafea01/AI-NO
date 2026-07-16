@@ -25,9 +25,9 @@ class NodeServices implements INodeServices {
 
         for (var nodeData in response.data) {
           NodeModel node = NodeModel.fromJson(nodeData);
-          if (nodeData['uid'] != null && nodeData['uid'] is int) {
+          if (nodeData['cid'] != null && nodeData['cid'] is int) {
             nodesWithIdx.add({
-              'uid': nodeData['uid'],
+              'cid': nodeData['cid'],
               'idx': nodeData['idx'] ?? 100, // Default to 0 if idx is null
               'node': node,
             });
@@ -40,7 +40,7 @@ class NodeServices implements INodeServices {
 
         // Convert back to dictionary
         for (var item in nodesWithIdx) {
-          nodesDictionary[item['uid']] = item['node'];
+          nodesDictionary[item['cid']] = item['node'];
         }
       }
       return nodesDictionary;

@@ -108,16 +108,16 @@ class NodeModel {
     }
 
     return NodeModel(
-      id: json['uid'],
+      id: json['cid'],
       nodeId: json['node_id'],
       projectId: json['project'],
       index: json['idx'] != null ? int.parse(json['idx'].toString()) : 6,
       name: name,
       displayName: json['displayed_name'] ?? name,
       description: json['description'],
-      category: json['category'] ?? "cat ${json['uid']}",
-      type: json['node_type'] ?? "type ${json['uid']}",
-      task: json['task'] ?? "task ${json['uid']}",
+      category: json['category'] ?? "cat ${json['cid']}",
+      type: json['node_type'] ?? "type ${json['cid']}",
+      task: json['task'] ?? "task ${json['cid']}",
       endPoint: json['api_call'],
       inputDots: inputDots,
       outputDots: outputDots,
@@ -129,7 +129,7 @@ class NodeModel {
   // used in serialization
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = <String, dynamic>{};
-    json['uid'] = id;
+    json['cid'] = id;
     json['idx'] = index;
     json['node_name'] = name;
     json['displayed_name'] = displayName;
