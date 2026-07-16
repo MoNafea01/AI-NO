@@ -1,0 +1,133 @@
+services:
+
+  # ── AI-NO FastAPI ──
+  fastapi:
+    build:
+      context: ..
+      dockerfile: docker/aino/Dockerfile
+    container_name: aino-fastapi
+    networks: [ backend ]
+    restart: always
+    ports: [ "8000:8000" ]
+    env_file: [ ./env/app/.env ]
+    volumes: [ aino_data:/app/data ]
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Celery Worker ──
+  celery-worker:
+    build:
+      context: ..
+      dockerfile: docker/aino/Dockerfile
+    container_name: aino-celery-worker
+    networks: [ backend ]
+    restart: always
+    depends_on:
+      postgres: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    env_file: [ ./env/app/.env ]
+    volumes: [ aino_data:/app/data ]
+    command: [ "celery", "-A", "celery_app", "worker", "--loglevel=info", "-Q", "default,workflow_queue" ]
+
+  # ── Celery Beat ──
+  celery-beat:
+    build:
+      context: ..
+      dockerfile: docker/aino/Dockerfile
+    container_name: aino-celery-beat
+    networks: [ backend ]
+    restart: always
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    env_file: [ ./env/app/.env ]
+    command: [ "python", "-m", "celery", "-A", "celery_app", "beat", "--loglevel=info" ]
+
+  # ── Flower ──
+  flower:
+    image: mher/flower:2.0
+    container_name: aino-flower
+    ports: [ "5555:5555" ]
+    networks: [ backend ]
+    restart: always
+    depends_on: [ rabbitmq ]
+    env_file: [ ./env/app/.env ]
+
+  # ── PostgreSQL ──
+  postgres:
+    image: postgres:17-alpine
+    container_name: aino-postgres
+    ports: [ "5432:5432" ]
+    volumes: [ aino_pg_data:/var/lib/postgresql/data ]
+    env_file: [ ./env/postgres/.env ]
+    networks: [ backend ]
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Qdrant ──
+  qdrant:
+    image: qdrant/qdrant:v1.13.6
+    container_name: aino-qdrant
+    ports: [ "6333:6333", "6334:6334" ]
+    volumes: [ aino_qdrant_data:/qdrant/storage ]
+    networks: [ backend ]
+    restart: always
+
+  # ── RabbitMQ ──
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+    container_name: aino-rabbitmq
+    ports: [ "5672:5672", "15672:15672" ]
+    volumes: [ aino_rabbitmq_data:/var/lib/rabbitmq ]
+    env_file: [ ./env/rabbitmq/.env ]
+    networks: [ backend ]
+    restart: always
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      timeout: 10s
+      retries: 5
+
+  # ── Redis ──
+  redis:
+    image: redis:8-alpine
+    container_name: aino-redis
+    ports: [ "6379:6379" ]
+    volumes: [ aino_redis_data:/data ]
+    networks: [ backend ]
+    restart: always
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      timeout: 10s
+      retries: 5
+    command: [ "redis-server", "--appendonly", "yes" ]
+
+  # ── Nginx ──
+  nginx:
+    image: nginx:stable-alpine
+    container_name: aino-nginx
+    ports: [ "8080:80" ]
+    volumes: [ ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro ]
+    depends_on: [ fastapi ]
+    networks: [ backend ]
+    restart: always
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  aino_data:
+  aino_pg_data:
+  aino_qdrant_data:
+  aino_rabbitmq_data:
+  aino_redis_data:

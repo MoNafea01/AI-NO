@@ -3,7 +3,7 @@ setlocal
 
 :: Ask the user to enter the path to activate.bat
 echo Enter the full path to your environment's activate.bat file:
-set /p VENV_PATH=
+set /p VENV_PATH="D:\MO\Depi\envai\Scripts\activate.bat"
 
 :: Validate path
 if not exist "%VENV_PATH%" (

@@ -1,0 +1,56 @@
+# Core FastAPI
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.6.1
+
+# Database
+sqlalchemy==2.0.36
+alembic==1.14.0
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+qdrant-client==1.10.0
+
+# AI/ML
+scikit-learn==1.6.1
+numpy==1.26.4
+pandas==2.2.3
+tensorflow==2.19.0
+joblib==1.4.2
+langgraph==0.2.0
+dspy-ai==2.5.43
+
+# LLM Providers
+groq==0.33.0
+openai==1.35.13
+cohere==4.45.0
+
+# HTTP & Utilities
+python-dotenv==1.0.1
+python-multipart==0.0.9
+aiofiles==23.2.1
+slowapi==0.1.9
+
+# Logging & Monitoring
+structlog==24.4.0
+python-json-logger==3.2.1
+prometheus-fastapi-instrumentator==7.0.0
+
+# Task Queue (Celery + RabbitMQ + Redis)
+celery==5.5.3
+redis==6.2.0
+kombu==5.5.4
+billiard==4.2.1
+vine==5.1.0
+flower==2.0.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.0.0
+email-validator>=2.0.0
