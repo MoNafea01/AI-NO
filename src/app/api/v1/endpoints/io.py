@@ -1,14 +1,15 @@
 ﻿"""I/O endpoints (project export/import only)."""
 
 import asyncio
+import datetime
+import json
 import logging
 import os
-import json
-import datetime
-import tempfile
 import sys
+import tempfile
 from pathlib import Path
-from fastapi import APIRouter, Depends, Request, HTTPException
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import Response
 
 from app.core.auth import get_current_user
@@ -198,7 +199,7 @@ async def import_project(
 
     json_data = None
     if fmt == "json":
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             raw = json.load(f)
         json_data = raw if isinstance(raw, list) else raw.get("nodes", [])
 
@@ -224,7 +225,7 @@ async def import_project(
             stdout, stderr = await process.communicate()
             if process.returncode != 0:
                 raise Exception(stderr.decode())
-            with open(tmp_json_path, "r", encoding="utf-8") as f:
+            with open(tmp_json_path, encoding="utf-8") as f:
                 raw = json.load(f)
             json_data = raw if isinstance(raw, list) else raw.get("nodes", [])
             os.unlink(tmp_json_path)

@@ -5,7 +5,6 @@ sync helpers for Celery engine layer."""
 import logging
 import uuid
 
-from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -28,7 +27,7 @@ class WorkflowRepository(BaseRepository[Workflow]):
             result = await session.execute(statement)
             return list(result.scalars().all())
 
-    async def clone_workflow(self, workflow_id: int, new_name: str = None) -> Optional[Workflow]:
+    async def clone_workflow(self, workflow_id: int, new_name: str = None) -> Workflow | None:
         """Deep-copy a workflow and all its nodes, generating new node IDs."""
         async with self.session_factory() as session:
             original = await session.get(Workflow, workflow_id)
@@ -109,7 +108,7 @@ class WorkflowRunRepository(BaseRepository[WorkflowRun]):
             )
             return list(result.scalars().all())
 
-    async def get_with_steps(self, run_id: int) -> Optional[WorkflowRun]:
+    async def get_with_steps(self, run_id: int) -> WorkflowRun | None:
         async with self.session_factory() as session:
             result = await session.execute(
                 select(WorkflowRun)
@@ -170,7 +169,7 @@ class WorkflowStepRepository(BaseRepository[WorkflowStep]):
             status="pending",
         )
 
-    async def update_step_status(self, step_id: int, status: str, error: Optional[str] = None, result: Optional[dict] = None):
+    async def update_step_status(self, step_id: int, status: str, error: str | None = None, result: dict | None = None):
         kwargs = {"status": status}
         if error is not None:
             kwargs["error"] = error

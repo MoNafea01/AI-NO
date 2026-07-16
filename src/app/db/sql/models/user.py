@@ -1,10 +1,10 @@
 """User SQLAlchemy model."""
 
 from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy.orm import relationship
 
 from .base import SQLAlchemyBase, TimestampMixin
 
-from sqlalchemy.orm import relationship
 
 class User(SQLAlchemyBase, TimestampMixin):
     """Registered user account."""
@@ -15,7 +15,7 @@ class User(SQLAlchemyBase, TimestampMixin):
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
-    
+
     projects = relationship("Project", back_populates="user", cascade="all, delete-orphan")
     refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
 

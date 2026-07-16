@@ -1,8 +1,7 @@
 """Component and category SQLAlchemy models."""
 
-from sqlalchemy import Column, BigInteger, Integer, String, ForeignKey
+from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
-
 from sqlalchemy.orm import relationship
 
 from .base import SQLAlchemyBase

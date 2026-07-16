@@ -1,9 +1,8 @@
 """Refresh token SQLAlchemy model — DB-stored for server-side revocation."""
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.sql import func
-
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from .base import SQLAlchemyBase
 
@@ -19,7 +18,7 @@ class RefreshToken(SQLAlchemyBase):
     expires_at = Column(DateTime(timezone=True), nullable=False)
     revoked = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    
+
     user = relationship("User", back_populates="refresh_tokens")
 
     def __repr__(self) -> str:

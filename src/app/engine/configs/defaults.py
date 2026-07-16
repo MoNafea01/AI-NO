@@ -1,3 +1,10 @@
+from sklearn.datasets import (
+    load_diabetes,
+    load_digits,
+    load_iris,
+    make_classification,
+    make_regression,
+)
 from sklearn.ensemble import (
     AdaBoostClassifier,
     AdaBoostRegressor,
@@ -8,6 +15,7 @@ from sklearn.ensemble import (
     RandomForestClassifier,
     RandomForestRegressor,
 )
+from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.linear_model import (
     ElasticNet,
     Lasso,
@@ -18,6 +26,17 @@ from sklearn.linear_model import (
     SGDClassifier,
     SGDRegressor,
 )
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    log_loss,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+    root_mean_squared_error,
+)
 from sklearn.naive_bayes import (
     BernoulliNB,
     GaussianNB,
@@ -27,16 +46,6 @@ from sklearn.neighbors import (
     KNeighborsClassifier,
     KNeighborsRegressor,
 )
-from sklearn.svm import (
-    SVC,
-    SVR,
-)
-from sklearn.tree import (
-    DecisionTreeClassifier,
-    DecisionTreeRegressor,
-)
-
-from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.preprocessing import (
     Binarizer,
     LabelBinarizer,
@@ -49,24 +58,13 @@ from sklearn.preprocessing import (
     RobustScaler,
     StandardScaler,
 )
-from sklearn.datasets import (
-    load_diabetes,
-    load_digits,
-    load_iris,
-    make_classification,
-    make_regression,
+from sklearn.svm import (
+    SVC,
+    SVR,
 )
-
-from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    log_loss,
-    mean_absolute_error,
-    mean_squared_error,
-    precision_score,
-    r2_score,
-    recall_score,
-    root_mean_squared_error,
+from sklearn.tree import (
+    DecisionTreeClassifier,
+    DecisionTreeRegressor,
 )
 
 MODELS = {
@@ -82,7 +80,7 @@ MODELS = {
     'adaboost_regressor':{'node': AdaBoostRegressor,'params': {}},
     'bagging_regressor':{'node': BaggingRegressor,'params': {}},
     'knn_regressor':{'node': KNeighborsRegressor,'params': {'n_neighbors': 5,}},
-    
+
     'gaussian_nb':{'node': GaussianNB,'params': {}},
     'bernoulli_nb':{'node': BernoulliNB,'params': {}},
     'multinomial_nb':{'node': MultinomialNB,'params': {}},
@@ -104,15 +102,15 @@ PREPROCESSORS = {
     'minmax_scaler':{'node': MinMaxScaler, 'params': {'feature_range': (0, 1)}},
     'robust_scaler':{'node': RobustScaler, 'params': {'quantile_range': (25.0, 75.0)}},
     'standard_scaler':{'node': StandardScaler, 'params': {'with_mean': True, 'with_std': True}},
-    
+
     'label_encoder':{'node': LabelEncoder, 'params':{}},
     'onehot_encoder':{'node': OneHotEncoder, 'params':{}},
     'ordinal_encoder':{'node': OrdinalEncoder, 'params':{}},
     'label_binarizer':{'node': LabelBinarizer, 'params':{}},
-    
+
     'knn_imputer':{'node': KNNImputer, 'params':{'n_neighbors': 5}},
     'simple_imputer':{'node': SimpleImputer, 'params':{'strategy': 'mean'}},
-    
+
     'binarizer':{'node': Binarizer, 'params':{'threshold': 0.5}}
 }
 

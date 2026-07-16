@@ -17,7 +17,7 @@ from app.engine.repositories.execution import EnginePersistence
 from app.engine.workflow_executor import WorkflowExecutor
 
 from ...schemas.request import WorkflowCreate, WorkflowUpdate
-from ...schemas.response import MessageResponse, WorkflowResponse, WorkflowDetailResponse
+from ...schemas.response import MessageResponse, WorkflowDetailResponse, WorkflowResponse
 
 workflow_router = APIRouter(prefix="/workflows", tags=["workflows"])
 
@@ -99,14 +99,14 @@ async def get_workflow(
     wf = await repo.get_by_id(workflow_id)
     if not wf or wf.project_id != project_id:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    
+
     data = WorkflowDetailResponse.model_validate(wf)
-    
+
     if include_nodes:
         node_repo = NodeRepository(request.app.state.db_client)
         nodes = await node_repo.get_by_workflow(workflow_id=workflow_id, project_id=project_id)
         data.content = [n.__dict__ for n in nodes]
-        
+
     return data
 
 

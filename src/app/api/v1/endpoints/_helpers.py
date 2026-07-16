@@ -3,9 +3,6 @@
 import logging
 
 from fastapi import HTTPException, Request
-from typing import Optional
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -14,8 +11,8 @@ async def create_pending_node(
     request: Request,
     node_name: str,
     body_data: dict,
-    project_id: Optional[int] = None,
-    workflow_id: Optional[int] = None,
+    project_id: int | None = None,
+    workflow_id: int | None = None,
 ) -> dict:
     """Unified node creation with registry lookup, defaults merge, and validation.
 

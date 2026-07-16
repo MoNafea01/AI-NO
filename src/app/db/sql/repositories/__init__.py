@@ -1,7 +1,7 @@
 from .base import BaseRepository
-from .project import ProjectRepository
-from .node import NodeRepository
 from .component import ComponentRepository
+from .node import NodeRepository
+from .project import ProjectRepository
 
 __all__ = [
     "BaseRepository",

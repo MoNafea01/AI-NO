@@ -27,7 +27,7 @@ class Workflow(SQLAlchemyBase, TimestampMixin):
     name = Column(String(255), nullable=False, default="Untitled")
     description = Column(Text, nullable=True, default="")
     current_version = Column(Integer, nullable=True, default=None)
-    
+
     project = relationship("Project", back_populates="workflows")
     nodes = relationship("Node", back_populates="workflow", cascade="all, delete-orphan")
     runs = relationship("WorkflowRun", back_populates="workflow", cascade="all, delete-orphan")

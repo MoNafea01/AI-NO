@@ -21,7 +21,7 @@ class ActionMixin:
         Returns the loaded object on success.
         Raises DataLoadError or ValidationError on failure.
         """
-        if isinstance(resource, (dict, int, str)):
+        if isinstance(resource, dict | int | str):
             return self._load_by_id(resource, error_prefix)
         elif resource_path and isinstance(resource_path, str):
             return self._load_by_path(resource_path, error_prefix)

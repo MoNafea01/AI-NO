@@ -2,7 +2,6 @@
 
 from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
-
 from sqlalchemy.orm import relationship
 
 from .base import SQLAlchemyBase, TimestampMixin

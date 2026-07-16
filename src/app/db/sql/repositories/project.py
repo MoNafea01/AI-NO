@@ -1,10 +1,11 @@
 ﻿"""Project repository."""
 
-from typing import List, Optional
-from sqlalchemy import delete, select, func
+
+from sqlalchemy import delete, select
+
+from app.db.sql.models.project import Project
 
 from .base import BaseRepository
-from app.db.sql.models.project import Project
 
 
 class ProjectRepository(BaseRepository[Project]):
@@ -13,11 +14,11 @@ class ProjectRepository(BaseRepository[Project]):
     async def get_filtered(
         self,
         user_id: int,
-        model_name: Optional[str] = None,
-        dataset_name: Optional[str] = None,
+        model_name: str | None = None,
+        dataset_name: str | None = None,
         skip: int = 0,
         limit: int = 100,
-    ) -> List[Project]:
+    ) -> list[Project]:
         async with self.session_factory() as session:
             query = select(Project).where(Project.user_id == user_id)
             if model_name:
@@ -48,7 +49,7 @@ class ProjectRepository(BaseRepository[Project]):
 
             return result.rowcount
 
-    async def get_distinct_models(self, user_id: int) -> List[str]:
+    async def get_distinct_models(self, user_id: int) -> list[str]:
         async with self.session_factory() as session:
             query = (
                 select(Project.model)
@@ -63,7 +64,7 @@ class ProjectRepository(BaseRepository[Project]):
             result = await session.execute(query)
             return list(result.scalars().all())
 
-    async def get_distinct_datasets(self, user_id: int) -> List[str]:
+    async def get_distinct_datasets(self, user_id: int) -> list[str]:
         async with self.session_factory() as session:
             query = (
                 select(Project.dataset)

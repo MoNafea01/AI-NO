@@ -2,10 +2,10 @@
 
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
-
 from sqlalchemy.orm import relationship
 
 from .base import SQLAlchemyBase, TimestampMixin
+
 
 class WorkflowSnapshot(SQLAlchemyBase, TimestampMixin):
     __tablename__ = "workflow_snapshots"
@@ -18,5 +18,5 @@ class WorkflowSnapshot(SQLAlchemyBase, TimestampMixin):
     version = Column(Integer, nullable=False)
     snapshot = Column(JSONB, nullable=False)
     label = Column(String(255), nullable=True)
-    
+
     workflow = relationship("Workflow", back_populates="snapshots")

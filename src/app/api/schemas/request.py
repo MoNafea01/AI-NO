@@ -1,7 +1,9 @@
 
-from typing import Optional, Any, List
+from typing import Any
+
 from pydantic import Field
-from .base import BaseSchema, JSONOrInt, EmailStr
+
+from .base import BaseSchema, EmailStr, JSONOrInt
 
 # ── Component Schemas ──
 
@@ -11,27 +13,27 @@ class ComponentCreate(BaseSchema):
     displayed_name: str = ""
     description: str = ""
     order: int = 0
-    category_id: Optional[int] = None
+    category_id: int | None = None
     type: str = "general"
     task: str = "general"
-    params: Optional[Any] = None
-    inputs: Optional[List] = None
-    outputs: Optional[List] = None
+    params: Any | None = None
+    inputs: list | None = None
+    outputs: list | None = None
     api_call: str = Field(..., max_length=100)
 
 
 class ComponentUpdate(BaseSchema):
-    displayed_name: Optional[str] = None
-    description: Optional[str] = None
-    order: Optional[int] = None
-    category_id: Optional[int] = None
-    name: Optional[str] = None
-    type: Optional[str] = None
-    task: Optional[str] = None
-    params: Optional[Any] = None
-    inputs: Optional[List] = None
-    outputs: Optional[List] = None
-    api_call: Optional[str] = None
+    displayed_name: str | None = None
+    description: str | None = None
+    order: int | None = None
+    category_id: int | None = None
+    name: str | None = None
+    type: str | None = None
+    task: str | None = None
+    params: Any | None = None
+    inputs: list | None = None
+    outputs: list | None = None
+    api_call: str | None = None
 
 
 # ── Node Schemas ──
@@ -41,8 +43,8 @@ class NodeCreate(BaseSchema):
     in_ports: dict[str, str] | None = None
     out_ports: dict[str, str] | None = None
     selected_output: str | None = None
-    project_id: Optional[int] = None
-    workflow_id: Optional[int] = None
+    project_id: int | None = None
+    workflow_id: int | None = None
     location_x: float = 0.0
     location_y: float = 0.0
     displayed_name: str | None = None
@@ -93,44 +95,44 @@ class WorkflowCreate(BaseSchema):
     description: str = ""
 
 class WorkflowUpdate(BaseSchema):
-    name: Optional[str] = Field(None, max_length=255)
-    description: Optional[str] = None
+    name: str | None = Field(None, max_length=255)
+    description: str | None = None
 
 
 # ── Project Schemas ──
 class ProjectCreate(BaseSchema):
     name: str = Field(..., max_length=255)
     description: str = ""
-    model: Optional[str] = None
-    dataset: Optional[str] = None
+    model: str | None = None
+    dataset: str | None = None
 
 
 class ProjectUpdate(BaseSchema):
-    name: Optional[str] = Field(None, max_length=255)
-    description: Optional[str] = None
-    model: Optional[str] = None
-    dataset: Optional[str] = None
+    name: str | None = Field(None, max_length=255)
+    description: str | None = None
+    model: str | None = None
+    dataset: str | None = None
 
 
 class BulkProjectDelete(BaseSchema):
-    ids: List[int]
+    ids: list[int]
 
 
 class ExportProjectRequest(BaseSchema):
     project_id: int
-    folder_path: Optional[str] = ""
-    format: Optional[str] = Field("json", pattern="^(json|ainoprj)$")
-    file_name: Optional[str] = ""
-    password: Optional[str] = ""
+    folder_path: str | None = ""
+    format: str | None = Field("json", pattern="^(json|ainoprj)$")
+    file_name: str | None = ""
+    password: str | None = ""
 
 
 class ImportProjectRequest(BaseSchema):
     path: str
     format: str = Field("auto", pattern="^(auto|json|ainoprj)$")
-    password: Optional[str] = ""
-    name: Optional[str] = ""
-    description: Optional[str] = ""
-    project_id: Optional[int] = None
+    password: str | None = ""
+    name: str | None = ""
+    description: str | None = ""
+    project_id: int | None = None
 
 
 class RegisterRequest(BaseSchema):

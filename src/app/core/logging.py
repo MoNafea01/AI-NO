@@ -3,6 +3,7 @@
 import logging
 import sys
 from typing import Any
+
 import structlog
 
 from app.core.config import settings

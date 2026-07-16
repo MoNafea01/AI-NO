@@ -6,8 +6,8 @@ from sqlalchemy import func, select
 from app.db.sql.models.component import Component
 
 from ..base_node import SAVING_DIR, BaseNode, build_save_path
-from ..repositories.execution import EnginePersistence
 from ..repositories.db import get_sync_session
+from ..repositories.execution import EnginePersistence
 from ..utils import PayloadBuilder
 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))

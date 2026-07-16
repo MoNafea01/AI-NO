@@ -25,7 +25,6 @@ from app.engine.dag import (
 )
 from app.engine.repositories.execution import EnginePersistence
 
-
 logger = logging.getLogger(__name__)
 
 

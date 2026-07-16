@@ -5,18 +5,17 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.auth import create_access_token
-from app.core.security import hash_password, verify_password
 from app.core.config import settings
-
+from app.core.security import hash_password, verify_password
 from app.db.sql.models.refresh_token import RefreshToken
 from app.db.sql.repositories.user import UserRepository
-    
-from ...schemas.request import RegisterRequest, RefreshRequest
+
+from ...schemas.request import RefreshRequest, RegisterRequest
 from ...schemas.response import RegisterResponse, TokenPairResponse
 
 logger = logging.getLogger(__name__)

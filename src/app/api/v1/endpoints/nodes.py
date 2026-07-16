@@ -1,7 +1,7 @@
 ﻿"""Node CRUD + I/O endpoints."""
 
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from typing import Optional
 
 from app.core.auth import get_current_user
 from app.db.sql.repositories.node import NodeRepository
@@ -48,8 +48,8 @@ def _to_response(node) -> NodeResponse:
 async def list_nodes(
     request: Request,
     user: dict = Depends(get_current_user),
-    project_id: Optional[int] = None,
-    workflow_id: Optional[int] = None,
+    project_id: int | None = None,
+    workflow_id: int | None = None,
     skip: int = 0,
     limit: int = 1000,
 ):
@@ -67,8 +67,8 @@ async def list_nodes(
     "/", response_model=NodeResponse, status_code=status.HTTP_201_CREATED
 )
 async def create_node(
-    request: Request, body: NodeCreate, 
-    project_id: Optional[int] = None, workflow_id: Optional[int] = None, 
+    request: Request, body: NodeCreate,
+    project_id: int | None = None, workflow_id: int | None = None,
     user: dict = Depends(get_current_user)
 ):
     """Unified node creation — resolves type/defaults/metadata from registry."""
@@ -126,6 +126,7 @@ async def save_node(
 ):
     """Save a node payload to disk."""
     import asyncio
+
     from app.engine.repositories.execution import EnginePersistence
 
     payload = body.node
@@ -152,6 +153,7 @@ async def load_node(
 ):
     """Load a node from disk and create a DB record."""
     import asyncio
+
     from app.engine.repositories.execution import EnginePersistence
 
     path = body.params.get("node_path", "")

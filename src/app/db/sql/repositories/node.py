@@ -29,7 +29,7 @@ class NodeRepository(BaseRepository[Node]):
                 .limit(limit)
             )
             return list(result.scalars().all())
-    
+
     async def get_by_workflow(
         self, workflow_id: int, project_id: int | None = None, skip: int = 0, limit: int = 1000
     ) -> list[Node]:
@@ -86,7 +86,7 @@ class NodeRepository(BaseRepository[Node]):
             )
             await session.commit()
             return result.rowcount
-    
+
     async def clear_workflow_nodes(self, workflow_id: int, project_id: int | None = None) -> int:
         async with self.session_factory() as session:
             result = await session.execute(
