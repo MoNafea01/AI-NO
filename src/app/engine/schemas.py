@@ -3,7 +3,7 @@
 import uuid
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class NodeContext(BaseModel):
@@ -39,5 +39,4 @@ class NodePayload(BaseModel):
     location_x: float = 0.0
     location_y: float = 0.0
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)

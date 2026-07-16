@@ -155,10 +155,9 @@ class TestTopologicalLevels:
 
 class TestComputeNodeHash:
     def _hash(self, params=None, parent_hashes=None, **overrides):
-        """Helper to call the new compute_node_hash signature."""
+        """Helper to call the current compute_node_hash signature."""
         return compute_node_hash(
-            node_type=overrides.get("node_type", "test_node"),
-            task=overrides.get("task", "general"),
+            node_name=overrides.get("node_name", "test_node"),
             params=params or {},
             out_ports=overrides.get("out_ports", []),
             in_ports=overrides.get("in_ports", []),
@@ -187,8 +186,8 @@ class TestComputeNodeHash:
         assert h1 != h2
 
     def test_different_type(self):
-        h1 = self._hash({"a": 1}, node_type="type_a")
-        h2 = self._hash({"a": 1}, node_type="type_b")
+        h1 = self._hash({"a": 1}, node_name="type_a")
+        h2 = self._hash({"a": 1}, node_name="type_b")
         assert h1 != h2
 
     def test_different_topology(self):

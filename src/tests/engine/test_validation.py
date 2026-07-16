@@ -21,13 +21,13 @@ class TestValidateModel:
         assert errors == []
 
     def test_unknown_model_type(self):
-        data = {"model_type": "unknown", "task": "t", "model_name": "n"}
+        data = {"model_type": "unknown", "task": "regression", "model_name": "ridge"}
         errors = validate_params("create_model", data)
         assert len(errors) == 1
         assert "Unknown model_type" in errors[0]
 
     def test_unknown_task(self):
-        data = {"model_type": "linear_models", "task": "unknown", "model_name": "n"}
+        data = {"model_type": "linear_models", "task": "unknown", "model_name": "ridge"}
         errors = validate_params("create_model", data)
         assert len(errors) == 1
         assert "Unknown task" in errors[0]
@@ -49,12 +49,13 @@ class TestValidatePreprocessor:
         data = {
             "preprocessor_type": "scaler",
             "preprocessor_name": "standard_scaler",
+            "task": "preprocessing",
         }
         errors = validate_params("create_preprocessor", data)
         assert errors == []
 
     def test_unknown_type(self):
-        data = {"preprocessor_type": "unknown", "preprocessor_name": "n"}
+        data = {"preprocessor_type": "unknown", "preprocessor_name": "n", "task": "preprocessing"}
         errors = validate_params("create_preprocessor", data)
         assert any("Unknown preprocessor_type" in e for e in errors)
 
@@ -62,6 +63,7 @@ class TestValidatePreprocessor:
         data = {
             "preprocessor_type": "scaler",
             "preprocessor_name": "unknown_scaler",
+            "task": "preprocessing",
         }
         errors = validate_params("create_preprocessor", data)
         assert any("Unknown preprocessor_name" in e for e in errors)
