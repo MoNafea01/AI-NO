@@ -86,8 +86,9 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Apply migrations
+        working-directory: src/app/db/sql
         run: |
-          alembic -c app/db/sql/alembic.ini upgrade head
+          alembic upgrade head
 
       - name: Run tests
         run: |
