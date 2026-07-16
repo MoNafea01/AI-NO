@@ -1,3 +1,11 @@
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
 [project]
 name = "aino"
 version = "0.1.0"
@@ -16,6 +24,7 @@ dependencies = [
     "tensorflow>=2.19.0",
     "joblib>=1.4.0",
     "pydantic>=2.10.0",
+    "pydantic-settings>=2.6.0",
     "celery>=5.5.0",
     "redis>=6.2.0",
     "python-dotenv>=1.0.0",
@@ -24,6 +33,12 @@ dependencies = [
     "groq>=0.33.0",
     "openai>=1.35.0",
     "cohere>=4.45.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "bcrypt>=4.0.0",
+    "email-validator>=2.0.0",
+    "slowapi>=0.1.9",
+    "qdrant-client>=1.10.0",
 ]
 
 [project.optional-dependencies]
