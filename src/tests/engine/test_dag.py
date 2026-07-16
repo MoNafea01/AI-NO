@@ -176,11 +176,11 @@ class TestComputeNodeHash:
 
     def test_different_parents(self):
         h1 = self._hash(
-            in_ports=[{"node_id": 10}],
+            in_ports={"Data": "10:0:0"},
             parent_hashes={10: "hash1"},
         )
         h2 = self._hash(
-            in_ports=[{"node_id": 10}],
+            in_ports={"Data": "10:0:0"},
             parent_hashes={10: "hash2"},
         )
         assert h1 != h2
@@ -191,8 +191,8 @@ class TestComputeNodeHash:
         assert h1 != h2
 
     def test_different_topology(self):
-        h1 = self._hash(in_ports=[{"node_id": 1}])
-        h2 = self._hash(in_ports=[{"node_id": 2}])
+        h1 = self._hash(in_ports={"Data": "1:0:0"})
+        h2 = self._hash(in_ports={"Data": "2:0:0"})
         assert h1 != h2
 
     def test_returns_sha256(self):

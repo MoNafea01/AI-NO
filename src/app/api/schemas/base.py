@@ -2,8 +2,7 @@
 
 from typing import Any, Union
 
-from pydantic import BaseModel, ConfigDict
-from pydantic.fields import EmailStr  # noqa: F401 — re-exported for other schema modules
+from pydantic import BaseModel, ConfigDict, EmailStr  # noqa: F401
 
 
 class BaseSchema(BaseModel):
