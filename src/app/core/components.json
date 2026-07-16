@@ -1,0 +1,2293 @@
+{
+  "Inputs": [
+    {
+      "component_id": 0,
+      "display_name": "Data Loader",
+      "description": "Loads data from various sources (CSV, database, API, etc.) for use in machine learning models.",
+      "name": "data_loader",
+      "type": "loader",
+      "task": "load_data",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "X and y",
+          "ports": [
+            {
+              "name": "X",
+              "type": "data"
+            },
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "X only",
+          "ports": [
+            {
+              "name": "X",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "y only",
+          "ports": [
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "dataset_name",
+          "type": "str",
+          "default": "iris",
+          "choices": [
+            "iris",
+            "digits",
+            "diabetes",
+            "make_regression",
+            "make_classification"
+          ]
+        },
+        {
+          "name": "dataset_path",
+          "type": "path",
+          "default": "",
+          "extensions": [
+            "pkl",
+            "csv",
+            "xlsx"
+          ]
+        }
+      ],
+      "api_call": "/load_data"
+    },
+    {
+      "component_id": 1,
+      "display_name": "Node Loader",
+      "description": "Loads saved node data for reuse in machine learning workflows.",
+      "name": "node_loader",
+      "type": "loader",
+      "task": "load_node",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Node",
+          "ports": [
+            {
+              "name": "Node",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Data",
+          "ports": [
+            {
+              "name": "Data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "node_path",
+          "type": "path_file",
+          "default": "",
+          "extensions": [
+            "pkl"
+          ]
+        }
+      ],
+      "api_call": "/load_node"
+    }
+  ],
+  "Outputs": [
+    {
+      "component_id": 2,
+      "display_name": "Node Saver",
+      "description": "Saves processed data or model states into a structured format (e.g., JSON, database, file system).",
+      "name": "node_saver",
+      "type": "saver",
+      "task": "save_node",
+      "inputs": [
+        {
+          "name": "Node",
+          "ports": [
+            {
+              "name": "Node",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Data",
+          "ports": [
+            {
+              "name": "Data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Execute",
+          "ports": [
+            {
+              "name": "Execute",
+              "type": "trigger"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "node_path",
+          "type": "path_folder",
+          "default": ""
+        }
+      ],
+      "api_call": "/save_node"
+    }
+  ],
+  "Models": [
+    {
+      "component_id": 3,
+      "display_name": "Linear Regression",
+      "description": "A simple regression model that fits a linear relationship between the input features and the target variable.",
+      "name": "linear_regression",
+      "type": "linear_models",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 4,
+      "display_name": "Ridge Regression",
+      "description": "A linear regression model with L2 regularization to prevent overfitting by penalizing large coefficients.",
+      "name": "ridge",
+      "type": "linear_models",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "alpha",
+          "type": "float",
+          "default": 1.0
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 5,
+      "display_name": "Lasso Regressor",
+      "description": "A linear regression model with L1 regularization that encourages sparsity by setting some coefficients to zero.",
+      "name": "lasso",
+      "type": "linear_models",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "alpha",
+          "type": "float",
+          "default": 1.0
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 6,
+      "display_name": "Elastic Net",
+      "description": "A combination of L1 (Lasso) and L2 (Ridge) regularization to balance feature selection and shrinkage.",
+      "name": "elastic_net",
+      "type": "linear_models",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "alpha",
+          "type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "l1_ratio",
+          "type": "float",
+          "default": 0.5
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 7,
+      "display_name": "Sgd Regression",
+      "description": "A linear regression model trained using Stochastic Gradient Descent (SGD) for large-scale datasets.",
+      "name": "sgd_regression",
+      "type": "linear_models",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "penalty",
+          "type": "str",
+          "default": "l2",
+          "choices": [
+            "l1",
+            "l2"
+          ]
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 8,
+      "display_name": "Logistic Regression",
+      "description": "A linear model for binary classification that uses the logistic function to model the probability of a binary outcome.",
+      "name": "logistic_regression",
+      "type": "linear_models",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "penalty",
+          "type": "str",
+          "default": "l2",
+          "choices": [
+            "l1",
+            "l2"
+          ]
+        },
+        {
+          "name": "C",
+          "type": "float",
+          "default": 1.0
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 9,
+      "display_name": "Ridge Classifier",
+      "description": "A linear model for binary classification that uses L2 regularization to prevent overfitting.",
+      "name": "ridge_classifier",
+      "type": "linear_models",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "alpha",
+          "type": "float",
+          "default": 1.0
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 10,
+      "display_name": "Sgd Classifier",
+      "description": "A linear model for binary classification that uses Stochastic Gradient Descent (SGD) for training.",
+      "name": "sgd_classifier",
+      "type": "linear_models",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "penalty",
+          "type": "str",
+          "default": "l2",
+          "choices": [
+            "l1",
+            "l2"
+          ]
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 11,
+      "display_name": "SVR",
+      "description": "Support Vector Regression.",
+      "name": "svr",
+      "type": "svm",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "C",
+          "type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "kernel",
+          "type": "str",
+          "default": "rbf",
+          "choices": [
+            "linear",
+            "poly",
+            "rbf",
+            "sigmoid"
+          ]
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 12,
+      "display_name": "SVC",
+      "description": "Support Vector Classification.",
+      "name": "svc",
+      "type": "svm",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "C",
+          "type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "kernel",
+          "type": "str",
+          "default": "rbf",
+          "choices": [
+            "linear",
+            "poly",
+            "rbf",
+            "sigmoid"
+          ]
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 13,
+      "display_name": "Regression Tree",
+      "description": "A non-linear regression model that splits data into hierarchical decision rules.",
+      "name": "decision_tree_regressor",
+      "type": "tree",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": " max_depth",
+          "type": "int",
+          "default": 5
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 14,
+      "display_name": "Classification Tree",
+      "description": "A non-linear classification model that splits data into hierarchical decision rules.",
+      "name": "decision_tree_classifier",
+      "type": "tree",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": " max_depth",
+          "type": "int",
+          "default": 5
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 15,
+      "display_name": "Random Forest Regressor",
+      "description": "An ensemble regression model that combines multiple decision trees to improve predictive performance and reduce overfitting.",
+      "name": "random_forest_regressor",
+      "type": "ensemble",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": " n_estimators",
+          "type": "int",
+          "default": 100
+        },
+        {
+          "name": "max_depth",
+          "type": "int",
+          "default": 5
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 16,
+      "display_name": "Random Forest Classifier",
+      "description": "An ensemble classification model that combines multiple decision trees to improve predictive performance and reduce overfitting.",
+      "name": "random_forest_classifier",
+      "type": "ensemble",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": " n_estimators",
+          "type": "int",
+          "default": 100
+        },
+        {
+          "name": "max_depth",
+          "type": "int",
+          "default": 5
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 17,
+      "display_name": "Gradient Boosting Regressor",
+      "description": "A Boosting ensemble regression model that builds sequential decision trees, where each tree corrects the errors of the previous ones.",
+      "name": "gradient_boosting_regressor",
+      "type": "ensemble",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 18,
+      "display_name": "Gradient Boosting Classifier",
+      "description": "A Boosting ensemble classification model that builds sequential decision trees, where each tree corrects the errors of the previous ones.",
+      "name": "gradient_boosting_classifier",
+      "type": "ensemble",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 19,
+      "display_name": "AdaBoost Regressor",
+      "description": "An ensemble regression model that combines multiple weak learners to create a strong predictor.",
+      "name": "adaboost_regressor",
+      "type": "ensemble",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 20,
+      "display_name": "AdaBoost Classifier",
+      "description": "An ensemble classification model that combines multiple weak learners to create a strong predictor.",
+      "name": "adaboost_classifier",
+      "type": "ensemble",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 21,
+      "display_name": "Bagging Regressor",
+      "description": "An ensemble regression model that combines multiple weak learners to create a strong predictor.",
+      "name": "bagging_regressor",
+      "type": "ensemble",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 22,
+      "display_name": "Bagging Classifier",
+      "description": "An ensemble classification model that combines multiple weak learners to create a strong predictor.",
+      "name": "bagging_classifier",
+      "type": "ensemble",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 23,
+      "display_name": "Gaussian Naïve Bayes",
+      "description": "A simple probabilistic classifier based on Bayes' theorem with the assumption of independence between features.",
+      "name": "gaussian_nb",
+      "type": "naive_bayes",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 24,
+      "display_name": "Multinomial Naïve Bayes",
+      "description": "A probabilistic classifier based on Bayes' theorem with the assumption of independence between features, suitable for discrete data.",
+      "name": "multinomial_nb",
+      "type": "naive_bayes",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 25,
+      "display_name": "Bernoulli Naïve Bayes",
+      "description": "A probabilistic classifier based on Bayes' theorem with the assumption of independence between features, suitable for binary data.",
+      "name": "bernoulli_nb",
+      "type": "naive_bayes",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/model"
+    },
+    {
+      "component_id": 26,
+      "display_name": "K-Nearest Neighbors Classifier",
+      "description": "A non-parametric method used for classification and regression.",
+      "name": "knn_classifier",
+      "type": "knn",
+      "task": "classification",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": " n_neighbors",
+          "type": "int",
+          "default": 5
+        }
+      ],
+      "api_call": "/model"
+    },
+    {
+      "component_id": 27,
+      "display_name": "K-Nearest Neighbors Regressor",
+      "description": "A non-parametric method used for classification and regression.",
+      "name": "knn_regressor",
+      "type": "knn",
+      "task": "regression",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": " n_neighbors",
+          "type": "int",
+          "default": 5
+        }
+      ],
+      "api_call": "/model"
+    }
+  ],
+  "Preprocessors": [
+    {
+      "component_id": 28,
+      "display_name": "Standard Scaler",
+      "description": "Scales features to have zero mean and unit variance.",
+      "name": "standard_scaler",
+      "type": "scaler",
+      "task": "scale",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 29,
+      "display_name": "Maxabs Scaler",
+      "description": "Scales features by their maximum absolute value, preserving sparsity.",
+      "name": "maxabs_scaler",
+      "type": "scaler",
+      "task": "scale",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "copy",
+          "type": "bool",
+          "default": true
+        }
+      ],
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 30,
+      "display_name": "Robust Scaler",
+      "description": "Scales features using statistics that are robust to outliers.",
+      "name": "robust_scaler",
+      "type": "scaler",
+      "task": "scale",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": " quantile_range",
+          "type": " tuple",
+          "default": [
+            0.25,
+            0.75
+          ]
+        }
+      ],
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 31,
+      "display_name": "Minmax Scaler",
+      "description": "Scales features to a fixed range, typically [0, 1].",
+      "name": "minmax_scaler",
+      "type": "scaler",
+      "task": "scale",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 32,
+      "display_name": "Normalizer",
+      "description": "Scales features to have unit norm.",
+      "name": "normalizer",
+      "type": "scaler",
+      "task": "scale",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "norm",
+          "type": "str",
+          "default": "l2",
+          "choices": [
+            "l1",
+            "l2",
+            "max"
+          ]
+        }
+      ],
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 33,
+      "display_name": "Label Encoder",
+      "description": "Encodes target labels as integers.",
+      "name": "label_encoder",
+      "type": "encoder",
+      "task": "encode",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 34,
+      "display_name": "Onehot Encoder",
+      "description": "Encodes categorical features as a one-hot vector.",
+      "name": "onehot_encoder",
+      "type": "encoder",
+      "task": "encode",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 35,
+      "display_name": "Ordinal Encoder",
+      "description": "Encodes categorical features as ordinal integers.",
+      "name": "ordinal_encoder",
+      "type": "encoder",
+      "task": "encode",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 36,
+      "display_name": "Label Binarizer",
+      "description": "Encodes target labels as a binary matrix.",
+      "name": "label_binarizer",
+      "type": "encoder",
+      "task": "encode",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 37,
+      "display_name": "Simple Imputer",
+      "description": "Fills missing values with simple strategies.",
+      "name": "simple_imputer",
+      "type": "imputer",
+      "task": "impute",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 38,
+      "display_name": "KNN Imputer",
+      "description": "Fills missing values with K-nearest neighbors.",
+      "name": "knn_imputer",
+      "type": "imputer",
+      "task": "impute",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    },
+    {
+      "component_id": 39,
+      "display_name": "Binarizer",
+      "description": "Converts features to binary values.",
+      "name": "binarizer",
+      "type": "binarizer",
+      "task": "binarize",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Preprocessor",
+          "ports": [
+            {
+              "name": "preprocessor",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/preprocessor"
+    }
+  ],
+  "Core": [
+    {
+      "component_id": 40,
+      "display_name": "Model Fitter",
+      "description": "A general utility that trains a machine learning model on a dataset.",
+      "name": "model_fitter",
+      "type": "fitter",
+      "task": "fit_model",
+      "inputs": [
+        {
+          "name": "Model and Data",
+          "ports": [
+            {
+              "name": "Model",
+              "type": "node"
+            },
+            {
+              "name": "X",
+              "type": "data"
+            },
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Model Only",
+          "ports": [
+            {
+              "name": "fitted_model",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Model and Data",
+          "ports": [
+            {
+              "name": "Fitted Model",
+              "type": "node"
+            },
+            {
+              "name": "X",
+              "type": "data"
+            },
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/fit_model"
+    },
+    {
+      "component_id": 41,
+      "display_name": "Model Predictor",
+      "description": "A general utility that generates predictions from a trained machine learning model.",
+      "name": "predictor",
+      "type": "predictor",
+      "task": "predict",
+      "inputs": [
+        {
+          "name": "Model and Data",
+          "ports": [
+            {
+              "name": "Fitted Model",
+              "type": "node"
+            },
+            {
+              "name": "X",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Predictions Only",
+          "ports": [
+            {
+              "name": "Predictions",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "Model and Data",
+          "ports": [
+            {
+              "name": "Fitted Model",
+              "type": "node"
+            },
+            {
+              "name": "X",
+              "type": "data"
+            },
+            {
+              "name": "Predictions",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/predict"
+    },
+    {
+      "component_id": 42,
+      "display_name": "Preprocessor Fitter",
+      "description": "A general utility that fits a data preprocessor on a dataset.",
+      "name": "preprocessor_fitter",
+      "type": "fitter",
+      "task": "fit_preprocessor",
+      "inputs": [
+        {
+          "name": "Preprocessor and Data",
+          "ports": [
+            {
+              "name": "Fitted Preprocessor",
+              "type": "node"
+            },
+            {
+              "name": "Data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Fitted Preprocessor Only",
+          "ports": [
+            {
+              "name": "Fitted Preprocessor",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Preprocessor and Data",
+          "ports": [
+            {
+              "name": "Fitted Preprocessor",
+              "type": "node"
+            },
+            {
+              "name": "Data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/fit_preprocessor"
+    },
+    {
+      "component_id": 43,
+      "display_name": "Data Transformer",
+      "description": "A general utility that applies a fitted preprocessor to a dataset.",
+      "name": "preprocessor_transformer",
+      "type": "transformer",
+      "task": "transform",
+      "inputs": [
+        {
+          "name": "Preprocessor and Data",
+          "ports": [
+            {
+              "name": "Fitted Preprocessor",
+              "type": "node"
+            },
+            {
+              "name": "Data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Transformed Data Only",
+          "ports": [
+            {
+              "name": "transformed_data",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "Preprocessor and Transformed Data",
+          "ports": [
+            {
+              "name": "Fitted Preprocessor",
+              "type": "node"
+            },
+            {
+              "name": "Transformed Data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/transform"
+    },
+    {
+      "component_id": 44,
+      "display_name": "Fit Transform Preprocessor",
+      "description": "A general utility that fits and transforms a preprocessor on a dataset.",
+      "name": "fit_transform_preprocessor",
+      "type": "transformer",
+      "task": "fit_transform",
+      "inputs": [
+        {
+          "name": "Preprocessor and Data",
+          "ports": [
+            {
+              "name": "Fitted Preprocessor",
+              "type": "node"
+            },
+            {
+              "name": "Data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Fitted Preprocessor and Transformed Data",
+          "ports": [
+            {
+              "name": "Fitted Preprocessor",
+              "type": "node"
+            },
+            {
+              "name": "Transformed Data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/fit_transform"
+    },
+    {
+      "component_id": 45,
+      "display_name": "Model Evaluator",
+      "description": "A general utility that evaluates the performance of a trained machine learning model.",
+      "name": "evaluator",
+      "type": "evaluator",
+      "task": "evaluate",
+      "inputs": [
+        {
+          "name": "Model and Data",
+          "ports": [
+            {
+              "name": "Model",
+              "type": "node"
+            },
+            {
+              "name": "X",
+              "type": "data"
+            },
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Evaluation Results Only",
+          "ports": [
+            {
+              "name": "evaluation_results",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "Model and Evaluation Results",
+          "ports": [
+            {
+              "name": "Model",
+              "type": "node"
+            },
+            {
+              "name": "Evaluation Results",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "metric",
+          "type": "str",
+          "default": "accuracy",
+          "choices": [
+            "f1",
+            "r2",
+            "recall",
+            "mse",
+            "accuracy",
+            "mae",
+            "precision",
+            "log_loss",
+            "rmse"
+          ]
+        }
+      ],
+      "api_call": "/evaluate"
+    },
+    {
+      "component_id": 46,
+      "display_name": "Train Test Split",
+      "description": "A general utility that splits data into training and testing sets.",
+      "name": "train_test_splitter",
+      "type": "splitter",
+      "task": "split",
+      "inputs": [
+        {
+          "name": "X and y",
+          "ports": [
+            {
+              "name": "X",
+              "type": "data"
+            },
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "X only",
+          "ports": [
+            {
+              "name": "X",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "y only",
+          "ports": [
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Full",
+          "ports": [
+            {
+              "name": "X Train",
+              "type": "data"
+            },
+            {
+              "name": "X Test",
+              "type": "data"
+            },
+            {
+              "name": "y Train",
+              "type": "data"
+            },
+            {
+              "name": "y Test",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "Full (merged)",
+          "ports": [
+            {
+              "name": "train_data",
+              "type": "data"
+            },
+            {
+              "name": "test_data",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "X only",
+          "ports": [
+            {
+              "name": "X Train",
+              "type": "data"
+            },
+            {
+              "name": "X Test",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "y only",
+          "ports": [
+            {
+              "name": "y Train",
+              "type": "data"
+            },
+            {
+              "name": "y Test",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "test_size",
+          "type": "float",
+          "default": 0.3
+        },
+        {
+          "name": "random_state",
+          "type": "int",
+          "default": 42
+        }
+      ],
+      "api_call": "/train_test_split"
+    }
+  ],
+  "Networks": [
+    {
+      "component_id": 47,
+      "display_name": "Input Layer",
+      "description": "An input layer for Neural Network",
+      "name": "input_layer",
+      "type": "layer",
+      "task": "nn",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "shape",
+          "type": "list_int",
+          "default": [
+            1,
+            1
+          ]
+        }
+      ],
+      "api_call": "/input_layer"
+    },
+    {
+      "component_id": 48,
+      "display_name": "Conv2D Layer",
+      "description": "Layer that extract features of the image",
+      "name": "conv2d_layer",
+      "type": "layer",
+      "task": "nn",
+      "inputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "filters",
+          "type": "int",
+          "default": 32
+        },
+        {
+          "name": "kernel_size",
+          "type": "list_int",
+          "default": [
+            3,
+            3
+          ]
+        },
+        {
+          "name": "strides",
+          "type": "list_int",
+          "default": [
+            1,
+            1
+          ]
+        },
+        {
+          "name": "padding",
+          "type": "str",
+          "default": "valid",
+          "choices": [
+            "same",
+            "valid"
+          ]
+        },
+        {
+          "name": "activation",
+          "type": "str",
+          "default": "relu",
+          "choices": [
+            "relu",
+            "linear",
+            "sigmoid",
+            "leaky_relu",
+            "tanh"
+          ]
+        }
+      ],
+      "api_call": "/conv2d"
+    },
+    {
+      "component_id": 49,
+      "display_name": "Dense Layer",
+      "description": "A fully connected layer for Neural Network",
+      "name": "dense_layer",
+      "type": "layer",
+      "task": "nn",
+      "inputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "units",
+          "type": "int",
+          "default": 1
+        },
+        {
+          "name": "activation",
+          "type": "str",
+          "default": "relu",
+          "choices": [
+            "relu",
+            "linear",
+            "sigmoid",
+            "leaky_relu",
+            "tanh",
+            "softmax"
+          ]
+        }
+      ],
+      "api_call": "/dense"
+    },
+    {
+      "component_id": 50,
+      "display_name": "MaxPooling2D Layer",
+      "description": "Layer that performs max pooling on the input",
+      "name": "maxpool2d_layer",
+      "type": "layer",
+      "task": "nn",
+      "inputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "pool_size",
+          "type": "list_int",
+          "default": [
+            2,
+            2
+          ]
+        },
+        {
+          "name": "strides",
+          "type": "list_int",
+          "default": [
+            2,
+            2
+          ]
+        },
+        {
+          "name": "padding",
+          "type": "str",
+          "default": "valid",
+          "choices": [
+            "same",
+            "valid"
+          ]
+        }
+      ],
+      "api_call": "/maxpooling2d"
+    },
+    {
+      "component_id": 51,
+      "display_name": "DropOut Layer",
+      "description": "Removes Connections Temporarly during model training",
+      "name": "dropout_layer",
+      "type": "layer",
+      "task": "nn",
+      "inputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "rate",
+          "type": "float",
+          "default": 0.5
+        }
+      ],
+      "api_call": "/dropout"
+    },
+    {
+      "component_id": 52,
+      "display_name": "Flatten Layer",
+      "description": "Layer that flattens the input",
+      "name": "flatten_layer",
+      "type": "layer",
+      "task": "nn",
+      "inputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/flatten"
+    },
+    {
+      "component_id": 53,
+      "display_name": "Network Builder",
+      "description": "Neural Network Model that allows you to stack layers sequentially",
+      "name": "sequential_model",
+      "type": "nn_model",
+      "task": "nn",
+      "inputs": [
+        {
+          "name": "Layer",
+          "ports": [
+            {
+              "name": "layer",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "NN Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/sequential"
+    },
+    {
+      "component_id": 54,
+      "display_name": "Network Compiler",
+      "description": "Compile your Neural Network",
+      "name": "model_compiler",
+      "type": "compiler",
+      "task": "compile",
+      "inputs": [
+        {
+          "name": "Model",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "NN Model",
+          "ports": [
+            {
+              "name": "compiled model",
+              "type": "node"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "optimizer",
+          "type": "str",
+          "default": "adam",
+          "choices": [
+            "adam",
+            "sgd",
+            "adamax",
+            "adamw",
+            "rmsprop"
+          ]
+        },
+        {
+          "name": "loss",
+          "type": "str",
+          "default": "categorical_crossentropy",
+          "choices": [
+            "categorical_crossentropy",
+            "mean_squared_error",
+            "binary_crossentropy",
+            "sparse_categorical_crossentropy"
+          ]
+        },
+        {
+          "name": "metrics",
+          "type": "list_str",
+          "default": [
+            "accuracy"
+          ],
+          "choices": [
+            "accuracy",
+            "mse",
+            "mae"
+          ]
+        }
+      ],
+      "api_call": "/compile"
+    },
+    {
+      "component_id": 55,
+      "display_name": "FNN Fitter",
+      "description": "Fits a Fully Connected Neural Network",
+      "name": "nn_fitter",
+      "type": "fitter",
+      "task": "fit_net",
+      "inputs": [
+        {
+          "name": "Model and Data",
+          "ports": [
+            {
+              "name": "model",
+              "type": "node"
+            },
+            {
+              "name": "X",
+              "type": "data"
+            },
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Model Only",
+          "ports": [
+            {
+              "name": "fitted_model",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Fitted Model and Data",
+          "ports": [
+            {
+              "name": "fitted_model",
+              "type": "node"
+            },
+            {
+              "name": "X",
+              "type": "data"
+            },
+            {
+              "name": "y",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "batch_size",
+          "type": "int",
+          "default": 10
+        },
+        {
+          "name": "epochs",
+          "type": "int",
+          "default": 10
+        }
+      ],
+      "api_call": "/fit_net"
+    }
+  ],
+  "Custom": [
+    {
+      "component_id": 56,
+      "display_name": "Splitter",
+      "description": "Divides data into separate subsets, such as training and testing sets.",
+      "name": "splitter",
+      "type": "custom",
+      "task": "split",
+      "inputs": [
+        {
+          "name": "Dataset",
+          "ports": [
+            {
+              "name": "data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Splits",
+          "ports": [
+            {
+              "name": "train_data",
+              "type": "data"
+            },
+            {
+              "name": "test_data",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "Split 1",
+          "ports": [
+            {
+              "name": "data",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "Split 2",
+          "ports": [
+            {
+              "name": "data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/split"
+    },
+    {
+      "component_id": 57,
+      "display_name": "Joiner",
+      "description": "Combines multiple data subsets into a single dataset.",
+      "name": "joiner",
+      "type": "custom",
+      "task": "join",
+      "inputs": [
+        {
+          "name": "Dataset x4",
+          "ports": [
+            {
+              "name": "1",
+              "type": "data"
+            },
+            {
+              "name": "2",
+              "type": "data"
+            },
+            {
+              "name": "3",
+              "type": "data"
+            },
+            {
+              "name": "4",
+              "type": "data"
+            }
+          ]
+        },
+        {
+          "name": "Dataset x2",
+          "ports": [
+            {
+              "name": "1",
+              "type": "data"
+            },
+            {
+              "name": "2",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Merged Dataset",
+          "ports": [
+            {
+              "name": "data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/join"
+    },
+    {
+      "component_id": 58,
+      "display_name": "Node Template Saver",
+      "description": "Saves Architectures connected with New Created Architectures can be found at Custom Section",
+      "name": "node_template_saver",
+      "type": "saver",
+      "task": "save",
+      "inputs": [
+        {
+          "name": "Architecture",
+          "ports": [
+            {
+              "name": "architecture",
+              "type": "architecture"
+            }
+          ]
+        },
+        {
+          "name": "Node",
+          "ports": [
+            {
+              "name": "node",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Data",
+          "ports": [
+            {
+              "name": "data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Execute",
+          "ports": [
+            {
+              "name": "execute",
+              "type": "trigger"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "name": "name",
+          "type": "str",
+          "default": "Custom Architecture"
+        },
+        {
+          "name": "description",
+          "type": "str",
+          "default": "Custom Architecture Description"
+        }
+      ],
+      "api_call": "/save_template"
+    },
+    {
+      "component_id": 59,
+      "display_name": "Node Template Loader Example 1",
+      "description": "An Example of a saved node.",
+      "name": "example_1",
+      "type": "custom",
+      "task": "template",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Architecture",
+          "ports": [
+            {
+              "name": "architecture",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Node",
+          "ports": [
+            {
+              "name": "node",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Data",
+          "ports": [
+            {
+              "name": "data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/template"
+    },
+    {
+      "component_id": 60,
+      "display_name": "Node Template Loader Example 2",
+      "description": "An Example of a saved node.",
+      "name": "example_2",
+      "type": "custom",
+      "task": "template",
+      "inputs": null,
+      "outputs": [
+        {
+          "name": "Architecture",
+          "ports": [
+            {
+              "name": "architecture",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Node",
+          "ports": [
+            {
+              "name": "node",
+              "type": "node"
+            }
+          ]
+        },
+        {
+          "name": "Data",
+          "ports": [
+            {
+              "name": "data",
+              "type": "data"
+            }
+          ]
+        }
+      ],
+      "parameters": null,
+      "api_call": "/template"
+    }
+  ]
+}
