@@ -15,10 +15,8 @@ class TestNodePayload:
         assert payload.task == "general"
         assert payload.node_type == "general"
         assert payload.params == {}
-        assert payload.input_ports == []
-        assert payload.output_ports == []
-        assert payload.children == []
-        assert payload.parent == []
+        assert payload.in_ports == {}
+        assert payload.out_ports == {}
 
     def test_node_id_generated(self):
         p1 = NodePayload(message="a", node_name="n")
@@ -60,8 +58,8 @@ class TestNodeContext:
         assert ctx.project_id is None
         assert ctx.workflow_id is None
         assert ctx.node_id is None
-        assert ctx.input_ports == []
-        assert ctx.output_ports == []
+        assert ctx.in_ports == {}
+        assert ctx.out_ports == {}
 
     def test_custom_values(self):
         ctx = NodeContext(project_id=1, workflow_id=2, node_id=3, node_name="test")
