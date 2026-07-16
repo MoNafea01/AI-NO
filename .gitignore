@@ -23,3 +23,8 @@ chatbot/logs/*
 #Ignore environment folder
 backend/*
 arch/*
+
+# Ignore env files containing secrets
+.env
+*.env
+

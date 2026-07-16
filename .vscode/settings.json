@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
         "./project"
-    ]
+    ],
+    "cmake.sourceDirectory": "D:/MO/Graduation_Project/AI-NO/ai_gen/windows"
 }

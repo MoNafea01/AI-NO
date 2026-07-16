@@ -1,0 +1,58 @@
+[project]
+name = "aino"
+version = "0.1.0"
+description = "AI-NO: Node-Based Machine Learning Workflow System"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.14.0",
+    "asyncpg>=0.30.0",
+    "psycopg2-binary>=2.9.10",
+    "scikit-learn>=1.6.0",
+    "numpy>=1.26.0",
+    "pandas>=2.2.0",
+    "tensorflow>=2.19.0",
+    "joblib>=1.4.0",
+    "pydantic>=2.10.0",
+    "celery>=5.5.0",
+    "redis>=6.2.0",
+    "python-dotenv>=1.0.0",
+    "python-multipart>=0.0.9",
+    "structlog>=24.0.0",
+    "groq>=0.33.0",
+    "openai>=1.35.0",
+    "cohere>=4.45.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.0",
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"*/alembic/versions/*.py" = ["E501"]
+"app/engine/model/predict.py" = ["N803"]
+"app/tasks/workflow.py" = ["N806"]
+"app/services/node_service.py" = ["E402"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
