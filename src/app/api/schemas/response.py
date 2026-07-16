@@ -28,6 +28,7 @@ class WorkflowResponse(BaseSchema):
     name: str
     description: Optional[str] = ""
     project_id: int
+    current_version: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

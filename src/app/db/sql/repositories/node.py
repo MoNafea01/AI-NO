@@ -236,3 +236,42 @@ class NodeRepository(BaseRepository[Node]):
             shutil.rmtree(saving_dir, ignore_errors=True)
 
         return count
+
+    # ── Sync (Celery engine layer) ────────────────────────────────────
+
+    @staticmethod
+    def sync_get_by_workflow(project_id: int, workflow_id: int) -> list[Node]:
+        """Fetch all nodes for a workflow synchronously."""
+        from app.engine.repositories.db import get_sync_session
+
+        with get_sync_session() as session:
+            return list(
+                session.query(Node).filter(
+                    Node.project_id == project_id,
+                    Node.workflow_id == workflow_id,
+                ).all()
+            )
+
+    @staticmethod
+    def sync_set_status(node_id: int, status: str):
+        """Set a single node's status synchronously."""
+        from app.engine.repositories.db import get_sync_session
+
+        with get_sync_session() as session:
+            node = session.query(Node).filter_by(id=node_id).first()
+            if node:
+                node.status = status
+                session.commit()
+
+    @staticmethod
+    def sync_reset_status_batch(node_ids: set[int], node_map: dict):
+        """Reset a batch of nodes to 'pending' using a pre-fetched node_map."""
+        from app.engine.repositories.db import get_sync_session
+
+        with get_sync_session() as session:
+            for nid in node_ids:
+                node = node_map.get(nid)
+                if node:
+                    session.merge(node)
+                    node.status = "pending"
+            session.commit()

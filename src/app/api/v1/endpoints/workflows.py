@@ -233,7 +233,10 @@ async def save_snapshot(
     user: dict = Depends(get_current_user),
     label: str = None,
 ):
-    """Save current workflow architecture as a checkpoint."""
+    """Save current workflow architecture as a checkpoint.
+
+    Truncates any forward history if the current position is not the latest.
+    """
     wf_repo = WorkflowRepository(request.app.state.db_client)
     wf = await wf_repo.get(workflow_id)
     if not wf or wf.project_id != project_id:
@@ -250,6 +253,7 @@ async def save_snapshot(
         workflow_id=workflow_id,
         snapshot=snapshot_data,
         label=label,
+        current_version=wf.current_version,
     )
     return {
         "id": entry.id,
@@ -275,11 +279,13 @@ async def list_snapshots(
 
     snap_repo = WorkflowSnapshotRepository(request.app.state.db_client)
     snapshots = await snap_repo.get_by_workflow(workflow_id)
+    current = wf.current_version
     return [
         {
             "id": s.id,
             "version": s.version,
             "label": s.label,
+            "is_current": s.version == current,
             "node_count": len(s.snapshot) if s.snapshot else 0,
             "created_at": s.created_at.isoformat() if s.created_at else None,
         }
@@ -297,7 +303,7 @@ async def restore_snapshot(
     snapshot_id: int,
     user: dict = Depends(get_current_user),
 ):
-    """Restore workflow to a previous checkpoint."""
+    """Restore workflow to a checkpoint and update current_version."""
     wf_repo = WorkflowRepository(request.app.state.db_client)
     wf = await wf_repo.get(workflow_id)
     if not wf or wf.project_id != project_id:
@@ -357,15 +363,8 @@ async def restore_snapshot(
             status="pending",
         )
 
-    # 3. Auto-save a snapshot of the restored state
-    restored_nodes = await node_repo.get_by_project(project_id)
-    restored_workflow = [n for n in restored_nodes if n.workflow_id == workflow_id]
-    restored_snapshot = [_build_snapshot(n) for n in restored_workflow]
-    await snap_repo.create_snapshot(
-        workflow_id=workflow_id,
-        snapshot=restored_snapshot,
-        label=f"Restored from v{snap.version}",
-    )
+    # 3. Update current_version
+    await wf_repo.update(workflow_id, current_version=snap.version)
 
     # 4. Invalidate cache for this workflow
     await asyncio.to_thread(
@@ -375,5 +374,121 @@ async def restore_snapshot(
     return {
         "message": f"Restored from version {snap.version}",
         "restored_from_version": snap.version,
-        "node_count": len(restored_snapshot),
+        "current_version": snap.version,
+        "node_count": len(snap.snapshot),
+    }
+
+
+@workflow_router.post("/{project_id}/{workflow_id}/snapshots/undo")
+async def undo_snapshot(
+    request: Request,
+    project_id: int,
+    workflow_id: int,
+    user: dict = Depends(get_current_user),
+):
+    """Undo: restore the previous snapshot version."""
+    wf_repo = WorkflowRepository(request.app.state.db_client)
+    wf = await wf_repo.get(workflow_id)
+    if not wf or wf.project_id != project_id:
+        raise HTTPException(status_code=404, detail="Workflow not found")
+    if not wf.current_version or wf.current_version <= 1:
+        raise HTTPException(status_code=400, detail="Nothing to undo")
+
+    snap_repo = WorkflowSnapshotRepository(request.app.state.db_client)
+    snap = await snap_repo.get_by_version(workflow_id, wf.current_version - 1)
+    if not snap:
+        raise HTTPException(status_code=404, detail="Previous snapshot not found")
+
+    return await _apply_snapshot(
+        request, wf_repo, snap_repo, project_id, workflow_id, wf, snap,
+    )
+
+
+@workflow_router.post("/{project_id}/{workflow_id}/snapshots/redo")
+async def redo_snapshot(
+    request: Request,
+    project_id: int,
+    workflow_id: int,
+    user: dict = Depends(get_current_user),
+):
+    """Redo: restore the next snapshot version."""
+    wf_repo = WorkflowRepository(request.app.state.db_client)
+    wf = await wf_repo.get(workflow_id)
+    if not wf or wf.project_id != project_id:
+        raise HTTPException(status_code=404, detail="Workflow not found")
+    if not wf.current_version:
+        raise HTTPException(status_code=400, detail="Nothing to redo")
+
+    snap_repo = WorkflowSnapshotRepository(request.app.state.db_client)
+    snap = await snap_repo.get_by_version(workflow_id, wf.current_version + 1)
+    if not snap:
+        raise HTTPException(status_code=400, detail="Nothing to redo")
+
+    return await _apply_snapshot(
+        request, wf_repo, snap_repo, project_id, workflow_id, wf, snap,
+    )
+
+
+async def _apply_snapshot(
+    request, wf_repo, snap_repo, project_id, workflow_id, wf, snap,
+):
+    """Shared logic for restore/undo/redo: replace nodes + update current_version."""
+    node_repo = NodeRepository(request.app.state.db_client)
+    nodes = await node_repo.get_by_project(project_id)
+    workflow_nodes = [n for n in nodes if n.workflow_id == workflow_id]
+    for node in workflow_nodes:
+        await node_repo.delete_with_files(node.id, project_id)
+
+    old_to_new: dict[int, int] = {}
+    for entry in snap.snapshot:
+        old_id = entry["id"]
+        new_id = uuid.uuid4().int & ((1 << 63) - 1)
+        old_to_new[old_id] = new_id
+
+    def _remap_ports(ports: dict | None, mapping: dict[int, int]) -> dict:
+        if not ports:
+            return {}
+        remapped = {}
+        for port_name, ref in ports.items():
+            if not isinstance(ref, str):
+                remapped[port_name] = ref
+                continue
+            parts = ref.split(":")
+            if parts:
+                try:
+                    ref_node_id = int(parts[0])
+                    if ref_node_id in mapping:
+                        parts[0] = str(mapping[ref_node_id])
+                except (ValueError, TypeError):
+                    pass
+            remapped[port_name] = ":".join(parts)
+        return remapped
+
+    for entry in snap.snapshot:
+        new_id = old_to_new[entry["id"]]
+        await node_repo.create(
+            id=new_id,
+            node_name=entry["node_name"],
+            type=entry["type"],
+            task=entry.get("task", "general"),
+            params=entry.get("params", {}),
+            project_id=project_id,
+            workflow_id=workflow_id,
+            component_id=entry.get("component_id"),
+            in_ports=_remap_ports(entry.get("in_ports", {}), old_to_new),
+            out_ports=_remap_ports(entry.get("out_ports", {}), old_to_new),
+            status="pending",
+        )
+
+    await wf_repo.update(workflow_id, current_version=snap.version)
+
+    await asyncio.to_thread(
+        EnginePersistence.cache_invalidate_workflow, workflow_id
+    )
+
+    return {
+        "message": f"Restored from version {snap.version}",
+        "restored_from_version": snap.version,
+        "current_version": snap.version,
+        "node_count": len(snap.snapshot),
     }

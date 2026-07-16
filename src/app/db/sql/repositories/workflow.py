@@ -1,6 +1,8 @@
-"""Workflow repository — CRUD for workflows, workflow runs, and workflow steps."""
+"""Workflow repository — async CRUD for API layer,
+sync helpers for Celery engine layer."""
 
 
+import logging
 import uuid
 
 from typing import Optional
@@ -11,6 +13,8 @@ from app.db.sql.models.node import Node
 from app.db.sql.models.workflow import Workflow, WorkflowRun, WorkflowStep
 
 from .base import BaseRepository
+
+logger = logging.getLogger(__name__)
 
 
 class WorkflowRepository(BaseRepository[Workflow]):
@@ -126,7 +130,6 @@ class WorkflowRunRepository(BaseRepository[WorkflowRun]):
             await session.refresh(run)
             return run
 
-
     async def update_run_status(
         self, run_id: int, status: str, error: str = None, result: dict = None
     ):
@@ -137,13 +140,24 @@ class WorkflowRunRepository(BaseRepository[WorkflowRun]):
             kwargs["result"] = result
         await self.update(run_id, **kwargs)
 
-    async def _create_instance(self, model_class, **kwargs):
-        async with self.session_factory() as session:
-            instance = model_class(**kwargs)
-            session.add(instance)
-            await session.commit()
-            await session.refresh(instance)
-            return instance
+    # ── Sync (Celery engine layer) ────────────────────────────────────
+
+    @staticmethod
+    def sync_update_status(run_id: int, status: str, error: str = None):
+        """Update a workflow run's status (and optional error) synchronously."""
+        from app.engine.repositories.db import get_sync_session
+
+        try:
+            with get_sync_session() as session:
+                run = session.query(WorkflowRun).filter(WorkflowRun.id == run_id).first()
+                if run:
+                    run.status = status
+                    if error is not None:
+                        run.error = error
+                    session.commit()
+        except Exception:
+            logger.exception("Failed to update run %s status to %s", run_id, status)
+
 
 class WorkflowStepRepository(BaseRepository[WorkflowStep]):
     model = WorkflowStep
@@ -163,4 +177,44 @@ class WorkflowStepRepository(BaseRepository[WorkflowStep]):
         if result is not None:
             kwargs["result"] = result
         await self.update(step_id, **kwargs)
+
+    # ── Sync (Celery engine layer) ────────────────────────────────────
+
+    @staticmethod
+    def sync_create(run_id: int, node_id: int, node_type: str):
+        """Create a pending workflow step synchronously."""
+        from app.engine.repositories.db import get_sync_session
+
+        try:
+            with get_sync_session() as session:
+                step = WorkflowStep(
+                    run_id=run_id, node_id=node_id, node_type=node_type, status="pending"
+                )
+                session.add(step)
+                session.commit()
+        except Exception:
+            logger.exception("Failed to create step for node %s", node_id)
+
+    @staticmethod
+    def sync_update(run_id: int, node_id: int, status: str, error: str = None, result: dict = None):
+        """Update the latest workflow step for a node in a run synchronously."""
+        from app.engine.repositories.db import get_sync_session
+
+        try:
+            with get_sync_session() as session:
+                step = (
+                    session.query(WorkflowStep)
+                    .filter_by(run_id=run_id, node_id=node_id)
+                    .order_by(WorkflowStep.id.desc())
+                    .first()
+                )
+                if step:
+                    step.status = status
+                    if error is not None:
+                        step.error = error
+                    if result is not None:
+                        step.result = result
+                    session.commit()
+        except Exception:
+            logger.exception("Failed to update step for node %s", node_id)
 
